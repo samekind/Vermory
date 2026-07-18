@@ -2,12 +2,17 @@
 
 **面向 AI 的可治理记忆与上下文连续性平台**
 
-[![CI](https://github.com/jstar0/Vermory/actions/workflows/ci.yml/badge.svg)](https://github.com/jstar0/Vermory/actions/workflows/ci.yml)
+[![CI](https://github.com/samekind/Vermory/actions/workflows/ci.yml/badge.svg)](https://github.com/samekind/Vermory/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 
 [English](README.md)
 
 Vermory 是一个面向 AI 客户端的、以真实场景和可验证证据驱动的记忆与上下文连续性平台。它服务于 AI Coding 工具、Web Chat、个人助手及其他需要持续处理真实事务的 AI 系统。
+
+项目的 canonical repository 现为
+[`samekind/Vermory`](https://github.com/samekind/Vermory)。历史证据中原有的
+`jstar0/Vermory` 链接与签名 identity 作为已发生事实保留，不做伪改写。详见
+[ADR 0002](docs/adr/0002-canonical-repository-move.md)。
 
 Vermory 不只是保存几段 memo，也不只是给 PostgreSQL 套一层向量检索。它要解决的是：
 

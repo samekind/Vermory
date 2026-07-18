@@ -2,12 +2,17 @@
 
 **Governed Memory for AI**
 
-[![CI](https://github.com/jstar0/Vermory/actions/workflows/ci.yml/badge.svg)](https://github.com/jstar0/Vermory/actions/workflows/ci.yml)
+[![CI](https://github.com/samekind/Vermory/actions/workflows/ci.yml/badge.svg)](https://github.com/samekind/Vermory/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 
 [Chinese documentation](README.zh-CN.md)
 
 Vermory is a reality-first memory and context continuity platform for AI clients. It is designed for coding agents, web chat, assistants, and other tools that need to continue real work without mixing unrelated projects, reviving stale facts, or turning every conversation into permanent memory.
+
+The canonical repository is [`samekind/Vermory`](https://github.com/samekind/Vermory).
+Historical evidence may link to the former `jstar0/Vermory` repository and is
+preserved without rewriting. See
+[ADR 0002](docs/adr/0002-canonical-repository-move.md).
 
 Vermory is more than a memo store. Its core problem is deciding:
 

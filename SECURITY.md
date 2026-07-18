@@ -11,7 +11,7 @@ window explicitly.
 
 Do not open a public issue for a vulnerability that could expose memory content, credentials, tenant data, deleted facts, or continuity bindings.
 
-Use GitHub's private vulnerability reporting or Security Advisory flow for `jstar0/Vermory`. Include:
+Use GitHub's private vulnerability reporting or Security Advisory flow for `samekind/Vermory`. Include:
 
 - affected commit or version;
 - reproduction steps with synthetic data;
