@@ -83,7 +83,7 @@ jq -n --arg command "$MCP_COMMAND" --arg server "$SERVER" \
   > "$WORKSPACE/.cursor/mcp.json"
 
 version_output="$("$CURSOR_AGENT" --version 2>&1 || true)"
-printf '%s\n' "$version_output" | tr -cd '0-9A-Za-z._-\n' | head -1 > "$RUN_DIR/client-version.txt"
+printf '%s\n' "$version_output" | tr -cd '0-9A-Za-z._\n-' | head -1 > "$RUN_DIR/client-version.txt"
 
 logged_in=false
 status_output="$($CURSOR_AGENT status 2>"$RUN_DIR/status.stderr" || true)"
