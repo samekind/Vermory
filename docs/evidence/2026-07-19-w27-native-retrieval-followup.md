@@ -9,8 +9,9 @@ utility comparison and it does not establish a retrieval or provider ranking.
 
 The run used the dedicated Mac mini PostgreSQL database
 `vermory_w27_utility_20260719`, PostgreSQL 18.3, and a darwin/arm64 binary
-built from the working tree. It did not use NewAPI, mem0, or a replacement
-model.
+built from the working tree. The final remote binary SHA-256 was
+`9637b1e0786038f3c38c35d134190514877f27c3c32c5fe729ae256843c93639`.
+The run did not use NewAPI, mem0, or a replacement model.
 
 ## Implementation Change
 
@@ -58,21 +59,47 @@ device-maintenance facts. This is a real retrieval failure, not a write or
 deletion failure: the lexical query terms did not match the stored technical
 fact closely enough.
 
-## Semantic Attempt
+## Vector Run
 
-Run ID: `w27-native-vector-attempt-20260719`
+Run ID: `w27-native-vector-20260719`
 
-The command reached database migration and then stopped with:
+The direct SSH shell could identify the `vermory-siliconflow` Keychain item but
+could not read its secret. A one-shot user GUI launchd job could read the item,
+so the final vector run was launched there. The secret existed only in that
+child process environment and was not written to the command line, evidence
+files, logs, or PostgreSQL.
 
-```text
-embedding API key is required for utility semantic retrieval
-```
+The run used direct SiliconFlow `BAAI/bge-m3` embeddings with the registered
+1024-dimensional production profile. All four cases completed:
 
-The Mac mini contains a `vermory-siliconflow` Keychain item, but the SSH
-non-interactive session cannot read its secret (`security ... -w` returns
-status 36). No vector request was sent, no projection was claimed current,
-and no vector score or utility result was generated. This is intentionally
-recorded as an environmental prerequisite failure rather than a zero score.
+| Case | Delivered result |
+| --- | --- |
+| `W01-synapseloom-continuity` | All four expected current workspace facts |
+| `C01-device-maintenance-continuity` | The three lexical results plus `Gboard had 1,333,470 personal-dictionary rows.` |
+| `G01-language-default-local-override` | The same two explicit global-default facts; this path does not use vector projection |
+| `S01-deletion-and-source-injection` | The same two governed safety facts without the deleted recovery code |
+
+Post-run checks:
+
+| Check | Result |
+| --- | ---: |
+| Active governed memories | 12 |
+| Vector projection rows | 10 |
+| Memory deliveries | 4 |
+| Governed content containing deleted `ORCHID` value | 0 |
+| Governed content containing the Gboard fact `1,333,470` | 1 |
+
+The workspace and conversation tenants each had an `idle` production-profile
+cursor with lag 0. Their vector counts were 4 for W01, 4 for C01, and 2 for
+S01. G01 intentionally had no vector cursor because global defaults are read
+through the explicit defaults path.
+
+An intermediate deployment attempt overwrote a previously executed Mach-O path
+in place and was killed with status 137 before application logging. It was
+discarded as deployment evidence. Uploading the same binary under a new,
+versioned filename produced a valid checksum, executed successfully, and was
+used for the final run. Mac mini releases should therefore use versioned files
+and atomic activation rather than in-place executable overwrite.
 
 ## Interpretation
 
@@ -82,10 +109,11 @@ This run establishes three bounded facts:
   handling are operating in the dedicated remote runtime.
 - The current lexical path can lose a semantically equivalent technical fact
   even when the fact is stored and indexed.
-- The new semantic path is wired to the real store and projection worker, but
-  its effect is not yet evidenced because the remote non-interactive execution
-  path cannot obtain the embedding credential.
+- On the same governed authority, the vector path restored the missing C01
+  Gboard fact while preserving the deletion and scope boundaries in these four
+  cases.
 
-No claim is made here that Vermory improves downstream model task success. That
+This is evidence of a native retrieval improvement for one frozen failure, not
+evidence that Vermory improves downstream model task success. That broader
 claim requires a completed real-provider W27 matrix with per-call input,
 output, score, and raw artifacts, plus the independently produced mem0 lane.

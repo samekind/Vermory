@@ -259,7 +259,7 @@ func prepareNativeCaseContext(
 			return nativeContextReceipt{}, fmt.Errorf("seeded case %s without continuity", frozenCase.Manifest.ID)
 		}
 	}
-	if retriever != nil {
+	if retriever != nil && frozenCase.Manifest.ID != "G01-language-default-local-override" {
 		worker, err := runtime.NewProjectionWorker(store, embedder, runtime.ProjectionWorkerOptions{
 			TenantID: tenantID,
 			Profile:  profile,
