@@ -169,3 +169,17 @@ privacy/checksum verification.
 
 A Codex pass, Grok pass, fake Cursor test, MCP discovery result, or account/model
 listing cannot replace that run.
+
+## Post-W26 Re-probe
+
+After the trusted workspace attachment boundary reached head
+`7b2658d38bd690d42eb17478ffa99bcf177cde68`, a fresh isolated Cursor generation
+probe was executed before allocating another W25 database run. Cursor Agent
+`2026.07.13-7fe37d2` initialized the requested `gpt-5.3-codex` session and then
+exited `1` with the same `ActionRequiredError: You have an unpaid invoice`
+before MCP startup or tool use.
+
+The probe created no workspace artifact and made no Vermory authority change.
+No login identity, session identifier, or raw account output is retained in
+committed evidence. W25 therefore remains blocked by the external Cursor
+account rather than by the W26 attachment contract.

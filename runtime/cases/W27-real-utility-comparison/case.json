@@ -1,0 +1,53 @@
+{
+  "version": "1",
+  "id": "W27-real-utility-comparison",
+  "profile_name": "real-utility-comparison-v1",
+  "reality_case_ids": [
+    "W01-synapseloom-continuity",
+    "C01-device-maintenance-continuity",
+    "G01-language-default-local-override",
+    "S01-deletion-and-source-injection"
+  ],
+  "conditions": [
+    "no_context",
+    "full_history",
+    "plain_summary",
+    "plain_retrieval",
+    "mem0_oss",
+    "vermory_native"
+  ],
+  "provider_lanes": [
+    {
+      "provider": "siliconflow",
+      "model": "deepseek-ai/DeepSeek-V4-Flash",
+      "required_for_compatibility": true
+    },
+    {
+      "provider": "duojie",
+      "model": "gemini-3-flash",
+      "required_for_compatibility": false
+    }
+  ],
+  "minimum_complete_real_lanes": 1,
+  "calls_per_complete_lane": 24,
+  "max_context_bytes": 32768,
+  "max_output_tokens": 1024,
+  "native_writeback_status": "proposed",
+  "hard_gate_count": 14,
+  "hard_gates": [
+    "all four public case fixture locks validate before execution",
+    "every condition input is frozen and hashed before scoring",
+    "one direct real-provider lane completes all twenty-four calls",
+    "the native condition succeeds on all four downstream tasks",
+    "the native condition has zero stale deleted injected and cross-scope forbidden hits",
+    "PostgreSQL proves exact current-only native deliveries",
+    "native consumer output remains proposed and replay is idempotent",
+    "formal aggregates are recomputed from per-call artifacts rather than fixture counts",
+    "simple baselines are reported even when they equal or beat Vermory",
+    "utility claims follow the frozen dominance rule",
+    "mem0 remains isolated disposable and non-authoritative",
+    "all failures remain in an append-only ledger",
+    "normalized evidence contains no secret or private identity material",
+    "protected CI passes on the exact evidence head"
+  ]
+}
