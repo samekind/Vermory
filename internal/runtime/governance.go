@@ -16,38 +16,54 @@ type GovernanceWriteRequest struct {
 }
 
 type GovernanceService struct {
-	store    *Store
-	tenantID string
+	store               *Store
+	tenantID            string
+	filesystemNamespace string
 }
 
 func NewGovernanceService(store *Store, tenantID string) *GovernanceService {
-	return &GovernanceService{store: store, tenantID: strings.TrimSpace(tenantID)}
+	return NewGovernanceServiceWithNamespace(store, tenantID, "")
+}
+
+func NewGovernanceServiceWithNamespace(store *Store, tenantID, filesystemNamespace string) *GovernanceService {
+	return &GovernanceService{
+		store: store, tenantID: strings.TrimSpace(tenantID), filesystemNamespace: strings.TrimSpace(filesystemNamespace),
+	}
 }
 
 func (s *GovernanceService) ConfirmWorkspace(ctx context.Context, repoRoot string) (WorkspaceResolution, error) {
+	return s.ConfirmWorkspaceAnchor(ctx, s.workspaceAnchor(repoRoot))
+}
+
+func (s *GovernanceService) ConfirmWorkspaceAnchor(ctx context.Context, anchor WorkspaceAnchor) (WorkspaceResolution, error) {
 	if err := s.configured(); err != nil {
 		return WorkspaceResolution{}, err
 	}
-	continuityID, err := s.store.ConfirmWorkspaceBinding(ctx, s.tenantID, repoRoot)
+	continuityID, err := s.store.ConfirmWorkspaceAnchorBinding(ctx, s.tenantID, anchor)
 	if err != nil {
 		return WorkspaceResolution{}, err
 	}
-	anchor, err := (WorkspaceAnchor{RepoRoot: repoRoot}).Normalized()
+	anchor, err = anchor.Normalized()
 	if err != nil {
 		return WorkspaceResolution{}, err
 	}
 	return WorkspaceResolution{
-		Status:       ResolutionResolved,
-		ContinuityID: continuityID,
-		RepoRoot:     anchor.RepoRoot,
+		Status:              ResolutionResolved,
+		ContinuityID:        continuityID,
+		RepoRoot:            anchor.RepoRoot,
+		FilesystemNamespace: anchor.FilesystemNamespace,
 	}, nil
 }
 
 func (s *GovernanceService) InspectWorkspace(ctx context.Context, repoRoot string) (WorkspaceResolution, error) {
+	return s.InspectWorkspaceAnchor(ctx, s.workspaceAnchor(repoRoot))
+}
+
+func (s *GovernanceService) InspectWorkspaceAnchor(ctx context.Context, anchor WorkspaceAnchor) (WorkspaceResolution, error) {
 	if err := s.configured(); err != nil {
 		return WorkspaceResolution{}, err
 	}
-	return s.store.ResolveWorkspace(ctx, s.tenantID, WorkspaceAnchor{RepoRoot: repoRoot})
+	return s.store.ResolveWorkspace(ctx, s.tenantID, anchor)
 }
 
 func (s *GovernanceService) ListWorkspaceMemories(ctx context.Context, repoRoot string) (WorkspaceResolution, []GovernedMemory, error) {
@@ -141,4 +157,8 @@ func (s *GovernanceService) configured() error {
 		return fmt.Errorf("governance service is not configured")
 	}
 	return nil
+}
+
+func (s *GovernanceService) workspaceAnchor(repoRoot string) WorkspaceAnchor {
+	return WorkspaceAnchor{RepoRoot: repoRoot, FilesystemNamespace: s.filesystemNamespace}
 }

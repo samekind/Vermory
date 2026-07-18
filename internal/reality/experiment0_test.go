@@ -17,15 +17,15 @@ func TestBuildExperiment0ReportsFrozenPublicCoverage(t *testing.T) {
 	if !report.Pass || !report.PublicValidation.Pass {
 		t.Fatalf("expected public evidence to pass: %#v", report)
 	}
-	if len(report.PublicValidation.Results) != 18 {
-		t.Fatalf("expected eighteen cases, got %d", len(report.PublicValidation.Results))
+	if len(report.PublicValidation.Results) != 19 {
+		t.Fatalf("expected nineteen cases, got %d", len(report.PublicValidation.Results))
 	}
 	for _, result := range report.PublicValidation.Results {
 		if result.LockSHA256 == "" {
 			t.Fatalf("case %s has no fixture lock hash", result.CaseID)
 		}
 	}
-	if len(report.ContinuityCoverage[string(LineWorkspace)]) != 5 || len(report.ContinuityCoverage[string(LineConversation)]) != 11 {
+	if len(report.ContinuityCoverage[string(LineWorkspace)]) != 6 || len(report.ContinuityCoverage[string(LineConversation)]) != 11 {
 		t.Fatalf("unexpected continuity coverage: %#v", report.ContinuityCoverage)
 	}
 	if len(report.ContinuityCoverage[string(LineBridge)]) != 6 {
@@ -34,7 +34,7 @@ func TestBuildExperiment0ReportsFrozenPublicCoverage(t *testing.T) {
 	if len(report.PressureCoverage["explicit_deletion"]) != 1 {
 		t.Fatalf("expected deletion pressure coverage: %#v", report.PressureCoverage)
 	}
-	if report.EvidenceLevels[string(EvidencePublic)] != 18 || report.SealedStatus != "unavailable" {
+	if report.EvidenceLevels[string(EvidencePublic)] != 19 || report.SealedStatus != "unavailable" {
 		t.Fatalf("unexpected evidence status: levels=%#v sealed=%q", report.EvidenceLevels, report.SealedStatus)
 	}
 	if !containsText(report.Limitations, "target discovery coverage remains incomplete") {

@@ -279,6 +279,73 @@ func TestBridgeRebindMovesWorkspaceContinuityAndReverses(t *testing.T) {
 	}
 }
 
+func TestNamespacedWorkspaceBridgePreservesIdentityAcrossAdoptAndRebind(t *testing.T) {
+	store := openTestStore(t)
+	ctx := context.Background()
+	const tenantID = "w05-namespaced"
+	oldRoot := "/work/Vermory"
+	worktreeRoot := "/worktrees/Vermory-resolver"
+	newRoot := "/srv/Vermory"
+	continuityID, err := store.ConfirmWorkspaceAnchorBinding(ctx, tenantID, WorkspaceAnchor{
+		RepoRoot: oldRoot, FilesystemNamespace: "workstation-alpha",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	service := NewBridgeService(store, tenantID)
+	adopted, err := service.AdoptWorkspaceAnchor(ctx, AdoptWorkspaceAnchorRequest{
+		OperationID:         "w05-adopt-worktree",
+		ExistingRepoRoot:    oldRoot,
+		NewRepoRoot:         worktreeRoot,
+		ExistingNamespaceID: "workstation-alpha",
+		NewNamespaceID:      "workstation-alpha",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if adopted.TargetNamespaceID != "workstation-alpha" {
+		t.Fatalf("adopt receipt lost target namespace: %#v", adopted)
+	}
+	worktree, err := store.ResolveWorkspace(ctx, tenantID, WorkspaceAnchor{RepoRoot: worktreeRoot, FilesystemNamespace: "workstation-alpha"})
+	if err != nil || worktree.Status != ResolutionResolved || worktree.ContinuityID != continuityID {
+		t.Fatalf("adopted namespaced worktree did not reconnect: resolution=%#v err=%v", worktree, err)
+	}
+
+	rebound, err := service.RebindWorkspace(ctx, RebindWorkspaceRequest{
+		OperationID:    "w05-rebind-primary",
+		OldRepoRoot:    oldRoot,
+		NewRepoRoot:    newRoot,
+		OldNamespaceID: "workstation-alpha",
+		NewNamespaceID: "workstation-beta",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if rebound.SourceNamespaceID != "workstation-alpha" || rebound.TargetNamespaceID != "workstation-beta" {
+		t.Fatalf("rebind receipt lost namespace transition: %#v", rebound)
+	}
+	newResolution, err := store.ResolveWorkspace(ctx, tenantID, WorkspaceAnchor{RepoRoot: newRoot, FilesystemNamespace: "workstation-beta"})
+	if err != nil || newResolution.Status != ResolutionResolved || newResolution.ContinuityID != continuityID {
+		t.Fatalf("rebound namespaced workspace did not reconnect: resolution=%#v err=%v", newResolution, err)
+	}
+	oldResolution, err := store.ResolveWorkspace(ctx, tenantID, WorkspaceAnchor{RepoRoot: oldRoot, FilesystemNamespace: "workstation-alpha"})
+	if err != nil || oldResolution.Status != ResolutionNeedsConfirmation {
+		t.Fatalf("retired namespaced root remained attached: resolution=%#v err=%v", oldResolution, err)
+	}
+
+	if _, err := service.Reverse(ctx, ReverseBridgeRequest{OperationID: "w05-reverse-rebind", BridgeID: rebound.ID}); err != nil {
+		t.Fatal(err)
+	}
+	restored, err := store.ResolveWorkspace(ctx, tenantID, WorkspaceAnchor{RepoRoot: oldRoot, FilesystemNamespace: "workstation-alpha"})
+	if err != nil || restored.Status != ResolutionResolved || restored.ContinuityID != continuityID {
+		t.Fatalf("reversed namespaced rebind did not restore source: resolution=%#v err=%v", restored, err)
+	}
+	newResolution, err = store.ResolveWorkspace(ctx, tenantID, WorkspaceAnchor{RepoRoot: newRoot, FilesystemNamespace: "workstation-beta"})
+	if err != nil || newResolution.Status != ResolutionNeedsConfirmation {
+		t.Fatalf("reversed namespaced rebind retained target: resolution=%#v err=%v", newResolution, err)
+	}
+}
+
 func confirmConversationMemoryForBridge(t *testing.T, store *Store, tenantID string, anchor ConversationAnchor, operationPrefix, content string) (ConversationResolution, string) {
 	t.Helper()
 	ctx := context.Background()

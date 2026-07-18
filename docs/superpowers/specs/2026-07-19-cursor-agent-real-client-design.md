@@ -13,7 +13,7 @@ Codex or Grok run as Cursor evidence.
 The qualifying path is:
 
 ```text
-confirmed canonical workspace
+trusted workstation attachment for a confirmed canonical workspace
 -> Cursor Agent starts Vermory MCP over stdio
 -> prepare_context returns current accepted facts only
 -> Cursor creates and verifies continuity-report.md
@@ -36,7 +36,9 @@ error before MCP startup.
 
 That attempt remains a client failure. MCP discovery, another Cursor model, a
 Codex pass, or a Grok pass cannot convert it into a successful Cursor
-qualification.
+qualification. W25 was frozen before the W26 attachment boundary was added;
+any fresh execution uses the startup attachment contract below and does not
+ask the model to provide `repo_root`.
 
 ## 3. Runtime Boundary
 
@@ -54,7 +56,7 @@ The MCP surface remains exactly:
 
 | Tool | Client authority |
 |---|---|
-| `prepare_context` | Supplies an exact workspace root and task; cannot confirm or override a binding. |
+| `prepare_context` | Supplies task text and consumes the exact workspace attachment fixed at MCP startup; cannot choose or override a binding. |
 | `commit_observation` | Supplies a delivery receipt and result; receives `proposed` status. |
 
 The client receives no tool for tenant selection, acceptance, correction,
@@ -82,8 +84,9 @@ a real eligible row rather than an absent fixture.
 The client instruction requires this order:
 
 1. Call `prepare_context` with an operation ID derived from the unique W25 run
-   ID, the exact confirmed root, and the frozen task. The runner first proves
-   that these operation IDs have no existing authority effects.
+   ID and the frozen task. The trusted launcher fixes the exact confirmed root
+   before MCP starts, and the runner first proves that these operation IDs have
+   no existing authority effects.
 2. Stop without guessing if the result is not `resolved`.
 3. Create `continuity-report.md` with exactly these semantic fields derived
    from governed context:

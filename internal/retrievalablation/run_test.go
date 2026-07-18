@@ -80,7 +80,7 @@ func TestRunUsesNativePostgreSQLVectorBackend(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if report.SchemaVersion != 21 || !report.HardGates.Pass || !report.ProjectionRebuildEquivalent {
+	if report.SchemaVersion != 22 || !report.HardGates.Pass || !report.ProjectionRebuildEquivalent {
 		t.Fatalf("native run gates mismatch: %#v", report)
 	}
 	if vector := conditionReport(t, report, ConditionVector); vector.Metrics.RecallAtK != 1 {

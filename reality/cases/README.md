@@ -8,9 +8,9 @@ These cases freeze selected evidence for reality-first development. They are not
 - A repository-readable case is never labeled `sealed`.
 - Synthetic probes are identified as such and may extend a real trajectory without being represented as real historical events.
 
-The current public batch covers workspace continuity, conversation continuity,
-thin Global Defaults, governed bridges, deletion and source-injection safety,
-authenticated tenant isolation, PostgreSQL recovery, OpenClaw, and the Hermes
-real-client continuity contract. A frozen case remains a contract until its
-separate execution evidence records the exact client, model, runtime, and hard
-gates that were actually exercised.
+The current public batch covers workspace continuity and trusted attachment,
+conversation continuity, thin Global Defaults, governed bridges, deletion and
+source-injection safety, authenticated tenant isolation, PostgreSQL recovery,
+OpenClaw, and the Hermes real-client continuity contract. A frozen case remains
+a contract until its separate execution evidence records the exact client,
+model, runtime, and hard gates that were actually exercised.

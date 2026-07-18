@@ -398,8 +398,12 @@ func resolveCasebookContinuity(line string, loadedCase casebook.Case, task eval.
 
 	return resolver.ResolveWorkspace(resolver.WorkspaceInput{
 		CWD:                caseDir,
+		ExplicitBindingID:  "workspace:" + loadedCase.ID,
 		CandidateRepoRoot:  caseDir,
 		KnownWorkspaceName: loadedCase.ID,
+		Candidates: []resolver.WorkspaceCandidate{
+			{ID: "workspace:" + loadedCase.ID, Path: caseDir},
+		},
 	})
 }
 

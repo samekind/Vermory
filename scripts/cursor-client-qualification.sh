@@ -140,10 +140,14 @@ Execute the frozen W25 Cursor Agent real-client qualification in this exact work
 
 First call the $SERVER.prepare_context MCP tool with:
 - operation_id: $PREPARE_OPERATION_ID
-- repo_root: $WORKSPACE
 - task: $CASE_PROMPT
 
-Use only the returned governed context. Do not inspect git remotes, repository history, the Vermory source tree, or the W04 case. Do not guess values that are not in governed context. If the tool does not return resolved status, stop without writing an artifact.
+The trusted client launcher has already attached the exact workspace before the
+conversation. Use only the returned governed context. Do not provide or guess
+a repository path, tenant, namespace, binding, remote, or governance action.
+Do not inspect git remotes, repository history, the Vermory source tree, or the
+W04 case. If the tool does not return resolved status, stop without writing an
+artifact.
 
 When resolved, create continuity-report.md in the workspace. It must contain exactly two semantic lines named canonical_repository and continuation_marker, populated only from governed context. Verify that the report contains the current values and does not contain a superseded personal repository or an unrelated same-name workspace marker. Then call $SERVER.commit_observation with:
 - operation_id: $OBSERVATION_OPERATION_ID

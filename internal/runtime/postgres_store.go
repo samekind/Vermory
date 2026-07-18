@@ -24,9 +24,10 @@ const (
 )
 
 type WorkspaceResolution struct {
-	Status       ResolutionStatus
-	ContinuityID string
-	RepoRoot     string
+	Status              ResolutionStatus
+	ContinuityID        string
+	RepoRoot            string
+	FilesystemNamespace string
 }
 
 type ObservationReceipt struct {
@@ -184,15 +185,21 @@ func (s *Store) ResolveWorkspace(ctx context.Context, tenantID string, anchor Wo
 	if anchor.ExplicitBindingID != "" {
 		var continuityID string
 		err := s.pool.QueryRow(ctx, `
-SELECT id::text FROM continuity_spaces
-WHERE id::text = $1 AND tenant_id = $2 AND continuity_line = 'workspace' AND state = 'active'`,
-			anchor.ExplicitBindingID, tenantID).Scan(&continuityID)
+		SELECT b.continuity_id::text
+		FROM continuity_bindings b
+		JOIN continuity_spaces c ON c.id = b.continuity_id
+		WHERE b.continuity_id::text = $1 AND b.tenant_id = $2
+		  AND b.filesystem_namespace = $3 AND b.repo_root = $4
+		  AND b.binding_state = 'confirmed'
+		  AND c.continuity_line = 'workspace' AND c.state = 'active'`,
+			anchor.ExplicitBindingID, tenantID, anchor.FilesystemNamespace, anchor.RepoRoot).Scan(&continuityID)
 		if err == nil {
-			return WorkspaceResolution{Status: ResolutionResolved, ContinuityID: continuityID, RepoRoot: anchor.RepoRoot}, nil
+			return WorkspaceResolution{Status: ResolutionResolved, ContinuityID: continuityID, RepoRoot: anchor.RepoRoot, FilesystemNamespace: anchor.FilesystemNamespace}, nil
 		}
 		if !errors.Is(err, pgx.ErrNoRows) {
 			return WorkspaceResolution{}, fmt.Errorf("resolve explicit workspace binding: %w", err)
 		}
+		return WorkspaceResolution{Status: ResolutionNeedsConfirmation, RepoRoot: anchor.RepoRoot, FilesystemNamespace: anchor.FilesystemNamespace}, nil
 	}
 
 	var continuityID string
@@ -200,13 +207,14 @@ WHERE id::text = $1 AND tenant_id = $2 AND continuity_line = 'workspace' AND sta
 SELECT b.continuity_id::text
 FROM continuity_bindings b
 JOIN continuity_spaces c ON c.id = b.continuity_id
-WHERE b.tenant_id = $1 AND b.repo_root = $2 AND b.binding_state = 'confirmed'
-  AND c.continuity_line = 'workspace' AND c.state = 'active'`, tenantID, anchor.RepoRoot).Scan(&continuityID)
+WHERE b.tenant_id = $1 AND b.filesystem_namespace = $2 AND b.repo_root = $3
+  AND b.binding_state = 'confirmed'
+  AND c.continuity_line = 'workspace' AND c.state = 'active'`, tenantID, anchor.FilesystemNamespace, anchor.RepoRoot).Scan(&continuityID)
 	if err == nil {
-		return WorkspaceResolution{Status: ResolutionResolved, ContinuityID: continuityID, RepoRoot: anchor.RepoRoot}, nil
+		return WorkspaceResolution{Status: ResolutionResolved, ContinuityID: continuityID, RepoRoot: anchor.RepoRoot, FilesystemNamespace: anchor.FilesystemNamespace}, nil
 	}
 	if errors.Is(err, pgx.ErrNoRows) {
-		return WorkspaceResolution{Status: ResolutionNeedsConfirmation, RepoRoot: anchor.RepoRoot}, nil
+		return WorkspaceResolution{Status: ResolutionNeedsConfirmation, RepoRoot: anchor.RepoRoot, FilesystemNamespace: anchor.FilesystemNamespace}, nil
 	}
 	return WorkspaceResolution{}, fmt.Errorf("resolve workspace binding: %w", err)
 }
@@ -359,7 +367,15 @@ func (s *Store) ConfirmWorkspaceBinding(ctx context.Context, tenantID, repoRoot 
 	if err != nil {
 		return "", err
 	}
-	anchor, err := (WorkspaceAnchor{RepoRoot: repoRoot}).Normalized()
+	return s.ConfirmWorkspaceAnchorBinding(ctx, tenantID, WorkspaceAnchor{RepoRoot: repoRoot})
+}
+
+func (s *Store) ConfirmWorkspaceAnchorBinding(ctx context.Context, tenantID string, anchor WorkspaceAnchor) (string, error) {
+	ctx, err := withTenantContext(ctx, tenantID)
+	if err != nil {
+		return "", err
+	}
+	anchor, err = anchor.Normalized()
 	if err != nil {
 		return "", err
 	}
@@ -372,7 +388,7 @@ func (s *Store) ConfirmWorkspaceBinding(ctx context.Context, tenantID, repoRoot 
 	var existingID string
 	err = tx.QueryRow(ctx, `
 SELECT continuity_id::text FROM continuity_bindings
-WHERE tenant_id = $1 AND repo_root = $2 AND binding_state = 'confirmed'`, tenantID, anchor.RepoRoot).Scan(&existingID)
+WHERE tenant_id = $1 AND filesystem_namespace = $2 AND repo_root = $3 AND binding_state = 'confirmed'`, tenantID, anchor.FilesystemNamespace, anchor.RepoRoot).Scan(&existingID)
 	if err == nil {
 		if err := tx.Commit(ctx); err != nil {
 			return "", fmt.Errorf("commit existing workspace binding: %w", err)
@@ -391,8 +407,8 @@ RETURNING id::text`, tenantID).Scan(&continuityID); err != nil {
 		return "", fmt.Errorf("create workspace continuity: %w", err)
 	}
 	if _, err := tx.Exec(ctx, `
-INSERT INTO continuity_bindings (continuity_id, tenant_id, repo_root, binding_state)
-VALUES ($1::uuid, $2, $3, 'confirmed')`, continuityID, tenantID, anchor.RepoRoot); err != nil {
+INSERT INTO continuity_bindings (continuity_id, tenant_id, filesystem_namespace, repo_root, binding_state)
+	VALUES ($1::uuid, $2, $3, $4, 'confirmed')`, continuityID, tenantID, anchor.FilesystemNamespace, anchor.RepoRoot); err != nil {
 		return "", fmt.Errorf("create workspace binding: %w", err)
 	}
 	if err := tx.Commit(ctx); err != nil {

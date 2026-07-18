@@ -163,9 +163,15 @@ MCP remains a two-tool normal-flow server. For a temporary Grok CLI replay,
 register a user-local server against this dedicated database:
 
 ```bash
+ATTACHMENT="$(./bin/vermory workspace-attachment \
+  --cwd "$PWD" \
+  --filesystem-namespace workstation-alpha \
+  --format base64)"
+
 grok mcp add vermory-w03 -- "$(pwd)/bin/vermory" mcp-stdio \
   --database-url 'postgresql:///vermory_w03?host=/tmp' \
-  --tenant-id local-w03
+  --tenant-id local-w03 \
+  --workspace-attachment "$ATTACHMENT"
 
 grok mcp doctor vermory-w03 --json
 ```

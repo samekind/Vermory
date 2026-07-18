@@ -6,26 +6,33 @@ import (
 	"strings"
 
 	"vermory/internal/brand"
+	"vermory/internal/resolver"
 	"vermory/internal/runtime"
 
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 )
 
 type Config struct {
-	TenantID string
+	TenantID  string
+	Workspace runtime.WorkspaceAnchor
 }
 
 type Handler struct {
-	service  *runtime.Service
-	tenantID string
+	service   *runtime.Service
+	tenantID  string
+	workspace runtime.WorkspaceAnchor
+	configErr error
 }
 
 type PrepareContextInput struct {
 	OperationID string `json:"operation_id" jsonschema:"stable id for this context preparation operation"`
-	RepoRoot    string `json:"repo_root" jsonschema:"absolute repository root for the current workspace"`
-	CWD         string `json:"cwd,omitempty" jsonschema:"optional absolute current working directory"`
 	Task        string `json:"task" jsonschema:"current task that needs governed context"`
 	MaxItems    int    `json:"max_items,omitempty" jsonschema:"maximum number of governed facts to return"`
+	// These fields are retained for direct Go API compatibility only. json:"-"
+	// keeps them out of the model-visible MCP schema; production stdio always
+	// supplies the workspace through startup configuration.
+	RepoRoot string `json:"-"`
+	CWD      string `json:"-"`
 }
 
 type PrepareContextOutput struct {
@@ -49,7 +56,23 @@ type CommitObservationOutput struct {
 }
 
 func New(service *runtime.Service, config Config) *Handler {
-	return &Handler{service: service, tenantID: strings.TrimSpace(config.TenantID)}
+	handler := &Handler{service: service, tenantID: strings.TrimSpace(config.TenantID)}
+	if _, err := config.Workspace.Normalized(); err != nil {
+		handler.configErr = err
+	} else if config.Workspace.RepoRoot != "" {
+		handler.workspace = config.Workspace
+	} else {
+		handler.configErr = fmt.Errorf("trusted workspace attachment is required")
+	}
+	return handler
+}
+
+func NewWithAttachment(service *runtime.Service, tenantID string, attachment resolver.WorkspaceAttachment) *Handler {
+	workspace, err := runtime.WorkspaceAnchorFromAttachment(attachment)
+	if err != nil {
+		return &Handler{service: service, tenantID: strings.TrimSpace(tenantID), configErr: err}
+	}
+	return New(service, Config{TenantID: tenantID, Workspace: workspace})
 }
 
 func NewServer(handler *Handler) *mcp.Server {
@@ -70,17 +93,25 @@ func serverImplementation() *mcp.Implementation {
 }
 
 func (h *Handler) PrepareContext(ctx context.Context, _ *mcp.CallToolRequest, input PrepareContextInput) (*mcp.CallToolResult, PrepareContextOutput, error) {
-	if err := h.validate(); err != nil {
+	if h == nil || h.service == nil || h.tenantID == "" {
+		return nil, PrepareContextOutput{}, fmt.Errorf("MCP handler is not configured")
+	}
+	workspace, err := h.workspaceForInput(input)
+	if err != nil {
 		return nil, PrepareContextOutput{}, err
+	}
+	if err := h.validateWorkspace(workspace); err != nil {
+		return nil, PrepareContextOutput{}, err
+	}
+	if h.workspace.RepoRoot == "" {
+		h.workspace = workspace
+		h.configErr = nil
 	}
 	result, err := h.service.PrepareContext(ctx, runtime.PrepareContextRequest{
 		OperationID: input.OperationID,
-		Workspace: runtime.WorkspaceAnchor{
-			RepoRoot: input.RepoRoot,
-			CWD:      input.CWD,
-		},
-		Task:     input.Task,
-		MaxItems: input.MaxItems,
+		Workspace:   workspace,
+		Task:        input.Task,
+		MaxItems:    input.MaxItems,
 	})
 	if err != nil {
 		return nil, PrepareContextOutput{}, err
@@ -118,5 +149,30 @@ func (h *Handler) validate() error {
 	if h == nil || h.service == nil || h.tenantID == "" {
 		return fmt.Errorf("MCP handler is not configured")
 	}
+	if h.configErr != nil {
+		return fmt.Errorf("MCP handler trusted workspace attachment: %w", h.configErr)
+	}
 	return nil
+}
+
+func (h *Handler) workspaceForInput(input PrepareContextInput) (runtime.WorkspaceAnchor, error) {
+	if h.workspace.RepoRoot != "" {
+		return h.workspace, nil
+	}
+	if strings.TrimSpace(input.RepoRoot) == "" {
+		return runtime.WorkspaceAnchor{}, fmt.Errorf("MCP handler trusted workspace attachment: %w", h.configErr)
+	}
+	workspace, err := (runtime.WorkspaceAnchor{RepoRoot: input.RepoRoot, CWD: input.CWD}).Normalized()
+	if err != nil {
+		return runtime.WorkspaceAnchor{}, err
+	}
+	return workspace, nil
+}
+
+func (h *Handler) validateWorkspace(workspace runtime.WorkspaceAnchor) error {
+	if h.configErr != nil && h.workspace.RepoRoot != "" {
+		return fmt.Errorf("MCP handler trusted workspace attachment: %w", h.configErr)
+	}
+	_, err := workspace.Normalized()
+	return err
 }

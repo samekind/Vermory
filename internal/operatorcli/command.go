@@ -16,14 +16,16 @@ import (
 )
 
 type connectionOptions struct {
-	databaseURL string
-	tenantID    string
+	databaseURL         string
+	tenantID            string
+	filesystemNamespace string
 }
 
 type workspaceOutput struct {
-	Status       string `json:"status"`
-	ContinuityID string `json:"continuity_id,omitempty"`
-	RepoRoot     string `json:"repo_root"`
+	Status              string `json:"status"`
+	ContinuityID        string `json:"continuity_id,omitempty"`
+	RepoRoot            string `json:"repo_root"`
+	FilesystemNamespace string `json:"filesystem_namespace,omitempty"`
 }
 
 type mutationOutput struct {
@@ -114,9 +116,10 @@ func NewWorkspaceCommand() *cobra.Command {
 					return err
 				}
 				return writeJSON(cmd, workspaceOutput{
-					Status:       string(resolution.Status),
-					ContinuityID: resolution.ContinuityID,
-					RepoRoot:     resolution.RepoRoot,
+					Status:              string(resolution.Status),
+					ContinuityID:        resolution.ContinuityID,
+					RepoRoot:            resolution.RepoRoot,
+					FilesystemNamespace: resolution.FilesystemNamespace,
 				})
 			})
 		},
@@ -136,9 +139,10 @@ func NewWorkspaceCommand() *cobra.Command {
 					return err
 				}
 				return writeJSON(cmd, workspaceOutput{
-					Status:       string(resolution.Status),
-					ContinuityID: resolution.ContinuityID,
-					RepoRoot:     resolution.RepoRoot,
+					Status:              string(resolution.Status),
+					ContinuityID:        resolution.ContinuityID,
+					RepoRoot:            resolution.RepoRoot,
+					FilesystemNamespace: resolution.FilesystemNamespace,
 				})
 			})
 		},
@@ -837,13 +841,14 @@ func NewBridgeCommand() *cobra.Command {
 	export.Flags().StringVar(&exportProfile, "target-profile", "", "target consumer profile")
 	markRequired(export, "operation-id", "repo-root", "memory-id", "title", "target-profile")
 
-	var adoptOperationID, adoptExistingRoot, adoptNewRoot string
+	var adoptOperationID, adoptExistingRoot, adoptNewRoot, adoptExistingNamespace, adoptNewNamespace string
 	adopt := &cobra.Command{
 		Use: "adopt", Short: "Add a confirmed alias to an existing workspace", Args: cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return withBridges(cmd.Context(), options, func(service *runtime.BridgeService) error {
 				receipt, err := service.AdoptWorkspaceAnchor(cmd.Context(), runtime.AdoptWorkspaceAnchorRequest{
 					OperationID: adoptOperationID, ExistingRepoRoot: adoptExistingRoot, NewRepoRoot: adoptNewRoot,
+					ExistingNamespaceID: adoptExistingNamespace, NewNamespaceID: adoptNewNamespace,
 				})
 				if err != nil {
 					return err
@@ -855,15 +860,18 @@ func NewBridgeCommand() *cobra.Command {
 	adopt.Flags().StringVar(&adoptOperationID, "operation-id", "", "idempotency key")
 	adopt.Flags().StringVar(&adoptExistingRoot, "existing-repo-root", "", "existing confirmed workspace root")
 	adopt.Flags().StringVar(&adoptNewRoot, "new-repo-root", "", "new alias root")
+	adopt.Flags().StringVar(&adoptExistingNamespace, "existing-filesystem-namespace", "", "existing trusted filesystem namespace")
+	adopt.Flags().StringVar(&adoptNewNamespace, "new-filesystem-namespace", "", "new trusted filesystem namespace")
 	markRequired(adopt, "operation-id", "existing-repo-root", "new-repo-root")
 
-	var rebindOperationID, rebindOldRoot, rebindNewRoot string
+	var rebindOperationID, rebindOldRoot, rebindNewRoot, rebindOldNamespace, rebindNewNamespace string
 	rebind := &cobra.Command{
 		Use: "rebind", Short: "Move a workspace continuity to a new root", Args: cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return withBridges(cmd.Context(), options, func(service *runtime.BridgeService) error {
 				receipt, err := service.RebindWorkspace(cmd.Context(), runtime.RebindWorkspaceRequest{
 					OperationID: rebindOperationID, OldRepoRoot: rebindOldRoot, NewRepoRoot: rebindNewRoot,
+					OldNamespaceID: rebindOldNamespace, NewNamespaceID: rebindNewNamespace,
 				})
 				if err != nil {
 					return err
@@ -875,6 +883,8 @@ func NewBridgeCommand() *cobra.Command {
 	rebind.Flags().StringVar(&rebindOperationID, "operation-id", "", "idempotency key")
 	rebind.Flags().StringVar(&rebindOldRoot, "old-repo-root", "", "current confirmed workspace root")
 	rebind.Flags().StringVar(&rebindNewRoot, "new-repo-root", "", "replacement workspace root")
+	rebind.Flags().StringVar(&rebindOldNamespace, "old-filesystem-namespace", "", "old trusted filesystem namespace")
+	rebind.Flags().StringVar(&rebindNewNamespace, "new-filesystem-namespace", "", "new trusted filesystem namespace")
 	markRequired(rebind, "operation-id", "old-repo-root", "new-repo-root")
 
 	var reverseOperationID, reverseBridgeID string
@@ -917,6 +927,7 @@ func NewBridgeCommand() *cobra.Command {
 func addConnectionFlags(command *cobra.Command, options *connectionOptions) {
 	command.PersistentFlags().StringVar(&options.databaseURL, "database-url", "", "PostgreSQL connection URL")
 	command.PersistentFlags().StringVar(&options.tenantID, "tenant-id", "", "server-owned tenant identifier")
+	command.PersistentFlags().StringVar(&options.filesystemNamespace, "filesystem-namespace", "", "trusted filesystem namespace for workspace governance")
 	_ = command.MarkPersistentFlagRequired("database-url")
 	_ = command.MarkPersistentFlagRequired("tenant-id")
 }
@@ -942,7 +953,7 @@ func withGovernance(ctx context.Context, options connectionOptions, run func(*ru
 	if err := store.Migrate(ctx); err != nil {
 		return err
 	}
-	return run(runtime.NewGovernanceService(store, options.tenantID))
+	return run(runtime.NewGovernanceServiceWithNamespace(store, options.tenantID, options.filesystemNamespace))
 }
 
 func withMemoryEligibility(ctx context.Context, options connectionOptions, run func(*runtime.MemoryEligibilityService) error) error {

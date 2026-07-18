@@ -15,6 +15,7 @@ import (
 	"vermory/internal/memorybackend"
 	"vermory/internal/operatorcli"
 	"vermory/internal/reality"
+	"vermory/internal/resolver"
 	"vermory/internal/runtime"
 
 	"github.com/modelcontextprotocol/go-sdk/mcp"
@@ -58,6 +59,7 @@ func newRootCommand() *cobra.Command {
 	var loadScopeSuffix string
 	var mcpDatabaseURL string
 	var mcpTenantID string
+	var mcpWorkspaceAttachment string
 	mcpRetrieval := defaultRetrievalRuntimeOptions()
 
 	rootCmd := &cobra.Command{
@@ -121,6 +123,10 @@ func newRootCommand() *cobra.Command {
 			if strings.TrimSpace(mcpTenantID) == "" {
 				return fmt.Errorf("--tenant-id is required")
 			}
+			attachment, err := resolver.DecodeWorkspaceAttachment(mcpWorkspaceAttachment)
+			if err != nil {
+				return err
+			}
 			store, err := runtime.OpenStore(cmd.Context(), mcpDatabaseURL)
 			if err != nil {
 				return fmt.Errorf("open MCP runtime store")
@@ -137,14 +143,17 @@ func newRootCommand() *cobra.Command {
 			if retriever != nil {
 				service = runtime.NewServiceWithRetriever(store, mcpTenantID, retriever)
 			}
-			handler := mcpserver.New(service, mcpserver.Config{TenantID: mcpTenantID})
+			handler := mcpserver.NewWithAttachment(service, mcpTenantID, attachment)
 			return mcpserver.NewServer(handler).Run(cmd.Context(), &mcp.StdioTransport{})
 		},
 	}
 	mcpStdioCmd.Flags().StringVar(&mcpDatabaseURL, "database-url", "", "PostgreSQL connection URL")
 	mcpStdioCmd.Flags().StringVar(&mcpTenantID, "tenant-id", "", "server-owned tenant identifier")
+	mcpStdioCmd.Flags().StringVar(&mcpWorkspaceAttachment, "workspace-attachment", "", "trusted workstation-generated workspace attachment")
+	_ = mcpStdioCmd.MarkFlagRequired("workspace-attachment")
 	addSharedRetrievalFlags(mcpStdioCmd, &mcpRetrieval)
 	rootCmd.AddCommand(mcpStdioCmd)
+	rootCmd.AddCommand(newWorkspaceAttachmentCommand())
 
 	evalSelfCaseCmd := &cobra.Command{
 		Use:   "eval-self-case",

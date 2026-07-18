@@ -50,7 +50,7 @@ promote its output directly into durable memory.
 |---|---|
 | `cmd/vermory` | Cobra CLI, runtime commands, packaging entry point |
 | `internal/domain` | Core identifiers and domain contracts |
-| `internal/resolver` | Workspace, conversation, and Global Defaults resolution |
+| `internal/resolver` | Trusted workspace attachment probing, workspace/conversation resolution, and Global Defaults resolution |
 | `internal/governance` | Candidate and governed-memory lifecycle |
 | `internal/bridge` | Explicit continuity bridge operations |
 | `internal/store/postgres` | Authoritative PostgreSQL persistence and migrations |

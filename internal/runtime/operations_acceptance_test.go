@@ -50,8 +50,8 @@ func TestOperationsRecovery(t *testing.T) {
 		if err := admin.pool.QueryRow(ctx, `SELECT max(version_id) FROM goose_db_version WHERE is_applied`).Scan(&schemaVersion); err != nil {
 			t.Fatal(err)
 		}
-		if schemaVersion != 21 {
-			t.Fatalf("expected schema version 21 after replay, got %d", schemaVersion)
+		if schemaVersion != 22 {
+			t.Fatalf("expected schema version 22 after replay, got %d", schemaVersion)
 		}
 
 		continuityID, activeContent, staleContent, deletedContent := seedOperationsProjection(t, admin.pool)
@@ -179,7 +179,7 @@ func TestOperationsRecovery(t *testing.T) {
 		}
 	})
 
-	t.Run("trimpath release binary migrates outside repository", func(t *testing.T) {
+		t.Run("trimpath release binary migrates outside repository", func(t *testing.T) {
 		dedicatedURL, _, _ := createOperationsDatabase(t, databaseURL)
 		moduleRoot, err := filepath.Abs(filepath.Join("..", ".."))
 		if err != nil {
@@ -205,7 +205,7 @@ func TestOperationsRecovery(t *testing.T) {
 		if err := pool.QueryRow(context.Background(), `SELECT max(version_id) FROM goose_db_version WHERE is_applied`).Scan(&schemaVersion); err != nil {
 			t.Fatal(err)
 		}
-		if schemaVersion != 21 {
+		if schemaVersion != 22 {
 			t.Fatalf("release migration reached schema %d", schemaVersion)
 		}
 	})
@@ -328,7 +328,7 @@ func testProductionRetrievalDumpRestore(t *testing.T, baseURL string) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if version != 21 {
+	if version != 22 {
 		t.Fatalf("restored schema version=%d", version)
 	}
 	if targetCounts := operationsRetrievalCounts(t, target.pool); !reflect.DeepEqual(targetCounts, sourceCounts) {

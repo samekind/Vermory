@@ -186,7 +186,7 @@ func TestMCPStdioCommandIsRegistered(t *testing.T) {
 		if command.Name() != "mcp-stdio" {
 			continue
 		}
-		for _, flagName := range []string{"database-url", "tenant-id"} {
+		for _, flagName := range []string{"database-url", "tenant-id", "workspace-attachment"} {
 			if command.Flags().Lookup(flagName) == nil {
 				t.Fatalf("mcp-stdio must expose --%s", flagName)
 			}

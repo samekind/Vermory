@@ -54,13 +54,26 @@ type Resolution struct {
 
 func ResolveWorkspace(input WorkspaceInput) Resolution {
 	if strings.TrimSpace(input.ExplicitBindingID) != "" {
+		for _, candidate := range input.Candidates {
+			if candidate.ID == input.ExplicitBindingID &&
+				strings.TrimSpace(input.CandidateRepoRoot) != "" &&
+				filepathClean(candidate.Path) == filepathClean(input.CandidateRepoRoot) {
+				return Resolution{
+					Status:         ResolutionResolved,
+					Line:           domain.ContinuityLineWorkspace,
+					SpaceID:        candidate.ID,
+					Name:           input.KnownWorkspaceName,
+					Anchor:         candidate.Path,
+					AnchorStrength: domain.AnchorStrengthStrong,
+				}
+			}
+		}
 		return Resolution{
-			Status:         ResolutionResolved,
+			Status:         ResolutionNeedsConfirmation,
 			Line:           domain.ContinuityLineWorkspace,
-			SpaceID:        input.ExplicitBindingID,
-			Name:           input.KnownWorkspaceName,
 			Anchor:         firstNonEmpty(input.CandidateRepoRoot, input.CWD),
 			AnchorStrength: domain.AnchorStrengthStrong,
+			Candidates:     append([]WorkspaceCandidate(nil), input.Candidates...),
 		}
 	}
 
@@ -87,9 +100,8 @@ func ResolveWorkspace(input WorkspaceInput) Resolution {
 
 	if strings.TrimSpace(input.CandidateRepoRoot) != "" {
 		return Resolution{
-			Status:         ResolutionResolved,
+			Status:         ResolutionNeedsConfirmation,
 			Line:           domain.ContinuityLineWorkspace,
-			SpaceID:        "workspace:" + filepath.Base(input.CandidateRepoRoot),
 			Name:           input.KnownWorkspaceName,
 			Anchor:         input.CandidateRepoRoot,
 			AnchorStrength: domain.AnchorStrengthStrong,
@@ -102,6 +114,14 @@ func ResolveWorkspace(input WorkspaceInput) Resolution {
 		Anchor:         input.CWD,
 		AnchorStrength: domain.AnchorStrengthStrong,
 	}
+}
+
+func filepathClean(value string) string {
+	value = strings.TrimSpace(value)
+	if value == "" {
+		return ""
+	}
+	return filepath.Clean(value)
 }
 
 func ResolveConversation(input ConversationInput) Resolution {

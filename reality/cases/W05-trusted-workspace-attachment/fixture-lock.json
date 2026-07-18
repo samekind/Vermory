@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "case_id": "W05-trusted-workspace-attachment",
+  "manifest_sha256": "a863fb6d1fd589fe2237a3b1e45253754d4234902179650c1f9cef2e350207ff",
+  "events_sha256": "0d6f69a671a97bf36482f63ddbe6e9fdddeaf0d068547d3f196a265e0da0d234",
+  "files": [
+    {
+      "path": "fixtures/workspace-topology.md",
+      "sha256": "0658679d0d87a7f489cd6fc8b8335a0049108ec5d05f6654c3b680b1802b798f",
+      "bytes": 1382
+    }
+  ]
+}

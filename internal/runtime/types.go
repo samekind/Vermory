@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"path/filepath"
 	"strings"
+
+	"vermory/internal/resolver"
 )
 
 const (
@@ -29,9 +31,10 @@ const (
 )
 
 type WorkspaceAnchor struct {
-	RepoRoot          string `json:"repo_root"`
-	CWD               string `json:"cwd,omitempty"`
-	ExplicitBindingID string `json:"explicit_binding_id,omitempty"`
+	RepoRoot            string `json:"repo_root"`
+	CWD                 string `json:"cwd,omitempty"`
+	FilesystemNamespace string `json:"filesystem_namespace,omitempty"`
+	ExplicitBindingID   string `json:"explicit_binding_id,omitempty"`
 }
 
 func (a WorkspaceAnchor) Normalized() (WorkspaceAnchor, error) {
@@ -40,6 +43,11 @@ func (a WorkspaceAnchor) Normalized() (WorkspaceAnchor, error) {
 		return WorkspaceAnchor{}, fmt.Errorf("workspace repo_root: %w", err)
 	}
 	a.RepoRoot = repoRoot
+	namespace, err := resolver.NormalizeFilesystemNamespace(a.FilesystemNamespace, true)
+	if err != nil {
+		return WorkspaceAnchor{}, err
+	}
+	a.FilesystemNamespace = namespace
 	a.ExplicitBindingID = strings.TrimSpace(a.ExplicitBindingID)
 	if strings.TrimSpace(a.CWD) == "" {
 		return a, nil
@@ -50,6 +58,18 @@ func (a WorkspaceAnchor) Normalized() (WorkspaceAnchor, error) {
 	}
 	a.CWD = cwd
 	return a, nil
+}
+
+func WorkspaceAnchorFromAttachment(attachment resolver.WorkspaceAttachment) (WorkspaceAnchor, error) {
+	normalized, err := attachment.Normalized()
+	if err != nil {
+		return WorkspaceAnchor{}, err
+	}
+	return WorkspaceAnchor{
+		RepoRoot:            normalized.RepoRoot,
+		CWD:                 normalized.CWD,
+		FilesystemNamespace: normalized.FilesystemNamespace,
+	}, nil
 }
 
 type PrepareContextRequest struct {

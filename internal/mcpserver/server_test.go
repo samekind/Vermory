@@ -21,6 +21,44 @@ func TestServerVersionUsesBrandVersion(t *testing.T) {
 	}
 }
 
+func TestPrepareContextSchemaDoesNotExposeWorkspaceOrGovernanceAuthority(t *testing.T) {
+	handler := New(nil, Config{
+		TenantID:  "local",
+		Workspace: runtime.WorkspaceAnchor{RepoRoot: "/repo/attached"},
+	})
+	ctx := context.Background()
+	serverTransport, clientTransport := mcp.NewInMemoryTransports()
+	serverSession, err := NewServer(handler).Connect(ctx, serverTransport, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = serverSession.Close() })
+	client := mcp.NewClient(&mcp.Implementation{Name: "schema-client", Version: "0.1.0"}, nil)
+	clientSession, err := client.Connect(ctx, clientTransport, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = clientSession.Close() })
+	tools, err := clientSession.ListTools(ctx, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, tool := range tools.Tools {
+		if tool.Name != "prepare_context" && tool.Name != "commit_observation" {
+			continue
+		}
+		encoded, err := json.Marshal(tool.InputSchema)
+		if err != nil {
+			t.Fatal(err)
+		}
+		for _, forbidden := range []string{"repo_root", "cwd", "filesystem_namespace", "tenant_id", "explicit_binding_id", "adopt", "rebind"} {
+			if strings.Contains(string(encoded), forbidden) {
+				t.Fatalf("MCP tool %s exposed forbidden authority field %q: %s", tool.Name, forbidden, encoded)
+			}
+		}
+	}
+}
+
 func TestPrepareContextToolReturnsNeedsConfirmationWithoutContext(t *testing.T) {
 	handler, _ := testHandler(t)
 	_, out, err := handler.PrepareContext(context.Background(), nil, PrepareContextInput{
@@ -329,6 +367,8 @@ func (retriever *mcpRecordingRetriever) Retrieve(_ context.Context, request runt
 
 func TestServerAdvertisesOnlyNormalFlowTools(t *testing.T) {
 	handler, _ := testHandler(t)
+	handler.workspace = runtime.WorkspaceAnchor{RepoRoot: "/ambiguous/repo"}
+	handler.configErr = nil
 	ctx := context.Background()
 	serverTransport, clientTransport := mcp.NewInMemoryTransports()
 	serverSession, err := NewServer(handler).Connect(ctx, serverTransport, nil)
@@ -362,7 +402,6 @@ func TestServerAdvertisesOnlyNormalFlowTools(t *testing.T) {
 		Name: "prepare_context",
 		Arguments: map[string]any{
 			"operation_id": "prepare-mcp-protocol",
-			"repo_root":    "/ambiguous/repo",
 			"task":         "Continue work.",
 		},
 	})

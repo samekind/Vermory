@@ -1,0 +1,93 @@
+{
+  "version": 1,
+  "id": "W05-trusted-workspace-attachment",
+  "title": "Trusted workspace attachment reconnects exact governed work without model-controlled or same-name binding",
+  "evidence_level": "public",
+  "continuity_lines": ["workspace", "security"],
+  "pressures": [
+    "nested_cwd_git_root_detection",
+    "cross_coder_continuity",
+    "filesystem_namespace_isolation",
+    "same_basename_repository_isolation",
+    "git_worktree_explicit_adopt",
+    "moved_path_explicit_rebind",
+    "mirror_clone_ambiguity",
+    "remote_mcp_attachment",
+    "model_authority_denial",
+    "deterministic_abstention"
+  ],
+  "sources": [
+    {
+      "id": "w05-workspace-topology",
+      "kind": "synthetic_authorized_workspace_topology",
+      "fixture_path": "fixtures/workspace-topology.md",
+      "original_ref": "synthetic:trusted-workspace-attachment-v1",
+      "original_revision": "1",
+      "sha256": "0658679d0d87a7f489cd6fc8b8335a0049108ec5d05f6654c3b680b1802b798f",
+      "authorized": true,
+      "anonymization": "All namespaces, paths, repositories, clients, and transitions are synthetic; no host identity, credential, private transcript, or personal absolute path is retained."
+    }
+  ],
+  "anchors": [
+    {
+      "kind": "filesystem_namespace_and_canonical_repo_root",
+      "value": "workstation-alpha:/work/Vermory",
+      "ambiguous": false
+    },
+    {
+      "kind": "same_path_other_namespace",
+      "value": "workstation-beta:/work/Vermory",
+      "ambiguous": true
+    },
+    {
+      "kind": "same_basename_other_repo",
+      "value": "workstation-alpha:/archive/Vermory",
+      "ambiguous": true
+    },
+    {
+      "kind": "unadopted_git_worktree",
+      "value": "workstation-alpha:/worktrees/Vermory-resolver",
+      "ambiguous": true
+    }
+  ],
+  "expectations": {
+    "current_facts": [
+      "A trusted local probe resolves a nested cwd to the canonical Git checkout root before the model runs.",
+      "The same namespaced canonical root resolves to one governed continuity across coding clients.",
+      "An exact namespaced attachment resolves only after a trusted governance binding exists.",
+      "An adopted worktree alias and a rebound moved path retain the original continuity through explicit governance."
+    ],
+    "forbidden_facts": [
+      "A repository basename determines workspace identity.",
+      "Matching remote URLs, titles, or semantic content automatically merge workspaces.",
+      "A path from another filesystem namespace is equivalent because its text matches.",
+      "The model may submit repo_root, tenant, binding, adopt, or rebind authority through prepare_context.",
+      "The remote MCP server may infer a workstation path it cannot inspect."
+    ],
+    "allowed_unknowns": [
+      "Whether an unbound checkout is a clone, mirror, fork, restored copy, or unrelated repository.",
+      "Whether an unadopted worktree should share continuity with a primary checkout."
+    ],
+    "expected_action": "The trusted launcher probes the local Git checkout, starts MCP with a bounded namespaced attachment, and the server resolves only an exact confirmed binding or returns needs_confirmation without model-controlled fallback."
+  },
+  "task": {
+    "prompt": "Continue the current workspace using only the continuity attached by the trusted client launcher. If attachment resolution is not resolved, stop and request an operator binding rather than guessing from repository names or remotes.",
+    "artifact_checks": [
+      "nested cwd resolves to the governed repository root",
+      "same attachment resolves across coding clients",
+      "same-name and cross-namespace repositories remain isolated",
+      "unadopted worktree, moved path, mirror, and clone abstain",
+      "adopt and rebind work only through trusted governance",
+      "prepare_context exposes no path or governance override"
+    ],
+    "deterministic_checks": [
+      "resolved:workstation-alpha:/work/Vermory",
+      "same_continuity:codex:grok:cursor",
+      "needs_confirmation:workstation-beta:/work/Vermory",
+      "needs_confirmation:workstation-alpha:/archive/Vermory",
+      "needs_confirmation:workstation-alpha:/worktrees/Vermory-resolver",
+      "needs_confirmation:workstation-alpha:/srv/Vermory",
+      "not_exposed:repo_root:tenant_id:binding_id:adopt:rebind"
+    ]
+  }
+}

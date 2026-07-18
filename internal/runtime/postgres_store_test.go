@@ -36,6 +36,49 @@ func TestStoreResolveWorkspaceRequiresConfirmationForUnknownAnchor(t *testing.T)
 	}
 }
 
+func TestStoreWorkspaceAttachmentUsesExactFilesystemNamespaceAndRoot(t *testing.T) {
+	store := openTestStore(t)
+	ctx := context.Background()
+	const repoRoot = "/work/Vermory"
+	alpha, err := store.ConfirmWorkspaceAnchorBinding(ctx, "local", WorkspaceAnchor{
+		RepoRoot: repoRoot, FilesystemNamespace: "workstation-alpha",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	beta, err := store.ConfirmWorkspaceAnchorBinding(ctx, "local", WorkspaceAnchor{
+		RepoRoot: repoRoot, FilesystemNamespace: "workstation-beta",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if alpha == beta {
+		t.Fatalf("same path in different filesystem namespaces shared continuity: %s", alpha)
+	}
+	for _, test := range []struct {
+		name      string
+		anchor    WorkspaceAnchor
+		wantID    string
+		wantState ResolutionStatus
+	}{
+		{name: "alpha", anchor: WorkspaceAnchor{RepoRoot: repoRoot, FilesystemNamespace: "workstation-alpha"}, wantID: alpha, wantState: ResolutionResolved},
+		{name: "beta", anchor: WorkspaceAnchor{RepoRoot: repoRoot, FilesystemNamespace: "workstation-beta"}, wantID: beta, wantState: ResolutionResolved},
+		{name: "unknown namespace", anchor: WorkspaceAnchor{RepoRoot: repoRoot, FilesystemNamespace: "workstation-gamma"}, wantState: ResolutionNeedsConfirmation},
+		{name: "unknown path", anchor: WorkspaceAnchor{RepoRoot: "/archive/Vermory", FilesystemNamespace: "workstation-alpha"}, wantState: ResolutionNeedsConfirmation},
+		{name: "binding mismatch", anchor: WorkspaceAnchor{RepoRoot: repoRoot, FilesystemNamespace: "workstation-beta", ExplicitBindingID: alpha}, wantState: ResolutionNeedsConfirmation},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			resolution, err := store.ResolveWorkspace(ctx, "local", test.anchor)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if resolution.Status != test.wantState || (test.wantID != "" && resolution.ContinuityID != test.wantID) {
+				t.Fatalf("unexpected exact attachment resolution: %#v", resolution)
+			}
+		})
+	}
+}
+
 func TestStoreCommitObservationIsIdempotent(t *testing.T) {
 	store := openTestStore(t)
 	ctx := context.Background()

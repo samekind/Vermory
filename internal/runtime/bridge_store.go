@@ -247,7 +247,7 @@ VALUES ($1::uuid, $2, $3::uuid, $4::uuid, 'active')`, operation.ID, tenantID, pr
 	return receipt, err
 }
 
-func (s *Store) AdoptWorkspaceBinding(ctx context.Context, tenantID, operationID, continuityID, existingRoot, newRoot string) (BridgeReceipt, error) {
+func (s *Store) AdoptWorkspaceBinding(ctx context.Context, tenantID, operationID, continuityID string, existingAnchor, newAnchor WorkspaceAnchor) (BridgeReceipt, error) {
 	ctx, err := withTenantContext(ctx, tenantID)
 	if err != nil {
 		return BridgeReceipt{}, err
@@ -257,29 +257,39 @@ func (s *Store) AdoptWorkspaceBinding(ctx context.Context, tenantID, operationID
 		return BridgeReceipt{}, fmt.Errorf("begin workspace adopt: %w", err)
 	}
 	defer tx.Rollback(ctx)
+	existingAnchor, err = existingAnchor.Normalized()
+	if err != nil {
+		return BridgeReceipt{}, err
+	}
+	newAnchor, err = newAnchor.Normalized()
+	if err != nil {
+		return BridgeReceipt{}, err
+	}
 	operation, replayed, err := createBridgeOperationTx(ctx, tx, bridgeLedgerInput{
 		TenantID:           tenantID,
 		OperationID:        operationID,
 		Action:             BridgeActionAdopt,
-		RequestFingerprint: bridgeRequestFingerprint(existingRoot, newRoot),
+		RequestFingerprint: bridgeRequestFingerprint(existingAnchor.FilesystemNamespace, existingAnchor.RepoRoot, newAnchor.FilesystemNamespace, newAnchor.RepoRoot),
 		SourceContinuityID: continuityID,
 		TargetContinuityID: continuityID,
-		SourceAnchor:       existingRoot,
-		TargetAnchor:       newRoot,
+		SourceAnchor:       existingAnchor.RepoRoot,
+		TargetAnchor:       newAnchor.RepoRoot,
+		SourceNamespaceID:  existingAnchor.FilesystemNamespace,
+		TargetNamespaceID:  newAnchor.FilesystemNamespace,
 	})
 	if err != nil {
 		return BridgeReceipt{}, err
 	}
 	if !replayed {
-		if err := requireConfirmedWorkspaceBindingTx(ctx, tx, tenantID, continuityID, existingRoot); err != nil {
+		if err := requireConfirmedWorkspaceBindingTx(ctx, tx, tenantID, continuityID, existingAnchor); err != nil {
 			return BridgeReceipt{}, err
 		}
-		if err := requireUnboundWorkspaceRootTx(ctx, tx, tenantID, newRoot); err != nil {
+		if err := requireUnboundWorkspaceRootTx(ctx, tx, tenantID, newAnchor); err != nil {
 			return BridgeReceipt{}, err
 		}
 		if _, err := tx.Exec(ctx, `
-INSERT INTO continuity_bindings (continuity_id, tenant_id, repo_root, binding_state)
-VALUES ($1::uuid, $2, $3, 'confirmed')`, continuityID, tenantID, newRoot); err != nil {
+		INSERT INTO continuity_bindings (continuity_id, tenant_id, filesystem_namespace, repo_root, binding_state)
+		VALUES ($1::uuid, $2, $3, $4, 'confirmed')`, continuityID, tenantID, newAnchor.FilesystemNamespace, newAnchor.RepoRoot); err != nil {
 			return BridgeReceipt{}, fmt.Errorf("create adopted workspace binding: %w", err)
 		}
 	}
@@ -291,7 +301,7 @@ VALUES ($1::uuid, $2, $3, 'confirmed')`, continuityID, tenantID, newRoot); err !
 	return receipt, err
 }
 
-func (s *Store) RebindWorkspaceBinding(ctx context.Context, tenantID, operationID, continuityID, oldRoot, newRoot string) (BridgeReceipt, error) {
+func (s *Store) RebindWorkspaceBinding(ctx context.Context, tenantID, operationID, continuityID string, oldAnchor, newAnchor WorkspaceAnchor) (BridgeReceipt, error) {
 	ctx, err := withTenantContext(ctx, tenantID)
 	if err != nil {
 		return BridgeReceipt{}, err
@@ -301,34 +311,44 @@ func (s *Store) RebindWorkspaceBinding(ctx context.Context, tenantID, operationI
 		return BridgeReceipt{}, fmt.Errorf("begin workspace rebind: %w", err)
 	}
 	defer tx.Rollback(ctx)
+	oldAnchor, err = oldAnchor.Normalized()
+	if err != nil {
+		return BridgeReceipt{}, err
+	}
+	newAnchor, err = newAnchor.Normalized()
+	if err != nil {
+		return BridgeReceipt{}, err
+	}
 	operation, replayed, err := createBridgeOperationTx(ctx, tx, bridgeLedgerInput{
 		TenantID:           tenantID,
 		OperationID:        operationID,
 		Action:             BridgeActionRebind,
-		RequestFingerprint: bridgeRequestFingerprint(oldRoot, newRoot),
+		RequestFingerprint: bridgeRequestFingerprint(oldAnchor.FilesystemNamespace, oldAnchor.RepoRoot, newAnchor.FilesystemNamespace, newAnchor.RepoRoot),
 		SourceContinuityID: continuityID,
 		TargetContinuityID: continuityID,
-		SourceAnchor:       oldRoot,
-		TargetAnchor:       newRoot,
+		SourceAnchor:       oldAnchor.RepoRoot,
+		TargetAnchor:       newAnchor.RepoRoot,
+		SourceNamespaceID:  oldAnchor.FilesystemNamespace,
+		TargetNamespaceID:  newAnchor.FilesystemNamespace,
 	})
 	if err != nil {
 		return BridgeReceipt{}, err
 	}
 	if !replayed {
-		bindingID, err := confirmedWorkspaceBindingIDTx(ctx, tx, tenantID, continuityID, oldRoot)
+		bindingID, err := confirmedWorkspaceBindingIDTx(ctx, tx, tenantID, continuityID, oldAnchor)
 		if err != nil {
 			return BridgeReceipt{}, err
 		}
-		if err := requireUnboundWorkspaceRootTx(ctx, tx, tenantID, newRoot); err != nil {
+		if err := requireUnboundWorkspaceRootTx(ctx, tx, tenantID, newAnchor); err != nil {
 			return BridgeReceipt{}, err
 		}
 		if _, err := tx.Exec(ctx, `
-UPDATE continuity_bindings SET binding_state = 'retired' WHERE id = $1::uuid`, bindingID); err != nil {
+			UPDATE continuity_bindings SET binding_state = 'retired' WHERE id = $1::uuid`, bindingID); err != nil {
 			return BridgeReceipt{}, fmt.Errorf("retire old workspace binding: %w", err)
 		}
 		if _, err := tx.Exec(ctx, `
-INSERT INTO continuity_bindings (continuity_id, tenant_id, repo_root, binding_state)
-VALUES ($1::uuid, $2, $3, 'confirmed')`, continuityID, tenantID, newRoot); err != nil {
+		INSERT INTO continuity_bindings (continuity_id, tenant_id, filesystem_namespace, repo_root, binding_state)
+		VALUES ($1::uuid, $2, $3, $4, 'confirmed')`, continuityID, tenantID, newAnchor.FilesystemNamespace, newAnchor.RepoRoot); err != nil {
 			return BridgeReceipt{}, fmt.Errorf("create rebound workspace binding: %w", err)
 		}
 	}
@@ -353,11 +373,16 @@ func (s *Store) ReverseBridge(ctx context.Context, tenantID, operationID, bridge
 	var action BridgeAction
 	var status BridgeStatus
 	var targetContinuityID string
+	var sourceAnchor, targetAnchor string
+	var sourceNamespaceID, targetNamespaceID string
 	err = tx.QueryRow(ctx, `
-SELECT action, status, COALESCE(target_continuity_id::text, '')
+SELECT action, status, COALESCE(target_continuity_id::text, ''),
+       source_anchor, target_anchor, source_filesystem_namespace,
+       target_filesystem_namespace
 FROM bridge_operations
 WHERE id = $1::uuid AND tenant_id = $2
-FOR UPDATE`, bridgeID, tenantID).Scan(&action, &status, &targetContinuityID)
+FOR UPDATE`, bridgeID, tenantID).Scan(&action, &status, &targetContinuityID,
+		&sourceAnchor, &targetAnchor, &sourceNamespaceID, &targetNamespaceID)
 	if errors.Is(err, pgx.ErrNoRows) {
 		return BridgeReceipt{}, fmt.Errorf("bridge does not exist")
 	}
@@ -417,9 +442,9 @@ WHERE bridge_id = $1::uuid AND tenant_id = $2 AND link_state = 'active'`, bridge
 			command, err := tx.Exec(ctx, `
 UPDATE continuity_bindings
 SET binding_state = 'retired'
-WHERE tenant_id = $1 AND continuity_id = $2::uuid AND repo_root = (
-  SELECT target_anchor FROM bridge_operations WHERE id = $3::uuid
-) AND binding_state = 'confirmed'`, tenantID, targetContinuityID, bridgeID)
+WHERE tenant_id = $1 AND continuity_id = $2::uuid
+  AND filesystem_namespace = $3 AND repo_root = $4 AND binding_state = 'confirmed'`,
+				tenantID, targetContinuityID, targetNamespaceID, targetAnchor)
 			if err != nil {
 				return BridgeReceipt{}, fmt.Errorf("reverse adopted workspace binding: %w", err)
 			}
@@ -427,15 +452,12 @@ WHERE tenant_id = $1 AND continuity_id = $2::uuid AND repo_root = (
 				return BridgeReceipt{}, fmt.Errorf("active adopted workspace binding is missing")
 			}
 		case BridgeActionRebind:
-			var sourceAnchor, targetAnchor string
-			if err := tx.QueryRow(ctx, `
-SELECT source_anchor, target_anchor FROM bridge_operations WHERE id = $1::uuid`, bridgeID).Scan(&sourceAnchor, &targetAnchor); err != nil {
-				return BridgeReceipt{}, fmt.Errorf("load rebind anchors for reversal: %w", err)
-			}
 			command, err := tx.Exec(ctx, `
 UPDATE continuity_bindings
 SET binding_state = 'retired'
-WHERE tenant_id = $1 AND continuity_id = $2::uuid AND repo_root = $3 AND binding_state = 'confirmed'`, tenantID, targetContinuityID, targetAnchor)
+WHERE tenant_id = $1 AND continuity_id = $2::uuid
+  AND filesystem_namespace = $3 AND repo_root = $4 AND binding_state = 'confirmed'`,
+				tenantID, targetContinuityID, targetNamespaceID, targetAnchor)
 			if err != nil {
 				return BridgeReceipt{}, fmt.Errorf("retire rebound workspace target: %w", err)
 			}
@@ -446,14 +468,15 @@ WHERE tenant_id = $1 AND continuity_id = $2::uuid AND repo_root = $3 AND binding
 WITH candidate AS (
   SELECT id
   FROM continuity_bindings
-  WHERE tenant_id = $1 AND continuity_id = $2::uuid AND repo_root = $3 AND binding_state = 'retired'
+  WHERE tenant_id = $1 AND continuity_id = $2::uuid
+    AND filesystem_namespace = $3 AND repo_root = $4 AND binding_state = 'retired'
   ORDER BY created_at DESC, id DESC
   LIMIT 1
   FOR UPDATE
 )
 UPDATE continuity_bindings
 SET binding_state = 'confirmed'
-WHERE id = (SELECT id FROM candidate)`, tenantID, targetContinuityID, sourceAnchor)
+WHERE id = (SELECT id FROM candidate)`, tenantID, targetContinuityID, sourceNamespaceID, sourceAnchor)
 			if err != nil {
 				return BridgeReceipt{}, fmt.Errorf("restore original workspace binding: %w", err)
 			}
@@ -476,18 +499,19 @@ WHERE id = (SELECT id FROM candidate)`, tenantID, targetContinuityID, sourceAnch
 	return receipt, err
 }
 
-func requireConfirmedWorkspaceBindingTx(ctx context.Context, tx pgx.Tx, tenantID, continuityID, repoRoot string) error {
-	_, err := confirmedWorkspaceBindingIDTx(ctx, tx, tenantID, continuityID, repoRoot)
+func requireConfirmedWorkspaceBindingTx(ctx context.Context, tx pgx.Tx, tenantID, continuityID string, anchor WorkspaceAnchor) error {
+	_, err := confirmedWorkspaceBindingIDTx(ctx, tx, tenantID, continuityID, anchor)
 	return err
 }
 
-func confirmedWorkspaceBindingIDTx(ctx context.Context, tx pgx.Tx, tenantID, continuityID, repoRoot string) (string, error) {
+func confirmedWorkspaceBindingIDTx(ctx context.Context, tx pgx.Tx, tenantID, continuityID string, anchor WorkspaceAnchor) (string, error) {
 	var bindingID string
 	err := tx.QueryRow(ctx, `
 SELECT id::text
 FROM continuity_bindings
-WHERE tenant_id = $1 AND continuity_id = $2::uuid AND repo_root = $3 AND binding_state = 'confirmed'
-FOR UPDATE`, tenantID, continuityID, repoRoot).Scan(&bindingID)
+WHERE tenant_id = $1 AND continuity_id = $2::uuid
+  AND filesystem_namespace = $3 AND repo_root = $4 AND binding_state = 'confirmed'
+FOR UPDATE`, tenantID, continuityID, anchor.FilesystemNamespace, anchor.RepoRoot).Scan(&bindingID)
 	if errors.Is(err, pgx.ErrNoRows) {
 		return "", fmt.Errorf("workspace binding is not confirmed for this continuity")
 	}
@@ -497,13 +521,13 @@ FOR UPDATE`, tenantID, continuityID, repoRoot).Scan(&bindingID)
 	return bindingID, nil
 }
 
-func requireUnboundWorkspaceRootTx(ctx context.Context, tx pgx.Tx, tenantID, repoRoot string) error {
+func requireUnboundWorkspaceRootTx(ctx context.Context, tx pgx.Tx, tenantID string, anchor WorkspaceAnchor) error {
 	var confirmed bool
 	if err := tx.QueryRow(ctx, `
 SELECT EXISTS (
   SELECT 1 FROM continuity_bindings
-  WHERE tenant_id = $1 AND repo_root = $2 AND binding_state = 'confirmed'
-)`, tenantID, repoRoot).Scan(&confirmed); err != nil {
+  WHERE tenant_id = $1 AND filesystem_namespace = $2 AND repo_root = $3 AND binding_state = 'confirmed'
+)`, tenantID, anchor.FilesystemNamespace, anchor.RepoRoot).Scan(&confirmed); err != nil {
 		return fmt.Errorf("check workspace target binding: %w", err)
 	}
 	if confirmed {
@@ -568,12 +592,13 @@ WHERE tenant_id = $1 AND operation_id = $2`, input.TenantID, input.OperationID).
 INSERT INTO bridge_operations (
   tenant_id, operation_id, action, status,
   source_continuity_id, target_continuity_id,
-  source_anchor, target_anchor, target_profile, title, export_body, request_fingerprint
+  source_anchor, target_anchor, source_filesystem_namespace,
+  target_filesystem_namespace, target_profile, title, export_body, request_fingerprint
 )
 VALUES (
   $1, $2, $3, 'active',
   NULLIF($4, '')::uuid, NULLIF($5, '')::uuid,
-  $6, $7, $8, $9, $10, $11
+  $6, $7, $8, $9, $10, $11, $12, $13
 )
 RETURNING id::text, operation_id, action, status`,
 		input.TenantID,
@@ -583,6 +608,8 @@ RETURNING id::text, operation_id, action, status`,
 		input.TargetContinuityID,
 		input.SourceAnchor,
 		input.TargetAnchor,
+		input.SourceNamespaceID,
+		input.TargetNamespaceID,
 		input.TargetProfile,
 		input.Title,
 		input.ExportBody,
@@ -683,7 +710,8 @@ func (s *Store) InspectBridge(ctx context.Context, tenantID, bridgeID string) (B
 	err = s.pool.QueryRow(ctx, `
 SELECT id::text, operation_id, action, status,
        COALESCE(source_continuity_id::text, ''), COALESCE(target_continuity_id::text, ''),
-       source_anchor, target_anchor, target_profile, title, export_body, reverse_operation_id
+       source_anchor, target_anchor, source_filesystem_namespace,
+       target_filesystem_namespace, target_profile, title, export_body, reverse_operation_id
 FROM bridge_operations
 WHERE id = $1::uuid AND tenant_id = $2`, bridgeID, tenantID).Scan(
 		&receipt.ID,
@@ -694,6 +722,8 @@ WHERE id = $1::uuid AND tenant_id = $2`, bridgeID, tenantID).Scan(
 		&receipt.TargetContinuityID,
 		&receipt.SourceAnchor,
 		&receipt.TargetAnchor,
+		&receipt.SourceNamespaceID,
+		&receipt.TargetNamespaceID,
 		&receipt.TargetProfile,
 		&receipt.Title,
 		&receipt.ExportBody,

@@ -5,6 +5,8 @@ import (
 	"encoding/hex"
 	"fmt"
 	"strings"
+
+	"vermory/internal/resolver"
 )
 
 type BridgeAction string
@@ -65,6 +67,8 @@ type BridgeReceipt struct {
 	TargetContinuityID string               `json:"target_continuity_id,omitempty"`
 	SourceAnchor       string               `json:"source_anchor,omitempty"`
 	TargetAnchor       string               `json:"target_anchor,omitempty"`
+	SourceNamespaceID  string               `json:"source_filesystem_namespace,omitempty"`
+	TargetNamespaceID  string               `json:"target_filesystem_namespace,omitempty"`
 	TargetProfile      string               `json:"target_profile,omitempty"`
 	Title              string               `json:"title,omitempty"`
 	ExportBody         string               `json:"export_body,omitempty"`
@@ -114,9 +118,11 @@ type LinkConversationsRequest struct {
 }
 
 type AdoptWorkspaceAnchorRequest struct {
-	OperationID      string `json:"operation_id"`
-	ExistingRepoRoot string `json:"existing_repo_root"`
-	NewRepoRoot      string `json:"new_repo_root"`
+	OperationID         string `json:"operation_id"`
+	ExistingRepoRoot    string `json:"existing_repo_root"`
+	NewRepoRoot         string `json:"new_repo_root"`
+	ExistingNamespaceID string `json:"existing_filesystem_namespace,omitempty"`
+	NewNamespaceID      string `json:"new_filesystem_namespace,omitempty"`
 }
 
 func (r *AdoptWorkspaceAnchorRequest) Validate() error {
@@ -136,13 +142,21 @@ func (r *AdoptWorkspaceAnchorRequest) Validate() error {
 	}
 	r.ExistingRepoRoot = existing
 	r.NewRepoRoot = newRoot
+	if r.ExistingNamespaceID, err = normalizeWorkspaceNamespace(r.ExistingNamespaceID); err != nil {
+		return fmt.Errorf("existing_filesystem_namespace: %w", err)
+	}
+	if r.NewNamespaceID, err = normalizeWorkspaceNamespace(r.NewNamespaceID); err != nil {
+		return fmt.Errorf("new_filesystem_namespace: %w", err)
+	}
 	return nil
 }
 
 type RebindWorkspaceRequest struct {
-	OperationID string `json:"operation_id"`
-	OldRepoRoot string `json:"old_repo_root"`
-	NewRepoRoot string `json:"new_repo_root"`
+	OperationID    string `json:"operation_id"`
+	OldRepoRoot    string `json:"old_repo_root"`
+	NewRepoRoot    string `json:"new_repo_root"`
+	OldNamespaceID string `json:"old_filesystem_namespace,omitempty"`
+	NewNamespaceID string `json:"new_filesystem_namespace,omitempty"`
 }
 
 func (r *RebindWorkspaceRequest) Validate() error {
@@ -162,6 +176,12 @@ func (r *RebindWorkspaceRequest) Validate() error {
 	}
 	r.OldRepoRoot = oldRoot
 	r.NewRepoRoot = newRoot
+	if r.OldNamespaceID, err = normalizeWorkspaceNamespace(r.OldNamespaceID); err != nil {
+		return fmt.Errorf("old_filesystem_namespace: %w", err)
+	}
+	if r.NewNamespaceID, err = normalizeWorkspaceNamespace(r.NewNamespaceID); err != nil {
+		return fmt.Errorf("new_filesystem_namespace: %w", err)
+	}
 	return nil
 }
 
@@ -240,6 +260,8 @@ type bridgeLedgerInput struct {
 	TargetContinuityID string
 	SourceAnchor       string
 	TargetAnchor       string
+	SourceNamespaceID  string
+	TargetNamespaceID  string
 	TargetProfile      string
 	Title              string
 	ExportBody         string
@@ -253,6 +275,13 @@ func (i *bridgeLedgerInput) normalize() error {
 	i.TargetContinuityID = strings.TrimSpace(i.TargetContinuityID)
 	i.SourceAnchor = strings.TrimSpace(i.SourceAnchor)
 	i.TargetAnchor = strings.TrimSpace(i.TargetAnchor)
+	var err error
+	if i.SourceNamespaceID, err = normalizeWorkspaceNamespace(i.SourceNamespaceID); err != nil {
+		return fmt.Errorf("source_filesystem_namespace: %w", err)
+	}
+	if i.TargetNamespaceID, err = normalizeWorkspaceNamespace(i.TargetNamespaceID); err != nil {
+		return fmt.Errorf("target_filesystem_namespace: %w", err)
+	}
 	i.TargetProfile = strings.TrimSpace(i.TargetProfile)
 	i.Title = strings.TrimSpace(i.Title)
 	i.ExportBody = strings.TrimSpace(i.ExportBody)
@@ -272,6 +301,10 @@ func (i *bridgeLedgerInput) normalize() error {
 		return fmt.Errorf("request fingerprint is required")
 	}
 	return nil
+}
+
+func normalizeWorkspaceNamespace(value string) (string, error) {
+	return resolver.NormalizeFilesystemNamespace(value, true)
 }
 
 func bridgeRequestFingerprint(parts ...string) string {
