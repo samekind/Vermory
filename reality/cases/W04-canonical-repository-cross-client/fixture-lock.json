@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "case_id": "W04-canonical-repository-cross-client",
+  "manifest_sha256": "0c4a5487a1b45b98f64013211151345e3c2dd917de949a1ce8d442750f3b9618",
+  "events_sha256": "69af5cda964a17e617fef7131f017d83011f3cfd35831c33d393bd5e0308abfd",
+  "files": [
+    {
+      "path": "fixtures/canonical-repository-state.md",
+      "sha256": "f40b016cfcfd34a4029ae6fbed7d29e551b034e056903ff43577d0d9280ce398",
+      "bytes": 937
+    },
+    {
+      "path": "fixtures/same-name-distractor.md",
+      "sha256": "8888373d3f9d18bb678ac1a80f605ff884c33073cab4e50834896e92b268fd90",
+      "bytes": 489
+    }
+  ]
+}

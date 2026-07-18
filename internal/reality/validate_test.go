@@ -294,6 +294,48 @@ func TestH01HermesCaseIsFrozen(t *testing.T) {
 	}
 }
 
+func TestW04CanonicalRepositoryCrossClientCaseIsFrozen(t *testing.T) {
+	c, err := LoadCase("../../reality/cases/W04-canonical-repository-cross-client")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got := ValidateCase(c); len(got) != 0 {
+		t.Fatalf("expected valid W04 case, got violations: %#v", got)
+	}
+
+	for _, expected := range []ContinuityLine{LineWorkspace, LineSecurity} {
+		found := false
+		for _, line := range c.Manifest.ContinuityLines {
+			if line == expected {
+				found = true
+				break
+			}
+		}
+		if !found {
+			t.Fatalf("W04 does not declare continuity line %q: %#v", expected, c.Manifest.ContinuityLines)
+		}
+	}
+	requireStrings(t, c.Manifest.Pressures,
+		"real_cursor_agent",
+		"cross_client_continuity",
+		"canonical_repository_migration",
+		"source_revision",
+		"same_name_workspace_isolation",
+		"current_only_delivery",
+		"proposed_only_writeback",
+		"client_failure_retention",
+	)
+	requireStrings(t, c.Manifest.Expectations.CurrentFacts,
+		"The canonical repository is https://github.com/samekind/Vermory.",
+		"The current continuation marker is samekind-w25-current.",
+	)
+	requireStrings(t, c.Manifest.Expectations.ForbiddenFacts,
+		"https://github.com/jstar0/Vermory is the current canonical repository.",
+		"The canonical workspace continuation marker is distractor-w25-only.",
+		"A coding client may activate, correct, delete, rebind, or change the tenant of its own write-back.",
+	)
+}
+
 func TestI01AuthenticatedMultiTenantCaseIsFrozen(t *testing.T) {
 	c, err := LoadCase("../../reality/cases/I01-authenticated-multitenant-rls")
 	if err != nil {

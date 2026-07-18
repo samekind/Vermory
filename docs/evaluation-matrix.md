@@ -753,6 +753,36 @@ This does not qualify manual snapshots, tagged release publication,
 notarization, package-manager distribution, container signing, SLSA provenance,
 or external sealed evaluation. See
 [the W24 evidence](evidence/2026-07-18-protected-artifact-signing.md).
++
+## Cursor Agent Real-Client Attempt W25
+
+W25 freezes `W04-canonical-repository-cross-client` and attempts the complete
+workspace MCP path through the real `cursor-agent` CLI. The Mac mini
+PostgreSQL seed contains a current `samekind/Vermory` revision, one superseded
+personal-repository fact, and an active same-name distractor in another
+continuity.
+
+The real Cursor CLI successfully discovers the remote stdio server and exposes
+only `prepare_context` and `commit_observation`. The generation request then
+exits `1` with an unpaid-invoice account error before either tool is called.
+The final ledger therefore contains zero deliveries, zero agent-result
+observations, zero proposed memories, and no artifact.
+
+| Gate | Result |
+|---|---|
+| Real Cursor binary and model discovery | pass |
+| Project-local MCP approval and readiness | pass |
+| Restricted two-tool MCP schema | pass |
+| Real `prepare_context` call | blocked |
+| Exact artifact | not run |
+| Proposed-only write-back and replay | not run |
+| PostgreSQL zero-side-effect failure check | pass |
+| Privacy and 85-entry checksum verification | pass |
+| W25 qualification | **blocked / not qualified** |
+
+The failed attempts are retained rather than replaced by another client. See
+[the W25 evidence](evidence/2026-07-19-cursor-agent-real-client-attempt.md).
+
 
 ## Duojie Core Matrix Findings
 
