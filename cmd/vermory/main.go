@@ -45,6 +45,20 @@ func newRootCommand() *cobra.Command {
 	var caseLine string
 	var casebookReportPath string
 	var benchmarkMapPath string
+	var utilityProfilePath string
+	var utilityBundlePath string
+	var utilityMem0ContextDir string
+	var utilityNativeContextDir string
+	var utilityResetDedicated bool
+	var utilityRetrievalMode string
+	var utilityRetrievalProfile string
+	var utilityEmbeddingBaseURL string
+	var utilityEmbeddingAPIKeyEnv string
+	var utilityEmbeddingModel string
+	var utilityEmbeddingDimensions int
+	var mem0BaseURL string
+	var mem0APIKeyEnv string
+	var mem0IncludeSource bool
 	var backendName string
 	var backendBaseURL string
 	var backendAPIKeyEnv string
@@ -186,6 +200,146 @@ func newRootCommand() *cobra.Command {
 	evalSelfCaseCmd.Flags().StringVar(&runID, "run-id", "", "stable platform run id")
 	evalSelfCaseCmd.Flags().IntVar(&maxTokens, "max-tokens", 1024, "maximum output tokens")
 	rootCmd.AddCommand(evalSelfCaseCmd)
+
+	utilityComparisonCmd := &cobra.Command{
+		Use:   "utility-comparison",
+		Short: "Run frozen W27 context conditions against a prepared context bundle",
+		Args:  cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			report, err := app.EvalUtilityComparison(cmd.Context(), app.UtilityComparisonOptions{
+				ProfilePath:  utilityProfilePath,
+				BundlePath:   utilityBundlePath,
+				ArtifactRoot: artifactRoot,
+				Provider:     providerName,
+				BaseURL:      providerBaseURL,
+				APIKeyEnv:    providerAPIKeyEnv,
+				Model:        providerModel,
+				RunID:        runID,
+				MaxTokens:    maxTokens,
+			})
+			if err != nil {
+				return err
+			}
+			fmt.Fprintf(cmd.OutOrStdout(), "provider=%s model=%s calls=%d report=%s\n", report.ProviderName, report.Model, len(report.Results), report.ReportURI)
+			return nil
+		},
+	}
+	utilityComparisonCmd.Flags().StringVar(&utilityProfilePath, "profile", "runtime/cases/W27-real-utility-comparison/case.json", "W27 utility profile JSON")
+	utilityComparisonCmd.Flags().StringVar(&utilityBundlePath, "context-bundle", "", "hashed W27 context bundle JSON")
+	_ = utilityComparisonCmd.MarkFlagRequired("context-bundle")
+	utilityComparisonCmd.Flags().StringVar(&artifactRoot, "artifact-root", "./artifacts", "artifact output root")
+	utilityComparisonCmd.Flags().StringVar(&providerName, "provider", "mock", "provider: mock, grok-cli, openai-compatible, siliconflow, or duojie")
+	utilityComparisonCmd.Flags().StringVar(&providerBaseURL, "base-url", "", "direct provider base URL")
+	utilityComparisonCmd.Flags().StringVar(&providerAPIKeyEnv, "api-key-env", "", "environment variable containing provider API key")
+	utilityComparisonCmd.Flags().StringVar(&providerModel, "model", "", "provider model name")
+	utilityComparisonCmd.Flags().StringVar(&runID, "run-id", "", "stable utility run id")
+	utilityComparisonCmd.Flags().IntVar(&maxTokens, "max-tokens", 1024, "maximum output tokens")
+	rootCmd.AddCommand(utilityComparisonCmd)
+
+	prepareUtilityContextsCmd := &cobra.Command{
+		Use:   "prepare-utility-contexts",
+		Short: "Prepare W27 native deliveries and freeze the context bundle",
+		Args:  cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			bundle, err := app.PrepareUtilityContextBundle(cmd.Context(), app.UtilityContextBundleOptions{
+				ProfilePath:    utilityProfilePath,
+				CaseRoot:       caseRoot,
+				DatabaseURL:    databaseURL,
+				BundlePath:     utilityBundlePath,
+				Mem0ContextDir: utilityMem0ContextDir,
+				RunID:          runID,
+				ResetDedicated: utilityResetDedicated,
+			})
+			if err != nil {
+				return err
+			}
+			fmt.Fprintf(cmd.OutOrStdout(), "profile=%s cases=%d bundle=%s\n", bundle.ProfileID, len(bundle.Inputs), utilityBundlePath)
+			return nil
+		},
+	}
+	prepareUtilityContextsCmd.Flags().StringVar(&utilityProfilePath, "profile", "runtime/cases/W27-real-utility-comparison/case.json", "W27 utility profile JSON")
+	prepareUtilityContextsCmd.Flags().StringVar(&caseRoot, "case-root", "reality/cases", "frozen reality case root")
+	prepareUtilityContextsCmd.Flags().StringVar(&databaseURL, "database-url", "", "dedicated PostgreSQL connection URL")
+	_ = prepareUtilityContextsCmd.MarkFlagRequired("database-url")
+	prepareUtilityContextsCmd.Flags().StringVar(&utilityBundlePath, "bundle", "", "output hashed context bundle JSON")
+	_ = prepareUtilityContextsCmd.MarkFlagRequired("bundle")
+	prepareUtilityContextsCmd.Flags().StringVar(&utilityMem0ContextDir, "mem0-context-dir", "", "directory containing independently produced <case-id>.md mem0 contexts")
+	_ = prepareUtilityContextsCmd.MarkFlagRequired("mem0-context-dir")
+	prepareUtilityContextsCmd.Flags().StringVar(&runID, "run-id", "", "stable context preparation run id")
+	prepareUtilityContextsCmd.Flags().BoolVar(&utilityResetDedicated, "reset-dedicated", false, "reset the explicitly dedicated qualification database before seeding")
+	rootCmd.AddCommand(prepareUtilityContextsCmd)
+
+	prepareNativeContextsCmd := &cobra.Command{
+		Use:   "prepare-native-contexts",
+		Short: "Prepare W27 native PostgreSQL deliveries without a mem0 substitution",
+		Args:  cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if err := app.PrepareNativeUtilityContexts(cmd.Context(), app.NativeUtilityContextOptions{
+				ProfilePath:         utilityProfilePath,
+				CaseRoot:            caseRoot,
+				DatabaseURL:         databaseURL,
+				OutputDir:           utilityNativeContextDir,
+				RunID:               runID,
+				ResetDedicated:      utilityResetDedicated,
+				RetrievalMode:       utilityRetrievalMode,
+				RetrievalProfile:    utilityRetrievalProfile,
+				EmbeddingBaseURL:    utilityEmbeddingBaseURL,
+				EmbeddingAPIKey:     os.Getenv(utilityEmbeddingAPIKeyEnv),
+				EmbeddingModel:      utilityEmbeddingModel,
+				EmbeddingDimensions: utilityEmbeddingDimensions,
+			}); err != nil {
+				return err
+			}
+			fmt.Fprintf(cmd.OutOrStdout(), "contexts=%s\n", utilityNativeContextDir)
+			return nil
+		},
+	}
+	prepareNativeContextsCmd.Flags().StringVar(&utilityProfilePath, "profile", "runtime/cases/W27-real-utility-comparison/case.json", "W27 utility profile JSON")
+	prepareNativeContextsCmd.Flags().StringVar(&caseRoot, "case-root", "reality/cases", "frozen reality case root")
+	prepareNativeContextsCmd.Flags().StringVar(&databaseURL, "database-url", "", "dedicated PostgreSQL connection URL")
+	_ = prepareNativeContextsCmd.MarkFlagRequired("database-url")
+	prepareNativeContextsCmd.Flags().StringVar(&utilityNativeContextDir, "output-dir", "", "native context evidence directory")
+	_ = prepareNativeContextsCmd.MarkFlagRequired("output-dir")
+	prepareNativeContextsCmd.Flags().StringVar(&runID, "run-id", "", "stable native context run id")
+	prepareNativeContextsCmd.Flags().BoolVar(&utilityResetDedicated, "reset-dedicated", false, "reset the explicitly dedicated qualification database before seeding")
+	prepareNativeContextsCmd.Flags().StringVar(&utilityRetrievalMode, "retrieval-mode", "lexical", "native retrieval mode: lexical, shadow, or vector")
+	prepareNativeContextsCmd.Flags().StringVar(&utilityRetrievalProfile, "retrieval-profile", runtime.ProductionRetrievalProfileID, "native retrieval profile identifier")
+	prepareNativeContextsCmd.Flags().StringVar(&utilityEmbeddingBaseURL, "embedding-base-url", "", "direct SiliconFlow embedding API base URL")
+	prepareNativeContextsCmd.Flags().StringVar(&utilityEmbeddingAPIKeyEnv, "embedding-api-key-env", "SILICONFLOW_API_KEY", "environment variable containing the embedding API key")
+	prepareNativeContextsCmd.Flags().StringVar(&utilityEmbeddingModel, "embedding-model", "", "embedding model name")
+	prepareNativeContextsCmd.Flags().IntVar(&utilityEmbeddingDimensions, "embedding-dimensions", 0, "embedding vector dimensions")
+	rootCmd.AddCommand(prepareNativeContextsCmd)
+
+	prepareMem0ContextsCmd := &cobra.Command{
+		Use:   "prepare-mem0-contexts",
+		Short: "Prepare the isolated mem0 OSS W27 comparison contexts",
+		Args:  cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if err := app.PrepareMem0UtilityContexts(cmd.Context(), app.Mem0UtilityContextOptions{
+				ProfilePath:   utilityProfilePath,
+				CaseRoot:      caseRoot,
+				BaseURL:       mem0BaseURL,
+				APIKey:        os.Getenv(mem0APIKeyEnv),
+				ContextDir:    utilityMem0ContextDir,
+				RunID:         runID,
+				IncludeSource: mem0IncludeSource,
+			}); err != nil {
+				return err
+			}
+			fmt.Fprintf(cmd.OutOrStdout(), "contexts=%s\n", utilityMem0ContextDir)
+			return nil
+		},
+	}
+	prepareMem0ContextsCmd.Flags().StringVar(&utilityProfilePath, "profile", "runtime/cases/W27-real-utility-comparison/case.json", "W27 utility profile JSON")
+	prepareMem0ContextsCmd.Flags().StringVar(&caseRoot, "case-root", "reality/cases", "frozen reality case root")
+	prepareMem0ContextsCmd.Flags().StringVar(&mem0BaseURL, "base-url", "", "mem0 OSS API base URL")
+	_ = prepareMem0ContextsCmd.MarkFlagRequired("base-url")
+	prepareMem0ContextsCmd.Flags().StringVar(&mem0APIKeyEnv, "api-key-env", "", "optional environment variable containing mem0 API key")
+	prepareMem0ContextsCmd.Flags().StringVar(&utilityMem0ContextDir, "context-dir", "", "output mem0 context directory")
+	_ = prepareMem0ContextsCmd.MarkFlagRequired("context-dir")
+	prepareMem0ContextsCmd.Flags().StringVar(&runID, "run-id", "", "stable mem0 context run id")
+	prepareMem0ContextsCmd.Flags().BoolVar(&mem0IncludeSource, "include-source", true, "include the case source fixtures in the disposable mem0 scope")
+	rootCmd.AddCommand(prepareMem0ContextsCmd)
 
 	probeProviderCmd := &cobra.Command{
 		Use:   "probe-provider",
