@@ -92,6 +92,23 @@ func TestLongMemEvalVectorProfileV3AddsBoundedProjectionRecovery(t *testing.T) {
 	}
 }
 
+func TestLongMemEvalVectorProfileV4AlignsWorkerAndProviderBatches(t *testing.T) {
+	root, err := projectRoot()
+	if err != nil {
+		t.Fatal(err)
+	}
+	profile, digest, err := loadLongMemEvalVectorProfile(filepath.Join(root, "casebook/benchmarks/profiles/longmemeval-s-vector-retrieval-v4.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if digest == "" || profile.ID != "w28-longmemeval-s-vector-retrieval-v4" ||
+		profile.WorkerBatchSize != 16 || profile.EmbeddingBatchSize != 16 ||
+		profile.MaxAttempts != 5 || profile.ProjectionMaxRecoveries != 10 ||
+		profile.ProjectionRecoveryDelaySeconds != 30 {
+		t.Fatalf("unexpected v4 durable batch profile: digest=%q profile=%#v", digest, profile)
+	}
+}
+
 func TestLiveLongMemEvalVectorProfileBatch(t *testing.T) {
 	if os.Getenv("VERMORY_W28_LIVE_EMBEDDING") != "1" {
 		t.Skip("VERMORY_W28_LIVE_EMBEDDING=1 is required")
@@ -104,7 +121,7 @@ func TestLiveLongMemEvalVectorProfileBatch(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	profile, _, err := loadLongMemEvalVectorProfile(filepath.Join(root, "casebook/benchmarks/profiles/longmemeval-s-vector-retrieval-v3.json"))
+	profile, _, err := loadLongMemEvalVectorProfile(filepath.Join(root, "casebook/benchmarks/profiles/longmemeval-s-vector-retrieval-v4.json"))
 	if err != nil {
 		t.Fatal(err)
 	}

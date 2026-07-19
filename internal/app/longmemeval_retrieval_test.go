@@ -25,6 +25,12 @@ type longMemEvalProjectionRecoveryTestEmbedder struct {
 	batchFailuresRemaining int
 }
 
+type longMemEvalScheduledBatchFailureEmbedder struct {
+	longMemEvalVectorTestEmbedder
+	batchCalls  int
+	failedCalls map[int]bool
+}
+
 func (longMemEvalVectorTestEmbedder) Embed(_ context.Context, text string) ([]float32, error) {
 	vector := make([]float32, 1024)
 	lower := strings.ToLower(text)
@@ -54,6 +60,14 @@ func (embedder longMemEvalVectorTestEmbedder) EmbedBatch(ctx context.Context, te
 func (embedder *longMemEvalProjectionRecoveryTestEmbedder) EmbedBatch(ctx context.Context, texts []string) ([][]float32, error) {
 	if embedder.batchFailuresRemaining > 0 {
 		embedder.batchFailuresRemaining--
+		return nil, errors.New("transient provider outage")
+	}
+	return embedder.longMemEvalVectorTestEmbedder.EmbedBatch(ctx, texts)
+}
+
+func (embedder *longMemEvalScheduledBatchFailureEmbedder) EmbedBatch(ctx context.Context, texts []string) ([][]float32, error) {
+	embedder.batchCalls++
+	if embedder.failedCalls[embedder.batchCalls] {
 		return nil, errors.New("transient provider outage")
 	}
 	return embedder.longMemEvalVectorTestEmbedder.EmbedBatch(ctx, texts)
@@ -137,7 +151,7 @@ func TestLongMemEvalVectorRetrievalRunnerRecoversExhaustedProjectionOperation(t 
 	}
 	paths := prepareLongMemEvalRetrievalTestFiles(t, records)
 	prepareLongMemEvalVectorExecution(t, paths.execution)
-	profilePath := prepareLongMemEvalProjectionRecoveryProfile(t, func(profile *LongMemEvalVectorProfile) {
+	profilePath := prepareLongMemEvalVectorTestProfile(t, "longmemeval-s-vector-retrieval-v3.json", func(profile *LongMemEvalVectorProfile) {
 		profile.RetryDelayMilliseconds = 0
 	})
 	embedder := &longMemEvalProjectionRecoveryTestEmbedder{batchFailuresRemaining: 5}
@@ -183,7 +197,7 @@ func TestLongMemEvalVectorRetrievalRunnerFailsAfterProjectionRecoveryBudget(t *t
 	}
 	paths := prepareLongMemEvalRetrievalTestFiles(t, records)
 	prepareLongMemEvalVectorExecution(t, paths.execution)
-	profilePath := prepareLongMemEvalProjectionRecoveryProfile(t, func(profile *LongMemEvalVectorProfile) {
+	profilePath := prepareLongMemEvalVectorTestProfile(t, "longmemeval-s-vector-retrieval-v3.json", func(profile *LongMemEvalVectorProfile) {
 		profile.RetryDelayMilliseconds = 0
 		profile.ProjectionMaxRecoveries = 1
 	})
@@ -231,6 +245,61 @@ WHERE tenant_id=$1 AND profile_id=$2`,
 	}
 	if status != "failed" || failureCode != "embedding_unavailable" || lastEventID != 0 || attempts != 2 || vectors != 0 {
 		t.Fatalf("projection failure evidence drifted: status=%s failure=%s last=%d attempts=%d vectors=%d", status, failureCode, lastEventID, attempts, vectors)
+	}
+}
+
+func TestLongMemEvalVectorRetrievalRunnerPreservesCommittedProviderBatchPrefix(t *testing.T) {
+	databaseURL := resetBenchmarkDatabase(t)
+	records := []benchmark.LongMemEvalRecord{
+		retrievalTestRecord("record-a", "What is my launch code?", "ORBIT-7319", "answer-a", "My launch code is ORBIT-7319."),
+		retrievalTestRecord("record-b", "When is the maintenance window?", "Friday 22:30", "answer-b", "The maintenance window is Friday 22:30."),
+	}
+	paths := prepareLongMemEvalRetrievalTestFiles(t, records)
+	prepareLongMemEvalVectorExecution(t, paths.execution)
+	profilePath := prepareLongMemEvalVectorTestProfile(t, "longmemeval-s-vector-retrieval-v4.json", func(profile *LongMemEvalVectorProfile) {
+		profile.WorkerBatchSize = 2
+		profile.EmbeddingBatchSize = 2
+		profile.RetryDelayMilliseconds = 0
+	})
+	embedder := &longMemEvalScheduledBatchFailureEmbedder{failedCalls: map[int]bool{
+		2: true, 3: true, 4: true, 5: true, 6: true,
+	}}
+	pool, err := pgxpool.New(context.Background(), databaseURL)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer pool.Close()
+	var vectorsAtRecovery []int
+	report, err := RunLongMemEvalRetrieval(context.Background(), LongMemEvalRetrievalOptions{
+		QualificationPath:      paths.qualification,
+		ExecutionPath:          paths.execution,
+		SourceDatasetPath:      paths.source,
+		DatabaseURL:            databaseURL,
+		ArtifactRoot:           t.TempDir(),
+		RunID:                  "longmemeval-vector-prefix-recovery-test",
+		ImplementationRevision: "test-revision",
+		VectorProfilePath:      profilePath,
+		VectorEmbedder:         embedder,
+		ProjectionRecoverySleeper: func(_ context.Context, _ time.Duration) error {
+			var count int
+			if queryErr := pool.QueryRow(context.Background(), `SELECT count(*) FROM memory_vector_documents WHERE tenant_id=$1`, "benchmark:longmemeval-vector-prefix-recovery-test").Scan(&count); queryErr != nil {
+				return queryErr
+			}
+			vectorsAtRecovery = append(vectorsAtRecovery, count)
+			return nil
+		},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if report.Vector == nil || !report.Vector.HardGatesPass || report.Vector.RecoveredProjectionFailures != 1 {
+		t.Fatalf("provider-batch recovery did not pass: %#v", report.Vector)
+	}
+	if len(vectorsAtRecovery) != 1 || vectorsAtRecovery[0] != 2 {
+		t.Fatalf("committed provider-batch prefix was not retained: %#v", vectorsAtRecovery)
+	}
+	if embedder.batchCalls != 7 || report.Vector.Embedding.TerminalFailures != 1 || report.Vector.Embedding.SuccessfulItems != 6 {
+		t.Fatalf("unexpected provider-batch accounting: calls=%d embedding=%#v", embedder.batchCalls, report.Vector.Embedding)
 	}
 }
 
@@ -504,13 +573,13 @@ func prepareLongMemEvalVectorExecution(t *testing.T, path string) {
 	writeBenchmarkJSON(t, path, execution)
 }
 
-func prepareLongMemEvalProjectionRecoveryProfile(t *testing.T, mutate func(*LongMemEvalVectorProfile)) string {
+func prepareLongMemEvalVectorTestProfile(t *testing.T, name string, mutate func(*LongMemEvalVectorProfile)) string {
 	t.Helper()
 	root, err := projectRoot()
 	if err != nil {
 		t.Fatal(err)
 	}
-	profile, _, err := loadLongMemEvalVectorProfile(filepath.Join(root, "casebook/benchmarks/profiles/longmemeval-s-vector-retrieval-v3.json"))
+	profile, _, err := loadLongMemEvalVectorProfile(filepath.Join(root, "casebook/benchmarks/profiles", name))
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -124,6 +124,48 @@ therefore cannot be misclassified as a recovered projection failure: it still
 produces a degraded audited query and fails the qualification. v3 changes no
 retrieval condition, ranking label, source data, or production default.
 
+The exact-head v3 full run then reproduced the earlier provider boundary at
+2,560 committed vectors. Same-process recovery correctly moved the cursor from
+`failed` back to `running` without restarting the LaunchAgent, but all ten
+30-second recovery windows eventually exhausted. The run retained 500
+continuities, 23,867 active memories, 2,560 matching vectors, zero retrieval
+audits, and no partial cursor advancement; it contributes no score.
+
+A post-failure diagnostic sent the same event 2,561 as a one-item request and
+events 2,561-2,576 as one 16-item request. Both returned HTTP 200 with the
+expected 1 and 16 vectors at 1,024 dimensions. Payloads and response bodies
+were deleted; retained evidence contains only status, byte counts, dimensions,
+and response hashes. This again falsifies invalid content, deterministic batch
+shape, and a persistent account block.
+
+Code inspection identified the remaining progress defect. A 256-event worker
+pass calls the 16-item embedding provider up to sixteen times before
+`prepareEvents` returns. Event transactions and cursor advancement begin only
+after all sixteen calls succeed. A transient failure near the end therefore
+discards the successful provider-call prefix, and every recovery repeats that
+prefix before reaching the failing operation.
+
+The next append-only profile is
+`casebook/benchmarks/profiles/longmemeval-s-vector-retrieval-v4.json`:
+
+| Field | v4 value |
+|---|---|
+| Worker batch | `16` events |
+| Embedding batch | `16` texts |
+| Maximum attempts per embedding operation | `5` |
+| Attempt delay | linear: `2 / 4 / 6 / 8 seconds` |
+| Maximum projection recoveries | `10` |
+| Projection recovery cooldown | `30 seconds` |
+
+v4 aligns one provider operation with one durable worker pass. Once the
+provider returns sixteen valid vectors, those sixteen events are authority
+rechecked and committed before another provider operation begins. A later
+failure can repeat only its own uncommitted operation, not up to fifteen
+already successful provider calls. Tests inject a failure after one committed
+provider batch and prove that the committed vector/cursor prefix remains
+visible during recovery. v4 does not weaken atomic provider-response
+validation, increase retry budgets, or change any retrieval label.
+
 The profile contains no credential. The CLI accepts only the name of an
 environment variable and reads the secret inside the process. The profile's
 endpoint, model, dimensions, and projection class must match the registered
