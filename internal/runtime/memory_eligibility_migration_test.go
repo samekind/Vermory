@@ -20,8 +20,8 @@ func TestMemoryEligibilitySchema(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if version != 22 {
-		t.Fatalf("schema version=%d want 22", version)
+	if version != 23 {
+		t.Fatalf("schema version=%d want 23", version)
 	}
 
 	for _, column := range []struct {

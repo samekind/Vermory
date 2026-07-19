@@ -30,6 +30,10 @@ type LongMemEvalVectorProfile struct {
 	ProjectionClass                string   `json:"projection_class"`
 	WorkerBatchSize                int      `json:"worker_batch_size"`
 	EmbeddingBatchSize             int      `json:"embedding_batch_size"`
+	EmbeddingInputPolicy           string   `json:"embedding_input_policy,omitempty"`
+	MaxChunkBytes                  int      `json:"max_chunk_bytes,omitempty"`
+	ChunkOverlapBytes              int      `json:"chunk_overlap_bytes,omitempty"`
+	ChunkPooling                   string   `json:"chunk_pooling,omitempty"`
 	HTTPTimeoutSeconds             int      `json:"http_timeout_seconds"`
 	MaxAttempts                    int      `json:"max_attempts"`
 	RetryDelayMilliseconds         int      `json:"retry_delay_milliseconds"`
@@ -58,11 +62,18 @@ func (profile LongMemEvalVectorProfile) Validate() error {
 	if profile.BaseURL != spec.BaseURL || profile.Model != spec.Model || profile.Dimensions != spec.Dimensions || profile.ProjectionClass != string(spec.ProjectionClass) {
 		return fmt.Errorf("LongMemEval vector profile does not match registered retrieval profile %q", spec.ID)
 	}
+	inputPolicy := profile.inputPolicy()
+	if inputPolicy != spec.InputPolicy {
+		return fmt.Errorf("LongMemEval embedding input policy does not match registered retrieval profile %q", spec.ID)
+	}
 	if profile.WorkerBatchSize <= 0 || profile.WorkerBatchSize > 256 {
 		return fmt.Errorf("LongMemEval vector worker batch size must be between 1 and 256")
 	}
-	if profile.EmbeddingBatchSize <= 1 || profile.EmbeddingBatchSize > profile.WorkerBatchSize {
-		return fmt.Errorf("LongMemEval embedding batch size must be between 2 and the worker batch size")
+	if profile.EmbeddingBatchSize <= 1 || profile.EmbeddingBatchSize > 256 {
+		return fmt.Errorf("LongMemEval embedding batch size must be between 2 and 256")
+	}
+	if inputPolicy == (vermoryruntime.EmbeddingInputPolicy{}) && profile.EmbeddingBatchSize > profile.WorkerBatchSize {
+		return fmt.Errorf("LongMemEval embedding batch size cannot exceed the worker batch size without an input expansion policy")
 	}
 	if profile.HTTPTimeoutSeconds <= 0 || profile.HTTPTimeoutSeconds > 600 {
 		return fmt.Errorf("LongMemEval embedding timeout must be between 1 and 600 seconds")
@@ -97,6 +108,15 @@ func (profile LongMemEvalVectorProfile) Validate() error {
 	return nil
 }
 
+func (profile LongMemEvalVectorProfile) inputPolicy() vermoryruntime.EmbeddingInputPolicy {
+	return vermoryruntime.EmbeddingInputPolicy{
+		ID:                profile.EmbeddingInputPolicy,
+		MaxChunkBytes:     profile.MaxChunkBytes,
+		ChunkOverlapBytes: profile.ChunkOverlapBytes,
+		Pooling:           profile.ChunkPooling,
+	}
+}
+
 func (profile LongMemEvalVectorProfile) runtimeProfile() vermoryruntime.RetrievalProfile {
 	return vermoryruntime.RetrievalProfile{
 		ID:              profile.RetrievalProfile,
@@ -104,6 +124,7 @@ func (profile LongMemEvalVectorProfile) runtimeProfile() vermoryruntime.Retrieva
 		Model:           profile.Model,
 		Dimensions:      profile.Dimensions,
 		ProjectionClass: vermoryruntime.ProjectionClass(profile.ProjectionClass),
+		InputPolicy:     profile.inputPolicy(),
 	}
 }
 
@@ -129,13 +150,14 @@ func loadLongMemEvalVectorProfile(path string) (LongMemEvalVectorProfile, string
 }
 
 type longMemEvalEmbeddingStats struct {
-	LogicalOperations int64 `json:"logical_operations"`
-	ProviderAttempts  int64 `json:"provider_attempts"`
-	AttemptedItems    int64 `json:"attempted_items"`
-	SuccessfulItems   int64 `json:"successful_items"`
-	FailedAttempts    int64 `json:"failed_attempts"`
-	RetriedOperations int64 `json:"retried_operations"`
-	TerminalFailures  int64 `json:"terminal_failures"`
+	LogicalOperations     int64 `json:"logical_operations"`
+	LogicalEmbeddingItems int64 `json:"logical_embedding_items"`
+	ProviderAttempts      int64 `json:"provider_attempts"`
+	AttemptedItems        int64 `json:"attempted_items"`
+	SuccessfulItems       int64 `json:"successful_items"`
+	FailedAttempts        int64 `json:"failed_attempts"`
+	RetriedOperations     int64 `json:"retried_operations"`
+	TerminalFailures      int64 `json:"terminal_failures"`
 }
 
 type longMemEvalRetryingEmbedder struct {
@@ -146,12 +168,19 @@ type longMemEvalRetryingEmbedder struct {
 	retryBackoff      string
 	sleeper           func(context.Context, time.Duration) error
 	logicalOperations atomic.Int64
+	logicalItems      atomic.Int64
 	providerAttempts  atomic.Int64
 	attemptedItems    atomic.Int64
 	successfulItems   atomic.Int64
 	failedAttempts    atomic.Int64
 	retriedOperations atomic.Int64
 	terminalFailures  atomic.Int64
+}
+
+func (embedder *longMemEvalRetryingEmbedder) RecordLogicalEmbeddingSuccess(items int) {
+	if items > 0 {
+		embedder.logicalItems.Add(int64(items))
+	}
 }
 
 func newLongMemEvalRetryingEmbedder(delegate vermoryruntime.Embedder, profile LongMemEvalVectorProfile) (*longMemEvalRetryingEmbedder, error) {
@@ -232,13 +261,14 @@ func (embedder *longMemEvalRetryingEmbedder) retryDelayForAttempt(attempt int) t
 
 func (embedder *longMemEvalRetryingEmbedder) stats() longMemEvalEmbeddingStats {
 	return longMemEvalEmbeddingStats{
-		LogicalOperations: embedder.logicalOperations.Load(),
-		ProviderAttempts:  embedder.providerAttempts.Load(),
-		AttemptedItems:    embedder.attemptedItems.Load(),
-		SuccessfulItems:   embedder.successfulItems.Load(),
-		FailedAttempts:    embedder.failedAttempts.Load(),
-		RetriedOperations: embedder.retriedOperations.Load(),
-		TerminalFailures:  embedder.terminalFailures.Load(),
+		LogicalOperations:     embedder.logicalOperations.Load(),
+		LogicalEmbeddingItems: embedder.logicalItems.Load(),
+		ProviderAttempts:      embedder.providerAttempts.Load(),
+		AttemptedItems:        embedder.attemptedItems.Load(),
+		SuccessfulItems:       embedder.successfulItems.Load(),
+		FailedAttempts:        embedder.failedAttempts.Load(),
+		RetriedOperations:     embedder.retriedOperations.Load(),
+		TerminalFailures:      embedder.terminalFailures.Load(),
 	}
 }
 

@@ -1,0 +1,43 @@
+{
+  "schema_version": "longmemeval-vector-profile/v1",
+  "id": "w28-longmemeval-s-vector-retrieval-v5",
+  "provider": "siliconflow-direct",
+  "retrieval_profile": "siliconflow-bge-m3-1024-chunked-mean-v2",
+  "base_url": "https://api.siliconflow.cn/v1",
+  "model": "BAAI/bge-m3",
+  "dimensions": 1024,
+  "projection_class": "vector_1024",
+  "worker_batch_size": 1,
+  "embedding_batch_size": 16,
+  "embedding_input_policy": "utf8-byte-chunks-v1",
+  "max_chunk_bytes": 7500,
+  "chunk_overlap_bytes": 500,
+  "chunk_pooling": "normalized_mean",
+  "http_timeout_seconds": 120,
+  "max_attempts": 5,
+  "retry_delay_milliseconds": 2000,
+  "retry_backoff": "linear",
+  "projection_max_recoveries": 10,
+  "projection_recovery_delay_seconds": 30,
+  "conditions": [
+    "plain_token_overlap",
+    "vermory_lexical",
+    "vermory_vector"
+  ],
+  "hard_gates": [
+    "all 500 pinned records execute and all 470 scored records contain three condition scores",
+    "the governed authority contains exactly 500 isolated conversation continuities and 23867 active session memories",
+    "the candidate vector projection is idle with zero lag and exactly 23867 logical vector documents",
+    "every embedding input is valid UTF-8 and at most 7500 bytes",
+    "each governed memory and query has exact logical and physical embedding accounting",
+    "all vector retrievals remain effective vector results with zero degradation",
+    "unrecovered projection or provider failures and scope or lifecycle leakage remain zero",
+    "the legacy profiles and two-condition lexical execution remain unchanged"
+  ],
+  "non_claims": [
+    "not a full LongMemEval QA score",
+    "not an embedding-provider or language-model ranking",
+    "not a production default retrieval switch",
+    "not a sealed or held-out result"
+  ]
+}

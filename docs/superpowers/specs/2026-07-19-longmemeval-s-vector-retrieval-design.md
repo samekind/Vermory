@@ -166,6 +166,45 @@ provider batch and prove that the committed vector/cursor prefix remains
 visible during recovery. v4 does not weaken atomic provider-response
 validation, increase retry budgets, or change any retrieval label.
 
+The exact-head v4 run validated that durable alignment: it committed 2,592
+vectors, beyond the earlier 2,560 boundary, before the next one-event worker
+pass exhausted its recovery budget. It executed no retrieval query and
+contributes no score. A post-run diagnostic then replayed the exact physical
+operation for events 2,593-2,608. The 16-item request contained 174,727 input
+bytes and returned HTTP 400 with provider code `20015`. Individual replay
+returned HTTP 200 and one 1,024-dimensional vector for 15 items; the remaining
+43,406-byte item returned the same HTTP 400 and provider code. Response bodies,
+headers, credentials, and input payloads were not retained.
+
+This identifies a deterministic per-input provider limit. More retries cannot
+make the operation valid, and silent truncation would change the governed
+memory's meaning. The next append-only profile is therefore
+`casebook/benchmarks/profiles/longmemeval-s-vector-retrieval-v5.json`:
+
+| Field | v5 value |
+|---|---|
+| Retrieval profile | `siliconflow-bge-m3-1024-chunked-mean-v2` |
+| Lifecycle | registered candidate; production default remains v1 |
+| Worker batch | `1` logical memory |
+| Provider batch | at most `16` physical chunks |
+| Input policy | `utf8-byte-chunks-v1` |
+| Maximum chunk size | `7,500` bytes |
+| Chunk overlap | `500` bytes |
+| Pooling | arithmetic mean in float64, then L2 normalization |
+
+The chunk boundary is moved only to a valid UTF-8 boundary. Invalid UTF-8,
+non-progressing policies, wrong vector counts or dimensions, and zero-norm
+pooled vectors fail closed. No source bytes are dropped. One governed memory
+still produces one rebuildable vector document with the full source-content
+hash, and query embeddings use the same input policy. A single-chunk input
+preserves the provider vector unchanged, so the candidate introduces no
+unnecessary normalization on short inputs.
+
+The profile identity includes the transformation policy. The v1-v4 profile
+tuples retain a zero input policy and their original runtime behavior. The
+candidate is stored in PostgreSQL as `candidate`; this public qualification
+cannot activate it or change Vermory's default retrieval profile.
+
 The profile contains no credential. The CLI accepts only the name of an
 environment variable and reads the secret inside the process. The profile's
 endpoint, model, dimensions, and projection class must match the registered
@@ -185,6 +224,11 @@ The existing single-text `Embed` contract remains valid. W28 adds an optional
 - authority is rechecked before each vector mutation;
 - projection events remain resumable and idempotent;
 - neither input text nor provider error bodies enter public evidence.
+- each physical input obeys the registered UTF-8 and byte-bound contract;
+- physical chunks are transient request material and are not new authority or
+  separately stored memories;
+- one logical memory or query is counted as successful only after all of its
+  physical chunks produce one valid logical vector.
 
 This is a production runtime capability used by W28, not a benchmark-side
 shortcut. It applies to durable event projection and current-authority rebuilds.
@@ -200,13 +244,17 @@ remain distinct occurrences exactly as in W14.
 
 ### 2. Durable vector projection
 
-After import, the registered production projection worker drains the tenant's
-durable projection events. It uses the frozen event and embedding batch sizes.
+After import, the production projection worker drains the tenant's durable
+projection events using the retrieval profile selected by the frozen W28
+profile. It uses the frozen event and embedding batch sizes.
 The phase is complete only when:
 
 - cursor status is `idle`;
 - projection lag is zero;
 - vector count equals the number of active governed session memories;
+- every physical provider input obeys the selected profile's byte limit;
+- successful logical and physical item counts equal their independently
+  computed expectations;
 - no rebuild-required or terminal provider failure remains.
 
 ### 3. Three-condition retrieval
@@ -225,7 +273,7 @@ retained with its failure code and fails qualification.
 The runner applies the existing deterministic LongMemEval session metrics at
 K=5, K=10, and K=12. It reports aggregate and question-type RecallAny,
 RecallAll, nDCG, MRR, classification counts, latency, projection state, and
-embedding request/item counts.
+embedding operation, logical-item, and physical provider-item counts.
 
 ## Failure And Resume Semantics
 
@@ -252,10 +300,12 @@ W28 is execution-qualified only when all of the following hold:
 4. The vector projection is `idle`, has zero lag, and contains exactly 23,867 current vectors.
 5. Every vector query is effective `vector`; degraded queries are zero.
 6. Unrecovered embedding/provider failures are zero; every exhausted operation, recovery cooldown, attempt, and item is counted.
-7. Cross-tenant, cross-continuity, unmapped, non-active, superseded, archived, deleted, and redacted retrieval results are zero.
-8. Query and projection operation identities remain idempotent under verified replay.
-9. Old W14 lexical execution remains accepted without embedding configuration.
-10. PostgreSQL, race, vet, repository policy, release, and protected CI gates pass.
+7. Successful logical embedding items equal 23,867 memories plus 500 queries, and successful physical provider items exactly equal the count independently derived with the registered input policy.
+8. Every physical candidate-profile input is valid UTF-8 and no larger than 7,500 bytes; truncation is forbidden.
+9. Cross-tenant, cross-continuity, unmapped, non-active, superseded, archived, deleted, and redacted retrieval results are zero.
+10. Query and projection operation identities remain idempotent under verified replay.
+11. Old W14 lexical execution and v1-v4 retrieval profiles remain accepted without input-policy drift.
+12. PostgreSQL, race, vet, repository policy, release, and protected CI gates pass.
 
 Retrieval quality is a measured outcome, not a hard-coded pass threshold. A
 vector score below the lexical or token-overlap baseline is a valid negative

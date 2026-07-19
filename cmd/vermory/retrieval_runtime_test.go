@@ -359,3 +359,21 @@ func TestRetrievalRuntimeProfileIDResolvesFrozenTuple(t *testing.T) {
 		})
 	}
 }
+
+func TestRetrievalRuntimeProfileIDResolvesChunkedInputPolicy(t *testing.T) {
+	t.Setenv("W28_PRESENT_KEY", "secret-value-that-must-not-leak")
+	options := defaultRetrievalRuntimeOptions()
+	options.Mode = runtime.RetrievalVector
+	options.ProfileID = runtime.ChunkedMeanRetrievalProfileID
+	options.EmbeddingAPIKeyEnv = "W28_PRESENT_KEY"
+	profile := options.profile()
+	if profile.ID != runtime.ChunkedMeanRetrievalProfileID ||
+		profile.InputPolicy.ID != runtime.EmbeddingInputPolicyUTF8ChunkedMeanV1 ||
+		profile.InputPolicy.MaxChunkBytes != 7500 || profile.InputPolicy.ChunkOverlapBytes != 500 ||
+		profile.InputPolicy.Pooling != runtime.EmbeddingPoolingNormalizedMean {
+		t.Fatalf("chunked retrieval profile lost its input policy: %#v", profile)
+	}
+	if _, err := options.validateSemantic(); err != nil {
+		t.Fatal(err)
+	}
+}

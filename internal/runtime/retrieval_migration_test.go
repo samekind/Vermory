@@ -129,8 +129,8 @@ WHERE conrelid IN (
 	if err := store.pool.QueryRow(ctx, `SELECT count(*) FROM memory_retrieval_profiles`).Scan(&profileCount); err != nil {
 		t.Fatal(err)
 	}
-	if profileCount != 3 {
-		t.Fatalf("retrieval profile registry count=%d, want 3", profileCount)
+	if profileCount != 4 {
+		t.Fatalf("retrieval profile registry count=%d, want 4", profileCount)
 	}
 	var candidateModel string
 	if err := store.pool.QueryRow(ctx, `

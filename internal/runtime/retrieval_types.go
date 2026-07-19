@@ -11,6 +11,7 @@ import (
 
 const (
 	ProductionRetrievalProfileID           = "siliconflow-bge-m3-1024-v1"
+	ChunkedMeanRetrievalProfileID          = "siliconflow-bge-m3-1024-chunked-mean-v2"
 	MigrationRetrievalProfileID            = "siliconflow-bge-large-zh-1024-v2"
 	DimensionalMigrationRetrievalProfileID = "siliconflow-qwen3-embedding-4b-2560-v3"
 	ProjectionStatusRebuildRequired        = "rebuild_required"
@@ -31,6 +32,7 @@ type RetrievalProfileSpec struct {
 	Dimensions      int
 	ProjectionClass ProjectionClass
 	Status          string
+	InputPolicy     EmbeddingInputPolicy
 }
 
 func SupportedRetrievalProfile(id string) (RetrievalProfileSpec, bool) {
@@ -38,6 +40,16 @@ func SupportedRetrievalProfile(id string) (RetrievalProfileSpec, bool) {
 		ProductionRetrievalProfileID: {
 			ID: ProductionRetrievalProfileID, BaseURL: "https://api.siliconflow.cn/v1",
 			Model: "BAAI/bge-m3", Dimensions: 1024, ProjectionClass: ProjectionClass1024, Status: "active",
+		},
+		ChunkedMeanRetrievalProfileID: {
+			ID: ChunkedMeanRetrievalProfileID, BaseURL: "https://api.siliconflow.cn/v1",
+			Model: "BAAI/bge-m3", Dimensions: 1024, ProjectionClass: ProjectionClass1024, Status: "candidate",
+			InputPolicy: EmbeddingInputPolicy{
+				ID:                EmbeddingInputPolicyUTF8ChunkedMeanV1,
+				MaxChunkBytes:     7500,
+				ChunkOverlapBytes: 500,
+				Pooling:           EmbeddingPoolingNormalizedMean,
+			},
 		},
 		MigrationRetrievalProfileID: {
 			ID: MigrationRetrievalProfileID, BaseURL: "https://api.siliconflow.cn/v1",
@@ -146,6 +158,7 @@ type RetrievalProfile struct {
 	Model           string
 	Dimensions      int
 	ProjectionClass ProjectionClass
+	InputPolicy     EmbeddingInputPolicy
 }
 
 func (p RetrievalProfile) Validate() error {
@@ -170,6 +183,9 @@ func (p RetrievalProfile) Validate() error {
 	if p.ProjectionClass != spec.ProjectionClass {
 		return fmt.Errorf("retrieval projection class must be %s", spec.ProjectionClass)
 	}
+	if p.InputPolicy != spec.InputPolicy {
+		return fmt.Errorf("retrieval embedding input policy does not match profile %q", spec.ID)
+	}
 	return nil
 }
 
@@ -179,6 +195,10 @@ type Embedder interface {
 
 type BatchEmbedder interface {
 	EmbedBatch(context.Context, []string) ([][]float32, error)
+}
+
+type LogicalEmbeddingObserver interface {
+	RecordLogicalEmbeddingSuccess(int)
 }
 
 type ProjectionStatus struct {

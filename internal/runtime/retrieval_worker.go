@@ -197,6 +197,10 @@ ON CONFLICT (tenant_id, profile_id) DO UPDATE SET
 		}
 		vectors, err := w.embedTexts(tenantCtx, texts)
 		if err != nil {
+			var dimensionErr embeddingDimensionError
+			if errors.As(err, &dimensionErr) {
+				return w.failRebuild(ctx, connection, result, "embedding_dimension_mismatch")
+			}
 			return w.failRebuild(ctx, connection, result, "embedding_unavailable")
 		}
 		for index, memory := range page {
@@ -387,6 +391,10 @@ func (w *ProjectionWorker) prepareEvents(ctx context.Context, connection *pgxpoo
 	}
 	vectors, err := w.embedTexts(ctx, texts)
 	if err != nil {
+		var dimensionErr embeddingDimensionError
+		if errors.As(err, &dimensionErr) {
+			return nil, projectionRunError{code: "embedding_dimension_mismatch"}
+		}
 		return nil, projectionRunError{code: "embedding_unavailable"}
 	}
 	for vectorIndex, preparedIndex := range textIndexes {
@@ -399,6 +407,17 @@ func (w *ProjectionWorker) prepareEvents(ctx context.Context, connection *pgxpoo
 }
 
 func (w *ProjectionWorker) embedTexts(ctx context.Context, texts []string) ([][]float32, error) {
+	if w.options.Profile.InputPolicy != (EmbeddingInputPolicy{}) {
+		vectors, _, err := embedLogicalTexts(
+			ctx,
+			w.embedder,
+			texts,
+			w.options.EmbeddingBatchSize,
+			w.options.Profile.Dimensions,
+			w.options.Profile.InputPolicy,
+		)
+		return vectors, err
+	}
 	if len(texts) == 0 {
 		return [][]float32{}, nil
 	}
@@ -427,6 +446,9 @@ func (w *ProjectionWorker) embedTexts(ctx context.Context, texts []string) ([][]
 			}
 			vectors = append(vectors, vector)
 		}
+	}
+	if observer, ok := w.embedder.(LogicalEmbeddingObserver); ok {
+		observer.RecordLogicalEmbeddingSuccess(len(vectors))
 	}
 	return vectors, nil
 }

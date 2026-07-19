@@ -117,6 +117,10 @@ func TestLongMemEvalVectorRetrievalRunnerUsesDurableProductionProjection(t *test
 	if report.Vector.Embedding.SuccessfulItems != 6 || report.Vector.Embedding.TerminalFailures != 0 {
 		t.Fatalf("unexpected embedding accounting: %#v", report.Vector.Embedding)
 	}
+	if report.Vector.Embedding.LogicalEmbeddingItems != 6 || report.Vector.ExpectedLogicalEmbeddingItems != 6 ||
+		report.Vector.ExpectedProviderItems != 6 || report.Vector.SuccessfulProviderItems != 6 {
+		t.Fatalf("logical/provider embedding accounting drifted: %#v", report.Vector)
+	}
 	for _, result := range report.Results {
 		if len(result.Conditions) != 3 {
 			t.Fatalf("record %s does not contain three conditions: %#v", result.RecordID, result.Conditions)
@@ -140,6 +144,49 @@ func TestLongMemEvalVectorRetrievalRunnerUsesDurableProductionProjection(t *test
 	}
 	if audits != 2 || vectors != 4 {
 		t.Fatalf("production vector evidence is missing: audits=%d vectors=%d", audits, vectors)
+	}
+}
+
+func TestLongMemEvalVectorRetrievalRunnerAccountsForChunkedPhysicalInputs(t *testing.T) {
+	databaseURL := resetBenchmarkDatabase(t)
+	record := retrievalTestRecord(
+		"record-chunked",
+		"What is my launch code? "+strings.Repeat("launch orbit continuity question ", 1700),
+		"ORBIT-7319",
+		"answer-chunked",
+		"My launch code is ORBIT-7319. "+strings.Repeat("launch orbit governed evidence ", 1700),
+	)
+	paths := prepareLongMemEvalRetrievalTestFiles(t, []benchmark.LongMemEvalRecord{record})
+	prepareLongMemEvalVectorExecution(t, paths.execution)
+	root, err := projectRoot()
+	if err != nil {
+		t.Fatal(err)
+	}
+	report, err := RunLongMemEvalRetrieval(context.Background(), LongMemEvalRetrievalOptions{
+		QualificationPath:      paths.qualification,
+		ExecutionPath:          paths.execution,
+		SourceDatasetPath:      paths.source,
+		DatabaseURL:            databaseURL,
+		ArtifactRoot:           t.TempDir(),
+		RunID:                  "longmemeval-vector-chunked-accounting-test",
+		ImplementationRevision: "test-revision",
+		VectorProfilePath:      filepath.Join(root, "casebook/benchmarks/profiles/longmemeval-s-vector-retrieval-v5.json"),
+		VectorEmbedder:         longMemEvalVectorTestEmbedder{},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if report.Vector == nil || !report.Vector.HardGatesPass ||
+		report.Vector.RetrievalProfile != vermoryruntime.ChunkedMeanRetrievalProfileID {
+		t.Fatalf("chunked runner hard gates did not pass: %#v", report.Vector)
+	}
+	if report.Vector.ExpectedLogicalEmbeddingItems != 3 || report.Vector.Embedding.LogicalEmbeddingItems != 3 ||
+		report.Vector.ExpectedProviderItems <= 3 ||
+		report.Vector.SuccessfulProviderItems != report.Vector.ExpectedProviderItems {
+		t.Fatalf("chunked runner accounting drifted: %#v", report.Vector)
+	}
+	if report.Vector.Projection.VectorCount != 2 || report.Vector.EffectiveVectorQueries != 1 || report.Vector.DegradedVectorQueries != 0 {
+		t.Fatalf("chunked runner projection/query evidence drifted: %#v", report.Vector)
 	}
 }
 

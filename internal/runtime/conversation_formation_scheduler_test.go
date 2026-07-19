@@ -18,7 +18,7 @@ func TestConversationFormationScheduleMigrationIsTenantScopedAndPreservesParentO
 	store := openTestStore(t)
 	ctx := context.Background()
 
-	if version, err := store.SchemaVersion(ctx); err != nil || version != 22 {
+	if version, err := store.SchemaVersion(ctx); err != nil || version != 23 {
 		t.Fatalf("schema version=%d err=%v", version, err)
 	}
 	for _, column := range []string{

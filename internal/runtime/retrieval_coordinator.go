@@ -109,9 +109,14 @@ func (c *RetrievalCoordinator) Retrieve(ctx context.Context, request RetrievalRe
 	} else {
 		projectionCurrent = true
 		vectorStarted := time.Now()
-		queryVector, embedErr := c.embedder.Embed(ctx, normalized.Query)
+		queryVector, embedErr := c.embedQuery(ctx, normalized.Query)
 		if embedErr != nil {
-			failureCode = "embedding_unavailable"
+			var dimensionErr embeddingDimensionError
+			if errors.As(embedErr, &dimensionErr) {
+				failureCode = "embedding_dimension_mismatch"
+			} else {
+				failureCode = "embedding_unavailable"
+			}
 		} else if len(queryVector) != c.profile.Dimensions {
 			failureCode = "embedding_dimension_mismatch"
 		} else {
@@ -169,6 +174,33 @@ func (c *RetrievalCoordinator) Retrieve(ctx context.Context, request RetrievalRe
 		AuditID:         auditID,
 		EligibilityAsOf: normalized.EligibilityAsOf,
 	}, nil
+}
+
+func (c *RetrievalCoordinator) embedQuery(ctx context.Context, query string) ([]float32, error) {
+	if c.profile.InputPolicy == (EmbeddingInputPolicy{}) {
+		vector, err := c.embedder.Embed(ctx, query)
+		if err == nil {
+			if observer, ok := c.embedder.(LogicalEmbeddingObserver); ok {
+				observer.RecordLogicalEmbeddingSuccess(1)
+			}
+		}
+		return vector, err
+	}
+	vectors, _, err := embedLogicalTexts(
+		ctx,
+		c.embedder,
+		[]string{query},
+		semanticQueryEmbeddingBatchSize,
+		c.profile.Dimensions,
+		c.profile.InputPolicy,
+	)
+	if err != nil {
+		return nil, err
+	}
+	if len(vectors) != 1 {
+		return nil, fmt.Errorf("embedding query returned %d logical vectors, want 1", len(vectors))
+	}
+	return vectors[0], nil
 }
 
 func (c *RetrievalCoordinator) lexical(ctx context.Context, request RetrievalRequest, scope retrievalScope) ([]Memory, error) {

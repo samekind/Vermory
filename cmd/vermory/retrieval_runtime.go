@@ -39,8 +39,10 @@ func (options retrievalRuntimeOptions) profile() runtime.RetrievalProfile {
 	model := strings.TrimSpace(options.EmbeddingModel)
 	dimensions := options.EmbeddingDimensions
 	var projectionClass runtime.ProjectionClass
+	var inputPolicy runtime.EmbeddingInputPolicy
 	if spec, ok := runtime.SupportedRetrievalProfile(profileID); ok {
 		projectionClass = spec.ProjectionClass
+		inputPolicy = spec.InputPolicy
 		if baseURL == "" {
 			baseURL = spec.BaseURL
 		}
@@ -57,6 +59,7 @@ func (options retrievalRuntimeOptions) profile() runtime.RetrievalProfile {
 		Model:           model,
 		Dimensions:      dimensions,
 		ProjectionClass: projectionClass,
+		InputPolicy:     inputPolicy,
 	}
 }
 

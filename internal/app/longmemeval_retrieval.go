@@ -120,6 +120,10 @@ type LongMemEvalVectorEvidence struct {
 	ProjectionClass                string                          `json:"projection_class"`
 	WorkerBatchSize                int                             `json:"worker_batch_size"`
 	EmbeddingBatchSize             int                             `json:"embedding_batch_size"`
+	EmbeddingInputPolicy           string                          `json:"embedding_input_policy,omitempty"`
+	MaxChunkBytes                  int                             `json:"max_chunk_bytes,omitempty"`
+	ChunkOverlapBytes              int                             `json:"chunk_overlap_bytes,omitempty"`
+	ChunkPooling                   string                          `json:"chunk_pooling,omitempty"`
 	HTTPTimeoutSeconds             int                             `json:"http_timeout_seconds"`
 	MaxAttempts                    int                             `json:"max_attempts"`
 	RetryDelayMilliseconds         int                             `json:"retry_delay_milliseconds"`
@@ -132,6 +136,9 @@ type LongMemEvalVectorEvidence struct {
 	ProjectionDurationMilliseconds int64                           `json:"projection_duration_ms"`
 	Projection                     vermoryruntime.ProjectionStatus `json:"projection"`
 	Embedding                      longMemEvalEmbeddingStats       `json:"embedding"`
+	ExpectedLogicalEmbeddingItems  int64                           `json:"expected_logical_embedding_items"`
+	ExpectedProviderItems          int64                           `json:"expected_provider_items"`
+	SuccessfulProviderItems        int64                           `json:"successful_provider_items"`
 	EffectiveVectorQueries         int                             `json:"effective_vector_queries"`
 	DegradedVectorQueries          int                             `json:"degraded_vector_queries"`
 	FailureCodeBreakdown           map[string]int                  `json:"failure_code_breakdown"`
@@ -253,11 +260,18 @@ func RunLongMemEvalRetrieval(ctx context.Context, opts LongMemEvalRetrievalOptio
 		if err != nil {
 			return LongMemEvalRetrievalReport{}, err
 		}
-		vectorRetriever, err = vermoryruntime.NewRetrievalCoordinator(store, vectorMeter, vectorProfile.runtimeProfile())
+		vectorRuntimeProfile := vectorProfile.runtimeProfile()
+		vectorRetriever, err = vermoryruntime.NewRetrievalCoordinator(store, vectorMeter, vectorRuntimeProfile)
 		if err != nil {
 			return LongMemEvalRetrievalReport{}, err
 		}
+		var expectedProviderItems int64
 		if _, err := benchmark.ScanLongMemEval(sourcePath, func(record benchmark.LongMemEvalRecord) error {
+			items, countErr := countLongMemEvalEmbeddingInputs(vectorRuntimeProfile, record)
+			if countErr != nil {
+				return countErr
+			}
+			expectedProviderItems += items
 			_, err := importLongMemEvalRetrievalRecord(ctx, store, tenantID, runID, execution, record)
 			return err
 		}); err != nil {
@@ -265,7 +279,7 @@ func RunLongMemEvalRetrieval(ctx context.Context, opts LongMemEvalRetrievalOptio
 		}
 		worker, err := vermoryruntime.NewProjectionWorker(store, vectorMeter, vermoryruntime.ProjectionWorkerOptions{
 			TenantID:           tenantID,
-			Profile:            vectorProfile.runtimeProfile(),
+			Profile:            vectorRuntimeProfile,
 			BatchSize:          vectorProfile.WorkerBatchSize,
 			EmbeddingBatchSize: vectorProfile.EmbeddingBatchSize,
 		})
@@ -323,6 +337,10 @@ func RunLongMemEvalRetrieval(ctx context.Context, opts LongMemEvalRetrievalOptio
 			ProjectionClass:                vectorProfile.ProjectionClass,
 			WorkerBatchSize:                vectorProfile.WorkerBatchSize,
 			EmbeddingBatchSize:             vectorProfile.EmbeddingBatchSize,
+			EmbeddingInputPolicy:           vectorProfile.EmbeddingInputPolicy,
+			MaxChunkBytes:                  vectorProfile.MaxChunkBytes,
+			ChunkOverlapBytes:              vectorProfile.ChunkOverlapBytes,
+			ChunkPooling:                   vectorProfile.ChunkPooling,
 			HTTPTimeoutSeconds:             vectorProfile.HTTPTimeoutSeconds,
 			MaxAttempts:                    vectorProfile.MaxAttempts,
 			RetryDelayMilliseconds:         vectorProfile.RetryDelayMilliseconds,
@@ -334,6 +352,8 @@ func RunLongMemEvalRetrieval(ctx context.Context, opts LongMemEvalRetrievalOptio
 			ProjectionRecoverySleeps:       projectionRecoverySleeps,
 			ProjectionDurationMilliseconds: time.Since(projectionStarted).Milliseconds(),
 			Projection:                     projectionStatus, FailureCodeBreakdown: make(map[string]int),
+			ExpectedLogicalEmbeddingItems: int64(summary.SessionCount + summary.RecordCount),
+			ExpectedProviderItems:         expectedProviderItems,
 		}
 		if projectionStatus.Status != "idle" || projectionStatus.Lag != 0 || projectionStatus.VectorCount != int64(summary.SessionCount) {
 			return LongMemEvalRetrievalReport{}, fmt.Errorf("LongMemEval vector projection is not current: status=%s lag=%d vectors=%d want=%d", projectionStatus.Status, projectionStatus.Lag, projectionStatus.VectorCount, summary.SessionCount)
@@ -382,6 +402,7 @@ func RunLongMemEvalRetrieval(ctx context.Context, opts LongMemEvalRetrievalOptio
 	report := finalizeLongMemEvalRetrievalReport(runID, implementationRevision, qualification, execution, summary, results)
 	if vectorEvidence != nil {
 		vectorEvidence.Embedding = vectorMeter.stats()
+		vectorEvidence.SuccessfulProviderItems = vectorEvidence.Embedding.SuccessfulItems
 		for _, result := range report.Results {
 			for _, condition := range result.Conditions {
 				if condition.Condition != longMemEvalRetrievalVector {
@@ -403,7 +424,8 @@ func RunLongMemEvalRetrieval(ctx context.Context, opts LongMemEvalRetrievalOptio
 			vectorEvidence.ProjectionRecoverySleeps == vectorEvidence.RecoveredProjectionFailures &&
 			vectorEvidence.RecoveredProjectionFailures <= vectorEvidence.ProjectionMaxRecoveries &&
 			vectorEvidence.Embedding.TerminalFailures == int64(vectorEvidence.RecoveredProjectionFailures) &&
-			vectorEvidence.Embedding.SuccessfulItems == int64(summary.SessionCount+summary.RecordCount)
+			vectorEvidence.Embedding.LogicalEmbeddingItems == vectorEvidence.ExpectedLogicalEmbeddingItems &&
+			vectorEvidence.SuccessfulProviderItems == vectorEvidence.ExpectedProviderItems
 		report.Vector = vectorEvidence
 	}
 	if err := writeLongMemEvalRetrievalArtifacts(ctx, artifactStore, opts.ArtifactRoot, prefix, qualification, execution, &report); err != nil {
@@ -414,6 +436,22 @@ func RunLongMemEvalRetrieval(ctx context.Context, opts LongMemEvalRetrievalOptio
 			len(report.Failures), report.ScoredRecordCount, execution.ExpectedScoredRecordCount, report.Artifacts["report"])
 	}
 	return report, nil
+}
+
+func countLongMemEvalEmbeddingInputs(profile vermoryruntime.RetrievalProfile, record benchmark.LongMemEvalRecord) (int64, error) {
+	var total int64
+	for _, occurrence := range longMemEvalRetrievalOccurrences(record) {
+		count, err := vermoryruntime.EmbeddingInputCount(profile, occurrence.Session.SemanticText())
+		if err != nil {
+			return 0, fmt.Errorf("count LongMemEval session embedding inputs: %w", err)
+		}
+		total += int64(count)
+	}
+	count, err := vermoryruntime.EmbeddingInputCount(profile, record.Question)
+	if err != nil {
+		return 0, fmt.Errorf("count LongMemEval query embedding inputs: %w", err)
+	}
+	return total + int64(count), nil
 }
 
 func longMemEvalLexicalConditions() []string {
@@ -913,7 +951,7 @@ func markdownLongMemEvalRetrievalReport(report LongMemEvalRetrievalReport) strin
 		fmt.Fprintf(&builder, "- Projection: status=`%s`, lag=`%d`, vectors=`%d`\n", report.Vector.Projection.Status, report.Vector.Projection.Lag, report.Vector.Projection.VectorCount)
 		fmt.Fprintf(&builder, "- Projection failures: recovered=`%d`, unrecovered=`%d`, cooldowns=`%d`\n", report.Vector.RecoveredProjectionFailures, report.Vector.UnrecoveredProjectionFailures, report.Vector.ProjectionRecoverySleeps)
 		fmt.Fprintf(&builder, "- Vector queries: effective=`%d`, degraded=`%d`\n", report.Vector.EffectiveVectorQueries, report.Vector.DegradedVectorQueries)
-		fmt.Fprintf(&builder, "- Embedding: operations=`%d`, attempts=`%d`, successful items=`%d`, failed attempts=`%d`, terminal failures=`%d`\n", report.Vector.Embedding.LogicalOperations, report.Vector.Embedding.ProviderAttempts, report.Vector.Embedding.SuccessfulItems, report.Vector.Embedding.FailedAttempts, report.Vector.Embedding.TerminalFailures)
+		fmt.Fprintf(&builder, "- Embedding: operations=`%d`, logical items=`%d/%d`, provider items=`%d/%d`, attempts=`%d`, failed attempts=`%d`, terminal failures=`%d`\n", report.Vector.Embedding.LogicalOperations, report.Vector.Embedding.LogicalEmbeddingItems, report.Vector.ExpectedLogicalEmbeddingItems, report.Vector.SuccessfulProviderItems, report.Vector.ExpectedProviderItems, report.Vector.Embedding.ProviderAttempts, report.Vector.Embedding.FailedAttempts, report.Vector.Embedding.TerminalFailures)
 		fmt.Fprintf(&builder, "- Vector hard gates: `%t`\n\n", report.Vector.HardGatesPass)
 	}
 	builder.WriteString("## Aggregate Retrieval\n\n")

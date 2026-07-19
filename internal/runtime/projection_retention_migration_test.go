@@ -19,8 +19,8 @@ func TestProjectionRetentionSchema(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if version != 22 {
-		t.Fatalf("schema version=%d want 22", version)
+	if version != 23 {
+		t.Fatalf("schema version=%d want 23", version)
 	}
 
 	for _, table := range []string{"memory_projection_retention", "memory_projection_prune_runs"} {

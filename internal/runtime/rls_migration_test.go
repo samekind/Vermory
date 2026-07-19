@@ -145,6 +145,12 @@ INSERT INTO memory_vector_documents (
 			t.Fatal(err)
 		}
 		if _, err := admin.pool.Exec(ctx, `
+INSERT INTO memory_vector_documents (
+  profile_id, tenant_id, continuity_id, memory_id, content_sha256, embedding
+) VALUES ($1, $2, $3::uuid, $4::uuid, repeat('f', 64), array_fill(0::real, ARRAY[1024])::vector)`, ChunkedMeanRetrievalProfileID, tenantID, graph.continuityID, graph.memoryID); err != nil {
+			t.Fatal(err)
+		}
+		if _, err := admin.pool.Exec(ctx, `
 INSERT INTO memory_vector_documents_2560 (
   profile_id, tenant_id, continuity_id, memory_id, content_sha256, embedding
 ) VALUES ($1, $2, $3::uuid, $4::uuid, repeat('d', 64), array_fill(0::real, ARRAY[2560])::halfvec)`, DimensionalMigrationRetrievalProfileID, tenantID, graph.continuityID, graph.memoryID); err != nil {
@@ -218,6 +224,17 @@ INSERT INTO memory_projection_prune_runs (
 			}
 			if visible != tenantID {
 				t.Fatalf("%s tenant %s observed %q", table, tenantID, visible)
+			}
+			if table == "memory_vector_documents" {
+				var candidateCount int
+				if err := runtimeStore.pool.QueryRow(tenantCtx, `
+SELECT count(*) FROM memory_vector_documents
+WHERE profile_id = $1`, ChunkedMeanRetrievalProfileID).Scan(&candidateCount); err != nil {
+					t.Fatalf("query chunked candidate as %s: %v", tenantID, err)
+				}
+				if candidateCount != 1 {
+					t.Fatalf("chunked candidate tenant %s rows=%d want 1", tenantID, candidateCount)
+				}
 			}
 		}
 	}
