@@ -26,17 +26,18 @@ const (
 )
 
 type LongMemEvalRetrievalOptions struct {
-	QualificationPath      string
-	ExecutionPath          string
-	SourceDatasetPath      string
-	DatabaseURL            string
-	ArtifactRoot           string
-	RunID                  string
-	ImplementationRevision string
-	Resume                 bool
-	VectorProfilePath      string
-	EmbeddingAPIKey        string
-	VectorEmbedder         vermoryruntime.Embedder
+	QualificationPath         string
+	ExecutionPath             string
+	SourceDatasetPath         string
+	DatabaseURL               string
+	ArtifactRoot              string
+	RunID                     string
+	ImplementationRevision    string
+	Resume                    bool
+	VectorProfilePath         string
+	EmbeddingAPIKey           string
+	VectorEmbedder            vermoryruntime.Embedder
+	ProjectionRecoverySleeper func(context.Context, time.Duration) error
 }
 
 type LongMemEvalRetrievalReport struct {
@@ -123,6 +124,11 @@ type LongMemEvalVectorEvidence struct {
 	MaxAttempts                    int                             `json:"max_attempts"`
 	RetryDelayMilliseconds         int                             `json:"retry_delay_milliseconds"`
 	RetryBackoff                   string                          `json:"retry_backoff"`
+	ProjectionMaxRecoveries        int                             `json:"projection_max_recoveries"`
+	ProjectionRecoveryDelaySeconds int                             `json:"projection_recovery_delay_seconds"`
+	RecoveredProjectionFailures    int                             `json:"recovered_projection_failures"`
+	UnrecoveredProjectionFailures  int                             `json:"unrecovered_projection_failures"`
+	ProjectionRecoverySleeps       int                             `json:"projection_recovery_sleeps"`
 	ProjectionDurationMilliseconds int64                           `json:"projection_duration_ms"`
 	Projection                     vermoryruntime.ProjectionStatus `json:"projection"`
 	Embedding                      longMemEvalEmbeddingStats       `json:"embedding"`
@@ -267,10 +273,37 @@ func RunLongMemEvalRetrieval(ctx context.Context, opts LongMemEvalRetrievalOptio
 			return LongMemEvalRetrievalReport{}, err
 		}
 		projectionStarted := time.Now()
+		recoverySleeper := opts.ProjectionRecoverySleeper
+		if recoverySleeper == nil {
+			recoverySleeper = sleepLongMemEvalEmbeddingRetry
+		}
+		recoveriesUsed := 0
+		pendingProjectionFailures := 0
+		recoveredProjectionFailures := 0
+		projectionRecoverySleeps := 0
 		for {
 			result, runErr := worker.RunOnce(ctx)
 			if runErr != nil {
+				if result.FailureCode == "embedding_unavailable" && vectorProfile.ProjectionMaxRecoveries > 0 {
+					if recoveriesUsed >= vectorProfile.ProjectionMaxRecoveries {
+						return LongMemEvalRetrievalReport{}, fmt.Errorf(
+							"project LongMemEval vector authority: projection recovery budget exhausted after %d recoveries: %w",
+							recoveriesUsed, runErr,
+						)
+					}
+					recoveriesUsed++
+					pendingProjectionFailures++
+					projectionRecoverySleeps++
+					if sleepErr := recoverySleeper(ctx, time.Duration(vectorProfile.ProjectionRecoveryDelaySeconds)*time.Second); sleepErr != nil {
+						return LongMemEvalRetrievalReport{}, fmt.Errorf("project LongMemEval vector authority recovery cooldown: %w", sleepErr)
+					}
+					continue
+				}
 				return LongMemEvalRetrievalReport{}, fmt.Errorf("project LongMemEval vector authority: %w", runErr)
+			}
+			if pendingProjectionFailures > 0 {
+				recoveredProjectionFailures += pendingProjectionFailures
+				pendingProjectionFailures = 0
 			}
 			if result.AlreadyRunning {
 				return LongMemEvalRetrievalReport{}, fmt.Errorf("LongMemEval vector projection worker is already running")
@@ -294,6 +327,11 @@ func RunLongMemEvalRetrieval(ctx context.Context, opts LongMemEvalRetrievalOptio
 			MaxAttempts:                    vectorProfile.MaxAttempts,
 			RetryDelayMilliseconds:         vectorProfile.RetryDelayMilliseconds,
 			RetryBackoff:                   vectorProfile.RetryBackoff,
+			ProjectionMaxRecoveries:        vectorProfile.ProjectionMaxRecoveries,
+			ProjectionRecoveryDelaySeconds: vectorProfile.ProjectionRecoveryDelaySeconds,
+			RecoveredProjectionFailures:    recoveredProjectionFailures,
+			UnrecoveredProjectionFailures:  pendingProjectionFailures,
+			ProjectionRecoverySleeps:       projectionRecoverySleeps,
 			ProjectionDurationMilliseconds: time.Since(projectionStarted).Milliseconds(),
 			Projection:                     projectionStatus, FailureCodeBreakdown: make(map[string]int),
 		}
@@ -361,7 +399,10 @@ func RunLongMemEvalRetrieval(ctx context.Context, opts LongMemEvalRetrievalOptio
 		vectorEvidence.HardGatesPass = vectorEvidence.Projection.Status == "idle" &&
 			vectorEvidence.Projection.Lag == 0 && vectorEvidence.Projection.VectorCount == int64(summary.SessionCount) &&
 			vectorEvidence.EffectiveVectorQueries == summary.RecordCount && vectorEvidence.DegradedVectorQueries == 0 &&
-			vectorEvidence.Embedding.TerminalFailures == 0 &&
+			vectorEvidence.UnrecoveredProjectionFailures == 0 &&
+			vectorEvidence.ProjectionRecoverySleeps == vectorEvidence.RecoveredProjectionFailures &&
+			vectorEvidence.RecoveredProjectionFailures <= vectorEvidence.ProjectionMaxRecoveries &&
+			vectorEvidence.Embedding.TerminalFailures == int64(vectorEvidence.RecoveredProjectionFailures) &&
 			vectorEvidence.Embedding.SuccessfulItems == int64(summary.SessionCount+summary.RecordCount)
 		report.Vector = vectorEvidence
 	}
@@ -868,7 +909,9 @@ func markdownLongMemEvalRetrievalReport(report LongMemEvalRetrievalReport) strin
 	if report.Vector != nil {
 		fmt.Fprintf(&builder, "- Vector profile: `%s` (`%s`)\n", report.Vector.RetrievalProfile, report.Vector.ProfileSHA256)
 		fmt.Fprintf(&builder, "- Embedding retry contract: timeout=`%ds`, attempts=`%d`, delay=`%dms`, backoff=`%s`\n", report.Vector.HTTPTimeoutSeconds, report.Vector.MaxAttempts, report.Vector.RetryDelayMilliseconds, report.Vector.RetryBackoff)
+		fmt.Fprintf(&builder, "- Projection recovery contract: recoveries=`%d`, cooldown=`%ds`\n", report.Vector.ProjectionMaxRecoveries, report.Vector.ProjectionRecoveryDelaySeconds)
 		fmt.Fprintf(&builder, "- Projection: status=`%s`, lag=`%d`, vectors=`%d`\n", report.Vector.Projection.Status, report.Vector.Projection.Lag, report.Vector.Projection.VectorCount)
+		fmt.Fprintf(&builder, "- Projection failures: recovered=`%d`, unrecovered=`%d`, cooldowns=`%d`\n", report.Vector.RecoveredProjectionFailures, report.Vector.UnrecoveredProjectionFailures, report.Vector.ProjectionRecoverySleeps)
 		fmt.Fprintf(&builder, "- Vector queries: effective=`%d`, degraded=`%d`\n", report.Vector.EffectiveVectorQueries, report.Vector.DegradedVectorQueries)
 		fmt.Fprintf(&builder, "- Embedding: operations=`%d`, attempts=`%d`, successful items=`%d`, failed attempts=`%d`, terminal failures=`%d`\n", report.Vector.Embedding.LogicalOperations, report.Vector.Embedding.ProviderAttempts, report.Vector.Embedding.SuccessfulItems, report.Vector.Embedding.FailedAttempts, report.Vector.Embedding.TerminalFailures)
 		fmt.Fprintf(&builder, "- Vector hard gates: `%t`\n\n", report.Vector.HardGatesPass)

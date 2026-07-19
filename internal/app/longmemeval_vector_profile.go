@@ -20,23 +20,25 @@ import (
 )
 
 type LongMemEvalVectorProfile struct {
-	SchemaVersion          string   `json:"schema_version"`
-	ID                     string   `json:"id"`
-	Provider               string   `json:"provider"`
-	RetrievalProfile       string   `json:"retrieval_profile"`
-	BaseURL                string   `json:"base_url"`
-	Model                  string   `json:"model"`
-	Dimensions             int      `json:"dimensions"`
-	ProjectionClass        string   `json:"projection_class"`
-	WorkerBatchSize        int      `json:"worker_batch_size"`
-	EmbeddingBatchSize     int      `json:"embedding_batch_size"`
-	HTTPTimeoutSeconds     int      `json:"http_timeout_seconds"`
-	MaxAttempts            int      `json:"max_attempts"`
-	RetryDelayMilliseconds int      `json:"retry_delay_milliseconds"`
-	RetryBackoff           string   `json:"retry_backoff,omitempty"`
-	Conditions             []string `json:"conditions"`
-	HardGates              []string `json:"hard_gates"`
-	NonClaims              []string `json:"non_claims"`
+	SchemaVersion                  string   `json:"schema_version"`
+	ID                             string   `json:"id"`
+	Provider                       string   `json:"provider"`
+	RetrievalProfile               string   `json:"retrieval_profile"`
+	BaseURL                        string   `json:"base_url"`
+	Model                          string   `json:"model"`
+	Dimensions                     int      `json:"dimensions"`
+	ProjectionClass                string   `json:"projection_class"`
+	WorkerBatchSize                int      `json:"worker_batch_size"`
+	EmbeddingBatchSize             int      `json:"embedding_batch_size"`
+	HTTPTimeoutSeconds             int      `json:"http_timeout_seconds"`
+	MaxAttempts                    int      `json:"max_attempts"`
+	RetryDelayMilliseconds         int      `json:"retry_delay_milliseconds"`
+	RetryBackoff                   string   `json:"retry_backoff,omitempty"`
+	ProjectionMaxRecoveries        int      `json:"projection_max_recoveries,omitempty"`
+	ProjectionRecoveryDelaySeconds int      `json:"projection_recovery_delay_seconds,omitempty"`
+	Conditions                     []string `json:"conditions"`
+	HardGates                      []string `json:"hard_gates"`
+	NonClaims                      []string `json:"non_claims"`
 }
 
 func (profile LongMemEvalVectorProfile) Validate() error {
@@ -73,6 +75,18 @@ func (profile LongMemEvalVectorProfile) Validate() error {
 	}
 	if profile.RetryBackoff != "" && profile.RetryBackoff != "fixed" && profile.RetryBackoff != "linear" {
 		return fmt.Errorf("LongMemEval embedding retry backoff must be fixed or linear")
+	}
+	if profile.ProjectionMaxRecoveries < 0 || profile.ProjectionMaxRecoveries > 100 {
+		return fmt.Errorf("LongMemEval projection recoveries must be between 0 and 100")
+	}
+	if profile.ProjectionRecoveryDelaySeconds < 0 || profile.ProjectionRecoveryDelaySeconds > 3600 {
+		return fmt.Errorf("LongMemEval projection recovery delay must be between 0 and 3600 seconds")
+	}
+	if profile.ProjectionMaxRecoveries == 0 && profile.ProjectionRecoveryDelaySeconds != 0 {
+		return fmt.Errorf("LongMemEval projection recovery delay requires a positive recovery budget")
+	}
+	if profile.ProjectionMaxRecoveries > 0 && profile.ProjectionRecoveryDelaySeconds == 0 {
+		return fmt.Errorf("LongMemEval projection recovery budget requires a positive delay")
 	}
 	if !slices.Equal(profile.Conditions, longMemEvalVectorConditions()) {
 		return fmt.Errorf("LongMemEval vector conditions are %v, want %v", profile.Conditions, longMemEvalVectorConditions())

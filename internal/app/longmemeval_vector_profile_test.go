@@ -76,6 +76,22 @@ func TestLongMemEvalVectorProfileV2UsesBoundedLinearRecovery(t *testing.T) {
 	}
 }
 
+func TestLongMemEvalVectorProfileV3AddsBoundedProjectionRecovery(t *testing.T) {
+	root, err := projectRoot()
+	if err != nil {
+		t.Fatal(err)
+	}
+	profile, digest, err := loadLongMemEvalVectorProfile(filepath.Join(root, "casebook/benchmarks/profiles/longmemeval-s-vector-retrieval-v3.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if digest == "" || profile.ID != "w28-longmemeval-s-vector-retrieval-v3" ||
+		profile.MaxAttempts != 5 || profile.RetryBackoff != "linear" ||
+		profile.ProjectionMaxRecoveries != 10 || profile.ProjectionRecoveryDelaySeconds != 30 {
+		t.Fatalf("unexpected v3 recovery profile: digest=%q profile=%#v", digest, profile)
+	}
+}
+
 func TestLiveLongMemEvalVectorProfileBatch(t *testing.T) {
 	if os.Getenv("VERMORY_W28_LIVE_EMBEDDING") != "1" {
 		t.Skip("VERMORY_W28_LIVE_EMBEDDING=1 is required")
@@ -84,7 +100,14 @@ func TestLiveLongMemEvalVectorProfileBatch(t *testing.T) {
 	if apiKey == "" {
 		t.Skip("VERMORY_LIVE_EMBEDDING_API_KEY is required")
 	}
-	profile := validLongMemEvalVectorProfile(t)
+	root, err := projectRoot()
+	if err != nil {
+		t.Fatal(err)
+	}
+	profile, _, err := loadLongMemEvalVectorProfile(filepath.Join(root, "casebook/benchmarks/profiles/longmemeval-s-vector-retrieval-v3.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
 	embedder, err := configureLongMemEvalVectorEmbedder(LongMemEvalRetrievalOptions{EmbeddingAPIKey: apiKey}, profile)
 	if err != nil {
 		t.Fatal(err)
@@ -135,6 +158,26 @@ func TestLongMemEvalVectorProfileRejectsRuntimeRegistryDrift(t *testing.T) {
 	profile.Conditions = []string{longMemEvalRetrievalBaseline, longMemEvalRetrievalVermory}
 	if err := profile.Validate(); err == nil {
 		t.Fatal("vector profile accepted the legacy two-condition contract")
+	}
+
+	for name, mutate := range map[string]func(*LongMemEvalVectorProfile){
+		"negative recovery budget": func(profile *LongMemEvalVectorProfile) {
+			profile.ProjectionMaxRecoveries = -1
+		},
+		"recovery delay without budget": func(profile *LongMemEvalVectorProfile) {
+			profile.ProjectionRecoveryDelaySeconds = 30
+		},
+		"recovery budget without delay": func(profile *LongMemEvalVectorProfile) {
+			profile.ProjectionMaxRecoveries = 1
+		},
+	} {
+		t.Run(name, func(t *testing.T) {
+			profile := validLongMemEvalVectorProfile(t)
+			mutate(&profile)
+			if err := profile.Validate(); err == nil {
+				t.Fatalf("vector profile accepted invalid recovery contract: %#v", profile)
+			}
+		})
 	}
 }
 

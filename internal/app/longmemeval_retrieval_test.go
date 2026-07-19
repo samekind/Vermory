@@ -5,10 +5,12 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
 	"vermory/internal/benchmark"
 	vermoryruntime "vermory/internal/runtime"
@@ -17,6 +19,11 @@ import (
 )
 
 type longMemEvalVectorTestEmbedder struct{}
+
+type longMemEvalProjectionRecoveryTestEmbedder struct {
+	longMemEvalVectorTestEmbedder
+	batchFailuresRemaining int
+}
 
 func (longMemEvalVectorTestEmbedder) Embed(_ context.Context, text string) ([]float32, error) {
 	vector := make([]float32, 1024)
@@ -42,6 +49,14 @@ func (embedder longMemEvalVectorTestEmbedder) EmbedBatch(ctx context.Context, te
 		vectors[index] = vector
 	}
 	return vectors, nil
+}
+
+func (embedder *longMemEvalProjectionRecoveryTestEmbedder) EmbedBatch(ctx context.Context, texts []string) ([][]float32, error) {
+	if embedder.batchFailuresRemaining > 0 {
+		embedder.batchFailuresRemaining--
+		return nil, errors.New("transient provider outage")
+	}
+	return embedder.longMemEvalVectorTestEmbedder.EmbedBatch(ctx, texts)
 }
 
 func TestLongMemEvalVectorRetrievalRunnerUsesDurableProductionProjection(t *testing.T) {
@@ -111,6 +126,111 @@ func TestLongMemEvalVectorRetrievalRunnerUsesDurableProductionProjection(t *test
 	}
 	if audits != 2 || vectors != 4 {
 		t.Fatalf("production vector evidence is missing: audits=%d vectors=%d", audits, vectors)
+	}
+}
+
+func TestLongMemEvalVectorRetrievalRunnerRecoversExhaustedProjectionOperation(t *testing.T) {
+	databaseURL := resetBenchmarkDatabase(t)
+	records := []benchmark.LongMemEvalRecord{
+		retrievalTestRecord("record-a", "What is my launch code?", "ORBIT-7319", "answer-a", "My launch code is ORBIT-7319."),
+		retrievalTestRecord("record-b", "When is the maintenance window?", "Friday 22:30", "answer-b", "The maintenance window is Friday 22:30."),
+	}
+	paths := prepareLongMemEvalRetrievalTestFiles(t, records)
+	prepareLongMemEvalVectorExecution(t, paths.execution)
+	profilePath := prepareLongMemEvalProjectionRecoveryProfile(t, func(profile *LongMemEvalVectorProfile) {
+		profile.RetryDelayMilliseconds = 0
+	})
+	embedder := &longMemEvalProjectionRecoveryTestEmbedder{batchFailuresRemaining: 5}
+	var recoveryDelays []time.Duration
+	report, err := RunLongMemEvalRetrieval(context.Background(), LongMemEvalRetrievalOptions{
+		QualificationPath:      paths.qualification,
+		ExecutionPath:          paths.execution,
+		SourceDatasetPath:      paths.source,
+		DatabaseURL:            databaseURL,
+		ArtifactRoot:           t.TempDir(),
+		RunID:                  "longmemeval-vector-projection-recovery-test",
+		ImplementationRevision: "test-revision",
+		VectorProfilePath:      profilePath,
+		VectorEmbedder:         embedder,
+		ProjectionRecoverySleeper: func(_ context.Context, delay time.Duration) error {
+			recoveryDelays = append(recoveryDelays, delay)
+			return nil
+		},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if report.Vector == nil || !report.Vector.HardGatesPass {
+		t.Fatalf("recovered vector hard gates did not pass: %#v", report.Vector)
+	}
+	if report.Vector.ProjectionMaxRecoveries != 10 || report.Vector.ProjectionRecoveryDelaySeconds != 30 ||
+		report.Vector.RecoveredProjectionFailures != 1 || report.Vector.UnrecoveredProjectionFailures != 0 ||
+		report.Vector.ProjectionRecoverySleeps != 1 {
+		t.Fatalf("unexpected projection recovery evidence: %#v", report.Vector)
+	}
+	if len(recoveryDelays) != 1 || recoveryDelays[0] != 30*time.Second {
+		t.Fatalf("unexpected projection recovery delays: %#v", recoveryDelays)
+	}
+	if report.Vector.Embedding.TerminalFailures != 1 || report.Vector.Embedding.SuccessfulItems != 6 {
+		t.Fatalf("exhausted operation was not transparently accounted: %#v", report.Vector.Embedding)
+	}
+}
+
+func TestLongMemEvalVectorRetrievalRunnerFailsAfterProjectionRecoveryBudget(t *testing.T) {
+	databaseURL := resetBenchmarkDatabase(t)
+	records := []benchmark.LongMemEvalRecord{
+		retrievalTestRecord("record-a", "What is my launch code?", "ORBIT-7319", "answer-a", "My launch code is ORBIT-7319."),
+	}
+	paths := prepareLongMemEvalRetrievalTestFiles(t, records)
+	prepareLongMemEvalVectorExecution(t, paths.execution)
+	profilePath := prepareLongMemEvalProjectionRecoveryProfile(t, func(profile *LongMemEvalVectorProfile) {
+		profile.RetryDelayMilliseconds = 0
+		profile.ProjectionMaxRecoveries = 1
+	})
+	embedder := &longMemEvalProjectionRecoveryTestEmbedder{batchFailuresRemaining: 10}
+	recoverySleeps := 0
+	_, err := RunLongMemEvalRetrieval(context.Background(), LongMemEvalRetrievalOptions{
+		QualificationPath:      paths.qualification,
+		ExecutionPath:          paths.execution,
+		SourceDatasetPath:      paths.source,
+		DatabaseURL:            databaseURL,
+		ArtifactRoot:           t.TempDir(),
+		RunID:                  "longmemeval-vector-projection-budget-test",
+		ImplementationRevision: "test-revision",
+		VectorProfilePath:      profilePath,
+		VectorEmbedder:         embedder,
+		ProjectionRecoverySleeper: func(_ context.Context, _ time.Duration) error {
+			recoverySleeps++
+			return nil
+		},
+	})
+	if err == nil || !strings.Contains(err.Error(), "projection recovery budget exhausted") {
+		t.Fatalf("expected projection recovery budget failure, got %v", err)
+	}
+	if recoverySleeps != 1 {
+		t.Fatalf("unexpected projection recovery sleeps: %d", recoverySleeps)
+	}
+	pool, poolErr := pgxpool.New(context.Background(), databaseURL)
+	if poolErr != nil {
+		t.Fatal(poolErr)
+	}
+	defer pool.Close()
+	var status, failureCode string
+	var lastEventID int64
+	var attempts, vectors int
+	if queryErr := pool.QueryRow(context.Background(), `
+SELECT status, last_event_id, attempt_count, last_error_code
+FROM memory_projection_cursors
+WHERE tenant_id=$1 AND profile_id=$2`,
+		"benchmark:longmemeval-vector-projection-budget-test", vermoryruntime.ProductionRetrievalProfileID,
+	).Scan(&status, &lastEventID, &attempts, &failureCode); queryErr != nil {
+		t.Fatal(queryErr)
+	}
+	if queryErr := pool.QueryRow(context.Background(), `SELECT count(*) FROM memory_vector_documents WHERE tenant_id=$1`, "benchmark:longmemeval-vector-projection-budget-test").Scan(&vectors); queryErr != nil {
+		t.Fatal(queryErr)
+	}
+	if status != "failed" || failureCode != "embedding_unavailable" || lastEventID != 0 || attempts != 2 || vectors != 0 {
+		t.Fatalf("projection failure evidence drifted: status=%s failure=%s last=%d attempts=%d vectors=%d", status, failureCode, lastEventID, attempts, vectors)
 	}
 }
 
@@ -368,4 +488,34 @@ func countLongMemEvalRetrievalMemories(t *testing.T, databaseURL, tenantID strin
 		t.Fatal(err)
 	}
 	return count
+}
+
+func prepareLongMemEvalVectorExecution(t *testing.T, path string) {
+	t.Helper()
+	data, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var execution benchmark.ExecutionManifest
+	if err := json.Unmarshal(data, &execution); err != nil {
+		t.Fatal(err)
+	}
+	execution.Conditions = longMemEvalVectorConditions()
+	writeBenchmarkJSON(t, path, execution)
+}
+
+func prepareLongMemEvalProjectionRecoveryProfile(t *testing.T, mutate func(*LongMemEvalVectorProfile)) string {
+	t.Helper()
+	root, err := projectRoot()
+	if err != nil {
+		t.Fatal(err)
+	}
+	profile, _, err := loadLongMemEvalVectorProfile(filepath.Join(root, "casebook/benchmarks/profiles/longmemeval-s-vector-retrieval-v3.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	mutate(&profile)
+	path := filepath.Join(t.TempDir(), "vector-profile.json")
+	writeBenchmarkJSON(t, path, profile)
+	return path
 }

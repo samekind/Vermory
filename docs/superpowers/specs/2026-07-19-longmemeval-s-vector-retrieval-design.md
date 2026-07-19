@@ -84,6 +84,46 @@ conditions or quality labels, at
 The v1 file and failed runs remain unchanged evidence. v2 is an operational
 fault-recovery revision, not benchmark-label tuning.
 
+The proper one-shot v2 run then projected 2,560 of 23,867 current vectors and
+failed after one logical embedding operation exhausted all five linearly
+delayed attempts. It executed no retrieval queries and contributes no score.
+Together with the successful read-only replay of the v1 failing window, this
+shows that operation-local retries alone do not cover transient provider
+availability across the full qualification.
+
+The next append-only operational profile is therefore
+`casebook/benchmarks/profiles/longmemeval-s-vector-retrieval-v3.json`:
+
+| Field | v3 value |
+|---|---|
+| Maximum attempts per embedding operation | `5` |
+| Attempt delay | linear: `2 / 4 / 6 / 8 seconds` |
+| Maximum projection recoveries | `10` |
+| Projection recovery cooldown | `30 seconds` |
+
+A projection recovery is available only when `ProjectionWorker.RunOnce`
+returns the structured `embedding_unavailable` failure. The failed worker pass
+leaves its PostgreSQL cursor at the last committed event with status `failed`.
+After the cooldown, the same process invokes `RunOnce` again; the existing
+worker state machine changes the cursor back to `running` and resumes
+idempotently. Other failure codes, an already-running worker, context
+cancellation, and an exhausted recovery budget fail closed without recovery.
+
+Evidence keeps three counts separate:
+
+- `embedding.terminal_failures` is the number of logical embedding operations
+  that exhausted all operation-local attempts;
+- `recovered_projection_failures` is the number of those projection failures
+  followed by a successful worker pass;
+- `unrecovered_projection_failures` is the number still unresolved when the
+  projection phase ends, and must be zero for qualification.
+
+The final hard gate permits exhausted operations only when their count equals
+the recovered projection-failure count. A query-phase embedding exhaustion
+therefore cannot be misclassified as a recovered projection failure: it still
+produces a degraded audited query and fails the qualification. v3 changes no
+retrieval condition, ranking label, source data, or production default.
+
 The profile contains no credential. The CLI accepts only the name of an
 environment variable and reads the secret inside the process. The profile's
 endpoint, model, dimensions, and projection class must match the registered
@@ -154,9 +194,11 @@ consistent request accounting. An interrupted run, a terminal provider
 failure, a projection failure, or a degraded query is retained as append-only
 evidence and cannot be relabeled as a clean run.
 
-Retries are bounded by the frozen profile. Transient failed attempts are
-counted separately from terminal failures. Retrying must never advance the
-projection cursor or create duplicate governed memories.
+Retries and projection recoveries are bounded by the frozen profile. Transient
+failed attempts, exhausted logical operations, recovery cooldowns, recovered
+projection failures, and final unrecovered failures are counted separately.
+Retrying must never advance the projection cursor or create duplicate governed
+memories.
 
 ## Hard Gates
 
@@ -167,7 +209,7 @@ W28 is execution-qualified only when all of the following hold:
 3. Governed import produces exactly 23,867 active source memories in 500 isolated conversation continuities.
 4. The vector projection is `idle`, has zero lag, and contains exactly 23,867 current vectors.
 5. Every vector query is effective `vector`; degraded queries are zero.
-6. Terminal embedding/provider failures are zero and all attempts are counted.
+6. Unrecovered embedding/provider failures are zero; every exhausted operation, recovery cooldown, attempt, and item is counted.
 7. Cross-tenant, cross-continuity, unmapped, non-active, superseded, archived, deleted, and redacted retrieval results are zero.
 8. Query and projection operation identities remain idempotent under verified replay.
 9. Old W14 lexical execution remains accepted without embedding configuration.
