@@ -161,23 +161,29 @@ No ranking algorithm or weight is accepted before ablation.
 
 ### H-013: Row-level security defense in depth
 
-- Status: `proposed`
+- Status: `supported` for the authenticated single-host PostgreSQL 18 multi-tenant profile
 - Candidate: application authorization, tenant-bearing foreign keys, and PostgreSQL row-level security jointly protect tenant boundaries.
 - Reason: query filters alone are an insufficient final barrier for a multi-tenant memory platform.
-- Evidence needed: integration tests under tenant-scoped database roles, migration tests, and deliberate filter-omission attacks.
+- Existing evidence: I01-I05 used real random API tokens, a real non-owner `LOGIN NOSUPERUSER NOBYPASSRLS` PostgreSQL role, RLS-aware connection pools, authenticated HTTP handlers, and two tenants resolving the same OpenClaw session key to different continuities. Deliberate queries with omitted tenant predicates saw only the transaction tenant; missing tenant context saw zero rows; cross-tenant continuity, memory, delivery, and bridge foreign-key attacks failed; revoked and expired tokens returned `401`; concurrent requests through a two-connection pool did not inherit stale tenant settings. Native dump/restore and later formation, retrieval, retention, and HA/PITR profiles preserved restricted-role validation, RLS policy inventory, filter-omission behavior, and tenant-aware foreign keys.
+- Evidence artifacts: `docs/evidence/2026-07-14-identity-authorization-rls.md`, `docs/evidence/2026-07-14-postgresql-operations-recovery.md`, `docs/evidence/2026-07-14-production-retrieval-runtime.md`, `docs/evidence/2026-07-16-postgresql-ha-pitr.md`, and `docs/evidence/2026-07-18-automatic-conversation-review.md`.
+- Current decision: application authorization, tenant-bearing foreign keys, transaction-local tenant context, and PostgreSQL RLS remain jointly required for the named profile. Query predicates alone do not satisfy the boundary.
+- Evidence needed: independent security review, hostile connection-pool and role-misconfiguration testing beyond the named profiles, and cross-host or cross-region deployment qualification.
 - Falsifier: the initial supported deployment is explicitly single-tenant and RLS creates correctness or operations problems; the multi-tenant profile would still require a separate acceptance decision.
-- Decision gate: before any multi-tenant release claim.
+- Decision gate: passed for the authenticated single-host PostgreSQL 18 profile; reopen for a different database role topology, cross-host tenancy, or a broader multi-tenant release claim.
 
 ### H-014: Prepare and commit client operations
 
-- Status: `proposed`
+- Status: `supported` for the current bounded-turn Web Chat, MCP, OpenClaw, and Hermes contracts
 - Candidate: ordinary clients need one pre-task context operation and one post-task observation/write-back operation, with administrative APIs separate.
 - Reason: keeps normal client integration low-friction while preserving governance.
-- Evidence needed: one real coder, one Web Chat/API simulator, and one everyday-assistant path can integrate without custom memory semantics.
+- Existing evidence: W19 bound real Web Chat/Grok, workspace MCP/Grok, and official Codex CLI trajectories into one formal report. Each consumed currently eligible context, completed a bounded task, and wrote the result back as a proposed observation; no client output became active memory or a Global Default. W22 then ran real OpenClaw and official Hermes continuities through completed-turn scheduling, asynchronous formation, explicit review, later recall, correction, forgetting, restart, and isolation. W23 added verified tool-result completion without granting models governance tools. W27 wrote four real direct-model outputs through the production service as `agent_result`, retained all four as proposed with zero search projection rows, and replayed the writes idempotently after the optional mem0 process was removed.
+- Evidence artifacts: `docs/evidence/2026-07-16-memory-eligibility-retention.md`, `docs/evidence/2026-07-18-automatic-conversation-review.md`, `docs/evidence/2026-07-18-verified-tool-outcome-formation.md`, and `docs/evidence/2026-07-19-w27-real-utility-comparison.md`.
+- Current decision: ordinary bounded client turns use one prepared delivery before model work and one observed-result commit after work. Formation and governance remain asynchronous or operator-controlled and are not model tools.
+- Evidence needed: streaming partial-output cancellation, multi-hour tool loops, offline/mobile replay, and clients whose lifecycle cannot be represented as a bounded prepare/complete pair.
 - Falsifier: streaming, tool-loop, long-running session, or client lifecycle requires a different interaction contract.
-- Decision gate: after the first real-client experiment.
+- Decision gate: passed for the current bounded-turn Web Chat, MCP, OpenClaw, and Hermes integrations; reopen before freezing a stable public client API or claiming arbitrary streaming/agent compatibility.
 
-Names, payloads, streaming behavior, and transport are not frozen.
+Names, payloads, streaming behavior, and transport remain versioned rather than universally frozen.
 
 ### H-015: Optional backend projection adapters
 

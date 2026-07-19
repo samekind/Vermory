@@ -1,6 +1,6 @@
 # Vermory Direct Provider Connectivity
 
-> Historical provider-harness evidence. These runs validate direct model access for the legacy ContextMesh self-case; they are not Experiment 0 reality-case results or a ranking of models for Vermory.
+> Direct provider compatibility evidence. It includes the historical ContextMesh self-case and the later Vermory W27 reality-case utility run; neither is a ranking of models for Vermory.
 
 ## Purpose
 
@@ -41,6 +41,12 @@ This document records the direct provider path retained by the Vermory legacy ev
   - `Qwen/Qwen3-Coder-30B-A3B-Instruct`: clean `OK`
   - `Qwen/Qwen3-30B-A3B-Instruct-2507`: clean `OK`
   - `deepseek-ai/DeepSeek-V4-Flash`: timed out in direct probe mode under current client timeout, even though the full self-case run had succeeded earlier
+- Verified W27 real-utility run:
+  - Model: `deepseek-ai/DeepSeek-V4-Flash`
+  - Evidence: `docs/evidence/2026-07-19-w27-real-utility-comparison.md`
+  - `24/24` direct provider calls completed with `0` provider failures
+  - Four reality cases executed across six context conditions
+  - Vermory native completed `4/4` cases with `0` forbidden hits and `816` total delivered context bytes
 
 ### 3. Duojie
 
@@ -71,7 +77,7 @@ Current engineering decision:
 - These models are retained as test targets, not merely recommended defaults.
 - A model may still be a valid test target even if it is slow, noisy, or currently unstable.
 - `glm-5-turbo` and `glm-5.1` remain covered as probe targets, with their observed output quality retained in artifacts.
-- `deepseek-ai/DeepSeek-V4-Flash` remains an explicit SiliconFlow test target, but it currently shows upstream timeout/busy risk and should be classified separately from the Qwen pair.
+- `deepseek-ai/DeepSeek-V4-Flash` remains an explicit SiliconFlow compatibility target. W27 completed all 24 direct calls, while the earlier probe timeout remains retained operational evidence that long-running qualifications need bounded retry and recovery rather than assuming continuous provider availability.
 
 ## Verified Commands
 
@@ -212,7 +218,7 @@ These runs do not yet prove:
 - final WCEF quality
 - AI coding tool integration quality
 - browser or MCP consumption quality
-- strong real-world advantage on difficult project tasks
+- broad real-world advantage beyond the four bounded W27 reality cases
 
 The Grok harness deliberately disables tools and browser/search behavior. Its evidence is therefore packet-consumption evidence, not proof that a coding agent completed an implementation task.
 
@@ -238,6 +244,8 @@ Coverage note:
 - Matrix-covered:
   - `Qwen/Qwen3-Coder-30B-A3B-Instruct`
   - `Qwen/Qwen3-30B-A3B-Instruct-2507`
+- W27 real-utility covered:
+  - `deepseek-ai/DeepSeek-V4-Flash`
 - Probe-covered:
   - `deepseek-ai/DeepSeek-V4-Flash`
 - Self-case covered:
@@ -246,4 +254,5 @@ Coverage note:
 Coverage note:
 
 - The two Qwen models have full SiliconFlow matrix coverage.
-- `deepseek-ai/DeepSeek-V4-Flash` is explicitly included as a system test target, but current evidence shows upstream timeout/busy risk in repeated direct-run scenarios.
+- `deepseek-ai/DeepSeek-V4-Flash` completed the W27 four-case, six-condition direct utility run with 24/24 calls and zero provider failures.
+- Its earlier direct-probe timeout remains part of the evidence record; the later successful run establishes compatibility, not guaranteed provider availability or model superiority.
