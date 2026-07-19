@@ -11,25 +11,31 @@ import (
 )
 
 type ProviderLane struct {
-	Provider                 string `json:"provider"`
-	Model                    string `json:"model"`
-	RequiredForCompatibility bool   `json:"required_for_compatibility"`
+	Provider                 string  `json:"provider"`
+	Model                    string  `json:"model"`
+	DisableThinking          bool    `json:"disable_thinking"`
+	Temperature              float64 `json:"temperature"`
+	RequiredForCompatibility bool    `json:"required_for_compatibility"`
 }
 
 type Profile struct {
-	Version                  string         `json:"version"`
-	ID                       string         `json:"id"`
-	ProfileName              string         `json:"profile_name"`
-	RealityCaseIDs           []string       `json:"reality_case_ids"`
-	Conditions               []ConditionID  `json:"conditions"`
-	ProviderLanes            []ProviderLane `json:"provider_lanes"`
-	MinimumCompleteRealLanes int            `json:"minimum_complete_real_lanes"`
-	CallsPerCompleteLane     int            `json:"calls_per_complete_lane"`
-	MaxContextBytes          int            `json:"max_context_bytes"`
-	MaxOutputTokens          int            `json:"max_output_tokens"`
-	NativeWritebackStatus    string         `json:"native_writeback_status"`
-	HardGateCount            int            `json:"hard_gate_count"`
-	HardGates                []string       `json:"hard_gates"`
+	Version                  string                         `json:"version"`
+	ID                       string                         `json:"id"`
+	ProfileName              string                         `json:"profile_name"`
+	SHA256                   string                         `json:"-"`
+	ScorerVersion            string                         `json:"scorer_version"`
+	ScoringAliases           map[string]map[string][]string `json:"scoring_aliases,omitempty"`
+	Workers                  int                            `json:"workers"`
+	RealityCaseIDs           []string                       `json:"reality_case_ids"`
+	Conditions               []ConditionID                  `json:"conditions"`
+	ProviderLanes            []ProviderLane                 `json:"provider_lanes"`
+	MinimumCompleteRealLanes int                            `json:"minimum_complete_real_lanes"`
+	CallsPerCompleteLane     int                            `json:"calls_per_complete_lane"`
+	MaxContextBytes          int                            `json:"max_context_bytes"`
+	MaxOutputTokens          int                            `json:"max_output_tokens"`
+	NativeWritebackStatus    string                         `json:"native_writeback_status"`
+	HardGateCount            int                            `json:"hard_gate_count"`
+	HardGates                []string                       `json:"hard_gates"`
 }
 
 func LoadProfile(path string) (Profile, error) {
@@ -46,12 +52,19 @@ func LoadProfile(path string) (Profile, error) {
 	if err := profile.Validate(); err != nil {
 		return Profile{}, err
 	}
+	profile.SHA256 = sha256Hex(data)
 	return profile, nil
 }
 
 func (p Profile) Validate() error {
-	if p.Version != "1" || strings.TrimSpace(p.ID) == "" || strings.TrimSpace(p.ProfileName) == "" {
+	if p.Version != "2" || strings.TrimSpace(p.ID) == "" || strings.TrimSpace(p.ProfileName) == "" {
 		return errors.New("utilityeval: profile identity is invalid")
+	}
+	if p.ScorerVersion != ScorerVersion {
+		return fmt.Errorf("utilityeval: profile scorer is %q, expected %q", p.ScorerVersion, ScorerVersion)
+	}
+	if p.Workers < 1 || p.Workers > 16 {
+		return errors.New("utilityeval: profile workers must be between 1 and 16")
 	}
 	if len(p.RealityCaseIDs) == 0 || len(p.Conditions) != len(FrozenConditions) {
 		return errors.New("utilityeval: profile case or condition set is invalid")
@@ -83,6 +96,14 @@ func (p Profile) Validate() error {
 		}
 		seenCases[caseID] = struct{}{}
 	}
+	for caseID, aliases := range p.ScoringAliases {
+		if _, ok := seenCases[caseID]; !ok {
+			return fmt.Errorf("utilityeval: scoring aliases reference unknown case %q", caseID)
+		}
+		if err := validateScoringAliases(aliases, nil); err != nil {
+			return fmt.Errorf("utilityeval: scoring aliases for %s: %w", caseID, err)
+		}
+	}
 	for _, lane := range p.ProviderLanes {
 		if strings.TrimSpace(lane.Provider) == "" || strings.TrimSpace(lane.Model) == "" {
 			return errors.New("utilityeval: provider lane is incomplete")
@@ -90,19 +111,30 @@ func (p Profile) Validate() error {
 		if lane.Provider == "siliconflow" && strings.Contains(strings.ToLower(lane.Model), "/pro") {
 			return fmt.Errorf("utilityeval: Pro SiliconFlow model is not allowed: %s", lane.Model)
 		}
+		if lane.Temperature < 0 || lane.Temperature > 2 {
+			return fmt.Errorf("utilityeval: provider lane temperature is out of range: %s %s", lane.Provider, lane.Model)
+		}
 	}
 	return nil
 }
 
 type ContextBundle struct {
-	Version   string      `json:"version"`
-	ProfileID string      `json:"profile_id"`
-	Inputs    []CaseInput `json:"inputs"`
+	Version       string      `json:"version"`
+	ProfileID     string      `json:"profile_id"`
+	ProfileSHA256 string      `json:"profile_sha256"`
+	ScorerVersion string      `json:"scorer_version"`
+	Inputs        []CaseInput `json:"inputs"`
 }
 
 func (b ContextBundle) Validate() error {
-	if b.Version != "1" || strings.TrimSpace(b.ProfileID) == "" || len(b.Inputs) == 0 {
+	if b.Version != "2" || strings.TrimSpace(b.ProfileID) == "" || len(b.Inputs) == 0 {
 		return errors.New("utilityeval: context bundle identity is invalid")
+	}
+	if len(b.ProfileSHA256) != 64 {
+		return errors.New("utilityeval: context bundle profile digest is invalid")
+	}
+	if b.ScorerVersion != ScorerVersion {
+		return fmt.Errorf("utilityeval: context bundle scorer is %q, expected %q", b.ScorerVersion, ScorerVersion)
 	}
 	seen := make(map[string]struct{}, len(b.Inputs))
 	for _, input := range b.Inputs {

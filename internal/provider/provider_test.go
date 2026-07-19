@@ -16,8 +16,9 @@ func TestOpenAICompatibleProviderSendsDirectChatCompletionRequest(t *testing.T) 
 			Role    string `json:"role"`
 			Content string `json:"content"`
 		} `json:"messages"`
-		MaxTokens      int   `json:"max_tokens"`
-		EnableThinking *bool `json:"enable_thinking"`
+		MaxTokens      int      `json:"max_tokens"`
+		Temperature    *float64 `json:"temperature"`
+		EnableThinking *bool    `json:"enable_thinking"`
 	}
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -47,6 +48,7 @@ func TestOpenAICompatibleProviderSendsDirectChatCompletionRequest(t *testing.T) 
 		Prompt:        "finish the task",
 		ContextPacket: "confirmed context packet",
 		MaxTokens:     77,
+		Temperature:   float64Pointer(0),
 		JSONSchema:    `{"type":"object","required":["result"]}`,
 	})
 	if err != nil {
@@ -64,6 +66,9 @@ func TestOpenAICompatibleProviderSendsDirectChatCompletionRequest(t *testing.T) 
 	}
 	if captured.EnableThinking != nil {
 		t.Fatalf("default request unexpectedly set enable_thinking: %v", *captured.EnableThinking)
+	}
+	if captured.Temperature == nil || *captured.Temperature != 0 {
+		t.Fatalf("expected temperature=0, got %v", captured.Temperature)
 	}
 	if len(captured.Messages) != 2 {
 		t.Fatalf("expected system and user messages, got %d", len(captured.Messages))
@@ -90,6 +95,10 @@ func TestOpenAICompatibleProviderSendsDirectChatCompletionRequest(t *testing.T) 
 	}) {
 		t.Fatalf("unexpected OpenAI-compatible usage: %#v", resp.Usage)
 	}
+}
+
+func float64Pointer(value float64) *float64 {
+	return &value
 }
 
 func TestOpenAICompatibleProviderCanDisableThinking(t *testing.T) {

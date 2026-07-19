@@ -1,0 +1,92 @@
+{
+  "version": "1",
+  "case_id": "W27-real-utility-comparison",
+  "date": "2026-07-19",
+  "profile": {
+    "name": "real-utility-comparison-v6",
+    "sha256": "b3b92694e14ed2449da9d8e948429b676e18975ff8d9bcc414cfa4fcd38e6508",
+    "scorer": "utilityeval-checks-v3",
+    "workers": 2,
+    "disable_thinking": true,
+    "temperature": 0
+  },
+  "runtime": {
+    "model_run_binary_sha256": "875b67e74089624cc6d381e2bfc72f4ed878ebc93ac75f331352dbe82ef05ef4",
+    "writeback_binary_sha256": "0dccfa900e6c5395882304219ebcc3f91a78f7553f037d7b4cf1a03f30723c8d",
+    "report_validation_binary_sha256": "bd5819507cdd419dc081cbc96cf88ebef622c29d94cc28d11e4d12a6cb801b4d",
+    "postgresql_version": "18.3",
+    "architecture": "darwin-arm64"
+  },
+  "context_bundle": {
+    "sha256": "5106ac23cd53235ea4aa15239a33661c78a556a0b2403bf5dfbf06e90a2ae95c",
+    "cases": 4,
+    "conditions": 6,
+    "call_cells": 24
+  },
+  "provider_lane": {
+    "provider": "siliconflow",
+    "model": "deepseek-ai/DeepSeek-V4-Flash",
+    "report_sha256": "ec6258df477087c62de79e5358cc39eee36cb3467a003013e7ca521ff9f11d27",
+    "report_markdown_sha256": "f28da70454b5a40c929319f79af8abde522dd4445808e6bbbbeba21b5a862c52",
+    "inputs": 24,
+    "outputs": 24,
+    "scores": 24,
+    "raw_provider_artifacts": 24,
+    "provider_failures": 0
+  },
+  "aggregates": {
+    "no_context": {"completed": 4, "successful": 0, "forbidden_hits": 0, "context_bytes": 0},
+    "full_history": {"completed": 4, "successful": 1, "forbidden_hits": 0, "context_bytes": 2858},
+    "plain_summary": {"completed": 4, "successful": 1, "forbidden_hits": 1, "context_bytes": 2046},
+    "plain_retrieval": {"completed": 4, "successful": 0, "forbidden_hits": 0, "context_bytes": 1517},
+    "mem0_oss": {"completed": 4, "successful": 1, "forbidden_hits": 0, "context_bytes": 5586},
+    "vermory_native": {"completed": 4, "successful": 4, "forbidden_hits": 0, "context_bytes": 816}
+  },
+  "native_cases": {
+    "W01-synapseloom-continuity": {"successful": true, "forbidden_hits": 0},
+    "C01-device-maintenance-continuity": {"successful": true, "forbidden_hits": 0},
+    "G01-language-default-local-override": {"successful": true, "forbidden_hits": 0},
+    "S01-deletion-and-source-injection": {"successful": true, "forbidden_hits": 0}
+  },
+  "writeback": {
+    "evidence_sha256": "1637cb82935f4717640e9a20c67c1c0a38e7ed8cc924fea2d7d642d3e7b1457b",
+    "records": 4,
+    "distinct_tenants": 4,
+    "proposed": 4,
+    "active": 0,
+    "search_projection_rows": 0,
+    "first_write_replays": 0,
+    "idempotent_replays": 4,
+    "report_aggregates_recomputed": true,
+    "revalidation_first_replays": 4,
+    "observation_rows_after_revalidation": 4
+  },
+  "delivery_audit": {
+    "matched_deliveries": 4,
+    "distinct_tenants": 4,
+    "deleted_value_hits": 0
+  },
+  "mem0_oss": {
+    "source_commit": "17836748d7afe0521516c6a73c6a256680f05527",
+    "package_version": "2.0.12",
+    "seed_records": 30,
+    "retrieved_context_contains_deleted_or_injected_s01_input": true,
+    "loopback_http_before_teardown": 200,
+    "loopback_http_after_teardown": 0,
+    "native_writeback_completed_after_teardown": true
+  },
+  "append_only_prior_runs": [
+    {"profile": "initial-v1", "report_sha256": "0780dbd5d7b3e3d3f1a89266b479d2b86dea98ed98e92116a70f0c55cc6641c8", "native_successful": 2, "provider_timeouts": 0},
+    {"profile": "scorer-v2-workers4", "report_sha256": "f5a4a69f42a153e4f9466e2bf101736de5e0d4123385f446329e61eb770842a3", "completed": 13, "provider_timeouts": 11},
+    {"profile": "v3-workers2-nonthinking", "report_sha256": "14304dac42b82050fac6018f8c357353238eb72d13d314051bab14bc1247c258", "native_successful": 2, "provider_timeouts": 0},
+    {"profile": "v4-expanded-aliases", "report_sha256": "5ddfe3259c3d79c98d23be7a544cc746d0250642cb299aef8c094a2d6e7e56f7", "native_successful": 3, "provider_timeouts": 0},
+    {"profile": "v5-scorer-v3", "report_sha256": "6d625d432267de9c7a101dee52543d6f9ff31765472c765a892a2fe76072b562", "native_successful": 2, "provider_timeouts": 0}
+  ],
+  "decision": {
+    "native_no_worse_than_best_simple_baseline": true,
+    "native_strictly_more_successful": true,
+    "native_zero_forbidden_hits": true,
+    "native_uses_less_context_than_full_history": true,
+    "claim": "positive_utility_for_frozen_four_case_profile"
+  }
+}

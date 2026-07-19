@@ -3,6 +3,7 @@ package utilityeval
 import (
 	"errors"
 	"fmt"
+	"reflect"
 	"strings"
 
 	"vermory/internal/artifact"
@@ -39,10 +40,11 @@ type ContextEvidence struct {
 }
 
 type CaseInput struct {
-	ID      string                          `json:"id"`
-	Task    string                          `json:"task"`
-	Checks  reality.DownstreamTask          `json:"checks"`
-	Context map[ConditionID]ContextEvidence `json:"context"`
+	ID             string                          `json:"id"`
+	Task           string                          `json:"task"`
+	Checks         reality.DownstreamTask          `json:"checks"`
+	ScoringAliases map[string][]string             `json:"scoring_aliases,omitempty"`
+	Context        map[ConditionID]ContextEvidence `json:"context"`
 }
 
 func NewCaseInput(c reality.Case, contexts map[ConditionID]string) (CaseInput, error) {
@@ -81,6 +83,9 @@ func (input CaseInput) Validate() error {
 	if strings.TrimSpace(input.Task) == "" {
 		return fmt.Errorf("utilityeval: case %s task is required", input.ID)
 	}
+	if err := validateScoringAliases(input.ScoringAliases, input.Checks.DeterministicChecks); err != nil {
+		return fmt.Errorf("utilityeval: case %s scoring aliases: %w", input.ID, err)
+	}
 	for _, condition := range FrozenConditions {
 		evidence, ok := input.Context[condition]
 		if !ok {
@@ -111,12 +116,18 @@ func (e ContextEvidence) Validate(condition ConditionID) error {
 
 type RunOptions struct {
 	RunID           string
+	ProfileID       string
+	ProfileSHA256   string
 	ProviderName    string
 	ProviderMode    string
 	Model           string
 	System          string
 	MaxTokens       int
 	MaxContextBytes int
+	ScorerVersion   string
+	Workers         int
+	DisableThinking bool
+	Temperature     float64
 	Inputs          []CaseInput
 	Provider        provider.Provider
 	Artifacts       artifact.Store
@@ -126,11 +137,20 @@ func (o RunOptions) Validate() error {
 	if strings.TrimSpace(o.RunID) == "" {
 		return errors.New("utilityeval: run id is required")
 	}
+	if strings.TrimSpace(o.ProfileID) == "" || len(o.ProfileSHA256) != 64 {
+		return errors.New("utilityeval: runtime profile identity is invalid")
+	}
 	if strings.TrimSpace(o.ProviderName) == "" {
 		return errors.New("utilityeval: provider name is required")
 	}
 	if strings.TrimSpace(o.Model) == "" {
 		return errors.New("utilityeval: model is required")
+	}
+	if o.ScorerVersion != ScorerVersion {
+		return fmt.Errorf("utilityeval: scorer is %q, expected %q", o.ScorerVersion, ScorerVersion)
+	}
+	if o.Workers < 1 || o.Workers > 16 {
+		return errors.New("utilityeval: workers must be between 1 and 16")
 	}
 	if o.Provider == nil {
 		return errors.New("utilityeval: provider is required")
@@ -163,10 +183,11 @@ type CheckResult struct {
 }
 
 type Score struct {
-	Success         bool          `json:"success"`
-	RequiredChecks  []CheckResult `json:"required_checks"`
-	ForbiddenChecks []CheckResult `json:"forbidden_checks"`
-	ForbiddenHits   int           `json:"forbidden_hits"`
+	Success          bool          `json:"success"`
+	NormalizedOutput string        `json:"normalized_output"`
+	RequiredChecks   []CheckResult `json:"required_checks"`
+	ForbiddenChecks  []CheckResult `json:"forbidden_checks"`
+	ForbiddenHits    int           `json:"forbidden_hits"`
 }
 
 type CallResult struct {
@@ -199,14 +220,43 @@ type Aggregate struct {
 }
 
 type Report struct {
-	RunID        string                    `json:"run_id"`
-	ProviderName string                    `json:"provider_name"`
-	ProviderMode string                    `json:"provider_mode"`
-	Model        string                    `json:"model"`
-	Scorer       string                    `json:"scorer"`
-	Results      []CallResult              `json:"results"`
-	Aggregates   map[ConditionID]Aggregate `json:"aggregates"`
-	ReportURI    string                    `json:"report_uri,omitempty"`
+	RunID           string                    `json:"run_id"`
+	ProfileID       string                    `json:"profile_id"`
+	ProfileSHA256   string                    `json:"profile_sha256"`
+	ProviderName    string                    `json:"provider_name"`
+	ProviderMode    string                    `json:"provider_mode"`
+	Model           string                    `json:"model"`
+	Scorer          string                    `json:"scorer"`
+	Workers         int                       `json:"workers"`
+	DisableThinking bool                      `json:"disable_thinking"`
+	Temperature     float64                   `json:"temperature"`
+	Results         []CallResult              `json:"results"`
+	Aggregates      map[ConditionID]Aggregate `json:"aggregates"`
+	ReportURI       string                    `json:"report_uri,omitempty"`
+}
+
+func (r Report) Validate() error {
+	if strings.TrimSpace(r.RunID) == "" || strings.TrimSpace(r.ProfileID) == "" || len(r.ProfileSHA256) != 64 {
+		return errors.New("utilityeval: report identity is invalid")
+	}
+	if strings.TrimSpace(r.ProviderName) == "" || strings.TrimSpace(r.Model) == "" || r.Scorer != ScorerVersion {
+		return errors.New("utilityeval: report provider or scorer is invalid")
+	}
+	if r.Workers < 1 || r.Workers > 16 || len(r.Results) == 0 {
+		return errors.New("utilityeval: report execution shape is invalid")
+	}
+	for _, result := range r.Results {
+		if result.ProviderName != r.ProviderName || result.Model != r.Model {
+			return errors.New("utilityeval: report result provider or model drifted")
+		}
+		if result.Status != "completed" && result.Status != "failed" {
+			return fmt.Errorf("utilityeval: report result status %q is invalid", result.Status)
+		}
+	}
+	if recomputed := aggregate(r.Results); !reflect.DeepEqual(recomputed, r.Aggregates) {
+		return errors.New("utilityeval: report aggregates do not match call results")
+	}
+	return nil
 }
 
 func normalizeProviderError(err error) string {

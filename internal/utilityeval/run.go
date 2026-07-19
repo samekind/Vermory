@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"sort"
 	"strings"
+	"sync"
 	"time"
 
 	"vermory/internal/provider"
@@ -28,21 +29,45 @@ func Run(ctx context.Context, options RunOptions) (Report, error) {
 	}
 
 	report := Report{
-		RunID:        options.RunID,
-		ProviderName: options.ProviderName,
-		ProviderMode: options.ProviderMode,
-		Model:        options.Model,
-		Scorer:       scorerVersion,
-		Results:      make([]CallResult, 0, len(options.Inputs)*len(FrozenConditions)),
-		Aggregates:   make(map[ConditionID]Aggregate, len(FrozenConditions)),
+		RunID:           options.RunID,
+		ProfileID:       options.ProfileID,
+		ProfileSHA256:   options.ProfileSHA256,
+		ProviderName:    options.ProviderName,
+		ProviderMode:    options.ProviderMode,
+		Model:           options.Model,
+		Scorer:          options.ScorerVersion,
+		Workers:         options.Workers,
+		DisableThinking: options.DisableThinking,
+		Temperature:     options.Temperature,
+		Results:         make([]CallResult, len(options.Inputs)*len(FrozenConditions)),
+		Aggregates:      make(map[ConditionID]Aggregate, len(FrozenConditions)),
 	}
 
+	type callJob struct {
+		index     int
+		input     CaseInput
+		condition ConditionID
+	}
+	jobs := make(chan callJob)
+	var workers sync.WaitGroup
+	for worker := 0; worker < options.Workers; worker++ {
+		workers.Add(1)
+		go func() {
+			defer workers.Done()
+			for job := range jobs {
+				report.Results[job.index] = runCall(ctx, options, job.input, job.condition)
+			}
+		}()
+	}
+	index := 0
 	for _, input := range options.Inputs {
 		for _, condition := range FrozenConditions {
-			result := runCall(ctx, options, input, condition)
-			report.Results = append(report.Results, result)
+			jobs <- callJob{index: index, input: input, condition: condition}
+			index++
 		}
 	}
+	close(jobs)
+	workers.Wait()
 	report.Aggregates = aggregate(report.Results)
 
 	jsonBytes, err := json.MarshalIndent(report, "", "  ")
@@ -81,12 +106,14 @@ func runCall(ctx context.Context, options RunOptions, input CaseInput, condition
 	result.InputURI = inputArtifact.URI
 
 	started := time.Now()
+	temperature := options.Temperature
 	response, err := options.Provider.Generate(ctx, provider.GenerateRequest{
 		Model:         options.Model,
 		System:        options.System,
 		Prompt:        input.Task,
 		ContextPacket: evidence.Body,
 		MaxTokens:     options.MaxTokens,
+		Temperature:   &temperature,
 	})
 	if err != nil {
 		result.ErrorClass = normalizeProviderError(err)
@@ -94,7 +121,7 @@ func runCall(ctx context.Context, options RunOptions, input CaseInput, condition
 		return result
 	}
 	result.Status = "completed"
-	result.Score = scoreTask(input.Checks, response.Output)
+	result.Score = scoreTask(input.Checks, input.ScoringAliases, response.Output)
 
 	outputArtifact, err := options.Artifacts.Put(ctx, callKey(options.RunID, input.ID, condition, "output.md"), []byte(response.Output))
 	if err != nil {
@@ -160,7 +187,7 @@ func aggregate(results []CallResult) map[ConditionID]Aggregate {
 func MarkdownReport(report Report) string {
 	var b strings.Builder
 	fmt.Fprintf(&b, "# W27 Real Utility Comparison: %s\n\n", report.RunID)
-	fmt.Fprintf(&b, "- Provider: `%s`\n- Model: `%s`\n- Scorer: `%s`\n\n", report.ProviderName, report.Model, report.Scorer)
+	fmt.Fprintf(&b, "- Profile: `%s` (`%s`)\n- Provider: `%s`\n- Model: `%s`\n- Scorer: `%s`\n- Workers: `%d`\n- Thinking disabled: `%t`\n- Temperature: `%.2f`\n\n", report.ProfileID, report.ProfileSHA256, report.ProviderName, report.Model, report.Scorer, report.Workers, report.DisableThinking, report.Temperature)
 	b.WriteString("| Condition | Calls | Completed | Failed | Successful | Forbidden hits | Avg context bytes |\n")
 	b.WriteString("| --- | ---: | ---: | ---: | ---: | ---: | ---: |\n")
 	for _, condition := range sortedConditions(report.Aggregates) {

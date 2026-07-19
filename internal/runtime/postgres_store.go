@@ -615,6 +615,30 @@ WHERE id = $1::uuid AND tenant_id = $2`, deliveryID, tenantID).Scan(&continuityI
 	return continuityID, nil
 }
 
+func (s *Store) LookupDelivery(ctx context.Context, tenantID, deliveryID string) (DeliveryReceipt, error) {
+	ctx, err := withTenantContext(ctx, tenantID)
+	if err != nil {
+		return DeliveryReceipt{}, err
+	}
+	var receipt DeliveryReceipt
+	err = s.pool.QueryRow(ctx, `
+SELECT id::text, context_body, eligibility_as_of
+FROM memory_deliveries
+WHERE id = $1::uuid AND tenant_id = $2`, deliveryID, tenantID).Scan(
+		&receipt.DeliveryID,
+		&receipt.Context,
+		&receipt.EligibilityAsOf,
+	)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return DeliveryReceipt{}, fmt.Errorf("delivery does not belong to this tenant")
+	}
+	if err != nil {
+		return DeliveryReceipt{}, fmt.Errorf("lookup context delivery: %w", err)
+	}
+	receipt.EligibilityAsOf = receipt.EligibilityAsOf.UTC()
+	return receipt, nil
+}
+
 func (s *Store) GovernObservation(ctx context.Context, tenantID, continuityID, observationID string, request CommitObservationRequest) (MemoryReceipt, error) {
 	ctx, err := withTenantContext(ctx, tenantID)
 	if err != nil {

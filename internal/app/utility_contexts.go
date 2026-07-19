@@ -1,9 +1,11 @@
 package app
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -17,13 +19,13 @@ import (
 )
 
 type UtilityContextBundleOptions struct {
-	ProfilePath    string
-	CaseRoot       string
-	DatabaseURL    string
-	BundlePath     string
-	Mem0ContextDir string
-	RunID          string
-	ResetDedicated bool
+	ProfilePath                 string
+	CaseRoot                    string
+	DatabaseURL                 string
+	BundlePath                  string
+	NativeContextDir            string
+	Mem0ContextDir              string
+	ExpectedNativeRetrievalMode string
 }
 
 type NativeUtilityContextOptions struct {
@@ -83,10 +85,14 @@ func PrepareNativeUtilityContexts(ctx context.Context, opts NativeUtilityContext
 		if err := os.WriteFile(filepath.Join(opts.OutputDir, caseID+".md"), []byte(evidence.Body), 0o600); err != nil {
 			return err
 		}
-		receipt, err := json.MarshalIndent(map[string]any{
-			"case_id": caseID, "delivery_id": native.DeliveryID,
-			"context_sha256": evidence.SHA256, "context_bytes": evidence.ByteSize,
-			"run_id": opts.RunID,
+		receipt, err := json.MarshalIndent(nativeContextEvidenceReceipt{
+			CaseID:           caseID,
+			DeliveryID:       native.DeliveryID,
+			ContextSHA256:    evidence.SHA256,
+			ContextBytes:     evidence.ByteSize,
+			RunID:            opts.RunID,
+			RetrievalMode:    nativeReceiptRetrievalMode(caseID, opts.RetrievalMode),
+			RetrievalProfile: profileSpec.ID,
 		}, "", "  ")
 		if err != nil {
 			return err
@@ -109,10 +115,19 @@ func PrepareUtilityContextBundle(ctx context.Context, opts UtilityContextBundleO
 	if strings.TrimSpace(opts.BundlePath) == "" {
 		return utilityeval.ContextBundle{}, fmt.Errorf("utility context preparation requires --bundle")
 	}
+	if strings.TrimSpace(opts.NativeContextDir) == "" {
+		return utilityeval.ContextBundle{}, fmt.Errorf("utility context preparation requires --native-context-dir")
+	}
 	if strings.TrimSpace(opts.Mem0ContextDir) == "" {
 		return utilityeval.ContextBundle{}, fmt.Errorf("utility context preparation requires --mem0-context-dir")
 	}
-	opts.RunID = chooseRunID(opts.RunID, "utility-contexts")
+	expectedNativeMode := strings.TrimSpace(opts.ExpectedNativeRetrievalMode)
+	if expectedNativeMode == "" {
+		expectedNativeMode = string(runtime.RetrievalVector)
+	}
+	if expectedNativeMode != string(runtime.RetrievalLexical) && expectedNativeMode != string(runtime.RetrievalVector) && expectedNativeMode != string(runtime.RetrievalShadow) {
+		return utilityeval.ContextBundle{}, fmt.Errorf("unsupported expected native retrieval mode %q", expectedNativeMode)
+	}
 
 	store, err := runtime.OpenStore(ctx, opts.DatabaseURL)
 	if err != nil {
@@ -122,11 +137,6 @@ func PrepareUtilityContextBundle(ctx context.Context, opts UtilityContextBundleO
 	if err := store.Migrate(ctx); err != nil {
 		return utilityeval.ContextBundle{}, err
 	}
-	if opts.ResetDedicated {
-		if err := store.ResetForTest(ctx); err != nil {
-			return utilityeval.ContextBundle{}, fmt.Errorf("reset dedicated utility database: %w", err)
-		}
-	}
 
 	inputs := make([]utilityeval.CaseInput, 0, len(profile.RealityCaseIDs))
 	for _, caseID := range profile.RealityCaseIDs {
@@ -134,9 +144,27 @@ func PrepareUtilityContextBundle(ctx context.Context, opts UtilityContextBundleO
 		if err != nil {
 			return utilityeval.ContextBundle{}, err
 		}
-		native, err := prepareNativeCaseContext(ctx, store, frozenCase, opts.RunID, nil, nil, runtime.RetrievalProfile{})
+		native, receipt, err := loadNativeContextEvidence(opts.NativeContextDir, caseID)
 		if err != nil {
-			return utilityeval.ContextBundle{}, fmt.Errorf("prepare native %s: %w", caseID, err)
+			return utilityeval.ContextBundle{}, err
+		}
+		expectedCaseMode := expectedNativeMode
+		if caseID == "G01-language-default-local-override" {
+			expectedCaseMode = "global_defaults"
+		}
+		if receipt.RetrievalMode != expectedCaseMode {
+			return utilityeval.ContextBundle{}, fmt.Errorf("native context %s retrieval mode is %q, expected %q", caseID, receipt.RetrievalMode, expectedCaseMode)
+		}
+		if expectedCaseMode != string(runtime.RetrievalLexical) && expectedCaseMode != "global_defaults" && strings.TrimSpace(receipt.RetrievalProfile) == "" {
+			return utilityeval.ContextBundle{}, fmt.Errorf("native context %s has no retrieval profile", caseID)
+		}
+		tenantID := "w27-" + compactIdentifier(caseID)
+		stored, err := store.LookupDelivery(ctx, tenantID, native.DeliveryID)
+		if err != nil {
+			return utilityeval.ContextBundle{}, fmt.Errorf("verify native delivery %s: %w", caseID, err)
+		}
+		if strings.TrimSpace(stored.Context) != strings.TrimSpace(native.Context) {
+			return utilityeval.ContextBundle{}, fmt.Errorf("native context %s does not match PostgreSQL delivery", caseID)
 		}
 		mem0Bytes, err := os.ReadFile(filepath.Join(opts.Mem0ContextDir, caseID+".md"))
 		if err != nil {
@@ -150,6 +178,7 @@ func PrepareUtilityContextBundle(ctx context.Context, opts UtilityContextBundleO
 		if err != nil {
 			return utilityeval.ContextBundle{}, err
 		}
+		input.ScoringAliases = profile.ScoringAliases[caseID]
 		input.Context[utilityeval.ConditionVermoryNative] = utilityeval.ContextEvidence{
 			Body:       strings.TrimSpace(native.Context),
 			Source:     "postgresql:memory_delivery:" + native.DeliveryID,
@@ -163,11 +192,60 @@ func PrepareUtilityContextBundle(ctx context.Context, opts UtilityContextBundleO
 		inputs = append(inputs, input)
 	}
 
-	bundle := utilityeval.ContextBundle{Version: "1", ProfileID: profile.ID, Inputs: inputs}
+	bundle := utilityeval.ContextBundle{Version: "2", ProfileID: profile.ID, ProfileSHA256: profile.SHA256, ScorerVersion: profile.ScorerVersion, Inputs: inputs}
 	if err := utilityeval.WriteContextBundle(opts.BundlePath, bundle); err != nil {
 		return utilityeval.ContextBundle{}, err
 	}
 	return bundle, nil
+}
+
+type nativeContextEvidenceReceipt struct {
+	CaseID           string `json:"case_id"`
+	DeliveryID       string `json:"delivery_id"`
+	ContextSHA256    string `json:"context_sha256"`
+	ContextBytes     int    `json:"context_bytes"`
+	RunID            string `json:"run_id"`
+	RetrievalMode    string `json:"retrieval_mode"`
+	RetrievalProfile string `json:"retrieval_profile,omitempty"`
+}
+
+func loadNativeContextEvidence(directory, caseID string) (nativeContextReceipt, nativeContextEvidenceReceipt, error) {
+	bodyBytes, err := os.ReadFile(filepath.Join(directory, caseID+".md"))
+	if err != nil {
+		return nativeContextReceipt{}, nativeContextEvidenceReceipt{}, fmt.Errorf("read native context %s: %w", caseID, err)
+	}
+	receiptBytes, err := os.ReadFile(filepath.Join(directory, caseID+".receipt.json"))
+	if err != nil {
+		return nativeContextReceipt{}, nativeContextEvidenceReceipt{}, fmt.Errorf("read native receipt %s: %w", caseID, err)
+	}
+	var receipt nativeContextEvidenceReceipt
+	decoder := json.NewDecoder(bytes.NewReader(receiptBytes))
+	decoder.DisallowUnknownFields()
+	if err := decoder.Decode(&receipt); err != nil {
+		return nativeContextReceipt{}, nativeContextEvidenceReceipt{}, fmt.Errorf("decode native receipt %s: %w", caseID, err)
+	}
+	if err := decoder.Decode(&struct{}{}); err != io.EOF {
+		return nativeContextReceipt{}, nativeContextEvidenceReceipt{}, fmt.Errorf("decode native receipt %s: trailing JSON", caseID)
+	}
+	if receipt.CaseID != caseID || strings.TrimSpace(receipt.DeliveryID) == "" || strings.TrimSpace(receipt.RunID) == "" || strings.TrimSpace(receipt.RetrievalMode) == "" {
+		return nativeContextReceipt{}, nativeContextEvidenceReceipt{}, fmt.Errorf("native receipt %s identity is invalid", caseID)
+	}
+	evidence := utilityeval.NewContextEvidence(string(bodyBytes), "postgresql:memory_delivery:"+receipt.DeliveryID)
+	if receipt.ContextSHA256 != evidence.SHA256 || receipt.ContextBytes != evidence.ByteSize {
+		return nativeContextReceipt{}, nativeContextEvidenceReceipt{}, fmt.Errorf("native context %s does not match its receipt", caseID)
+	}
+	return nativeContextReceipt{Context: evidence.Body, DeliveryID: receipt.DeliveryID}, receipt, nil
+}
+
+func nativeReceiptRetrievalMode(caseID, requestedMode string) string {
+	if caseID == "G01-language-default-local-override" {
+		return "global_defaults"
+	}
+	mode := strings.TrimSpace(requestedMode)
+	if mode == "" {
+		return string(runtime.RetrievalLexical)
+	}
+	return mode
 }
 
 type utilityRetrievalBinding struct {

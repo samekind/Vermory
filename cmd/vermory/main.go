@@ -47,6 +47,8 @@ func newRootCommand() *cobra.Command {
 	var benchmarkMapPath string
 	var utilityProfilePath string
 	var utilityBundlePath string
+	var utilityReportPath string
+	var utilityWritebackEvidencePath string
 	var utilityMem0ContextDir string
 	var utilityNativeContextDir string
 	var utilityResetDedicated bool
@@ -56,6 +58,7 @@ func newRootCommand() *cobra.Command {
 	var utilityEmbeddingAPIKeyEnv string
 	var utilityEmbeddingModel string
 	var utilityEmbeddingDimensions int
+	var utilityExpectedNativeRetrievalMode string
 	var mem0BaseURL string
 	var mem0APIKeyEnv string
 	var mem0IncludeSource bool
@@ -236,19 +239,49 @@ func newRootCommand() *cobra.Command {
 	utilityComparisonCmd.Flags().IntVar(&maxTokens, "max-tokens", 1024, "maximum output tokens")
 	rootCmd.AddCommand(utilityComparisonCmd)
 
+	recordUtilityWritebacksCmd := &cobra.Command{
+		Use:   "record-utility-writebacks",
+		Short: "Record successful W27 native model outputs as proposed, idempotent observations",
+		Args:  cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			evidence, err := app.RecordUtilityWritebacks(cmd.Context(), app.UtilityWritebackOptions{
+				ProfilePath:  utilityProfilePath,
+				BundlePath:   utilityBundlePath,
+				ReportPath:   utilityReportPath,
+				DatabaseURL:  databaseURL,
+				EvidencePath: utilityWritebackEvidencePath,
+			})
+			if err != nil {
+				return err
+			}
+			fmt.Fprintf(cmd.OutOrStdout(), "run=%s writebacks=%d state=%s evidence=%s\n", evidence.RunID, len(evidence.Records), evidence.WritebackState, utilityWritebackEvidencePath)
+			return nil
+		},
+	}
+	recordUtilityWritebacksCmd.Flags().StringVar(&utilityProfilePath, "profile", "runtime/cases/W27-real-utility-comparison/case.json", "W27 utility profile JSON")
+	recordUtilityWritebacksCmd.Flags().StringVar(&utilityBundlePath, "context-bundle", "", "hashed W27 context bundle JSON")
+	_ = recordUtilityWritebacksCmd.MarkFlagRequired("context-bundle")
+	recordUtilityWritebacksCmd.Flags().StringVar(&utilityReportPath, "report", "", "completed W27 utility report JSON")
+	_ = recordUtilityWritebacksCmd.MarkFlagRequired("report")
+	recordUtilityWritebacksCmd.Flags().StringVar(&databaseURL, "database-url", "", "dedicated PostgreSQL connection URL")
+	_ = recordUtilityWritebacksCmd.MarkFlagRequired("database-url")
+	recordUtilityWritebacksCmd.Flags().StringVar(&utilityWritebackEvidencePath, "evidence", "", "output writeback receipt JSON")
+	_ = recordUtilityWritebacksCmd.MarkFlagRequired("evidence")
+	rootCmd.AddCommand(recordUtilityWritebacksCmd)
+
 	prepareUtilityContextsCmd := &cobra.Command{
 		Use:   "prepare-utility-contexts",
 		Short: "Prepare W27 native deliveries and freeze the context bundle",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			bundle, err := app.PrepareUtilityContextBundle(cmd.Context(), app.UtilityContextBundleOptions{
-				ProfilePath:    utilityProfilePath,
-				CaseRoot:       caseRoot,
-				DatabaseURL:    databaseURL,
-				BundlePath:     utilityBundlePath,
-				Mem0ContextDir: utilityMem0ContextDir,
-				RunID:          runID,
-				ResetDedicated: utilityResetDedicated,
+				ProfilePath:                 utilityProfilePath,
+				CaseRoot:                    caseRoot,
+				DatabaseURL:                 databaseURL,
+				BundlePath:                  utilityBundlePath,
+				NativeContextDir:            utilityNativeContextDir,
+				Mem0ContextDir:              utilityMem0ContextDir,
+				ExpectedNativeRetrievalMode: utilityExpectedNativeRetrievalMode,
 			})
 			if err != nil {
 				return err
@@ -263,10 +296,11 @@ func newRootCommand() *cobra.Command {
 	_ = prepareUtilityContextsCmd.MarkFlagRequired("database-url")
 	prepareUtilityContextsCmd.Flags().StringVar(&utilityBundlePath, "bundle", "", "output hashed context bundle JSON")
 	_ = prepareUtilityContextsCmd.MarkFlagRequired("bundle")
+	prepareUtilityContextsCmd.Flags().StringVar(&utilityNativeContextDir, "native-context-dir", "", "directory containing independently produced native context receipts")
+	_ = prepareUtilityContextsCmd.MarkFlagRequired("native-context-dir")
 	prepareUtilityContextsCmd.Flags().StringVar(&utilityMem0ContextDir, "mem0-context-dir", "", "directory containing independently produced <case-id>.md mem0 contexts")
 	_ = prepareUtilityContextsCmd.MarkFlagRequired("mem0-context-dir")
-	prepareUtilityContextsCmd.Flags().StringVar(&runID, "run-id", "", "stable context preparation run id")
-	prepareUtilityContextsCmd.Flags().BoolVar(&utilityResetDedicated, "reset-dedicated", false, "reset the explicitly dedicated qualification database before seeding")
+	prepareUtilityContextsCmd.Flags().StringVar(&utilityExpectedNativeRetrievalMode, "expected-native-retrieval-mode", "vector", "required native receipt mode: lexical, shadow, or vector")
 	rootCmd.AddCommand(prepareUtilityContextsCmd)
 
 	prepareNativeContextsCmd := &cobra.Command{

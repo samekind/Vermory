@@ -15,14 +15,15 @@ import (
 )
 
 type EvalSelfCaseOptions struct {
-	DatabaseURL  string
-	ArtifactRoot string
-	Provider     string
-	BaseURL      string
-	APIKeyEnv    string
-	Model        string
-	RunID        string
-	MaxTokens    int
+	DatabaseURL     string
+	ArtifactRoot    string
+	Provider        string
+	BaseURL         string
+	APIKeyEnv       string
+	Model           string
+	RunID           string
+	MaxTokens       int
+	DisableThinking bool
 }
 
 func EvalSelfCase(ctx context.Context, opts EvalSelfCaseOptions) (runner.EvaluationReport, error) {
@@ -105,8 +106,9 @@ func buildProvider(opts EvalSelfCaseOptions) (provider.Provider, string, string,
 			return nil, "", "", "", fmt.Errorf("%s provider requires non-empty env %s", providerName, apiKeyEnv)
 		}
 		return provider.NewOpenAICompatible(provider.Config{
-			BaseURL: baseURL,
-			APIKey:  apiKey,
+			BaseURL:         baseURL,
+			APIKey:          apiKey,
+			DisableThinking: opts.DisableThinking,
 		}), "real", providerName, model, nil
 	default:
 		return nil, "", "", "", fmt.Errorf("unsupported provider %q", providerName)

@@ -57,9 +57,10 @@ func (p *OpenAICompatible) Generate(ctx context.Context, req GenerateRequest) (G
 	}
 
 	request := openAICompatibleRequest{
-		Model:     req.Model,
-		Messages:  buildMessages(req),
-		MaxTokens: req.MaxTokens,
+		Model:       req.Model,
+		Messages:    buildMessages(req),
+		MaxTokens:   req.MaxTokens,
+		Temperature: req.Temperature,
 	}
 	if p.disableThinking {
 		enabled := false
@@ -136,6 +137,7 @@ type openAICompatibleRequest struct {
 	Model          string                `json:"model"`
 	Messages       []openAICompatibleMsg `json:"messages"`
 	MaxTokens      int                   `json:"max_tokens,omitempty"`
+	Temperature    *float64              `json:"temperature,omitempty"`
 	EnableThinking *bool                 `json:"enable_thinking,omitempty"`
 }
 

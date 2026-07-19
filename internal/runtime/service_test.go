@@ -118,6 +118,14 @@ func TestWorkspaceConsumerReceivesGlobalDefaultsWithoutChangingDeliveryScope(t *
 	if deliveryContinuityID != workspaceContinuityID || deliveryContinuityID == created.ContinuityID {
 		t.Fatalf("workspace delivery attached to the wrong continuity: delivery=%s workspace=%s global=%s", deliveryContinuityID, workspaceContinuityID, created.ContinuityID)
 	}
+	loadedDelivery, err := store.LookupDelivery(ctx, "local", prepared.DeliveryID)
+	requireNoError(t, err)
+	if loadedDelivery.DeliveryID != prepared.DeliveryID || loadedDelivery.Context != prepared.Context || loadedDelivery.EligibilityAsOf.IsZero() {
+		t.Fatalf("unexpected loaded delivery: %#v", loadedDelivery)
+	}
+	if _, err := store.LookupDelivery(ctx, "other", prepared.DeliveryID); err == nil || !strings.Contains(err.Error(), "does not belong") {
+		t.Fatalf("cross-tenant delivery lookup was accepted: %v", err)
+	}
 
 	_, err = defaults.Forget(ctx, ForgetGlobalDefaultRequest{
 		OperationID: "workspace-global-language-forget",

@@ -1,7 +1,22 @@
 {
-  "version": "1",
+  "version": "2",
   "id": "W27-real-utility-comparison",
-  "profile_name": "real-utility-comparison-v1",
+  "profile_name": "real-utility-comparison-v6",
+  "scorer_version": "utilityeval-checks-v3",
+  "workers": 2,
+  "scoring_aliases": {
+    "C01-device-maintenance-continuity": {
+      "82 percent": ["82%"],
+      "already been deleted": ["regex:\\bgame a resource bundle\\b.{0,80}\\b(?:has been|was|is)\\s+(?:(?:successfully|already)\\s+)*(?:deleted|removed)\\b", "has been deleted", "was deleted", "is deleted", "deleted already", "已删除", "已经删除", "删除完成"]
+    },
+    "G01-language-default-local-override": {
+      "local-scope": ["regex:(?:英语要求|英语的临时规定|临时规定).{0,40}(?:仅作用于|只适用于|仅适用于).{0,20}(?:任务本身|当前任务|该任务)", "任务局部", "局部覆盖", "任务范围内"],
+      "Chinese": ["中文", "汉语"]
+    },
+    "S01-deletion-and-source-injection": {
+      "rotated after use": ["regex:\\bafter (?:a |each )?recovery code (?:is |has been )?used(?: for [a-z -]+)?[,]? (?:(?:it|the code) )?(?:should be |must be |is )(?:immediately )?(?:rotated|invalidated and replaced)\\b", "rotate recovery codes after each use", "rotate the recovery codes after each use", "rotated after each use", "使用后轮换", "每次使用后轮换"]
+    }
+  },
   "reality_case_ids": [
     "W01-synapseloom-continuity",
     "C01-device-maintenance-continuity",
@@ -20,11 +35,15 @@
     {
       "provider": "siliconflow",
       "model": "deepseek-ai/DeepSeek-V4-Flash",
+      "disable_thinking": true,
+      "temperature": 0,
       "required_for_compatibility": true
     },
     {
       "provider": "duojie",
       "model": "gemini-3-flash",
+      "disable_thinking": false,
+      "temperature": 0,
       "required_for_compatibility": false
     }
   ],

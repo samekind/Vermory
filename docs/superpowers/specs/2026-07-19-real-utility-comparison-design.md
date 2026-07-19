@@ -204,3 +204,55 @@ for arbitrary input, qualify every provider, rank models, establish universal
 latency or cost SLOs, prove long-duration user satisfaction, or complete
 Vermory. It proves or falsifies one public four-case utility profile and keeps
 all weaker or failed results visible.
+
+## 11. Scorer v2 Amendment
+
+The first complete SiliconFlow lane exposed two deterministic false negatives
+without exposing a native context failure. C01 returned `82%` for the frozen
+`82 percent` fact. G01 followed the task's Chinese-language requirement and
+expressed `local-scope` and `Chinese` as Chinese phrases. The original
+`utilityeval-checks-v1` scorer rejected those surface forms even though the
+retained context and output artifacts contained the required meaning.
+
+The original run and its 2/4 native aggregate remain append-only evidence.
+They are not rescored or overwritten. The replacement profile is explicitly
+versioned as `real-utility-comparison-v2` with
+`utilityeval-checks-v2`. Its declared aliases are stored in `case.json`, copied
+into the hashed context bundle, validated against each case's existing
+deterministic checks, and recorded by the scorer when matched. The case
+history, prompt, current facts, forbidden facts, context bodies, and hard gates
+are unchanged.
+
+This amendment is a scorer correction made after observing the first run, so
+the v2 result is not represented as a blind pre-registered replication. A new
+provider run identity and a new report are required. Forbidden checks use the
+same declared-alias mechanism and still receive no semantic-similarity or LLM
+judge waiver.
+
+Two later append-only runs tightened the execution contract before the final
+replication. A four-worker run with provider-default thinking completed only
+13 of 24 calls and retained 11 `provider_timeout` failures. The next profile
+fixed two workers and explicitly disabled thinking for the SiliconFlow
+DeepSeek-V4-Flash lane; it completed 24 of 24 calls, then exposed two further
+surface-form false negatives: `has been deleted` versus
+`already been deleted`, and `rotate recovery codes after each use` versus
+`rotated after use`. The v4 profile declares common English and Chinese forms
+for those same frozen lifecycle facts. Each profile revision has a distinct
+SHA-256-bound bundle and run identity; no prior report is overwritten.
+
+The following v4 replication completed 24 of 24 calls and passed three native
+cases. C01 used the additional positive adverb in `has been successfully
+deleted`, demonstrating that substring aliases remained brittle. The v5
+profile therefore upgrades to `utilityeval-checks-v3` and declares a bounded
+RE2 equivalent that requires the `Game A resource bundle` subject and a
+positive deleted/removed construction. The same pattern rejects a negated
+`has not been deleted` clause. Regex equivalents are compiled during profile
+and bundle validation and are retained in the hashed scoring contract.
+
+The v5 replication again completed 24 of 24 calls but changed the valid G01
+and S01 wording under the provider's implicit sampling default. The v6 profile
+therefore freezes `temperature=0` as an explicit request and report field and
+adds bounded positive relation predicates for task-local override expiry and
+post-use recovery-code rotation. This removes provider-default randomness from
+the execution contract without weakening stale, deleted, injected, or
+cross-scope forbidden checks.

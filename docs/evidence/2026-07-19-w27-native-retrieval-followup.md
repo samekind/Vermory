@@ -2,10 +2,11 @@
 
 ## Scope
 
-This record covers the follow-up run after wiring the W27 native context
+This record covers the native retrieval slice after wiring the W27 native context
 preparation command to the production retrieval coordinator. It is evidence
-for the native PostgreSQL delivery path only. It is not a completed W27 model
-utility comparison and it does not establish a retrieval or provider ranking.
+for the native PostgreSQL delivery path only. The subsequently completed model
+utility comparison is recorded in
+`docs/evidence/2026-07-19-w27-real-utility-comparison.md`.
 
 The run used the dedicated Mac mini PostgreSQL database
 `vermory_w27_utility_20260719`, PostgreSQL 18.3, and a darwin/arm64 binary
@@ -113,7 +114,7 @@ This run establishes three bounded facts:
   Gboard fact while preserving the deletion and scope boundaries in these four
   cases.
 
-This is evidence of a native retrieval improvement for one frozen failure, not
-evidence that Vermory improves downstream model task success. That broader
-claim requires a completed real-provider W27 matrix with per-call input,
-output, score, and raw artifacts, plus the independently produced mem0 lane.
+This section alone is evidence of a native retrieval improvement for one
+frozen failure. The later W27 record supplies the completed real-provider
+matrix, official mem0 lane, proposed-only writeback receipts, and bounded
+utility decision.
