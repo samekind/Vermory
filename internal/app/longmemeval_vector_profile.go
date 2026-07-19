@@ -33,6 +33,7 @@ type LongMemEvalVectorProfile struct {
 	HTTPTimeoutSeconds     int      `json:"http_timeout_seconds"`
 	MaxAttempts            int      `json:"max_attempts"`
 	RetryDelayMilliseconds int      `json:"retry_delay_milliseconds"`
+	RetryBackoff           string   `json:"retry_backoff,omitempty"`
 	Conditions             []string `json:"conditions"`
 	HardGates              []string `json:"hard_gates"`
 	NonClaims              []string `json:"non_claims"`
@@ -69,6 +70,9 @@ func (profile LongMemEvalVectorProfile) Validate() error {
 	}
 	if profile.RetryDelayMilliseconds < 0 || profile.RetryDelayMilliseconds > 60000 {
 		return fmt.Errorf("LongMemEval embedding retry delay must be between 0 and 60000 milliseconds")
+	}
+	if profile.RetryBackoff != "" && profile.RetryBackoff != "fixed" && profile.RetryBackoff != "linear" {
+		return fmt.Errorf("LongMemEval embedding retry backoff must be fixed or linear")
 	}
 	if !slices.Equal(profile.Conditions, longMemEvalVectorConditions()) {
 		return fmt.Errorf("LongMemEval vector conditions are %v, want %v", profile.Conditions, longMemEvalVectorConditions())
@@ -125,6 +129,7 @@ type longMemEvalRetryingEmbedder struct {
 	batchDelegate     vermoryruntime.BatchEmbedder
 	maxAttempts       int
 	retryDelay        time.Duration
+	retryBackoff      string
 	sleeper           func(context.Context, time.Duration) error
 	logicalOperations atomic.Int64
 	providerAttempts  atomic.Int64
@@ -145,9 +150,10 @@ func newLongMemEvalRetryingEmbedder(delegate vermoryruntime.Embedder, profile Lo
 	}
 	return &longMemEvalRetryingEmbedder{
 		delegate: delegate, batchDelegate: batch,
-		maxAttempts: profile.MaxAttempts,
-		retryDelay:  time.Duration(profile.RetryDelayMilliseconds) * time.Millisecond,
-		sleeper:     sleepLongMemEvalEmbeddingRetry,
+		maxAttempts:  profile.MaxAttempts,
+		retryDelay:   time.Duration(profile.RetryDelayMilliseconds) * time.Millisecond,
+		retryBackoff: profile.RetryBackoff,
+		sleeper:      sleepLongMemEvalEmbeddingRetry,
 	}, nil
 }
 
@@ -168,7 +174,7 @@ func (embedder *longMemEvalRetryingEmbedder) Embed(ctx context.Context, text str
 		lastErr = err
 		embedder.failedAttempts.Add(1)
 		if attempt < embedder.maxAttempts {
-			if err := embedder.sleeper(ctx, embedder.retryDelay); err != nil {
+			if err := embedder.sleeper(ctx, embedder.retryDelayForAttempt(attempt)); err != nil {
 				return nil, err
 			}
 		}
@@ -194,13 +200,20 @@ func (embedder *longMemEvalRetryingEmbedder) EmbedBatch(ctx context.Context, tex
 		lastErr = err
 		embedder.failedAttempts.Add(1)
 		if attempt < embedder.maxAttempts {
-			if err := embedder.sleeper(ctx, embedder.retryDelay); err != nil {
+			if err := embedder.sleeper(ctx, embedder.retryDelayForAttempt(attempt)); err != nil {
 				return nil, err
 			}
 		}
 	}
 	embedder.terminalFailures.Add(1)
 	return nil, lastErr
+}
+
+func (embedder *longMemEvalRetryingEmbedder) retryDelayForAttempt(attempt int) time.Duration {
+	if embedder.retryBackoff == "linear" {
+		return time.Duration(attempt) * embedder.retryDelay
+	}
+	return embedder.retryDelay
 }
 
 func (embedder *longMemEvalRetryingEmbedder) stats() longMemEvalEmbeddingStats {

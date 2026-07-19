@@ -63,6 +63,27 @@ The versioned profile is stored at
 | Attempts | at most `3` per provider operation |
 | Retry delay | `2 seconds` |
 
+The initial v1 retry envelope is retained as an executed historical profile.
+The first proper one-shot full run projected 1,280 current vectors and then
+failed closed after three consecutive transient embedding failures. A
+read-only diagnostic immediately replayed the complete failing 256-event
+window as sixteen independent 16-item requests; every request returned HTTP
+200 with 16 vectors of 1024 dimensions, including the 31,855-byte longest
+input. This falsified deterministic input-size and batch-shape explanations.
+
+The formal retry profile is therefore revised, without changing retrieval
+conditions or quality labels, at
+`casebook/benchmarks/profiles/longmemeval-s-vector-retrieval-v2.json`:
+
+| Field | v2 value |
+|---|---|
+| Maximum attempts | `5` |
+| Retry delay | `2 seconds` base |
+| Retry backoff | linear: `2 / 4 / 6 / 8 seconds` |
+
+The v1 file and failed runs remain unchanged evidence. v2 is an operational
+fault-recovery revision, not benchmark-label tuning.
+
 The profile contains no credential. The CLI accepts only the name of an
 environment variable and reads the secret inside the process. The profile's
 endpoint, model, dimensions, and projection class must match the registered
@@ -177,4 +198,3 @@ W28 does not alter the product default. After the rankings are frozen:
 - W28 does not switch Vermory's default retrieval mode.
 - W28 is public benchmark evidence, not sealed or externally withheld evidence.
 - W28 does not complete the overall Vermory platform goal.
-

@@ -119,6 +119,10 @@ type LongMemEvalVectorEvidence struct {
 	ProjectionClass                string                          `json:"projection_class"`
 	WorkerBatchSize                int                             `json:"worker_batch_size"`
 	EmbeddingBatchSize             int                             `json:"embedding_batch_size"`
+	HTTPTimeoutSeconds             int                             `json:"http_timeout_seconds"`
+	MaxAttempts                    int                             `json:"max_attempts"`
+	RetryDelayMilliseconds         int                             `json:"retry_delay_milliseconds"`
+	RetryBackoff                   string                          `json:"retry_backoff"`
 	ProjectionDurationMilliseconds int64                           `json:"projection_duration_ms"`
 	Projection                     vermoryruntime.ProjectionStatus `json:"projection"`
 	Embedding                      longMemEvalEmbeddingStats       `json:"embedding"`
@@ -286,6 +290,10 @@ func RunLongMemEvalRetrieval(ctx context.Context, opts LongMemEvalRetrievalOptio
 			ProjectionClass:                vectorProfile.ProjectionClass,
 			WorkerBatchSize:                vectorProfile.WorkerBatchSize,
 			EmbeddingBatchSize:             vectorProfile.EmbeddingBatchSize,
+			HTTPTimeoutSeconds:             vectorProfile.HTTPTimeoutSeconds,
+			MaxAttempts:                    vectorProfile.MaxAttempts,
+			RetryDelayMilliseconds:         vectorProfile.RetryDelayMilliseconds,
+			RetryBackoff:                   vectorProfile.RetryBackoff,
 			ProjectionDurationMilliseconds: time.Since(projectionStarted).Milliseconds(),
 			Projection:                     projectionStatus, FailureCodeBreakdown: make(map[string]int),
 		}
@@ -859,6 +867,7 @@ func markdownLongMemEvalRetrievalReport(report LongMemEvalRetrievalReport) strin
 	fmt.Fprintf(&builder, "- Runtime failures: `%d`\n\n", len(report.Failures))
 	if report.Vector != nil {
 		fmt.Fprintf(&builder, "- Vector profile: `%s` (`%s`)\n", report.Vector.RetrievalProfile, report.Vector.ProfileSHA256)
+		fmt.Fprintf(&builder, "- Embedding retry contract: timeout=`%ds`, attempts=`%d`, delay=`%dms`, backoff=`%s`\n", report.Vector.HTTPTimeoutSeconds, report.Vector.MaxAttempts, report.Vector.RetryDelayMilliseconds, report.Vector.RetryBackoff)
 		fmt.Fprintf(&builder, "- Projection: status=`%s`, lag=`%d`, vectors=`%d`\n", report.Vector.Projection.Status, report.Vector.Projection.Lag, report.Vector.Projection.VectorCount)
 		fmt.Fprintf(&builder, "- Vector queries: effective=`%d`, degraded=`%d`\n", report.Vector.EffectiveVectorQueries, report.Vector.DegradedVectorQueries)
 		fmt.Fprintf(&builder, "- Embedding: operations=`%d`, attempts=`%d`, successful items=`%d`, failed attempts=`%d`, terminal failures=`%d`\n", report.Vector.Embedding.LogicalOperations, report.Vector.Embedding.ProviderAttempts, report.Vector.Embedding.SuccessfulItems, report.Vector.Embedding.FailedAttempts, report.Vector.Embedding.TerminalFailures)
