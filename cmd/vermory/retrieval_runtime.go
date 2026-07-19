@@ -145,13 +145,14 @@ func addSharedRetrievalFlags(command *cobra.Command, options *retrievalRuntimeOp
 }
 
 type retrievalWorkerCommandOptions struct {
-	DatabaseURL  string
-	TenantID     string
-	ProfileID    string
-	Embedding    retrievalRuntimeOptions
-	Once         bool
-	PollInterval time.Duration
-	BatchSize    int
+	DatabaseURL        string
+	TenantID           string
+	ProfileID          string
+	Embedding          retrievalRuntimeOptions
+	Once               bool
+	PollInterval       time.Duration
+	BatchSize          int
+	EmbeddingBatchSize int
 }
 
 func newRetrievalWorkerCommand() *cobra.Command {
@@ -192,10 +193,11 @@ func newRetrievalWorkerCommand() *cobra.Command {
 				return fmt.Errorf("configure embedding provider")
 			}
 			worker, err := runtime.NewProjectionWorker(store, embedder, runtime.ProjectionWorkerOptions{
-				TenantID:     options.TenantID,
-				Profile:      profile,
-				BatchSize:    options.BatchSize,
-				PollInterval: options.PollInterval,
+				TenantID:           options.TenantID,
+				Profile:            profile,
+				BatchSize:          options.BatchSize,
+				EmbeddingBatchSize: options.EmbeddingBatchSize,
+				PollInterval:       options.PollInterval,
 			})
 			if err != nil {
 				return err
@@ -224,15 +226,17 @@ func newRetrievalWorkerCommand() *cobra.Command {
 	command.Flags().BoolVar(&options.Once, "once", false, "process at most one batch and exit")
 	command.Flags().DurationVar(&options.PollInterval, "poll-interval", options.PollInterval, "continuous worker poll interval")
 	command.Flags().IntVar(&options.BatchSize, "batch-size", options.BatchSize, "maximum events processed per pass")
+	command.Flags().IntVar(&options.EmbeddingBatchSize, "embedding-batch-size", 1, "maximum texts sent per embedding request")
 	return command
 }
 
 type retrievalSnapshotRebuildCommandOptions struct {
-	DatabaseURL      string
-	TenantID         string
-	ProfileID        string
-	Embedding        retrievalRuntimeOptions
-	SnapshotPageSize int
+	DatabaseURL        string
+	TenantID           string
+	ProfileID          string
+	Embedding          retrievalRuntimeOptions
+	SnapshotPageSize   int
+	EmbeddingBatchSize int
 }
 
 func newRetrievalSnapshotRebuildCommand() *cobra.Command {
@@ -276,9 +280,10 @@ func newRetrievalSnapshotRebuildCommand() *cobra.Command {
 				return fmt.Errorf("configure embedding provider")
 			}
 			worker, err := runtime.NewProjectionWorker(store, embedder, runtime.ProjectionWorkerOptions{
-				TenantID:         options.TenantID,
-				Profile:          profile,
-				SnapshotPageSize: options.SnapshotPageSize,
+				TenantID:           options.TenantID,
+				Profile:            profile,
+				SnapshotPageSize:   options.SnapshotPageSize,
+				EmbeddingBatchSize: options.EmbeddingBatchSize,
 			})
 			if err != nil {
 				return err
@@ -298,6 +303,7 @@ func newRetrievalSnapshotRebuildCommand() *cobra.Command {
 	command.Flags().StringVar(&options.Embedding.EmbeddingModel, "embedding-model", options.Embedding.EmbeddingModel, "embedding model name")
 	command.Flags().IntVar(&options.Embedding.EmbeddingDimensions, "embedding-dimensions", options.Embedding.EmbeddingDimensions, "embedding vector dimensions")
 	command.Flags().IntVar(&options.SnapshotPageSize, "snapshot-page-size", options.SnapshotPageSize, "current-authority rows loaded per page")
+	command.Flags().IntVar(&options.EmbeddingBatchSize, "embedding-batch-size", 1, "maximum texts sent per embedding request")
 	return command
 }
 
