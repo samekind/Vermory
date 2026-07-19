@@ -11,9 +11,108 @@ import (
 	"testing"
 
 	"vermory/internal/benchmark"
+	vermoryruntime "vermory/internal/runtime"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
+
+type longMemEvalVectorTestEmbedder struct{}
+
+func (longMemEvalVectorTestEmbedder) Embed(_ context.Context, text string) ([]float32, error) {
+	vector := make([]float32, 1024)
+	lower := strings.ToLower(text)
+	switch {
+	case strings.Contains(lower, "launch") || strings.Contains(lower, "orbit"):
+		vector[0] = 1
+	case strings.Contains(lower, "maintenance") || strings.Contains(lower, "friday"):
+		vector[1] = 1
+	default:
+		vector[2] = 1
+	}
+	return vector, nil
+}
+
+func (embedder longMemEvalVectorTestEmbedder) EmbedBatch(ctx context.Context, texts []string) ([][]float32, error) {
+	vectors := make([][]float32, len(texts))
+	for index, text := range texts {
+		vector, err := embedder.Embed(ctx, text)
+		if err != nil {
+			return nil, err
+		}
+		vectors[index] = vector
+	}
+	return vectors, nil
+}
+
+func TestLongMemEvalVectorRetrievalRunnerUsesDurableProductionProjection(t *testing.T) {
+	databaseURL := resetBenchmarkDatabase(t)
+	records := []benchmark.LongMemEvalRecord{
+		retrievalTestRecord("record-a", "What is my launch code?", "ORBIT-7319", "answer-a", "My launch code is ORBIT-7319."),
+		retrievalTestRecord("record-b", "When is the maintenance window?", "Friday 22:30", "answer-b", "The maintenance window is Friday 22:30."),
+	}
+	paths := prepareLongMemEvalRetrievalTestFiles(t, records)
+	var execution benchmark.ExecutionManifest
+	executionBytes, err := os.ReadFile(paths.execution)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := json.Unmarshal(executionBytes, &execution); err != nil {
+		t.Fatal(err)
+	}
+	execution.Conditions = longMemEvalVectorConditions()
+	writeBenchmarkJSON(t, paths.execution, execution)
+	root, err := projectRoot()
+	if err != nil {
+		t.Fatal(err)
+	}
+	report, err := RunLongMemEvalRetrieval(context.Background(), LongMemEvalRetrievalOptions{
+		QualificationPath:      paths.qualification,
+		ExecutionPath:          paths.execution,
+		SourceDatasetPath:      paths.source,
+		DatabaseURL:            databaseURL,
+		ArtifactRoot:           t.TempDir(),
+		RunID:                  "longmemeval-vector-retrieval-test",
+		ImplementationRevision: "test-revision",
+		VectorProfilePath:      filepath.Join(root, "casebook/benchmarks/profiles/longmemeval-s-vector-retrieval-v1.json"),
+		VectorEmbedder:         longMemEvalVectorTestEmbedder{},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if report.Vector == nil || !report.Vector.HardGatesPass {
+		t.Fatalf("vector hard gates did not pass: %#v", report.Vector)
+	}
+	if report.Vector.Projection.VectorCount != 4 || report.Vector.Projection.Lag != 0 || report.Vector.EffectiveVectorQueries != 2 || report.Vector.DegradedVectorQueries != 0 {
+		t.Fatalf("unexpected vector production evidence: %#v", report.Vector)
+	}
+	if report.Vector.Embedding.SuccessfulItems != 6 || report.Vector.Embedding.TerminalFailures != 0 {
+		t.Fatalf("unexpected embedding accounting: %#v", report.Vector.Embedding)
+	}
+	for _, result := range report.Results {
+		if len(result.Conditions) != 3 {
+			t.Fatalf("record %s does not contain three conditions: %#v", result.RecordID, result.Conditions)
+		}
+		vector := result.Conditions[2]
+		if vector.Condition != longMemEvalRetrievalVector || vector.Status != "completed" || vector.EffectiveMode != vermoryruntime.RetrievalVector || vector.Degraded || vector.MetricAt12 == nil || vector.MetricAt12.RecallAll != 1 || vector.AuditID == "" {
+			t.Fatalf("record %s did not use effective production vector retrieval: %#v", result.RecordID, vector)
+		}
+	}
+	pool, err := pgxpool.New(context.Background(), databaseURL)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer pool.Close()
+	var audits, vectors int
+	if err := pool.QueryRow(context.Background(), `SELECT count(*) FROM memory_retrieval_runs WHERE tenant_id=$1 AND requested_mode='vector' AND effective_mode='vector' AND degraded=false`, "benchmark:longmemeval-vector-retrieval-test").Scan(&audits); err != nil {
+		t.Fatal(err)
+	}
+	if err := pool.QueryRow(context.Background(), `SELECT count(*) FROM memory_vector_documents WHERE tenant_id=$1 AND profile_id=$2`, "benchmark:longmemeval-vector-retrieval-test", vermoryruntime.ProductionRetrievalProfileID).Scan(&vectors); err != nil {
+		t.Fatal(err)
+	}
+	if audits != 2 || vectors != 4 {
+		t.Fatalf("production vector evidence is missing: audits=%d vectors=%d", audits, vectors)
+	}
+}
 
 func TestLongMemEvalRetrievalRunnerUsesProductionPathAndResumes(t *testing.T) {
 	databaseURL := resetBenchmarkDatabase(t)

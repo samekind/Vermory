@@ -228,7 +228,7 @@ func TestRetrievalCoordinatorVectorFallsBackByteExactlyWhenProjectionIsStale(t *
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !reflect.DeepEqual(result.Memories, lexical) || result.Effective != RetrievalLexical || !result.Degraded {
+	if !reflect.DeepEqual(result.Memories, lexical) || result.Effective != RetrievalLexical || !result.Degraded || result.FailureCode != "projection_lag" {
 		t.Fatalf("stale projection did not use exact lexical fallback: result=%#v lexical=%#v", result, lexical)
 	}
 	assertRetrievalAudit(t, store, request.TenantID, request.OperationID, RetrievalVector, RetrievalLexical, true, "projection_lag")
@@ -327,7 +327,7 @@ func TestRetrievalCoordinatorVectorFallsBackForProviderAndEmptyProjection(t *tes
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !reflect.DeepEqual(providerResult.Memories, lexical) || providerResult.Effective != RetrievalLexical || !providerResult.Degraded {
+	if !reflect.DeepEqual(providerResult.Memories, lexical) || providerResult.Effective != RetrievalLexical || !providerResult.Degraded || providerResult.FailureCode != "embedding_unavailable" {
 		t.Fatalf("provider fallback=%#v lexical=%#v", providerResult, lexical)
 	}
 	assertRetrievalAudit(t, store, request.TenantID, request.OperationID, RetrievalVector, RetrievalLexical, true, "embedding_unavailable")
@@ -339,7 +339,7 @@ func TestRetrievalCoordinatorVectorFallsBackForProviderAndEmptyProjection(t *tes
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !reflect.DeepEqual(emptyResult.Memories, lexical) || emptyResult.Effective != RetrievalLexical || !emptyResult.Degraded {
+	if !reflect.DeepEqual(emptyResult.Memories, lexical) || emptyResult.Effective != RetrievalLexical || !emptyResult.Degraded || emptyResult.FailureCode != "vector_empty" {
 		t.Fatalf("empty vector fallback=%#v lexical=%#v", emptyResult, lexical)
 	}
 	assertRetrievalAudit(t, store, emptyRequest.TenantID, emptyRequest.OperationID, RetrievalVector, RetrievalLexical, true, "vector_empty")

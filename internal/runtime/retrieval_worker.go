@@ -73,16 +73,21 @@ func (w *ProjectionWorker) RunOnce(ctx context.Context) (ProjectionRunResult, er
 		return projectionResult(status, 0, ProjectionFailureRebuildRequired, false),
 			projectionRunError{code: ProjectionFailureRebuildRequired}
 	}
+	events, err := nextProjectionEvents(tenantCtx, connection, w.options.TenantID, w.options.Profile.ID, w.options.BatchSize)
+	if err != nil {
+		return w.fail(ctx, connection, 0, "projection_read_error")
+	}
+	prepared, err := w.prepareEvents(tenantCtx, connection, events)
+	if err != nil {
+		var coded projectionRunError
+		if errors.As(err, &coded) {
+			return w.fail(ctx, connection, 0, coded.code)
+		}
+		return w.fail(ctx, connection, 0, "projection_read_error")
+	}
 	processed := 0
-	for processed < w.options.BatchSize {
-		event, found, err := nextProjectionEvent(tenantCtx, connection, w.options.TenantID, w.options.Profile.ID)
-		if err != nil {
-			return w.fail(ctx, connection, processed, "projection_read_error")
-		}
-		if !found {
-			break
-		}
-		if err := w.processEvent(tenantCtx, connection, event); err != nil {
+	for _, event := range prepared {
+		if err := w.processPreparedEvent(tenantCtx, connection, event); err != nil {
 			var coded projectionRunError
 			if errors.As(err, &coded) {
 				return w.fail(ctx, connection, processed, coded.code)
@@ -186,12 +191,17 @@ ON CONFLICT (tenant_id, profile_id) DO UPDATE SET
 		if len(page) == 0 {
 			break
 		}
-		for _, memory := range page {
+		texts := make([]string, len(page))
+		for index, memory := range page {
+			texts[index] = memory.Content
+		}
+		vectors, err := w.embedTexts(tenantCtx, texts)
+		if err != nil {
+			return w.failRebuild(ctx, connection, result, "embedding_unavailable")
+		}
+		for index, memory := range page {
 			result.Scanned++
-			vector, err := w.embedder.Embed(tenantCtx, memory.Content)
-			if err != nil {
-				return w.failRebuild(ctx, connection, result, "embedding_unavailable")
-			}
+			vector := vectors[index]
 			if len(vector) != w.options.Profile.Dimensions {
 				return w.failRebuild(ctx, connection, result, "embedding_dimension_mismatch")
 			}
@@ -352,53 +362,107 @@ func (w *ProjectionWorker) Run(ctx context.Context) error {
 	}
 }
 
-func (w *ProjectionWorker) processEvent(ctx context.Context, connection *pgxpool.Conn, event ProjectionEvent) error {
+type preparedProjectionEvent struct {
+	event         ProjectionEvent
+	before        projectionMemory
+	shouldProject bool
+	vector        []float32
+}
+
+func (w *ProjectionWorker) prepareEvents(ctx context.Context, connection *pgxpool.Conn, events []ProjectionEvent) ([]preparedProjectionEvent, error) {
+	prepared := make([]preparedProjectionEvent, len(events))
+	texts := make([]string, 0, len(events))
+	textIndexes := make([]int, 0, len(events))
+	for index, event := range events {
+		before, err := loadProjectionMemory(ctx, connection, event.TenantID, event.MemoryID)
+		if err != nil {
+			return nil, projectionRunError{code: "projection_read_error"}
+		}
+		shouldProject := before.Exists && before.Kind == "fact" && before.Status == "active" && before.Content != "[redacted]"
+		prepared[index] = preparedProjectionEvent{event: event, before: before, shouldProject: shouldProject}
+		if shouldProject {
+			texts = append(texts, before.Content)
+			textIndexes = append(textIndexes, index)
+		}
+	}
+	vectors, err := w.embedTexts(ctx, texts)
+	if err != nil {
+		return nil, projectionRunError{code: "embedding_unavailable"}
+	}
+	for vectorIndex, preparedIndex := range textIndexes {
+		if len(vectors[vectorIndex]) != w.options.Profile.Dimensions {
+			return nil, projectionRunError{code: "embedding_dimension_mismatch"}
+		}
+		prepared[preparedIndex].vector = vectors[vectorIndex]
+	}
+	return prepared, nil
+}
+
+func (w *ProjectionWorker) embedTexts(ctx context.Context, texts []string) ([][]float32, error) {
+	if len(texts) == 0 {
+		return [][]float32{}, nil
+	}
+	vectors := make([][]float32, 0, len(texts))
+	batch, batchCapable := w.embedder.(BatchEmbedder)
+	for start := 0; start < len(texts); start += w.options.EmbeddingBatchSize {
+		end := start + w.options.EmbeddingBatchSize
+		if end > len(texts) {
+			end = len(texts)
+		}
+		if batchCapable && w.options.EmbeddingBatchSize > 1 {
+			batchVectors, err := batch.EmbedBatch(ctx, texts[start:end])
+			if err != nil {
+				return nil, err
+			}
+			if len(batchVectors) != end-start {
+				return nil, fmt.Errorf("embedding batch returned %d vectors, want %d", len(batchVectors), end-start)
+			}
+			vectors = append(vectors, batchVectors...)
+			continue
+		}
+		for _, text := range texts[start:end] {
+			vector, err := w.embedder.Embed(ctx, text)
+			if err != nil {
+				return nil, err
+			}
+			vectors = append(vectors, vector)
+		}
+	}
+	return vectors, nil
+}
+
+func (w *ProjectionWorker) processPreparedEvent(ctx context.Context, connection *pgxpool.Conn, prepared preparedProjectionEvent) error {
 	projectionSQL, err := retrievalProjectionSQLForClass(w.options.Profile.ProjectionClass)
 	if err != nil {
 		return projectionRunError{code: "projection_write_error"}
 	}
-	before, err := loadProjectionMemory(ctx, connection, event.TenantID, event.MemoryID)
-	if err != nil {
-		return projectionRunError{code: "projection_read_error"}
-	}
-	shouldProject := before.Exists && before.Kind == "fact" && before.Status == "active" && before.Content != "[redacted]"
-	var vector []float32
-	if shouldProject {
-		vector, err = w.embedder.Embed(ctx, before.Content)
-		if err != nil {
-			return projectionRunError{code: "embedding_unavailable"}
-		}
-		if len(vector) != w.options.Profile.Dimensions {
-			return projectionRunError{code: "embedding_dimension_mismatch"}
-		}
-	}
-
 	tx, err := connection.Begin(ctx)
 	if err != nil {
 		return projectionRunError{code: "projection_write_error"}
 	}
 	defer tx.Rollback(ctx)
-	after, err := loadProjectionMemoryTx(ctx, tx, event.TenantID, event.MemoryID)
+	after, err := loadProjectionMemoryTx(ctx, tx, prepared.event.TenantID, prepared.event.MemoryID)
 	if err != nil {
 		return projectionRunError{code: "projection_read_error"}
 	}
+	before := prepared.before
 	if before.Exists != after.Exists || before.ContinuityID != after.ContinuityID || before.Kind != after.Kind || before.Status != after.Status || before.Content != after.Content || !before.UpdatedAt.Equal(after.UpdatedAt) {
 		return projectionRunError{code: "authority_changed"}
 	}
-	if !shouldProject {
+	if !prepared.shouldProject {
 		if _, err := tx.Exec(ctx, projectionSQL.deleteMemory,
-			w.options.Profile.ID, event.TenantID, event.MemoryID); err != nil {
+			w.options.Profile.ID, prepared.event.TenantID, prepared.event.MemoryID); err != nil {
 			return projectionRunError{code: "projection_write_error"}
 		}
 	} else {
 		hash := sha256.Sum256([]byte(after.Content))
 		if _, err := tx.Exec(ctx, projectionSQL.upsertMemory,
 			w.options.Profile.ID,
-			event.TenantID,
+			prepared.event.TenantID,
 			after.ContinuityID,
-			event.MemoryID,
+			prepared.event.MemoryID,
 			hex.EncodeToString(hash[:]),
-			retrievalVectorLiteral(vector),
+			retrievalVectorLiteral(prepared.vector),
 		); err != nil {
 			return projectionRunError{code: "projection_write_error"}
 		}
@@ -411,7 +475,7 @@ SET last_event_id = $3,
     last_error_code = '',
     last_attempt_at = now(),
     updated_at = now()
-WHERE tenant_id = $1 AND profile_id = $2`, event.TenantID, w.options.Profile.ID, event.EventID); err != nil {
+WHERE tenant_id = $1 AND profile_id = $2`, prepared.event.TenantID, w.options.Profile.ID, prepared.event.EventID); err != nil {
 		return projectionRunError{code: "projection_write_error"}
 	}
 	if err := tx.Commit(ctx); err != nil {
@@ -478,9 +542,8 @@ RETURNING status = 'rebuild_required'`, tenantID, profileID).Scan(&rebuildRequir
 	return rebuildRequired, nil
 }
 
-func nextProjectionEvent(ctx context.Context, connection *pgxpool.Conn, tenantID, profileID string) (ProjectionEvent, bool, error) {
-	var event ProjectionEvent
-	err := connection.QueryRow(ctx, `
+func nextProjectionEvents(ctx context.Context, connection *pgxpool.Conn, tenantID, profileID string, limit int) ([]ProjectionEvent, error) {
+	rows, err := connection.Query(ctx, `
 SELECT event.event_id, event.tenant_id, event.continuity_id::text,
        event.memory_id::text, event.desired_state, event.authority_version
 FROM memory_projection_events event
@@ -488,21 +551,23 @@ JOIN memory_projection_cursors cursor
   ON cursor.tenant_id = event.tenant_id AND cursor.profile_id = $2
 WHERE event.tenant_id = $1 AND event.event_id > cursor.last_event_id
 ORDER BY event.event_id
-LIMIT 1`, tenantID, profileID).Scan(
-		&event.EventID,
-		&event.TenantID,
-		&event.ContinuityID,
-		&event.MemoryID,
-		&event.DesiredState,
-		&event.AuthorityVersion,
-	)
-	if err == pgx.ErrNoRows {
-		return ProjectionEvent{}, false, nil
-	}
+LIMIT $3`, tenantID, profileID, limit)
 	if err != nil {
-		return ProjectionEvent{}, false, err
+		return nil, err
 	}
-	return event, true, nil
+	defer rows.Close()
+	events := make([]ProjectionEvent, 0, limit)
+	for rows.Next() {
+		var event ProjectionEvent
+		if err := rows.Scan(&event.EventID, &event.TenantID, &event.ContinuityID, &event.MemoryID, &event.DesiredState, &event.AuthorityVersion); err != nil {
+			return nil, err
+		}
+		events = append(events, event)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return events, nil
 }
 
 type projectionMemory struct {

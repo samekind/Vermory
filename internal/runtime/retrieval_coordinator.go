@@ -165,6 +165,7 @@ func (c *RetrievalCoordinator) Retrieve(ctx context.Context, request RetrievalRe
 		Memories:        delivered,
 		Effective:       effective,
 		Degraded:        degraded,
+		FailureCode:     failureCode,
 		AuditID:         auditID,
 		EligibilityAsOf: normalized.EligibilityAsOf,
 	}, nil

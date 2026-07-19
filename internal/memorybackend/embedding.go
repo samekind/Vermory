@@ -2,11 +2,14 @@ package memorybackend
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
 )
+
+var errInvalidEmbeddingBatch = errors.New("invalid embedding batch response")
 
 type openAIEmbedder struct {
 	remote     remoteClient
@@ -41,22 +44,50 @@ func newOpenAIEmbedder(baseURL, apiKey, model string, dimensions int, client *ht
 }
 
 func (e *openAIEmbedder) Embed(ctx context.Context, text string) ([]float32, error) {
-	body := map[string]any{"model": e.model, "input": text}
+	vectors, err := e.embed(ctx, text, 1)
+	if err != nil {
+		return nil, err
+	}
+	return vectors[0], nil
+}
+
+func (e *openAIEmbedder) EmbedBatch(ctx context.Context, texts []string) ([][]float32, error) {
+	if len(texts) == 0 {
+		return [][]float32{}, nil
+	}
+	return e.embed(ctx, texts, len(texts))
+}
+
+func (e *openAIEmbedder) embed(ctx context.Context, input any, expected int) ([][]float32, error) {
+	body := map[string]any{"model": e.model, "input": input}
 	var response struct {
 		Data []struct {
 			Embedding []float32 `json:"embedding"`
+			Index     *int      `json:"index"`
 		} `json:"data"`
 	}
 	if err := e.remote.doJSON(ctx, http.MethodPost, "/embeddings", body, &response); err != nil {
 		return nil, err
 	}
-	if len(response.Data) != 1 {
-		return nil, fmt.Errorf("embedding provider returned %d vectors", len(response.Data))
+	if len(response.Data) != expected {
+		return nil, fmt.Errorf("%w: embedding provider returned %d vectors, want %d", errInvalidEmbeddingBatch, len(response.Data), expected)
 	}
-	if len(response.Data[0].Embedding) != e.dimensions {
-		return nil, fmt.Errorf("embedding provider returned %d dimensions, want %d", len(response.Data[0].Embedding), e.dimensions)
+	vectors := make([][]float32, expected)
+	seen := make([]bool, expected)
+	for _, item := range response.Data {
+		if item.Index == nil || *item.Index < 0 || *item.Index >= expected {
+			return nil, fmt.Errorf("%w: embedding provider returned an out-of-range index", errInvalidEmbeddingBatch)
+		}
+		if seen[*item.Index] {
+			return nil, fmt.Errorf("%w: embedding provider returned duplicate index %d", errInvalidEmbeddingBatch, *item.Index)
+		}
+		if len(item.Embedding) != e.dimensions {
+			return nil, fmt.Errorf("%w: embedding provider returned %d dimensions, want %d", errInvalidEmbeddingBatch, len(item.Embedding), e.dimensions)
+		}
+		seen[*item.Index] = true
+		vectors[*item.Index] = item.Embedding
 	}
-	return response.Data[0].Embedding, nil
+	return vectors, nil
 }
 
 func vectorLiteral(vector []float32) string {

@@ -140,6 +140,8 @@ func TestBenchmarkLongMemEvalRetrievalCommandIsRegistered(t *testing.T) {
 			"run-id",
 			"implementation-revision",
 			"resume",
+			"vector-profile",
+			"embedding-api-key-env",
 		} {
 			if command.Flags().Lookup(flagName) == nil {
 				t.Fatalf("benchmark-longmemeval-retrieval must expose --%s", flagName)

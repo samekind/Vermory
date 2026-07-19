@@ -131,6 +131,7 @@ type RetrievalResult struct {
 	Memories        []Memory
 	Effective       RetrievalMode
 	Degraded        bool
+	FailureCode     string
 	AuditID         string
 	EligibilityAsOf time.Time
 }
@@ -176,6 +177,10 @@ type Embedder interface {
 	Embed(context.Context, string) ([]float32, error)
 }
 
+type BatchEmbedder interface {
+	EmbedBatch(context.Context, []string) ([][]float32, error)
+}
+
 type ProjectionStatus struct {
 	TenantID             string     `json:"tenant_id"`
 	ProfileID            string     `json:"profile_id"`
@@ -201,11 +206,12 @@ type ProjectionEvent struct {
 }
 
 type ProjectionWorkerOptions struct {
-	TenantID         string
-	Profile          RetrievalProfile
-	BatchSize        int
-	SnapshotPageSize int
-	PollInterval     time.Duration
+	TenantID           string
+	Profile            RetrievalProfile
+	BatchSize          int
+	EmbeddingBatchSize int
+	SnapshotPageSize   int
+	PollInterval       time.Duration
 }
 
 func (o *ProjectionWorkerOptions) normalize() error {
@@ -221,6 +227,12 @@ func (o *ProjectionWorkerOptions) normalize() error {
 	}
 	if o.BatchSize > 256 {
 		o.BatchSize = 256
+	}
+	if o.EmbeddingBatchSize <= 0 {
+		o.EmbeddingBatchSize = 1
+	}
+	if o.EmbeddingBatchSize > 256 {
+		o.EmbeddingBatchSize = 256
 	}
 	if o.SnapshotPageSize <= 0 {
 		o.SnapshotPageSize = 128

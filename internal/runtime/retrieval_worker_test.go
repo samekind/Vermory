@@ -3,6 +3,7 @@ package runtime
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -22,6 +23,76 @@ type projectionTestEmbedder struct {
 	calls   atomic.Int64
 	started chan struct{}
 	release chan struct{}
+}
+
+type projectionBatchTestEmbedder struct {
+	vector      []float32
+	singleCalls atomic.Int64
+	batchCalls  atomic.Int64
+	batchItems  atomic.Int64
+}
+
+func (embedder *projectionBatchTestEmbedder) Embed(context.Context, string) ([]float32, error) {
+	embedder.singleCalls.Add(1)
+	return append([]float32(nil), embedder.vector...), nil
+}
+
+func (embedder *projectionBatchTestEmbedder) EmbedBatch(_ context.Context, texts []string) ([][]float32, error) {
+	embedder.batchCalls.Add(1)
+	embedder.batchItems.Add(int64(len(texts)))
+	vectors := make([][]float32, len(texts))
+	for index := range texts {
+		vectors[index] = append([]float32(nil), embedder.vector...)
+	}
+	return vectors, nil
+}
+
+func TestProjectionWorkerBatchesDurableEventsWithoutChangingAuthority(t *testing.T) {
+	store := openTestStore(t)
+	ctx := context.Background()
+	tenantID := "retrieval-worker-batch"
+	repoRoot := "/fixtures/retrieval-worker-batch"
+	governance := NewGovernanceService(store, tenantID)
+	if _, err := governance.ConfirmWorkspace(ctx, repoRoot); err != nil {
+		t.Fatal(err)
+	}
+	for index, content := range []string{"first active fact", "second active fact", "third active fact"} {
+		if _, err := governance.AddSource(ctx, repoRoot, GovernanceWriteRequest{
+			OperationID: fmt.Sprintf("retrieval-worker-batch-%d", index),
+			MemoryKey:   fmt.Sprintf("batch.fact.%d", index),
+			Content:     content,
+			SourceRef:   fmt.Sprintf("fixture:batch:%d", index),
+		}); err != nil {
+			t.Fatal(err)
+		}
+	}
+	embedder := &projectionBatchTestEmbedder{vector: testVector1024(0.25)}
+	worker, err := NewProjectionWorker(store, embedder, ProjectionWorkerOptions{
+		TenantID:           tenantID,
+		Profile:            productionRetrievalProfile(t),
+		BatchSize:          8,
+		EmbeddingBatchSize: 8,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	result, err := worker.RunOnce(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result.Processed != 3 || result.Lag != 0 || result.Status != "idle" {
+		t.Fatalf("unexpected batch result: %#v", result)
+	}
+	if embedder.batchCalls.Load() != 1 || embedder.batchItems.Load() != 3 || embedder.singleCalls.Load() != 0 {
+		t.Fatalf("unexpected provider calls: batch=%d items=%d single=%d", embedder.batchCalls.Load(), embedder.batchItems.Load(), embedder.singleCalls.Load())
+	}
+	status, err := store.RetrievalProjectionStatus(ctx, tenantID, ProductionRetrievalProfileID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if status.VectorCount != 3 || status.Lag != 0 {
+		t.Fatalf("batch projection diverged from authority: %#v", status)
+	}
 }
 
 func TestProjectionWorkerRequiresRebuildBelowRetentionFloor(t *testing.T) {

@@ -20,6 +20,7 @@ import (
 const (
 	longMemEvalRetrievalBaseline = "plain_token_overlap"
 	longMemEvalRetrievalVermory  = "vermory_lexical"
+	longMemEvalRetrievalVector   = "vermory_vector"
 	longMemEvalRetrievalChannel  = "benchmark_longmemeval_retrieval"
 	longMemEvalRetrievalLimit    = 12
 )
@@ -33,6 +34,9 @@ type LongMemEvalRetrievalOptions struct {
 	RunID                  string
 	ImplementationRevision string
 	Resume                 bool
+	VectorProfilePath      string
+	EmbeddingAPIKey        string
+	VectorEmbedder         vermoryruntime.Embedder
 }
 
 type LongMemEvalRetrievalReport struct {
@@ -53,6 +57,7 @@ type LongMemEvalRetrievalReport struct {
 	Aggregates             map[string]LongMemEvalRetrievalAggregate            `json:"aggregates"`
 	QuestionTypeAggregates map[string]map[string]LongMemEvalRetrievalAggregate `json:"question_type_aggregates"`
 	Failures               []LongMemEvalRetrievalFailure                       `json:"failures"`
+	Vector                 *LongMemEvalVectorEvidence                          `json:"vector,omitempty"`
 	Artifacts              map[string]string                                   `json:"artifacts"`
 	NonClaims              []string                                            `json:"non_claims"`
 }
@@ -83,6 +88,10 @@ type LongMemEvalRetrievalConditionResult struct {
 	MetricAt10           *benchmark.SessionRetrievalMetric `json:"metric_at_10,omitempty"`
 	MetricAt12           *benchmark.SessionRetrievalMetric `json:"metric_at_12,omitempty"`
 	LatencyMilliseconds  int64                             `json:"latency_ms"`
+	EffectiveMode        vermoryruntime.RetrievalMode      `json:"effective_mode,omitempty"`
+	Degraded             bool                              `json:"degraded,omitempty"`
+	FailureCode          string                            `json:"failure_code,omitempty"`
+	AuditID              string                            `json:"audit_id,omitempty"`
 	Error                string                            `json:"error,omitempty"`
 }
 
@@ -96,7 +105,27 @@ type LongMemEvalRetrievalAggregate struct {
 type LongMemEvalRetrievalFailure struct {
 	RecordID     string `json:"record_id"`
 	QuestionType string `json:"question_type"`
+	Condition    string `json:"condition,omitempty"`
 	Error        string `json:"error"`
+}
+
+type LongMemEvalVectorEvidence struct {
+	ProfileID                      string                          `json:"profile_id"`
+	ProfileSHA256                  string                          `json:"profile_sha256"`
+	Provider                       string                          `json:"provider"`
+	RetrievalProfile               string                          `json:"retrieval_profile"`
+	Model                          string                          `json:"model"`
+	Dimensions                     int                             `json:"dimensions"`
+	ProjectionClass                string                          `json:"projection_class"`
+	WorkerBatchSize                int                             `json:"worker_batch_size"`
+	EmbeddingBatchSize             int                             `json:"embedding_batch_size"`
+	ProjectionDurationMilliseconds int64                           `json:"projection_duration_ms"`
+	Projection                     vermoryruntime.ProjectionStatus `json:"projection"`
+	Embedding                      longMemEvalEmbeddingStats       `json:"embedding"`
+	EffectiveVectorQueries         int                             `json:"effective_vector_queries"`
+	DegradedVectorQueries          int                             `json:"degraded_vector_queries"`
+	FailureCodeBreakdown           map[string]int                  `json:"failure_code_breakdown"`
+	HardGatesPass                  bool                            `json:"hard_gates_pass"`
 }
 
 type longMemEvalSessionOccurrence struct {
@@ -142,9 +171,26 @@ func RunLongMemEvalRetrieval(ctx context.Context, opts LongMemEvalRetrievalOptio
 	if execution.EvaluationTarget != benchmark.EvaluationTargetRetrieval || execution.ExecutionScope != benchmark.ExecutionScopeFull {
 		return LongMemEvalRetrievalReport{}, fmt.Errorf("LongMemEval retrieval runner requires a full retrieval execution")
 	}
-	conditions := longMemEvalRetrievalConditions()
-	if !slices.Equal(execution.Conditions, conditions) {
-		return LongMemEvalRetrievalReport{}, fmt.Errorf("LongMemEval retrieval conditions are %v, want %v", execution.Conditions, conditions)
+	vectorEnabled := slices.Equal(execution.Conditions, longMemEvalVectorConditions())
+	if !vectorEnabled && !slices.Equal(execution.Conditions, longMemEvalLexicalConditions()) {
+		return LongMemEvalRetrievalReport{}, fmt.Errorf("unsupported LongMemEval retrieval conditions %v", execution.Conditions)
+	}
+	conditions := append([]string(nil), execution.Conditions...)
+	var vectorProfile LongMemEvalVectorProfile
+	var vectorProfileSHA string
+	if vectorEnabled {
+		if strings.TrimSpace(opts.VectorProfilePath) == "" {
+			return LongMemEvalRetrievalReport{}, fmt.Errorf("LongMemEval vector execution requires --vector-profile")
+		}
+		vectorProfile, vectorProfileSHA, err = loadLongMemEvalVectorProfile(resolveBenchmarkPath(root, opts.VectorProfilePath))
+		if err != nil {
+			return LongMemEvalRetrievalReport{}, err
+		}
+		if !slices.Equal(vectorProfile.Conditions, execution.Conditions) {
+			return LongMemEvalRetrievalReport{}, fmt.Errorf("LongMemEval vector profile conditions do not match execution")
+		}
+	} else if strings.TrimSpace(opts.VectorProfilePath) != "" || opts.VectorEmbedder != nil {
+		return LongMemEvalRetrievalReport{}, fmt.Errorf("legacy LongMemEval lexical execution cannot configure a vector profile")
 	}
 
 	sourcePath := resolveBenchmarkPath(root, opts.SourceDatasetPath)
@@ -189,6 +235,64 @@ func RunLongMemEvalRetrieval(ctx context.Context, opts LongMemEvalRetrievalOptio
 	}
 	artifactStore := artifact.NewLocalStore(opts.ArtifactRoot)
 	prefix := filepath.ToSlash(filepath.Join("benchmarks", runID))
+	var vectorRetriever *vermoryruntime.RetrievalCoordinator
+	var vectorMeter *longMemEvalRetryingEmbedder
+	var vectorEvidence *LongMemEvalVectorEvidence
+	if vectorEnabled {
+		vectorMeter, err = configureLongMemEvalVectorEmbedder(opts, vectorProfile)
+		if err != nil {
+			return LongMemEvalRetrievalReport{}, err
+		}
+		vectorRetriever, err = vermoryruntime.NewRetrievalCoordinator(store, vectorMeter, vectorProfile.runtimeProfile())
+		if err != nil {
+			return LongMemEvalRetrievalReport{}, err
+		}
+		if _, err := benchmark.ScanLongMemEval(sourcePath, func(record benchmark.LongMemEvalRecord) error {
+			_, err := importLongMemEvalRetrievalRecord(ctx, store, tenantID, runID, execution, record)
+			return err
+		}); err != nil {
+			return LongMemEvalRetrievalReport{}, fmt.Errorf("import LongMemEval vector authority: %w", err)
+		}
+		worker, err := vermoryruntime.NewProjectionWorker(store, vectorMeter, vermoryruntime.ProjectionWorkerOptions{
+			TenantID:           tenantID,
+			Profile:            vectorProfile.runtimeProfile(),
+			BatchSize:          vectorProfile.WorkerBatchSize,
+			EmbeddingBatchSize: vectorProfile.EmbeddingBatchSize,
+		})
+		if err != nil {
+			return LongMemEvalRetrievalReport{}, err
+		}
+		projectionStarted := time.Now()
+		for {
+			result, runErr := worker.RunOnce(ctx)
+			if runErr != nil {
+				return LongMemEvalRetrievalReport{}, fmt.Errorf("project LongMemEval vector authority: %w", runErr)
+			}
+			if result.AlreadyRunning {
+				return LongMemEvalRetrievalReport{}, fmt.Errorf("LongMemEval vector projection worker is already running")
+			}
+			if result.Lag == 0 {
+				break
+			}
+		}
+		projectionStatus, err := store.RetrievalProjectionStatus(ctx, tenantID, vectorProfile.RetrievalProfile)
+		if err != nil {
+			return LongMemEvalRetrievalReport{}, err
+		}
+		vectorEvidence = &LongMemEvalVectorEvidence{
+			ProfileID: vectorProfile.ID, ProfileSHA256: vectorProfileSHA,
+			Provider: vectorProfile.Provider, RetrievalProfile: vectorProfile.RetrievalProfile,
+			Model: vectorProfile.Model, Dimensions: vectorProfile.Dimensions,
+			ProjectionClass:                vectorProfile.ProjectionClass,
+			WorkerBatchSize:                vectorProfile.WorkerBatchSize,
+			EmbeddingBatchSize:             vectorProfile.EmbeddingBatchSize,
+			ProjectionDurationMilliseconds: time.Since(projectionStarted).Milliseconds(),
+			Projection:                     projectionStatus, FailureCodeBreakdown: make(map[string]int),
+		}
+		if projectionStatus.Status != "idle" || projectionStatus.Lag != 0 || projectionStatus.VectorCount != int64(summary.SessionCount) {
+			return LongMemEvalRetrievalReport{}, fmt.Errorf("LongMemEval vector projection is not current: status=%s lag=%d vectors=%d want=%d", projectionStatus.Status, projectionStatus.Lag, projectionStatus.VectorCount, summary.SessionCount)
+		}
+	}
 	results := make([]LongMemEvalRetrievalRecordResult, 0, summary.RecordCount)
 
 	_, err = benchmark.ScanLongMemEval(sourcePath, func(record benchmark.LongMemEvalRecord) error {
@@ -213,7 +317,7 @@ func RunLongMemEvalRetrieval(ctx context.Context, opts LongMemEvalRetrievalOptio
 			return statErr
 		}
 
-		checkpoint, runErr := runLongMemEvalRetrievalRecord(ctx, store, retriever, tenantID, runID, implementationRevision, execution, record)
+		checkpoint, runErr := runLongMemEvalRetrievalRecord(ctx, store, retriever, vectorRetriever, tenantID, runID, implementationRevision, execution, record)
 		if runErr != nil {
 			checkpoint.Status = "runtime_failure"
 			checkpoint.Error = runErr.Error()
@@ -230,18 +334,45 @@ func RunLongMemEvalRetrieval(ctx context.Context, opts LongMemEvalRetrievalOptio
 	}
 
 	report := finalizeLongMemEvalRetrievalReport(runID, implementationRevision, qualification, execution, summary, results)
+	if vectorEvidence != nil {
+		vectorEvidence.Embedding = vectorMeter.stats()
+		for _, result := range report.Results {
+			for _, condition := range result.Conditions {
+				if condition.Condition != longMemEvalRetrievalVector {
+					continue
+				}
+				if condition.Status == "completed" && condition.EffectiveMode == vermoryruntime.RetrievalVector && !condition.Degraded {
+					vectorEvidence.EffectiveVectorQueries++
+				}
+				if condition.Degraded {
+					vectorEvidence.DegradedVectorQueries++
+					vectorEvidence.FailureCodeBreakdown[condition.FailureCode]++
+				}
+			}
+		}
+		vectorEvidence.HardGatesPass = vectorEvidence.Projection.Status == "idle" &&
+			vectorEvidence.Projection.Lag == 0 && vectorEvidence.Projection.VectorCount == int64(summary.SessionCount) &&
+			vectorEvidence.EffectiveVectorQueries == summary.RecordCount && vectorEvidence.DegradedVectorQueries == 0 &&
+			vectorEvidence.Embedding.TerminalFailures == 0 &&
+			vectorEvidence.Embedding.SuccessfulItems == int64(summary.SessionCount+summary.RecordCount)
+		report.Vector = vectorEvidence
+	}
 	if err := writeLongMemEvalRetrievalArtifacts(ctx, artifactStore, opts.ArtifactRoot, prefix, qualification, execution, &report); err != nil {
 		return LongMemEvalRetrievalReport{}, err
 	}
-	if len(report.Failures) != 0 || report.ScoredRecordCount != execution.ExpectedScoredRecordCount {
+	if len(report.Failures) != 0 || report.ScoredRecordCount != execution.ExpectedScoredRecordCount || report.Vector != nil && !report.Vector.HardGatesPass {
 		return report, fmt.Errorf("LongMemEval retrieval completed with %d runtime failures and %d/%d scored records; report=%s",
 			len(report.Failures), report.ScoredRecordCount, execution.ExpectedScoredRecordCount, report.Artifacts["report"])
 	}
 	return report, nil
 }
 
-func longMemEvalRetrievalConditions() []string {
+func longMemEvalLexicalConditions() []string {
 	return []string{longMemEvalRetrievalBaseline, longMemEvalRetrievalVermory}
+}
+
+func longMemEvalVectorConditions() []string {
+	return []string{longMemEvalRetrievalBaseline, longMemEvalRetrievalVermory, longMemEvalRetrievalVector}
 }
 
 func validateLongMemEvalRetrievalSummary(qualification benchmark.Qualification, execution benchmark.ExecutionManifest, summary benchmark.LongMemEvalSummary) error {
@@ -267,6 +398,7 @@ func runLongMemEvalRetrievalRecord(
 	ctx context.Context,
 	store *vermoryruntime.Store,
 	retriever *vermoryruntime.RetrievalCoordinator,
+	vectorRetriever *vermoryruntime.RetrievalCoordinator,
 	tenantID, runID, implementationRevision string,
 	execution benchmark.ExecutionManifest,
 	record benchmark.LongMemEvalRecord,
@@ -282,50 +414,12 @@ func runLongMemEvalRetrievalRecord(
 		Abstention:             strings.HasSuffix(record.QuestionID, "_abs"),
 		Status:                 "completed",
 	}
-	anchor := vermoryruntime.ConversationAnchor{Channel: longMemEvalRetrievalChannel, ThreadID: runID + ":" + record.QuestionID}
-	resolution, err := store.ResolveOrCreateConversation(ctx, tenantID, anchor)
+	imported, err := importLongMemEvalRetrievalRecord(ctx, store, tenantID, runID, execution, record)
 	if err != nil {
 		return checkpoint, err
 	}
-	checkpoint.ContinuityID = resolution.ContinuityID
-	occurrences := longMemEvalRetrievalOccurrences(record)
-	byMemoryID := make(map[string]longMemEvalSessionOccurrence, len(occurrences))
-	for _, occurrence := range occurrences {
-		receipt, err := store.CommitGovernedObservation(ctx, tenantID, resolution.ContinuityID, vermoryruntime.CommitObservationRequest{
-			OperationID: fmt.Sprintf("%s:%s:source:%06d:%s", runID, record.QuestionID, occurrence.Session.Position, occurrence.RawID),
-			Kind:        vermoryruntime.ObservationKindSourceUpdate,
-			Content:     occurrence.Session.SemanticText(),
-			SourceRef:   fmt.Sprintf("longmemeval-s:%s:%s:%06d:%s", execution.DatasetSHA256, record.QuestionID, occurrence.Session.Position, occurrence.RawID),
-		})
-		if err != nil {
-			return checkpoint, err
-		}
-		if receipt.Memory.Status != "active" {
-			return checkpoint, fmt.Errorf("session occurrence %s was not activated", occurrence.Key)
-		}
-		byMemoryID[receipt.Memory.MemoryID] = occurrence
-		checkpoint.ImportedMemoryCount++
-	}
-
-	authority, err := store.ListGovernedMemories(ctx, tenantID, resolution.ContinuityID)
-	if err != nil {
-		return checkpoint, err
-	}
-	if len(authority) != len(occurrences) {
-		return checkpoint, fmt.Errorf("continuity %s has %d governed memories, want %d", resolution.ContinuityID, len(authority), len(occurrences))
-	}
-	active := make(map[string]struct{}, len(authority))
-	for _, memory := range authority {
-		if memory.LifecycleStatus != "active" {
-			return checkpoint, fmt.Errorf("continuity %s contains non-active memory %s", resolution.ContinuityID, memory.ID)
-		}
-		active[memory.ID] = struct{}{}
-	}
-	for memoryID := range byMemoryID {
-		if _, exists := active[memoryID]; !exists {
-			return checkpoint, fmt.Errorf("imported memory %s is missing from active authority", memoryID)
-		}
-	}
+	checkpoint.ContinuityID = imported.ContinuityID
+	checkpoint.ImportedMemoryCount = len(imported.Occurrences)
 
 	baselineStarted := time.Now()
 	baselineSessions := benchmark.RetrieveSessions(record, longMemEvalRetrievalLimit)
@@ -343,7 +437,7 @@ func runLongMemEvalRetrievalRecord(
 	vermoryStarted := time.Now()
 	retrieved, err := retriever.Retrieve(ctx, vermoryruntime.RetrievalRequest{
 		TenantID:      tenantID,
-		ContinuityIDs: []string{resolution.ContinuityID},
+		ContinuityIDs: []string{imported.ContinuityID},
 		Query:         record.Question,
 		Limit:         longMemEvalRetrievalLimit,
 		Mode:          vermoryruntime.RetrievalLexical,
@@ -351,25 +445,129 @@ func runLongMemEvalRetrievalRecord(
 	if err != nil {
 		return checkpoint, err
 	}
-	vermoryKeys := make([]string, 0, len(retrieved.Memories))
-	vermoryIDs := make([]string, 0, len(retrieved.Memories))
-	for _, memory := range retrieved.Memories {
-		if _, exists := active[memory.ID]; !exists {
-			return checkpoint, fmt.Errorf("retrieval returned memory %s outside active continuity authority", memory.ID)
-		}
-		occurrence, exists := byMemoryID[memory.ID]
-		if !exists {
-			return checkpoint, fmt.Errorf("retrieval returned unmapped memory %s", memory.ID)
-		}
-		vermoryKeys = append(vermoryKeys, occurrence.Key)
-		vermoryIDs = append(vermoryIDs, occurrence.RawID)
+	vermoryKeys, vermoryIDs, err := mapLongMemEvalRetrievedMemories(retrieved.Memories, imported)
+	if err != nil {
+		return checkpoint, err
 	}
 	vermoryResult, err := buildLongMemEvalRetrievalCondition(record, longMemEvalRetrievalVermory, vermoryKeys, vermoryIDs, time.Since(vermoryStarted))
 	if err != nil {
 		return checkpoint, err
 	}
+	vermoryResult.EffectiveMode = vermoryruntime.RetrievalLexical
 	checkpoint.Conditions = []LongMemEvalRetrievalConditionResult{baseline, vermoryResult}
+
+	if vectorRetriever != nil {
+		vectorStarted := time.Now()
+		vector, err := vectorRetriever.Retrieve(ctx, vermoryruntime.RetrievalRequest{
+			OperationID:   fmt.Sprintf("%s:%s:vector", runID, record.QuestionID),
+			TenantID:      tenantID,
+			ContinuityIDs: []string{imported.ContinuityID},
+			Query:         record.Question,
+			Limit:         longMemEvalRetrievalLimit,
+			Mode:          vermoryruntime.RetrievalVector,
+		})
+		if err != nil {
+			return checkpoint, err
+		}
+		vectorKeys, vectorIDs, err := mapLongMemEvalRetrievedMemories(vector.Memories, imported)
+		if err != nil {
+			return checkpoint, err
+		}
+		vectorResult, err := buildLongMemEvalRetrievalCondition(record, longMemEvalRetrievalVector, vectorKeys, vectorIDs, time.Since(vectorStarted))
+		if err != nil {
+			return checkpoint, err
+		}
+		vectorResult.EffectiveMode = vector.Effective
+		vectorResult.Degraded = vector.Degraded
+		vectorResult.FailureCode = vector.FailureCode
+		vectorResult.AuditID = vector.AuditID
+		if vector.Degraded || vector.Effective != vermoryruntime.RetrievalVector {
+			vectorResult.Status = "degraded"
+		}
+		checkpoint.Conditions = append(checkpoint.Conditions, vectorResult)
+	}
 	return checkpoint, nil
+}
+
+type importedLongMemEvalRetrievalRecord struct {
+	ContinuityID string
+	Occurrences  []longMemEvalSessionOccurrence
+	ByMemoryID   map[string]longMemEvalSessionOccurrence
+	Active       map[string]struct{}
+}
+
+func importLongMemEvalRetrievalRecord(
+	ctx context.Context,
+	store *vermoryruntime.Store,
+	tenantID, runID string,
+	execution benchmark.ExecutionManifest,
+	record benchmark.LongMemEvalRecord,
+) (importedLongMemEvalRetrievalRecord, error) {
+	anchor := vermoryruntime.ConversationAnchor{Channel: longMemEvalRetrievalChannel, ThreadID: runID + ":" + record.QuestionID}
+	resolution, err := store.ResolveOrCreateConversation(ctx, tenantID, anchor)
+	if err != nil {
+		return importedLongMemEvalRetrievalRecord{}, err
+	}
+	occurrences := longMemEvalRetrievalOccurrences(record)
+	byMemoryID := make(map[string]longMemEvalSessionOccurrence, len(occurrences))
+	for _, occurrence := range occurrences {
+		receipt, err := store.CommitGovernedObservation(ctx, tenantID, resolution.ContinuityID, vermoryruntime.CommitObservationRequest{
+			OperationID: fmt.Sprintf("%s:%s:source:%06d:%s", runID, record.QuestionID, occurrence.Session.Position, occurrence.RawID),
+			Kind:        vermoryruntime.ObservationKindSourceUpdate,
+			Content:     occurrence.Session.SemanticText(),
+			SourceRef:   fmt.Sprintf("longmemeval-s:%s:%s:%06d:%s", execution.DatasetSHA256, record.QuestionID, occurrence.Session.Position, occurrence.RawID),
+		})
+		if err != nil {
+			return importedLongMemEvalRetrievalRecord{}, err
+		}
+		if receipt.Memory.Status != "active" {
+			return importedLongMemEvalRetrievalRecord{}, fmt.Errorf("session occurrence %s was not activated", occurrence.Key)
+		}
+		byMemoryID[receipt.Memory.MemoryID] = occurrence
+	}
+
+	authority, err := store.ListGovernedMemories(ctx, tenantID, resolution.ContinuityID)
+	if err != nil {
+		return importedLongMemEvalRetrievalRecord{}, err
+	}
+	if len(authority) != len(occurrences) {
+		return importedLongMemEvalRetrievalRecord{}, fmt.Errorf("continuity %s has %d governed memories, want %d", resolution.ContinuityID, len(authority), len(occurrences))
+	}
+	active := make(map[string]struct{}, len(authority))
+	for _, memory := range authority {
+		if memory.LifecycleStatus != "active" {
+			return importedLongMemEvalRetrievalRecord{}, fmt.Errorf("continuity %s contains non-active memory %s", resolution.ContinuityID, memory.ID)
+		}
+		active[memory.ID] = struct{}{}
+	}
+	for memoryID := range byMemoryID {
+		if _, exists := active[memoryID]; !exists {
+			return importedLongMemEvalRetrievalRecord{}, fmt.Errorf("imported memory %s is missing from active authority", memoryID)
+		}
+	}
+	return importedLongMemEvalRetrievalRecord{
+		ContinuityID: resolution.ContinuityID,
+		Occurrences:  occurrences,
+		ByMemoryID:   byMemoryID,
+		Active:       active,
+	}, nil
+}
+
+func mapLongMemEvalRetrievedMemories(memories []vermoryruntime.Memory, imported importedLongMemEvalRetrievalRecord) ([]string, []string, error) {
+	keys := make([]string, 0, len(memories))
+	ids := make([]string, 0, len(memories))
+	for _, memory := range memories {
+		if _, exists := imported.Active[memory.ID]; !exists {
+			return nil, nil, fmt.Errorf("retrieval returned memory %s outside active continuity authority", memory.ID)
+		}
+		occurrence, exists := imported.ByMemoryID[memory.ID]
+		if !exists {
+			return nil, nil, fmt.Errorf("retrieval returned unmapped memory %s", memory.ID)
+		}
+		keys = append(keys, occurrence.Key)
+		ids = append(ids, occurrence.RawID)
+	}
+	return keys, ids, nil
 }
 
 func longMemEvalRetrievalOccurrences(record benchmark.LongMemEvalRecord) []longMemEvalSessionOccurrence {
@@ -505,7 +703,7 @@ func finalizeLongMemEvalRetrievalReport(runID, implementationRevision string, qu
 		ImplementationRevision: implementationRevision,
 		SourceSummary:          summary,
 		RecordCount:            len(results),
-		Conditions:             longMemEvalRetrievalConditions(),
+		Conditions:             append([]string(nil), execution.Conditions...),
 		Results:                results,
 		Aggregates:             make(map[string]LongMemEvalRetrievalAggregate),
 		QuestionTypeAggregates: make(map[string]map[string]LongMemEvalRetrievalAggregate),
@@ -519,6 +717,15 @@ func finalizeLongMemEvalRetrievalReport(runID, implementationRevision string, qu
 		if result.Status != "completed" {
 			report.Failures = append(report.Failures, LongMemEvalRetrievalFailure{RecordID: result.RecordID, QuestionType: result.QuestionType, Error: result.Error})
 			continue
+		}
+		for _, condition := range result.Conditions {
+			if condition.Status != "completed" {
+				report.Failures = append(report.Failures, LongMemEvalRetrievalFailure{
+					RecordID: result.RecordID, QuestionType: result.QuestionType,
+					Condition: condition.Condition,
+					Error:     fmt.Sprintf("condition status=%s effective=%s degraded=%t failure=%s", condition.Status, condition.EffectiveMode, condition.Degraded, condition.FailureCode),
+				})
+			}
 		}
 		if result.Abstention {
 			continue
@@ -603,6 +810,7 @@ func writeLongMemEvalRetrievalArtifacts(ctx context.Context, store *artifact.Loc
 		"source_summary":           report.SourceSummary,
 		"aggregates":               report.Aggregates,
 		"question_type_aggregates": report.QuestionTypeAggregates,
+		"vector":                   report.Vector,
 		"results":                  report.Results,
 	})
 	if err != nil {
@@ -649,6 +857,13 @@ func markdownLongMemEvalRetrievalReport(report LongMemEvalRetrievalReport) strin
 	fmt.Fprintf(&builder, "- Records: `%d` total / `%d` scored\n", report.RecordCount, report.ScoredRecordCount)
 	fmt.Fprintf(&builder, "- Imported governed memories: `%d`\n", report.ImportedMemoryCount)
 	fmt.Fprintf(&builder, "- Runtime failures: `%d`\n\n", len(report.Failures))
+	if report.Vector != nil {
+		fmt.Fprintf(&builder, "- Vector profile: `%s` (`%s`)\n", report.Vector.RetrievalProfile, report.Vector.ProfileSHA256)
+		fmt.Fprintf(&builder, "- Projection: status=`%s`, lag=`%d`, vectors=`%d`\n", report.Vector.Projection.Status, report.Vector.Projection.Lag, report.Vector.Projection.VectorCount)
+		fmt.Fprintf(&builder, "- Vector queries: effective=`%d`, degraded=`%d`\n", report.Vector.EffectiveVectorQueries, report.Vector.DegradedVectorQueries)
+		fmt.Fprintf(&builder, "- Embedding: operations=`%d`, attempts=`%d`, successful items=`%d`, failed attempts=`%d`, terminal failures=`%d`\n", report.Vector.Embedding.LogicalOperations, report.Vector.Embedding.ProviderAttempts, report.Vector.Embedding.SuccessfulItems, report.Vector.Embedding.FailedAttempts, report.Vector.Embedding.TerminalFailures)
+		fmt.Fprintf(&builder, "- Vector hard gates: `%t`\n\n", report.Vector.HardGatesPass)
+	}
 	builder.WriteString("## Aggregate Retrieval\n\n")
 	builder.WriteString("| Condition | K | Recall any | Recall all | nDCG | MRR |\n")
 	builder.WriteString("|---|---:|---:|---:|---:|---:|\n")
