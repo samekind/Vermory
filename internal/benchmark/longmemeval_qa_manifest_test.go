@@ -174,6 +174,13 @@ func TestLongMemEvalQAOfficialManifestsValidate(t *testing.T) {
 	if err := ValidateLongMemEvalQAExecution(qualification, vectorManifest); err != nil {
 		t.Fatal(err)
 	}
+	domesticManifest, err := LoadExecution("../../casebook/benchmarks/executions/longmemeval-s-full-domestic-vector-reader-qa.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := ValidateLongMemEvalQAExecution(qualification, domesticManifest); err != nil {
+		t.Fatal(err)
+	}
 }
 
 func TestExecutionManifestRejectsCredentialShapedUnknownFields(t *testing.T) {

@@ -1,0 +1,78 @@
+{
+  "schema_version": "benchmark-execution/v1",
+  "benchmark": "LongMemEval",
+  "qualification_path": "casebook/benchmarks/qualifications/longmemeval-s-cleaned-qa.json",
+  "dataset_sha256": "d6f21ea9d60a0d56f34a05b609c79c88a451d2ae03597821ea3d5a9678c3a442",
+  "evaluation_target": "qa",
+  "execution_scope": "full",
+  "claim_scope": "qualified_dataset_full",
+  "selection_mode": "all_records",
+  "record_set_sha256": "f038965c54b03632f86a59104dd77848b66e3f80c08d5fbabdd3984d16457811",
+  "expected_session_count": 23867,
+  "expected_turn_count": 246750,
+  "expected_scored_record_count": 470,
+  "hard_factual": true,
+  "scorers": [
+    {
+      "name": "normalized_exact_match",
+      "class": "deterministic"
+    },
+    {
+      "name": "token_f1",
+      "class": "deterministic"
+    },
+    {
+      "name": "answer_token_recall",
+      "class": "deterministic"
+    },
+    {
+      "name": "abstention_phrase_detection",
+      "class": "deterministic"
+    },
+    {
+      "name": "upstream_prompt_custom_judge",
+      "class": "custom_model_judge"
+    }
+  ],
+  "conditions": [
+    "vermory_lexical_k10",
+    "vermory_vector_k10"
+  ],
+  "reader": {
+    "provider": "siliconflow",
+    "model": "deepseek-ai/DeepSeek-V4-Flash",
+    "interface": "openai_compatible_direct",
+    "max_output_tokens": 128,
+    "timeout_seconds": 180,
+    "workers": 4,
+    "max_attempts": 3
+  },
+  "judge": {
+    "provider": "siliconflow",
+    "model": "Qwen/Qwen3-30B-A3B-Instruct-2507",
+    "interface": "openai_compatible_direct",
+    "scorer_class": "custom_model_judge",
+    "max_output_tokens": 10,
+    "timeout_seconds": 120,
+    "workers": 4,
+    "max_attempts": 3
+  },
+  "retrieval_input": {
+    "path": "retrieval-results.jsonl",
+    "sha256": "1d2f0b50f618cdd94654c70afcfccf1ef9bc6471bc3921ff6de327a4ede453b6",
+    "run_id": "longmemeval-s-full-vector-retrieval-20260719-v7",
+    "implementation_revision": "837149e2c4ded381d749abc3b5a43513f24b40b3",
+    "k": 10
+  },
+  "non_claims": [
+    "This execution does not report official GPT-4o LongMemEval accuracy.",
+    "This direct domestic-model execution does not complete or substitute for the unavailable W29 Grok execution.",
+    "The tested DeepSeek and Qwen models are compatibility targets, not a model ranking or product default selection.",
+    "This execution does not evaluate LongMemEval-M.",
+    "This execution replays frozen W28 lexical and vector rankings and does not rerun or tune retrieval.",
+    "This execution does not measure automatic memory formation from raw chats.",
+    "This execution does not create source supersession chains from benchmark labels.",
+    "This execution does not change K, activate the vector candidate, or switch the product retrieval default.",
+    "This public benchmark execution is not withheld or externally sealed evidence."
+  ]
+}
