@@ -155,6 +155,20 @@ func TestValidateLongMemEvalQAExecutionRejectsConditionDrift(t *testing.T) {
 	}
 }
 
+func TestValidateLongMemEvalQAExecutionRejectsNegativeTerminalFailureLimit(t *testing.T) {
+	manifest := validLongMemEvalQAExecution()
+	manifest.Reader.MaxTerminalFailures = -1
+	if err := ValidateLongMemEvalQAExecution(validLongMemEvalQAQualification(), manifest); err == nil || !strings.Contains(err.Error(), "max_terminal_failures") {
+		t.Fatalf("expected reader terminal-failure-limit rejection, got %v", err)
+	}
+
+	manifest = validLongMemEvalQAExecution()
+	manifest.Judge.MaxTerminalFailures = -1
+	if err := ValidateLongMemEvalQAExecution(validLongMemEvalQAQualification(), manifest); err == nil || !strings.Contains(err.Error(), "max_terminal_failures") {
+		t.Fatalf("expected judge terminal-failure-limit rejection, got %v", err)
+	}
+}
+
 func TestLongMemEvalQAOfficialManifestsValidate(t *testing.T) {
 	qualification, err := LoadQualification("../../casebook/benchmarks/qualifications/longmemeval-s-cleaned-qa.json")
 	if err != nil {

@@ -80,6 +80,9 @@ func validateExecutionModelConfig(label string, config ExecutionModelConfig, jud
 	if config.MaxAttempts <= 0 {
 		return fmt.Errorf("%s max_attempts must be positive", label)
 	}
+	if config.MaxTerminalFailures < 0 {
+		return fmt.Errorf("%s max_terminal_failures cannot be negative", label)
+	}
 	if !judge {
 		if config.ScorerClass != "" {
 			return fmt.Errorf("reader scorer_class must be empty")

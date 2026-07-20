@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
 	"net/http"
 	"net/url"
@@ -122,7 +121,11 @@ func (p *OpenAICompatible) doChatCompletion(ctx context.Context, body []byte) ([
 			return raw, nil
 		}
 
-		lastErr = fmt.Errorf("provider: chat completions returned %s: %s", resp.Status, trimForError(raw))
+		lastErr = &HTTPStatusError{
+			StatusCode: resp.StatusCode,
+			Status:     resp.Status,
+			Body:       trimForError(raw),
+		}
 		if !shouldRetryStatus(resp.StatusCode) || attempt == maxBusyRetries-1 {
 			return nil, lastErr
 		}

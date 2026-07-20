@@ -97,14 +97,15 @@ type ExecutionScorer struct {
 }
 
 type ExecutionModelConfig struct {
-	Provider        string      `json:"provider"`
-	Model           string      `json:"model"`
-	Interface       string      `json:"interface"`
-	ScorerClass     ScorerClass `json:"scorer_class,omitempty"`
-	MaxOutputTokens int         `json:"max_output_tokens"`
-	TimeoutSeconds  int         `json:"timeout_seconds"`
-	Workers         int         `json:"workers"`
-	MaxAttempts     int         `json:"max_attempts"`
+	Provider            string      `json:"provider"`
+	Model               string      `json:"model"`
+	Interface           string      `json:"interface"`
+	ScorerClass         ScorerClass `json:"scorer_class,omitempty"`
+	MaxOutputTokens     int         `json:"max_output_tokens"`
+	TimeoutSeconds      int         `json:"timeout_seconds"`
+	Workers             int         `json:"workers"`
+	MaxAttempts         int         `json:"max_attempts"`
+	MaxTerminalFailures int         `json:"max_terminal_failures,omitempty"`
 }
 
 type RetrievalExecutionInput struct {

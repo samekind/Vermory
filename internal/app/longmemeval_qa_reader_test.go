@@ -6,6 +6,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"errors"
+	"net/http"
 	"os"
 	"path/filepath"
 	"sort"
@@ -98,6 +99,55 @@ func TestRunLongMemEvalQAReaderRejectsMismatchedResumeBeforeProviderCall(t *test
 	}
 }
 
+func TestRunLongMemEvalQAReaderDoesNotRetryNonRetryableProviderError(t *testing.T) {
+	fixture := writeLongMemEvalQAReaderFixture(t, 1)
+	reader := &longMemEvalQANonRetryableProvider{}
+	opts := fixture.options(reader)
+	opts.RetrySleeper = func(context.Context, time.Duration) error { return nil }
+
+	summary, err := RunLongMemEvalQAReader(context.Background(), opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if summary.Total != 2 || summary.Completed != 1 || summary.Failed != 1 {
+		t.Fatalf("unexpected summary: %#v", summary)
+	}
+	if reader.calls != 2 {
+		t.Fatalf("provider calls=%d want 2", reader.calls)
+	}
+
+	path, err := longMemEvalQACheckpointPath(opts.ArtifactRoot, opts.RunID, "record-00", longMemEvalQAVermoryCondition)
+	if err != nil {
+		t.Fatal(err)
+	}
+	checkpoint, err := loadLongMemEvalQACheckpoint(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(checkpoint.Attempts) != 1 || checkpoint.Attempts[0].Retryable == nil || *checkpoint.Attempts[0].Retryable {
+		t.Fatalf("unexpected permanent-failure checkpoint: %#v", checkpoint.Attempts)
+	}
+}
+
+func TestRunLongMemEvalQAReaderStopsAtFrozenTerminalFailureLimit(t *testing.T) {
+	fixture := writeLongMemEvalQAReaderFixture(t, 50)
+	fixture.execution.Reader.MaxTerminalFailures = 1
+	reader := &longMemEvalQARecordingProvider{delay: 2 * time.Millisecond}
+	opts := fixture.options(reader)
+	opts.RetrySleeper = func(context.Context, time.Duration) error { return nil }
+
+	summary, err := RunLongMemEvalQAReader(context.Background(), opts)
+	if err == nil || !strings.Contains(err.Error(), "reader terminal failure limit 1 reached") {
+		t.Fatalf("expected terminal-failure stop, got summary=%#v err=%v", summary, err)
+	}
+	if summary.Failed < 1 || summary.Total >= 100 {
+		t.Fatalf("reader did not stop early: %#v", summary)
+	}
+	if reader.calls >= 102 {
+		t.Fatalf("reader did not bound provider work: calls=%d", reader.calls)
+	}
+}
+
 type longMemEvalQARecordingProvider struct {
 	mu         sync.Mutex
 	calls      int
@@ -105,6 +155,25 @@ type longMemEvalQARecordingProvider struct {
 	maxActive  int
 	callsByKey map[string]int
 	delay      time.Duration
+}
+
+type longMemEvalQANonRetryableProvider struct {
+	mu    sync.Mutex
+	calls int
+}
+
+func (p *longMemEvalQANonRetryableProvider) Generate(_ context.Context, request provider.GenerateRequest) (provider.GenerateResponse, error) {
+	p.mu.Lock()
+	p.calls++
+	p.mu.Unlock()
+	if strings.HasPrefix(request.ContextPacket, "Governed memory:\n") {
+		return provider.GenerateResponse{}, &provider.HTTPStatusError{
+			StatusCode: http.StatusForbidden,
+			Status:     "403 Forbidden",
+			Body:       `{"code":30001,"message":"account balance is insufficient"}`,
+		}
+	}
+	return provider.GenerateResponse{Output: "answer record-00", Model: request.Model}, nil
 }
 
 func (p *longMemEvalQARecordingProvider) Generate(_ context.Context, request provider.GenerateRequest) (provider.GenerateResponse, error) {

@@ -189,7 +189,9 @@ func (runtime *longMemEvalQAJudgeRuntime) processTask(ctx context.Context, task 
 		if err := validateLongMemEvalQAJudgeState(*checkpoint.Judge, checkpoint.ReaderStatus, *runtime.opts.Execution.Judge, expectedPromptSHA256); err != nil {
 			return err
 		}
-		runtime.addSummary(*checkpoint.Judge, true)
+		if runtime.addSummary(*checkpoint.Judge, true) {
+			return fmt.Errorf("judge terminal failure limit %d reached", runtime.opts.Execution.Judge.MaxTerminalFailures)
+		}
 		return nil
 	}
 	if checkpoint.ReaderStatus == longMemEvalQAReaderFailed {
@@ -200,7 +202,9 @@ func (runtime *longMemEvalQAJudgeRuntime) processTask(ctx context.Context, task 
 		if err := writeLongMemEvalQACheckpoint(path, checkpoint); err != nil {
 			return err
 		}
-		runtime.addSummary(*checkpoint.Judge, false)
+		if runtime.addSummary(*checkpoint.Judge, false) {
+			return fmt.Errorf("judge terminal failure limit %d reached", runtime.opts.Execution.Judge.MaxTerminalFailures)
+		}
 		return nil
 	}
 	judge, err := runtime.executeTask(ctx, task.record, checkpoint)
@@ -218,7 +222,9 @@ func (runtime *longMemEvalQAJudgeRuntime) processTask(ctx context.Context, task 
 	if err := writeLongMemEvalQACheckpoint(path, checkpoint); err != nil {
 		return err
 	}
-	runtime.addSummary(judge, false)
+	if runtime.addSummary(judge, false) {
+		return fmt.Errorf("judge terminal failure limit %d reached", runtime.opts.Execution.Judge.MaxTerminalFailures)
+	}
 	return nil
 }
 
@@ -285,16 +291,22 @@ func (runtime *longMemEvalQAJudgeRuntime) executeTask(ctx context.Context, recor
 			hadInvalid = true
 			attempt.Status = longMemEvalQAAttemptInvalid
 			attempt.Error = truncateLongMemEvalQAError(parseErr.Error())
+			attempt.Retryable = longMemEvalQABoolPointer(true)
 			state.Output = output
 		} else {
 			attempt.Status = longMemEvalQAAttemptFailed
 			if attemptContextErr != nil {
 				attempt.Error = truncateLongMemEvalQAError(attemptContextErr.Error())
+				attempt.Retryable = longMemEvalQABoolPointer(true)
 			} else {
 				attempt.Error = truncateLongMemEvalQAError(generateErr.Error())
+				attempt.Retryable = longMemEvalQABoolPointer(provider.ShouldRetry(generateErr))
 			}
 		}
 		state.Attempts = append(state.Attempts, attempt)
+		if attempt.Retryable != nil && !*attempt.Retryable {
+			break
+		}
 		if attemptNumber < state.Config.MaxAttempts {
 			delay := time.Second << (attemptNumber - 1)
 			if err := runtime.sleep(ctx, delay); err != nil {
@@ -344,8 +356,14 @@ func validateLongMemEvalQAJudgeState(state LongMemEvalQAJudgeState, readerStatus
 			}
 		}
 	case longMemEvalQAJudgeFailed:
-		if state.Correct != nil || len(state.Attempts) != config.MaxAttempts {
+		if state.Correct != nil || len(state.Attempts) > config.MaxAttempts {
 			return fmt.Errorf("failed judge state is incomplete")
+		}
+		if len(state.Attempts) < config.MaxAttempts {
+			last := state.Attempts[len(state.Attempts)-1]
+			if last.Retryable == nil || *last.Retryable {
+				return fmt.Errorf("failed judge stopped before max attempts without a non-retryable final attempt")
+			}
 		}
 		for _, attempt := range state.Attempts {
 			if attempt.Status != longMemEvalQAAttemptFailed {
@@ -353,8 +371,14 @@ func validateLongMemEvalQAJudgeState(state LongMemEvalQAJudgeState, readerStatus
 			}
 		}
 	case longMemEvalQAJudgeInvalid:
-		if state.Correct != nil || len(state.Attempts) != config.MaxAttempts {
+		if state.Correct != nil || len(state.Attempts) > config.MaxAttempts {
 			return fmt.Errorf("invalid judge state is incomplete")
+		}
+		if len(state.Attempts) < config.MaxAttempts {
+			last := state.Attempts[len(state.Attempts)-1]
+			if last.Retryable == nil || *last.Retryable {
+				return fmt.Errorf("invalid judge stopped before max attempts without a non-retryable final attempt")
+			}
 		}
 		invalid := false
 		for _, attempt := range state.Attempts {
@@ -388,7 +412,7 @@ func longMemEvalQAJudgePromptSHA(record benchmark.LongMemEvalRecord, checkpoint 
 	return hex.EncodeToString(digest[:]), nil
 }
 
-func (runtime *longMemEvalQAJudgeRuntime) addSummary(state LongMemEvalQAJudgeState, resumed bool) {
+func (runtime *longMemEvalQAJudgeRuntime) addSummary(state LongMemEvalQAJudgeState, resumed bool) bool {
 	runtime.summaryMu.Lock()
 	defer runtime.summaryMu.Unlock()
 	runtime.summary.Total++
@@ -407,4 +431,7 @@ func (runtime *longMemEvalQAJudgeRuntime) addSummary(state LongMemEvalQAJudgeSta
 	case longMemEvalQAJudgeNotRunReaderFailed:
 		runtime.summary.NotRun++
 	}
+	limit := runtime.opts.Execution.Judge.MaxTerminalFailures
+	terminal := runtime.summary.Failed + runtime.summary.Invalid + runtime.summary.NotRun
+	return limit > 0 && terminal >= limit
 }

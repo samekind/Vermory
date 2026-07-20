@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -235,5 +236,41 @@ func TestOpenAICompatibleProviderRetriesBusyResponses(t *testing.T) {
 	}
 	if resp.Output != "direct ok after retry" {
 		t.Fatalf("unexpected output: %q", resp.Output)
+	}
+}
+
+func TestOpenAICompatibleProviderClassifiesNonRetryableHTTPStatus(t *testing.T) {
+	attempts := 0
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		attempts++
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusForbidden)
+		_, _ = w.Write([]byte(`{"code":30001,"message":"account balance is insufficient"}`))
+	}))
+	defer server.Close()
+
+	client := NewOpenAICompatible(Config{
+		BaseURL: server.URL + "/v1",
+		APIKey:  "test-key",
+		Client:  server.Client(),
+	})
+
+	_, err := client.Generate(context.Background(), GenerateRequest{
+		Model:     "direct-model",
+		Prompt:    "finish the task",
+		MaxTokens: 32,
+	})
+	if err == nil {
+		t.Fatal("expected provider error")
+	}
+	if attempts != 1 {
+		t.Fatalf("non-retryable HTTP status made %d provider attempts", attempts)
+	}
+	var statusErr *HTTPStatusError
+	if !errors.As(err, &statusErr) {
+		t.Fatalf("expected HTTPStatusError, got %T: %v", err, err)
+	}
+	if statusErr.StatusCode != http.StatusForbidden || ShouldRetry(err) {
+		t.Fatalf("unexpected HTTP error classification: %#v", statusErr)
 	}
 }

@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"errors"
+	"net/http"
 	"strings"
 	"sync"
 	"testing"
@@ -109,12 +110,74 @@ func TestRunLongMemEvalQAJudgeRejectsPromptDigestMismatchBeforeProviderCall(t *t
 	}
 }
 
+func TestRunLongMemEvalQAJudgeStopsAtFrozenTerminalFailureLimit(t *testing.T) {
+	fixture := writeLongMemEvalQAReaderFixture(t, 3)
+	readerOpts := fixture.options(&longMemEvalQARecordingProvider{})
+	readerOpts.RetrySleeper = func(context.Context, time.Duration) error { return nil }
+	if _, err := RunLongMemEvalQAReader(context.Background(), readerOpts); err != nil {
+		t.Fatal(err)
+	}
+
+	fixture.execution.Judge.MaxTerminalFailures = 1
+	judge := &longMemEvalQAJudgeRecordingProvider{}
+	opts := fixture.options(nil)
+	opts.JudgeProvider = judge
+	opts.RetrySleeper = func(context.Context, time.Duration) error { return nil }
+	summary, err := RunLongMemEvalQAJudge(context.Background(), opts)
+	if err == nil || !strings.Contains(err.Error(), "judge terminal failure limit 1 reached") {
+		t.Fatalf("expected terminal-failure stop, got summary=%#v err=%v", summary, err)
+	}
+	if summary.Failed+summary.Invalid+summary.NotRun < 1 || summary.Total >= 6 {
+		t.Fatalf("judge did not stop early: %#v", summary)
+	}
+}
+
+func TestRunLongMemEvalQAJudgeDoesNotRetryNonRetryableProviderError(t *testing.T) {
+	fixture := writeLongMemEvalQAReaderFixture(t, 1)
+	readerOpts := fixture.options(&longMemEvalQARecordingProvider{})
+	readerOpts.RetrySleeper = func(context.Context, time.Duration) error { return nil }
+	if _, err := RunLongMemEvalQAReader(context.Background(), readerOpts); err != nil {
+		t.Fatal(err)
+	}
+
+	judge := &longMemEvalQANonRetryableJudgeProvider{}
+	opts := fixture.options(nil)
+	opts.JudgeProvider = judge
+	opts.RetrySleeper = func(context.Context, time.Duration) error { return nil }
+	summary, err := RunLongMemEvalQAJudge(context.Background(), opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if summary.Total != 2 || summary.Failed != 1 || summary.NotRun != 1 || summary.ProviderCalls != 1 {
+		t.Fatalf("unexpected judge summary: %#v", summary)
+	}
+	if judge.calls != 1 {
+		t.Fatalf("judge provider calls=%d want 1", judge.calls)
+	}
+}
+
 type longMemEvalQAJudgeRecordingProvider struct {
 	mu        sync.Mutex
 	calls     int
 	active    int
 	maxActive int
 	requests  []provider.GenerateRequest
+}
+
+type longMemEvalQANonRetryableJudgeProvider struct {
+	mu    sync.Mutex
+	calls int
+}
+
+func (p *longMemEvalQANonRetryableJudgeProvider) Generate(_ context.Context, _ provider.GenerateRequest) (provider.GenerateResponse, error) {
+	p.mu.Lock()
+	p.calls++
+	p.mu.Unlock()
+	return provider.GenerateResponse{}, &provider.HTTPStatusError{
+		StatusCode: http.StatusForbidden,
+		Status:     "403 Forbidden",
+		Body:       `{"code":30001,"message":"account balance is insufficient"}`,
+	}
 }
 
 func (p *longMemEvalQAJudgeRecordingProvider) Generate(_ context.Context, request provider.GenerateRequest) (provider.GenerateResponse, error) {

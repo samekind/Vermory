@@ -1,6 +1,10 @@
 package provider
 
-import "context"
+import (
+	"context"
+	"errors"
+	"fmt"
+)
 
 type GenerateRequest struct {
 	Model         string
@@ -29,4 +33,22 @@ type GenerateResponse struct {
 
 type Provider interface {
 	Generate(ctx context.Context, req GenerateRequest) (GenerateResponse, error)
+}
+
+type HTTPStatusError struct {
+	StatusCode int
+	Status     string
+	Body       string
+}
+
+func (err *HTTPStatusError) Error() string {
+	return fmt.Sprintf("provider: chat completions returned %s: %s", err.Status, err.Body)
+}
+
+func ShouldRetry(err error) bool {
+	var statusErr *HTTPStatusError
+	if errors.As(err, &statusErr) {
+		return shouldRetryStatus(statusErr.StatusCode)
+	}
+	return true
 }

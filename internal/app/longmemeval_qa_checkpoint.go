@@ -29,6 +29,7 @@ type LongMemEvalQAAttempt struct {
 	Status            string               `json:"status"`
 	Output            string               `json:"output,omitempty"`
 	Error             string               `json:"error,omitempty"`
+	Retryable         *bool                `json:"retryable,omitempty"`
 	ProviderModel     string               `json:"provider_model,omitempty"`
 	Usage             *provider.TokenUsage `json:"usage,omitempty"`
 	RawArtifactURI    string               `json:"raw_artifact_uri,omitempty"`
@@ -241,8 +242,14 @@ func validateLongMemEvalQACheckpoint(checkpoint LongMemEvalQACheckpoint, task Lo
 		if checkpoint.Response != "" || checkpoint.Score != nil {
 			return fmt.Errorf("checkpoint failed reader cannot contain response or score")
 		}
-		if len(checkpoint.Attempts) != contract.Reader.MaxAttempts {
-			return fmt.Errorf("checkpoint failed reader has %d attempts, want %d", len(checkpoint.Attempts), contract.Reader.MaxAttempts)
+		if len(checkpoint.Attempts) > contract.Reader.MaxAttempts {
+			return fmt.Errorf("checkpoint failed reader has %d attempts, maximum %d", len(checkpoint.Attempts), contract.Reader.MaxAttempts)
+		}
+		if len(checkpoint.Attempts) < contract.Reader.MaxAttempts {
+			last := checkpoint.Attempts[len(checkpoint.Attempts)-1]
+			if last.Retryable == nil || *last.Retryable {
+				return fmt.Errorf("checkpoint failed reader stopped before max attempts without a non-retryable final attempt")
+			}
 		}
 		for _, attempt := range checkpoint.Attempts {
 			if attempt.Status != longMemEvalQAAttemptFailed {

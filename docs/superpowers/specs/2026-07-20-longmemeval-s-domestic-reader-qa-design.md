@@ -43,10 +43,10 @@ vector, non-degraded, and free of a failure code before any provider call.
 
 ## Reader And Judge
 
-| Role | Route | Model | Workers | Timeout | Attempts |
-|---|---|---|---:|---:|---:|
-| Reader | direct SiliconFlow | `deepseek-ai/DeepSeek-V4-Flash` | 4 | 180s | 3 |
-| Custom judge | direct SiliconFlow | `Qwen/Qwen3-30B-A3B-Instruct-2507` | 4 | 120s | 3 |
+| Role | Route | Model | Workers | Timeout | Attempts | Terminal failure limit |
+|---|---|---|---:|---:|---:|---:|
+| Reader | direct SiliconFlow | `deepseek-ai/DeepSeek-V4-Flash` | 4 | 180s | 3 | 1 |
+| Custom judge | direct SiliconFlow | `Qwen/Qwen3-30B-A3B-Instruct-2507` | 4 | 120s | 3 | 1 |
 
 Both model IDs are non-Pro routes. The reader and judge were selected as
 distinct available compatibility targets, not as winners. The request goes
@@ -58,19 +58,23 @@ command line, checkpoint, report, or committed evidence.
 
 ## Qualified Probe
 
-Before freezing the dataset run, one GUI LaunchAgent executed both model
-probes through the exact-head Vermory binary and Keychain wrapper:
+Before the v1 dataset run, one GUI LaunchAgent executed both model probes
+through the exact-head Vermory binary and Keychain wrapper:
 
-- label `org.vermory.w30.probe-siliconflow.ffcdcfe`;
+- implementation `7a7f7f258195a061f6d28a38318bb99628e36126`;
+- label `org.vermory.w30.probe-final.7a7f7f2`;
 - `runs=1`, exit `0`, empty stderr;
 - both models returned exactly `OK`;
 - probe report SHA-256
-  `ae3fae6d86edde0bf539ace706a2d8f8c6cefd38dd27c80ec439ff0e7b5885aa`;
+  `13e07a25467574801a6bc87d20aa28ec5bfabdc68b8fda01bcc2e4dca5ea913b`;
 - LaunchAgent status SHA-256
-  `6f0fcf994c3ec7acecfdb6c1c2879f4329ab0dcaae26ea1e6e54396facc77f94`.
+  `0594f0ed980ba5bb8784d3fb972279f32f892aceb12727f7e0441f09987b4d0d`.
 
 The earlier SSH probes failed before credential access and remain rejected.
 They contribute no provider-success claim.
+
+Every later source or manifest revision requires its own exact-head probe; the
+v1 probe cannot qualify a v2 run.
 
 ## Execution
 
@@ -88,6 +92,29 @@ They contribute no provider-success claim.
 Every rejected run gets a new run ID, artifact root, source snapshot, binary,
 and LaunchAgent label. Foreground PTY execution and `launchctl submit` are not
 formal transports.
+
+The manifest freezes `max_terminal_failures=1` for both phases. A
+non-retryable HTTP response ends that task without consuming the remaining
+outer attempts. Once one reader failure, judge failure, invalid judge result,
+or not-run judge state is durably represented, the process stops scheduling
+new work and exits nonzero. Already-running workers may finish or be canceled,
+but their checkpoints cannot make the rejected run resumable as a success.
+This is a provider-cost and evidence-integrity bound, not a way to weaken the
+zero-terminal-failure qualification gate.
+
+## Retained Rejected Run
+
+Run `longmemeval-s-full-domestic-vector-reader-qa-20260720-v1` completed 32
+reader tasks before SiliconFlow began returning `403` / code `30001` for
+insufficient account balance. It retained 45 terminal failures before manual
+shutdown, did not start the judge, and contributes no paired score. Its source,
+manifest, checkpoints, raw responses, and failure classification remain
+recorded in
+[`2026-07-20-longmemeval-s-domestic-vector-reader-qa-rejected-v1.md`](../../evidence/2026-07-20-longmemeval-s-domestic-vector-reader-qa-rejected-v1.md).
+
+The automatic terminal-failure bound was added after this observation. It does
+not retroactively qualify, resume, or alter v1. A fresh run requires sufficient
+provider credit plus a new exact-head runtime and run identity.
 
 ## Hard Gates
 

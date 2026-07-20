@@ -45,7 +45,8 @@
     "max_output_tokens": 128,
     "timeout_seconds": 180,
     "workers": 4,
-    "max_attempts": 3
+    "max_attempts": 3,
+    "max_terminal_failures": 1
   },
   "judge": {
     "provider": "siliconflow",
@@ -55,7 +56,8 @@
     "max_output_tokens": 10,
     "timeout_seconds": 120,
     "workers": 4,
-    "max_attempts": 3
+    "max_attempts": 3,
+    "max_terminal_failures": 1
   },
   "retrieval_input": {
     "path": "retrieval-results.jsonl",

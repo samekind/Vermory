@@ -244,7 +244,9 @@ func (runtime *longMemEvalQAReaderRuntime) processTask(ctx context.Context, task
 		if err := validateLongMemEvalQACheckpoint(checkpoint, task, runtime.contract); err != nil {
 			return err
 		}
-		runtime.addSummary(checkpoint, true)
+		if runtime.addSummary(checkpoint, true) {
+			return fmt.Errorf("reader terminal failure limit %d reached", runtime.contract.Reader.MaxTerminalFailures)
+		}
 		return nil
 	} else if !errors.Is(statErr, os.ErrNotExist) {
 		return statErr
@@ -260,7 +262,9 @@ func (runtime *longMemEvalQAReaderRuntime) processTask(ctx context.Context, task
 	if err := writeLongMemEvalQACheckpoint(path, checkpoint); err != nil {
 		return err
 	}
-	runtime.addSummary(checkpoint, false)
+	if runtime.addSummary(checkpoint, false) {
+		return fmt.Errorf("reader terminal failure limit %d reached", runtime.contract.Reader.MaxTerminalFailures)
+	}
 	return nil
 }
 
@@ -339,12 +343,18 @@ func (runtime *longMemEvalQAReaderRuntime) executeTask(ctx context.Context, task
 		switch {
 		case attemptContextErr != nil:
 			attempt.Error = truncateLongMemEvalQAError(attemptContextErr.Error())
+			attempt.Retryable = longMemEvalQABoolPointer(true)
 		case generateErr != nil:
 			attempt.Error = truncateLongMemEvalQAError(generateErr.Error())
+			attempt.Retryable = longMemEvalQABoolPointer(provider.ShouldRetry(generateErr))
 		default:
 			attempt.Error = "provider returned empty output"
+			attempt.Retryable = longMemEvalQABoolPointer(true)
 		}
 		checkpoint.Attempts = append(checkpoint.Attempts, attempt)
+		if attempt.Retryable != nil && !*attempt.Retryable {
+			break
+		}
 		if attemptNumber < runtime.contract.Reader.MaxAttempts {
 			delay := time.Second << (attemptNumber - 1)
 			if err := runtime.sleep(ctx, delay); err != nil {
@@ -356,7 +366,7 @@ func (runtime *longMemEvalQAReaderRuntime) executeTask(ctx context.Context, task
 	return checkpoint, nil
 }
 
-func (runtime *longMemEvalQAReaderRuntime) addSummary(checkpoint LongMemEvalQACheckpoint, resumed bool) {
+func (runtime *longMemEvalQAReaderRuntime) addSummary(checkpoint LongMemEvalQACheckpoint, resumed bool) bool {
 	runtime.summaryMu.Lock()
 	defer runtime.summaryMu.Unlock()
 	runtime.summary.Total++
@@ -370,6 +380,8 @@ func (runtime *longMemEvalQAReaderRuntime) addSummary(checkpoint LongMemEvalQACh
 	} else {
 		runtime.summary.Failed++
 	}
+	limit := runtime.contract.Reader.MaxTerminalFailures
+	return limit > 0 && runtime.summary.Failed >= limit
 }
 
 func sleepLongMemEvalQARetry(ctx context.Context, duration time.Duration) error {
@@ -389,6 +401,10 @@ func cloneLongMemEvalQAUsage(usage *provider.TokenUsage) *provider.TokenUsage {
 	}
 	copy := *usage
 	return &copy
+}
+
+func longMemEvalQABoolPointer(value bool) *bool {
+	return &value
 }
 
 func truncateLongMemEvalQAError(message string) string {

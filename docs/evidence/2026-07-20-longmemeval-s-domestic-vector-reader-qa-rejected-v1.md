@@ -116,8 +116,13 @@ must not be resumed into a successful run or used as the base for a judge run.
   with zero terminal failures.
 - Classify the interruption as `provider_account_balance_exhausted`, not as a
   retrieval-quality, model-quality, parser, concurrency, or retry-policy result.
-- Do not lower concurrency, change retry timing, or modify provider parsing in
-  response to this failure; none addresses insufficient account balance.
+- Do not lower concurrency or add retry backoff in response to this failure;
+  neither addresses insufficient account balance.
+- Preserve the HTTP status as a typed provider error so a non-retryable 403
+  does not consume all outer attempts. Freeze a one-terminal-failure execution
+  budget for later W30 runs so an already-disqualified run stops scheduling
+  new work automatically. This bounds waste but does not cure the account
+  state or change v1.
 - After the direct SiliconFlow account has enough credit, start a fresh run ID,
   artifact root, exact source snapshot, binary identity, and LaunchAgent label.
 - Preserve W29 separately. A successful W30 run would not replace the Grok
