@@ -90,6 +90,18 @@ plain only, `31` Vermory only, and `90` neither. The regression is retained;
 the run does not change the lexical default or rank models. See
 [LongMemEval-S Full Reader QA Evidence](docs/evidence/2026-07-15-longmemeval-s-full-reader-qa.md).
 
+W28 then qualified the registered candidate vector path over all 500 cleaned
+LongMemEval-S records without changing the production default. Direct
+SiliconFlow `BAAI/bge-m3` projected 23,867 governed session memories through a
+UTF-8 chunked, normalized-mean profile and completed 500/500 effective vector
+queries with zero degradation, runtime failure, or scope/lifecycle violation.
+At K=10, vector RecallAll was `0.9404`, compared with token overlap `0.8383`
+and Vermory lexical `0.7340`; vector nDCG was `0.9069`. The one-memory durable
+projection took `7,210.157s`, incurred 1,088 retried provider attempts, and
+therefore remains an explicit operational cost rather than a hidden success
+condition. The candidate remains inactive and lexical remains the default. See
+[LongMemEval-S Full Vector Retrieval Evidence](docs/evidence/2026-07-20-longmemeval-s-full-vector-retrieval.md).
+
 W16 then qualified a dedicated PostgreSQL 18 physical-recovery trajectory. A
 streaming standby reached the primary flush LSN, the dedicated primary was
 stopped with immediate mode, the transition Web Chat request produced zero

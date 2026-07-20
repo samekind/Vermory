@@ -85,6 +85,16 @@ W15 随后把固定的 K10 ranking 交给真实 reader，完成 1000 条隔离�
 默认值，也不用于模型排名。详见
 [LongMemEval-S 全量 Reader QA 实证](docs/evidence/2026-07-15-longmemeval-s-full-reader-qa.md)。
 
+W28 随后在全部 500 条 cleaned LongMemEval-S 记录上完成 registered candidate
+vector 路径资格验证，但没有改变生产默认值。直连硅基流动 `BAAI/bge-m3` 通过
+UTF-8 分块与 normalized-mean profile 投影 23,867 条 governed session memory，
+500/500 次查询都保持 effective vector，degradation、runtime failure 与
+scope/lifecycle violation 均为 0。K10 vector RecallAll 为 `0.9404`，高于 token
+overlap 的 `0.8383` 和 Vermory lexical 的 `0.7340`；vector nDCG 为 `0.9069`。
+单 memory durable projection 耗时 `7,210.157s`，并发生 1,088 次 provider
+重试，因此运行成本被保留为明确结论。candidate 仍未激活，lexical 仍是默认。
+详见 [LongMemEval-S 全量 Vector Retrieval 实证](docs/evidence/2026-07-20-longmemeval-s-full-vector-retrieval.md)。
+
 W16 随后完成了一条专用 PostgreSQL 18 物理恢复轨迹：streaming standby
 追到 primary flush LSN 后，专用 primary 被 immediate stop；过渡期 Web Chat
 请求返回零 receipt、零行，原 handler/runtime/auth pools 在 standby promotion

@@ -37,12 +37,12 @@ func TestBenchmarkCoverageWritesInternalReadyArtifacts(t *testing.T) {
 	if report.DesignMappingCount != 3 {
 		t.Fatalf("expected 3 design mappings, got %d", report.DesignMappingCount)
 	}
-	if report.OriginalExecutionCount != 3 {
-		t.Fatalf("expected three separately registered original executions, got %d", report.OriginalExecutionCount)
+	if report.OriginalExecutionCount != 4 {
+		t.Fatalf("expected four separately registered original executions, got %d", report.OriginalExecutionCount)
 	}
 	longMemEvalEvidence := false
 	for _, entry := range report.Entries {
-		if entry.Benchmark == "LongMemEval" && len(entry.OriginalExecutionEvidence) == 3 {
+		if entry.Benchmark == "LongMemEval" && len(entry.OriginalExecutionEvidence) == 4 {
 			longMemEvalEvidence = true
 		}
 	}

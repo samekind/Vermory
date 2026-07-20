@@ -322,6 +322,35 @@ W28 does not alter the product default. After the rankings are frozen:
 - the same public labels cannot be used both to tune a new algorithm and claim
   unbiased qualification without disclosure and a held-out evaluation.
 
+## Formal V7 Result
+
+The exact-head v7 run completed on 2026-07-20 and passed the generated report
+gates plus independent PostgreSQL consistency checks:
+
+| Gate | Result |
+|---|---:|
+| Records / scored records with three conditions | `500 / 470` |
+| Continuities / active memories / vectors | `500 / 23,867 / 23,867` |
+| Projection status / lag | `idle / 0` |
+| Effective / degraded vector queries | `500 / 0` |
+| Logical embedding items | `24,367 / 24,367` |
+| Physical provider items | `46,657 / 46,657` |
+| Runtime / terminal provider failures | `0 / 0` |
+| Scope, lifecycle, or authority-hash violations | `0` |
+
+At K=10, vector measured RecallAny `0.9830`, RecallAll `0.9404`, nDCG
+`0.9069`, and MRR `0.9006`. Token overlap measured `0.9489`, `0.8383`,
+`0.7983`, and `0.8119`; Vermory lexical measured `0.9021`, `0.7340`,
+`0.6918`, and `0.6974`.
+
+The execution also fixed the operational cost in evidence. Projection took
+`7,210.157s` with worker batch size one. The provider meter recorded `25,455`
+attempts, `1,088` failed attempts recovered inside the operation retry
+envelope, and zero terminal failures. Vector query latency was `178ms` p50 and
+`274ms` p95. This supports a later reader replay using the frozen vector K=10
+ranking, but does not activate the candidate. The full evidence is
+`docs/evidence/2026-07-20-longmemeval-s-full-vector-retrieval.md`.
+
 ## Non-Claims
 
 - W28 is not a full LongMemEval QA score.

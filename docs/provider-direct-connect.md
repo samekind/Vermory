@@ -1,6 +1,6 @@
 # Vermory Direct Provider Connectivity
 
-> Direct provider compatibility evidence. It includes the historical ContextMesh self-case and the later Vermory W27 reality-case utility run; neither is a ranking of models for Vermory.
+> Direct provider compatibility evidence. It includes the historical ContextMesh self-case, the Vermory W27 reality-case utility run, and the W28 full-dataset embedding qualification; none is a ranking of models for Vermory.
 
 ## Purpose
 
@@ -47,6 +47,14 @@ This document records the direct provider path retained by the Vermory legacy ev
   - `24/24` direct provider calls completed with `0` provider failures
   - Four reality cases executed across six context conditions
   - Vermory native completed `4/4` cases with `0` forbidden hits and `816` total delivered context bytes
+- Verified W28 full-dataset retrieval run:
+  - Embedding model: `BAAI/bge-m3`
+  - Retrieval profile: `siliconflow-bge-m3-1024-chunked-mean-v2` (candidate)
+  - Evidence: `docs/evidence/2026-07-20-longmemeval-s-full-vector-retrieval.md`
+  - `23,867` governed session memories projected and `500/500` vector queries completed
+  - Logical items: `24,367/24,367`; physical provider items: `46,657/46,657`
+  - Provider attempts: `25,455`, including `1,088` retried failed attempts and `0` terminal failures
+  - No NewAPI route, degraded vector query, scope/lifecycle violation, or profile activation
 
 ### 3. Duojie
 
@@ -212,6 +220,7 @@ These runs prove:
 - real provider outputs can be captured into repeatable artifacts
 - the four-baseline evaluation loop is operational
 - the locally authenticated Grok CLI can consume a packet in an isolated single-turn harness
+- direct SiliconFlow embeddings can drive the registered PostgreSQL projection and vector coordinator over the complete public LongMemEval-S corpus with exact logical/physical request accounting
 
 These runs do not yet prove:
 
@@ -219,6 +228,7 @@ These runs do not yet prove:
 - AI coding tool integration quality
 - browser or MCP consumption quality
 - broad real-world advantage beyond the four bounded W27 reality cases
+- production-default suitability of the W28 candidate profile; the measured public-corpus gain does not by itself satisfy promotion
 
 The Grok harness deliberately disables tools and browser/search behavior. Its evidence is therefore packet-consumption evidence, not proof that a coding agent completed an implementation task.
 
@@ -246,6 +256,8 @@ Coverage note:
   - `Qwen/Qwen3-30B-A3B-Instruct-2507`
 - W27 real-utility covered:
   - `deepseek-ai/DeepSeek-V4-Flash`
+- W28 full-dataset retrieval covered:
+  - `BAAI/bge-m3` embedding through `siliconflow-bge-m3-1024-chunked-mean-v2`
 - Probe-covered:
   - `deepseek-ai/DeepSeek-V4-Flash`
 - Self-case covered:
@@ -256,3 +268,4 @@ Coverage note:
 - The two Qwen models have full SiliconFlow matrix coverage.
 - `deepseek-ai/DeepSeek-V4-Flash` completed the W27 four-case, six-condition direct utility run with 24/24 calls and zero provider failures.
 - Its earlier direct-probe timeout remains part of the evidence record; the later successful run establishes compatibility, not guaranteed provider availability or model superiority.
+- `BAAI/bge-m3` completed W28 with exact `46,657` physical provider items and zero terminal failure, but 1,088 retry events and a 7,210-second projection remain material operational evidence rather than being hidden behind the retrieval score.

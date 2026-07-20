@@ -110,7 +110,7 @@ Benchmark coverage reports write:
 - `benchmark-coverage/<run-id>/report.json`
 - `benchmark-coverage/<run-id>/report.md`
 
-The benchmark coverage runner validates that all named public benchmarks are at least `translated_task`, at least 4 reach `executable_evaluation`, and executable benchmarks name concrete case ids. It reports translated proxies, design mappings, and registered original executions as separate counters. Every original evidence path must load a valid execution manifest and qualification; a path string alone is rejected. The current map covers 11 public benchmarks, 8 executable translated evaluations, 3 design mappings, and 3 qualified original-data executions: one oracle QA sample, one full LongMemEval-S retrieval run, and one full LongMemEval-S reader QA run with a custom judge.
+The benchmark coverage runner validates that all named public benchmarks are at least `translated_task`, at least 4 reach `executable_evaluation`, and executable benchmarks name concrete case ids. It reports translated proxies, design mappings, and registered original executions as separate counters. Every original evidence path must load a valid execution manifest and qualification; a path string alone is rejected. The current map covers 11 public benchmarks, 8 executable translated evaluations, 3 design mappings, and 4 qualified original-data executions: one oracle QA sample, full lexical and vector LongMemEval-S retrieval runs, and one full LongMemEval-S reader QA run with a custom judge.
 
 Internal Ready reports write:
 
@@ -168,6 +168,7 @@ go run ./cmd/vermory benchmark-coverage \
 - Internal Ready mock chain: completed
 - LongMemEval original oracle sample with Grok: completed as `dataset_sample`
 - LongMemEval-S full retrieval: completed as `qualified_dataset_full`
+- LongMemEval-S full vector retrieval: completed as `qualified_dataset_full`
 - LongMemEval-S full reader QA with Grok: completed as `qualified_dataset_full`
 - Explicit source revision runtime with Grok MCP: completed
 - Governed source conflict candidate runtime with Grok MCP: completed
@@ -189,6 +190,7 @@ go run ./cmd/vermory benchmark-coverage \
 - Internal Ready smoke run ID: `internal-ready-smoke`
 - LongMemEval original sample run ID: `longmemeval-original-sample-grok-20260714-attempt-6`
 - LongMemEval-S full retrieval run ID: `longmemeval-s-full-retrieval-20260715-v1`
+- LongMemEval-S full vector retrieval run ID: `longmemeval-s-full-vector-retrieval-20260719-v7`
 - LongMemEval-S full reader QA run ID: `longmemeval-s-full-reader-qa-grok-20260715-v3`
 - Source revision Grok session: `955B4CA6-68EB-4D0E-9CB4-96BE91AC1776`
 - Source candidate Grok session: `019f5f3c-d836-7d80-a8de-995dcde29ef8`
@@ -694,6 +696,35 @@ This is a qualified public full-dataset reader QA execution with a custom Grok
 judge. It is not official GPT-4o LongMemEval accuracy, not a model ranking, and
 not withheld or externally sealed evidence. See
 [the W15 evidence](evidence/2026-07-15-longmemeval-s-full-reader-qa.md).
+
+## LongMemEval-S Full Vector Retrieval W28
+
+W28 projected the same 23,867 governed session memories through the registered
+candidate `siliconflow-bge-m3-1024-chunked-mean-v2` profile and executed the
+production vector coordinator for all 500 records. The candidate uses direct
+SiliconFlow `BAAI/bge-m3`, bounded UTF-8 chunks, normalized-mean pooling, and
+one logical vector per governed memory. It remained inactive throughout the
+run.
+
+| Condition | K | Recall any | Recall all | nDCG | MRR |
+|---|---:|---:|---:|---:|---:|
+| token overlap | 10 | `0.9489` | `0.8383` | `0.7983` | `0.8119` |
+| Vermory lexical | 10 | `0.9021` | `0.7340` | `0.6918` | `0.6974` |
+| Vermory vector | 10 | `0.9830` | `0.9404` | `0.9069` | `0.9006` |
+
+All `500/500` vector queries remained effective vector results with zero
+degradation. The projection reached `idle`, lag `0`, and exactly `23,867`
+vectors. Logical embedding items were exactly `24,367/24,367`; physical
+provider items were exactly `46,657/46,657`. Independent PostgreSQL checks
+found zero scope/lifecycle or content-hash violations across 6,000 delivered
+memory IDs. Runtime and terminal provider failures were zero.
+
+The positive quality result has an explicit operational cost. Projection took
+`7,210.157s` with one-memory durable commit granularity, and 1,088 of 25,455
+provider attempts required retry. Vector p95 query latency was `274ms`, versus
+lexical `72ms`. W28 therefore justifies a separately identified frozen-vector
+reader replay, but it does not activate the candidate or switch the default.
+See [the W28 evidence](evidence/2026-07-20-longmemeval-s-full-vector-retrieval.md).
 
 ## PostgreSQL HA And PITR Qualification
 
