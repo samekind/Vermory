@@ -6,9 +6,14 @@ import (
 	"strings"
 )
 
-var longMemEvalQAConditions = []string{
+var longMemEvalQALegacyConditions = []string{
 	"plain_token_overlap_k10",
 	"vermory_lexical_k10",
+}
+
+var longMemEvalQAVectorConditions = []string{
+	"vermory_lexical_k10",
+	"vermory_vector_k10",
 }
 
 func ValidateLongMemEvalQAExecution(qualification Qualification, manifest ExecutionManifest) error {
@@ -24,11 +29,13 @@ func ValidateLongMemEvalQAExecution(qualification Qualification, manifest Execut
 	if qualification.OfficialScorer.Class != ScorerClassOfficialModelJudge {
 		return fmt.Errorf("LongMemEval QA qualification official scorer must be official_model_judge")
 	}
-	if strings.TrimSpace(manifest.RunID) == "" {
-		return fmt.Errorf("LongMemEval reader execution run_id is required")
+	legacyConditions := slices.Equal(manifest.Conditions, longMemEvalQALegacyConditions)
+	vectorConditions := slices.Equal(manifest.Conditions, longMemEvalQAVectorConditions)
+	if !legacyConditions && !vectorConditions {
+		return fmt.Errorf("LongMemEval reader execution conditions must be %v or %v", longMemEvalQALegacyConditions, longMemEvalQAVectorConditions)
 	}
-	if !slices.Equal(manifest.Conditions, longMemEvalQAConditions) {
-		return fmt.Errorf("LongMemEval reader execution conditions must be %v", longMemEvalQAConditions)
+	if legacyConditions && strings.TrimSpace(manifest.RunID) == "" {
+		return fmt.Errorf("LongMemEval reader execution run_id is required for legacy conditions")
 	}
 	if manifest.Reader == nil {
 		return fmt.Errorf("LongMemEval reader execution reader is required")

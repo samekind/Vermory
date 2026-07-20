@@ -127,7 +127,7 @@ func newBenchmarkLongMemEvalQACommandWithProviders(readerOverride, judgeOverride
 		},
 	}
 	command.Flags().StringVar(&options.SourceDatasetPath, "source-dataset", "", "verified official longmemeval_s_cleaned.json path")
-	command.Flags().StringVar(&options.RetrievalResultsPath, "retrieval-results", "", "verified W14 retrieval-results.jsonl path")
+	command.Flags().StringVar(&options.RetrievalResultsPath, "retrieval-results", "", "verified LongMemEval retrieval-results.jsonl path")
 	command.Flags().StringVar(&options.QualificationPath, "qualification", "casebook/benchmarks/qualifications/longmemeval-s-cleaned-qa.json", "official LongMemEval-S QA qualification manifest")
 	command.Flags().StringVar(&options.ExecutionPath, "execution", "casebook/benchmarks/executions/longmemeval-s-full-reader-qa.json", "full reader QA execution manifest")
 	command.Flags().StringVar(&options.ArtifactRoot, "artifact-root", "./artifacts", "artifact output root")

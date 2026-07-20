@@ -68,12 +68,16 @@ type LongMemEvalQARetrievalClassAggregate struct {
 }
 
 type LongMemEvalQAPairedAggregate struct {
-	Eligible           int `json:"eligible"`
-	BothCorrect        int `json:"both_correct"`
-	PlainOnlyCorrect   int `json:"plain_only_correct"`
-	VermoryOnlyCorrect int `json:"vermory_only_correct"`
-	NeitherCorrect     int `json:"neither_correct"`
-	Incomplete         int `json:"incomplete"`
+	FirstCondition     string `json:"first_condition"`
+	SecondCondition    string `json:"second_condition"`
+	Eligible           int    `json:"eligible"`
+	BothCorrect        int    `json:"both_correct"`
+	FirstOnlyCorrect   int    `json:"first_only_correct"`
+	SecondOnlyCorrect  int    `json:"second_only_correct"`
+	PlainOnlyCorrect   int    `json:"plain_only_correct,omitempty"`
+	VermoryOnlyCorrect int    `json:"vermory_only_correct,omitempty"`
+	NeitherCorrect     int    `json:"neither_correct"`
+	Incomplete         int    `json:"incomplete"`
 }
 
 type LongMemEvalQAFailure struct {
@@ -122,8 +126,8 @@ type longMemEvalQAConditionBuilder struct {
 }
 
 type longMemEvalQAPairState struct {
-	plain   *bool
-	vermory *bool
+	first  *bool
+	second *bool
 }
 
 type longMemEvalQASafeScore struct {
@@ -176,15 +180,16 @@ func FinalizeLongMemEvalQA(opts LongMemEvalQAOptions) (LongMemEvalQAReport, erro
 		return LongMemEvalQAReport{}, err
 	}
 	if len(retrieval) != opts.Qualification.Dataset.RecordCount {
-		return LongMemEvalQAReport{}, fmt.Errorf("W14 retrieval contains %d records, want %d", len(retrieval), opts.Qualification.Dataset.RecordCount)
+		return LongMemEvalQAReport{}, fmt.Errorf("retrieval input contains %d records, want %d", len(retrieval), opts.Qualification.Dataset.RecordCount)
 	}
 
-	checkpoints := make([]LongMemEvalQACheckpoint, 0, opts.Qualification.Dataset.RecordCount*2)
+	expectedTasks := opts.Qualification.Dataset.RecordCount * len(opts.Execution.Conditions)
+	checkpoints := make([]LongMemEvalQACheckpoint, 0, expectedTasks)
 	seen := make(map[string]struct{}, len(retrieval))
 	_, err = benchmark.ScanLongMemEval(sourcePath, func(record benchmark.LongMemEvalRecord) error {
 		result, exists := retrieval[record.QuestionID]
 		if !exists {
-			return fmt.Errorf("W14 retrieval is missing record %q", record.QuestionID)
+			return fmt.Errorf("retrieval input is missing record %q", record.QuestionID)
 		}
 		seen[record.QuestionID] = struct{}{}
 		tasks, err := BuildLongMemEvalQATasks(record, result, contract.K)
@@ -225,10 +230,10 @@ func FinalizeLongMemEvalQA(opts LongMemEvalQAOptions) (LongMemEvalQAReport, erro
 		return LongMemEvalQAReport{}, err
 	}
 	if len(seen) != len(retrieval) {
-		return LongMemEvalQAReport{}, fmt.Errorf("W14 retrieval contains records outside the qualified source")
+		return LongMemEvalQAReport{}, fmt.Errorf("retrieval input contains records outside the qualified source")
 	}
-	if len(checkpoints) != opts.Qualification.Dataset.RecordCount*2 {
-		return LongMemEvalQAReport{}, fmt.Errorf("LongMemEval QA has %d checkpoints, want %d", len(checkpoints), opts.Qualification.Dataset.RecordCount*2)
+	if len(checkpoints) != expectedTasks {
+		return LongMemEvalQAReport{}, fmt.Errorf("LongMemEval QA has %d checkpoints, want %d", len(checkpoints), expectedTasks)
 	}
 	report, err := aggregateLongMemEvalQA(opts, sourceSummary, checkpoints)
 	if err != nil {
@@ -245,8 +250,12 @@ func aggregateLongMemEvalQA(opts LongMemEvalQAOptions, sourceSummary benchmark.L
 	if opts.Execution.Reader == nil || opts.Execution.Judge == nil || opts.Execution.RetrievalInput == nil {
 		return LongMemEvalQAReport{}, fmt.Errorf("LongMemEval QA execution configs are incomplete")
 	}
-	if len(checkpoints) != sourceSummary.RecordCount*2 {
-		return LongMemEvalQAReport{}, fmt.Errorf("LongMemEval QA has %d checkpoints, want %d", len(checkpoints), sourceSummary.RecordCount*2)
+	if len(opts.Execution.Conditions) != 2 {
+		return LongMemEvalQAReport{}, fmt.Errorf("LongMemEval QA requires exactly two conditions")
+	}
+	expectedTasks := sourceSummary.RecordCount * len(opts.Execution.Conditions)
+	if len(checkpoints) != expectedTasks {
+		return LongMemEvalQAReport{}, fmt.Errorf("LongMemEval QA has %d checkpoints, want %d", len(checkpoints), expectedTasks)
 	}
 	sorted := append([]LongMemEvalQACheckpoint(nil), checkpoints...)
 	sort.Slice(sorted, func(i, j int) bool {
@@ -255,14 +264,12 @@ func aggregateLongMemEvalQA(opts LongMemEvalQAOptions, sourceSummary benchmark.L
 		}
 		return sorted[i].RecordID < sorted[j].RecordID
 	})
-	conditionBuilders := map[string]*longMemEvalQAConditionBuilder{
-		longMemEvalQAPlainCondition:   {},
-		longMemEvalQAVermoryCondition: {},
-	}
+	conditionBuilders := make(map[string]*longMemEvalQAConditionBuilder, len(opts.Execution.Conditions))
 	typeBuilders := make(map[string]map[string]*longMemEvalQAConditionBuilder)
-	retrievalClasses := map[string]map[string]LongMemEvalQARetrievalClassAggregate{
-		longMemEvalQAPlainCondition:   {},
-		longMemEvalQAVermoryCondition: {},
+	retrievalClasses := make(map[string]map[string]LongMemEvalQARetrievalClassAggregate, len(opts.Execution.Conditions))
+	for _, condition := range opts.Execution.Conditions {
+		conditionBuilders[condition] = &longMemEvalQAConditionBuilder{}
+		retrievalClasses[condition] = make(map[string]LongMemEvalQARetrievalClassAggregate)
 	}
 	pairs := make(map[string]*longMemEvalQAPairState, sourceSummary.RecordCount)
 	seen := make(map[string]struct{}, len(sorted))
@@ -279,9 +286,9 @@ func aggregateLongMemEvalQA(opts LongMemEvalQAOptions, sourceSummary benchmark.L
 			return LongMemEvalQAReport{}, fmt.Errorf("unsupported LongMemEval QA condition %q", checkpoint.Condition)
 		}
 		if typeBuilders[checkpoint.QuestionType] == nil {
-			typeBuilders[checkpoint.QuestionType] = map[string]*longMemEvalQAConditionBuilder{
-				longMemEvalQAPlainCondition:   {},
-				longMemEvalQAVermoryCondition: {},
+			typeBuilders[checkpoint.QuestionType] = make(map[string]*longMemEvalQAConditionBuilder, len(opts.Execution.Conditions))
+			for _, condition := range opts.Execution.Conditions {
+				typeBuilders[checkpoint.QuestionType][condition] = &longMemEvalQAConditionBuilder{}
 			}
 		}
 		accumulateLongMemEvalQACondition(builder, checkpoint)
@@ -306,10 +313,10 @@ func aggregateLongMemEvalQA(opts LongMemEvalQAOptions, sourceSummary benchmark.L
 		}
 		if checkpoint.Judge != nil && checkpoint.Judge.Status == longMemEvalQAJudgeCompleted {
 			correct := *checkpoint.Judge.Correct
-			if checkpoint.Condition == longMemEvalQAPlainCondition {
-				pair.plain = &correct
-			} else {
-				pair.vermory = &correct
+			if checkpoint.Condition == opts.Execution.Conditions[0] {
+				pair.first = &correct
+			} else if checkpoint.Condition == opts.Execution.Conditions[1] {
+				pair.second = &correct
 			}
 		}
 		if failure, exists := longMemEvalQAFailureForCheckpoint(checkpoint); exists {
@@ -353,23 +360,30 @@ func aggregateLongMemEvalQA(opts LongMemEvalQAOptions, sourceSummary benchmark.L
 		}
 		retrievalClasses[condition] = classes
 	}
-	paired := LongMemEvalQAPairedAggregate{}
+	paired := LongMemEvalQAPairedAggregate{
+		FirstCondition:  opts.Execution.Conditions[0],
+		SecondCondition: opts.Execution.Conditions[1],
+	}
 	for _, pair := range pairs {
-		if pair.plain == nil || pair.vermory == nil {
+		if pair.first == nil || pair.second == nil {
 			paired.Incomplete++
 			continue
 		}
 		paired.Eligible++
 		switch {
-		case *pair.plain && *pair.vermory:
+		case *pair.first && *pair.second:
 			paired.BothCorrect++
-		case *pair.plain:
-			paired.PlainOnlyCorrect++
-		case *pair.vermory:
-			paired.VermoryOnlyCorrect++
+		case *pair.first:
+			paired.FirstOnlyCorrect++
+		case *pair.second:
+			paired.SecondOnlyCorrect++
 		default:
 			paired.NeitherCorrect++
 		}
+	}
+	if paired.FirstCondition == longMemEvalQAPlainCondition && paired.SecondCondition == longMemEvalQAVermoryCondition {
+		paired.PlainOnlyCorrect = paired.FirstOnlyCorrect
+		paired.VermoryOnlyCorrect = paired.SecondOnlyCorrect
 	}
 	sort.Slice(failures, func(i, j int) bool {
 		if failures[i].RecordID == failures[j].RecordID {
@@ -590,6 +604,9 @@ func truncateLongMemEvalQAExcerpt(value string, limit int) string {
 
 func writeLongMemEvalQAArtifacts(ctx context.Context, opts LongMemEvalQAOptions, checkpoints []LongMemEvalQACheckpoint, report *LongMemEvalQAReport) error {
 	store := artifact.NewLocalStore(opts.ArtifactRoot)
+	finalExecution := opts.Execution
+	finalExecution.RunID = report.RunID
+	finalExecution.ImplementationRev = report.ImplementationRevision
 	prefix := filepath.ToSlash(filepath.Join("benchmarks", report.RunID))
 	paths := map[string]string{
 		"source":             filepath.ToSlash(filepath.Join(prefix, "source.json")),
@@ -614,7 +631,7 @@ func writeLongMemEvalQAArtifacts(ctx context.Context, opts LongMemEvalQAOptions,
 	systemDigest := sha256.Sum256([]byte(longMemEvalQASystemPrompt))
 	if _, err := putJSONArtifact(ctx, store, paths["source"], map[string]any{
 		"qualification":   opts.Qualification,
-		"execution":       opts.Execution,
+		"execution":       finalExecution,
 		"source_summary":  report.SourceSummary,
 		"retrieval_input": opts.Execution.RetrievalInput,
 	}); err != nil {
@@ -659,9 +676,6 @@ func writeLongMemEvalQAArtifacts(ctx context.Context, opts LongMemEvalQAOptions,
 	if _, err := putTextArtifact(ctx, store, paths["report"], markdownLongMemEvalQAReport(*report)); err != nil {
 		return err
 	}
-	finalExecution := opts.Execution
-	finalExecution.RunID = report.RunID
-	finalExecution.ImplementationRev = report.ImplementationRevision
 	finalExecution.Artifacts = copyStringMap(report.Artifacts)
 	if err := benchmark.ValidateLongMemEvalQAExecution(opts.Qualification, finalExecution); err != nil {
 		return err
@@ -750,15 +764,16 @@ func markdownLongMemEvalQAReport(report LongMemEvalQAReport) string {
 	builder.WriteString("## Condition Results\n\n")
 	builder.WriteString("| Condition | Completed | Reader failed | Judged | Judge failed | Judge invalid | Correct / total | Overall accuracy | Judged accuracy |\n")
 	builder.WriteString("|---|---:|---:|---:|---:|---:|---:|---:|---:|\n")
-	for _, condition := range []string{longMemEvalQAPlainCondition, longMemEvalQAVermoryCondition} {
+	for _, condition := range []string{report.Paired.FirstCondition, report.Paired.SecondCondition} {
 		aggregate := report.Conditions[condition]
 		fmt.Fprintf(&builder, "| `%s` | %d | %d | %d | %d | %d | %d / %d | %.4f | %.4f |\n",
 			condition, aggregate.Completed, aggregate.ReaderFailed, aggregate.Judged, aggregate.JudgeFailed, aggregate.JudgeInvalid,
 			aggregate.JudgeCorrect, aggregate.Total, aggregate.OverallJudgeAccuracy, aggregate.JudgedAccuracy)
 	}
 	builder.WriteString("\n## Paired Results\n\n")
-	fmt.Fprintf(&builder, "- Eligible: `%d`; both correct: `%d`; plain only: `%d`; Vermory only: `%d`; neither: `%d`; incomplete: `%d`.\n",
-		report.Paired.Eligible, report.Paired.BothCorrect, report.Paired.PlainOnlyCorrect, report.Paired.VermoryOnlyCorrect, report.Paired.NeitherCorrect, report.Paired.Incomplete)
+	fmt.Fprintf(&builder, "- Eligible: `%d`; both correct: `%d`; `%s` only: `%d`; `%s` only: `%d`; neither: `%d`; incomplete: `%d`.\n",
+		report.Paired.Eligible, report.Paired.BothCorrect, report.Paired.FirstCondition, report.Paired.FirstOnlyCorrect,
+		report.Paired.SecondCondition, report.Paired.SecondOnlyCorrect, report.Paired.NeitherCorrect, report.Paired.Incomplete)
 	builder.WriteString("\n## Non-Claims\n\n")
 	for _, nonClaim := range report.NonClaims {
 		builder.WriteString("- " + nonClaim + "\n")

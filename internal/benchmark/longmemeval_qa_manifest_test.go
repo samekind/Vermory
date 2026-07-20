@@ -15,6 +15,25 @@ func TestValidateLongMemEvalQAExecutionAcceptsFrozenFullRun(t *testing.T) {
 	}
 }
 
+func TestValidateLongMemEvalQAExecutionAcceptsFrozenLexicalVectorPair(t *testing.T) {
+	manifest := validLongMemEvalQAExecution()
+	manifest.RunID = ""
+	manifest.ImplementationRev = ""
+	manifest.Conditions = []string{"vermory_lexical_k10", "vermory_vector_k10"}
+	if err := ValidateLongMemEvalQAExecution(validLongMemEvalQAQualification(), manifest); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestValidateLongMemEvalQAExecutionPreservesLegacyRunIDRequirement(t *testing.T) {
+	manifest := validLongMemEvalQAExecution()
+	manifest.RunID = ""
+	err := ValidateLongMemEvalQAExecution(validLongMemEvalQAQualification(), manifest)
+	if err == nil || !strings.Contains(err.Error(), "run_id") {
+		t.Fatalf("expected legacy run ID rejection, got %v", err)
+	}
+}
+
 func TestValidateLongMemEvalQAExecutionRejectsMissingReader(t *testing.T) {
 	manifest := validLongMemEvalQAExecution()
 	manifest.Reader = nil
@@ -122,11 +141,17 @@ func TestValidateLongMemEvalQAExecutionAcceptsExactOfficialJudge(t *testing.T) {
 }
 
 func TestValidateLongMemEvalQAExecutionRejectsConditionDrift(t *testing.T) {
-	manifest := validLongMemEvalQAExecution()
-	manifest.Conditions = []string{"vermory_lexical_k10", "plain_token_overlap_k10"}
-	err := ValidateLongMemEvalQAExecution(validLongMemEvalQAQualification(), manifest)
-	if err == nil || !strings.Contains(err.Error(), "conditions") {
-		t.Fatalf("expected condition rejection, got %v", err)
+	for _, conditions := range [][]string{
+		{"vermory_lexical_k10", "plain_token_overlap_k10"},
+		{"plain_token_overlap_k10", "vermory_vector_k10"},
+		{"vermory_lexical_k10", "unknown_k10"},
+	} {
+		manifest := validLongMemEvalQAExecution()
+		manifest.Conditions = conditions
+		err := ValidateLongMemEvalQAExecution(validLongMemEvalQAQualification(), manifest)
+		if err == nil || !strings.Contains(err.Error(), "conditions") {
+			t.Fatalf("expected condition rejection for %v, got %v", conditions, err)
+		}
 	}
 }
 
@@ -140,6 +165,13 @@ func TestLongMemEvalQAOfficialManifestsValidate(t *testing.T) {
 		t.Fatal(err)
 	}
 	if err := ValidateLongMemEvalQAExecution(qualification, manifest); err != nil {
+		t.Fatal(err)
+	}
+	vectorManifest, err := LoadExecution("../../casebook/benchmarks/executions/longmemeval-s-full-vector-reader-qa.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := ValidateLongMemEvalQAExecution(qualification, vectorManifest); err != nil {
 		t.Fatal(err)
 	}
 }

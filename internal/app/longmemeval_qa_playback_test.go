@@ -160,6 +160,52 @@ func TestBuildLongMemEvalQATasksUsesExactK10PrefixesAndSemanticWrappers(t *testi
 	}
 }
 
+func TestLongMemEvalQAVectorPlaybackSelectsLexicalAndEffectiveVectorRankings(t *testing.T) {
+	record := longMemEvalQAPlaybackRecord("record-vector")
+	result := longMemEvalQAPlaybackVectorResult(record)
+	path, execution := writeLongMemEvalQARetrieval(t, []LongMemEvalRetrievalRecordResult{result})
+	execution.Conditions = []string{longMemEvalQAVermoryCondition, longMemEvalQAVectorCondition}
+
+	loaded, err := LoadLongMemEvalQARetrieval(path, execution)
+	if err != nil {
+		t.Fatal(err)
+	}
+	tasks, err := BuildLongMemEvalQATasks(record, loaded[record.QuestionID], 10)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(tasks) != 2 {
+		t.Fatalf("expected two selected tasks, got %d", len(tasks))
+	}
+	byCondition := make(map[string]LongMemEvalQATask, len(tasks))
+	for _, task := range tasks {
+		byCondition[task.Condition] = task
+		if !strings.HasPrefix(task.ContextPacket, "Governed memory:\n") {
+			t.Fatalf("condition %s did not use governed context: %q", task.Condition, task.ContextPacket)
+		}
+	}
+	lexical := byCondition[longMemEvalQAVermoryCondition]
+	vector := byCondition[longMemEvalQAVectorCondition]
+	if lexical.Condition == "" || vector.Condition == "" {
+		t.Fatalf("missing lexical/vector tasks: %#v", byCondition)
+	}
+	if lexical.ContextSHA256 == vector.ContextSHA256 {
+		t.Fatal("lexical and vector rankings produced identical frozen context")
+	}
+	if vector.RetrievalClassification != "all_evidence_retrieved" {
+		t.Fatalf("unexpected vector classification: %q", vector.RetrievalClassification)
+	}
+
+	degraded := result
+	degraded.Conditions = append([]LongMemEvalRetrievalConditionResult(nil), result.Conditions...)
+	degraded.Conditions[2].Degraded = true
+	path, execution = writeLongMemEvalQARetrieval(t, []LongMemEvalRetrievalRecordResult{degraded})
+	execution.Conditions = []string{longMemEvalQAVermoryCondition, longMemEvalQAVectorCondition}
+	if _, err := LoadLongMemEvalQARetrieval(path, execution); err == nil || !strings.Contains(err.Error(), "degraded") {
+		t.Fatalf("expected degraded vector rejection, got %v", err)
+	}
+}
+
 func TestBuildLongMemEvalQATasksPreservesShortProductionRanking(t *testing.T) {
 	record := longMemEvalQAPlaybackRecord("record-short-ranking")
 	result := longMemEvalQAPlaybackResult(record)
@@ -267,6 +313,55 @@ func TestLongMemEvalQARealPlaybackMetadata(t *testing.T) {
 	}
 }
 
+func TestLongMemEvalQAW28RealPlaybackMetadata(t *testing.T) {
+	sourcePath := os.Getenv("VERMORY_LONGMEMEVAL_S_DATASET")
+	retrievalPath := os.Getenv("VERMORY_LONGMEMEVAL_W28_RESULTS")
+	if sourcePath == "" || retrievalPath == "" {
+		t.Skip("real LongMemEval-S source and W28 retrieval results are not configured")
+	}
+	execution, err := benchmark.LoadExecution("../../casebook/benchmarks/executions/longmemeval-s-full-vector-reader-qa.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	retrieval, err := LoadLongMemEvalQARetrieval(retrievalPath, execution)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(retrieval) != 500 {
+		t.Fatalf("loaded %d W28 records, want 500", len(retrieval))
+	}
+	tasks := 0
+	summary, err := benchmark.ScanLongMemEval(sourcePath, func(record benchmark.LongMemEvalRecord) error {
+		result, exists := retrieval[record.QuestionID]
+		if !exists {
+			return os.ErrNotExist
+		}
+		built, err := BuildLongMemEvalQATasks(record, result, execution.RetrievalInput.K)
+		if err != nil {
+			return err
+		}
+		for _, task := range built {
+			if task.Condition != longMemEvalQAVermoryCondition && task.Condition != longMemEvalQAVectorCondition {
+				return os.ErrInvalid
+			}
+		}
+		tasks += len(built)
+		return nil
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if summary.RecordCount != 500 || summary.SessionCount != 23867 || summary.TurnCount != 246750 || summary.ScoredRecordCount != 470 || summary.AbstentionRecordCount != 30 {
+		t.Fatalf("unexpected real source summary: %#v", summary)
+	}
+	if summary.RecordSetSHA256 != execution.RecordSetSHA256 {
+		t.Fatalf("record-set digest=%s want %s", summary.RecordSetSHA256, execution.RecordSetSHA256)
+	}
+	if tasks != 1000 {
+		t.Fatalf("built %d tasks, want 1000", tasks)
+	}
+}
+
 func longMemEvalQAPlaybackRecord(id string) benchmark.LongMemEvalRecord {
 	record := benchmark.LongMemEvalRecord{
 		QuestionID:       id,
@@ -325,6 +420,26 @@ func longMemEvalQAPlaybackResult(record benchmark.LongMemEvalRecord) LongMemEval
 			},
 		},
 	}
+}
+
+func longMemEvalQAPlaybackVectorResult(record benchmark.LongMemEvalRecord) LongMemEvalRetrievalRecordResult {
+	result := longMemEvalQAPlaybackResult(record)
+	vectorKeys := make([]string, 0, 12)
+	vectorIDs := make([]string, 0, 12)
+	for index := 0; index < 12; index++ {
+		position := (index + 1) % 12
+		vectorKeys = append(vectorKeys, longMemEvalRetrievalOccurrenceKey(position, record.HaystackSessionIDs[position]))
+		vectorIDs = append(vectorIDs, record.HaystackSessionIDs[position])
+	}
+	result.Conditions = append(result.Conditions, LongMemEvalRetrievalConditionResult{
+		Condition:            longMemEvalRetrievalVector,
+		Status:               "completed",
+		RankedOccurrenceKeys: vectorKeys,
+		RankedSessionIDs:     vectorIDs,
+		MetricAt10:           &benchmark.SessionRetrievalMetric{K: 10, RecallAny: 1, RecallAll: 1},
+		EffectiveMode:        "vector",
+	})
+	return result
 }
 
 func writeLongMemEvalQARetrieval(t *testing.T, results []LongMemEvalRetrievalRecordResult) (string, benchmark.ExecutionManifest) {

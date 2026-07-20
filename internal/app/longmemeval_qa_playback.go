@@ -20,7 +20,7 @@ func LoadLongMemEvalQARetrieval(path string, execution benchmark.ExecutionManife
 	}
 	input := *execution.RetrievalInput
 	if err := benchmark.VerifyFileSHA256(path, input.SHA256); err != nil {
-		return nil, fmt.Errorf("verify W14 retrieval SHA-256: %w", err)
+		return nil, fmt.Errorf("verify LongMemEval retrieval SHA-256: %w", err)
 	}
 	file, err := os.Open(path)
 	if err != nil {
@@ -35,27 +35,27 @@ func LoadLongMemEvalQARetrieval(path string, execution benchmark.ExecutionManife
 	for scanner.Scan() {
 		line++
 		if strings.TrimSpace(scanner.Text()) == "" {
-			return nil, fmt.Errorf("W14 retrieval line %d is empty", line)
+			return nil, fmt.Errorf("LongMemEval retrieval line %d is empty", line)
 		}
 		var result LongMemEvalRetrievalRecordResult
 		decoder := json.NewDecoder(strings.NewReader(scanner.Text()))
 		decoder.DisallowUnknownFields()
 		if err := decoder.Decode(&result); err != nil {
-			return nil, fmt.Errorf("decode W14 retrieval line %d: %w", line, err)
+			return nil, fmt.Errorf("decode LongMemEval retrieval line %d: %w", line, err)
 		}
 		if err := validateLongMemEvalQARetrievalResult(result, execution); err != nil {
-			return nil, fmt.Errorf("W14 retrieval line %d: %w", line, err)
+			return nil, fmt.Errorf("LongMemEval retrieval line %d: %w", line, err)
 		}
 		if _, exists := results[result.RecordID]; exists {
-			return nil, fmt.Errorf("W14 retrieval contains duplicate record_id %q", result.RecordID)
+			return nil, fmt.Errorf("LongMemEval retrieval contains duplicate record_id %q", result.RecordID)
 		}
 		results[result.RecordID] = result
 	}
 	if err := scanner.Err(); err != nil {
-		return nil, fmt.Errorf("scan W14 retrieval results: %w", err)
+		return nil, fmt.Errorf("scan LongMemEval retrieval results: %w", err)
 	}
 	if len(results) == 0 {
-		return nil, fmt.Errorf("W14 retrieval results contain no records")
+		return nil, fmt.Errorf("LongMemEval retrieval results contain no records")
 	}
 	return results, nil
 }
@@ -83,10 +83,17 @@ func validateLongMemEvalQARetrievalResult(result LongMemEvalRetrievalRecordResul
 	if result.Status != "completed" {
 		return fmt.Errorf("record %s status is %q", result.RecordID, result.Status)
 	}
-	if len(result.Conditions) != 2 || result.Conditions[0].Condition != longMemEvalRetrievalBaseline || result.Conditions[1].Condition != longMemEvalRetrievalVermory {
-		return fmt.Errorf("record %s conditions must be %s then %s", result.RecordID, longMemEvalRetrievalBaseline, longMemEvalRetrievalVermory)
+	expectedConditions, err := longMemEvalQARetrievalShape(execution.Conditions)
+	if err != nil {
+		return err
 	}
-	for _, condition := range result.Conditions {
+	if len(result.Conditions) != len(expectedConditions) {
+		return fmt.Errorf("record %s conditions must be %v", result.RecordID, expectedConditions)
+	}
+	for index, condition := range result.Conditions {
+		if condition.Condition != expectedConditions[index] {
+			return fmt.Errorf("record %s condition %d is %s, want %s", result.RecordID, index, condition.Condition, expectedConditions[index])
+		}
 		if condition.Status != "completed" {
 			return fmt.Errorf("record %s condition %s status is %q", result.RecordID, condition.Condition, condition.Status)
 		}
@@ -99,8 +106,22 @@ func validateLongMemEvalQARetrievalResult(result LongMemEvalRetrievalRecordResul
 		if !result.Abstention && condition.MetricAt10 == nil {
 			return fmt.Errorf("record %s condition %s metric_at_10 is required", result.RecordID, condition.Condition)
 		}
+		if condition.Condition == longMemEvalRetrievalVector && (condition.EffectiveMode != vermoryruntime.RetrievalVector || condition.Degraded || condition.FailureCode != "") {
+			return fmt.Errorf("record %s vector condition is degraded or not effective vector", result.RecordID)
+		}
 	}
 	return nil
+}
+
+func longMemEvalQARetrievalShape(qaConditions []string) ([]string, error) {
+	switch strings.Join(qaConditions, "\x00") {
+	case longMemEvalQAPlainCondition + "\x00" + longMemEvalQAVermoryCondition:
+		return []string{longMemEvalRetrievalBaseline, longMemEvalRetrievalVermory}, nil
+	case longMemEvalQAVermoryCondition + "\x00" + longMemEvalQAVectorCondition:
+		return []string{longMemEvalRetrievalBaseline, longMemEvalRetrievalVermory, longMemEvalRetrievalVector}, nil
+	default:
+		return nil, fmt.Errorf("unsupported LongMemEval QA conditions %v", qaConditions)
+	}
 }
 
 func BuildLongMemEvalQATasks(record benchmark.LongMemEvalRecord, retrieval LongMemEvalRetrievalRecordResult, k int) ([]LongMemEvalQATask, error) {
@@ -113,19 +134,28 @@ func BuildLongMemEvalQATasks(record benchmark.LongMemEvalRecord, retrieval LongM
 	if record.QuestionType != retrieval.QuestionType {
 		return nil, fmt.Errorf("source question_type %q does not match retrieval %q", record.QuestionType, retrieval.QuestionType)
 	}
-	if len(retrieval.Conditions) != 2 {
+	var selected []LongMemEvalRetrievalConditionResult
+	orderSeed := ""
+	switch {
+	case len(retrieval.Conditions) == 2 && retrieval.Conditions[0].Condition == longMemEvalRetrievalBaseline && retrieval.Conditions[1].Condition == longMemEvalRetrievalVermory:
+		selected = retrieval.Conditions
+		orderSeed = "longmemeval-w15-v1:"
+	case len(retrieval.Conditions) == 3 && retrieval.Conditions[0].Condition == longMemEvalRetrievalBaseline && retrieval.Conditions[1].Condition == longMemEvalRetrievalVermory && retrieval.Conditions[2].Condition == longMemEvalRetrievalVector:
+		selected = retrieval.Conditions[1:]
+		orderSeed = "longmemeval-w29-v1:"
+	default:
 		return nil, fmt.Errorf("retrieval record %s conditions are incomplete", retrieval.RecordID)
 	}
 
 	tasks := make([]LongMemEvalQATask, 0, 2)
-	for _, condition := range retrieval.Conditions {
+	for _, condition := range selected {
 		task, err := buildLongMemEvalQATask(record, retrieval, condition, k)
 		if err != nil {
 			return nil, err
 		}
 		tasks = append(tasks, task)
 	}
-	orderDigest := sha256.Sum256([]byte("longmemeval-w15-v1:" + record.QuestionID))
+	orderDigest := sha256.Sum256([]byte(orderSeed + record.QuestionID))
 	if orderDigest[0]&1 == 1 {
 		tasks[0], tasks[1] = tasks[1], tasks[0]
 	}
@@ -165,8 +195,11 @@ func buildLongMemEvalQATask(record benchmark.LongMemEvalRecord, retrieval LongMe
 	case longMemEvalRetrievalBaseline:
 		conditionName = longMemEvalQAPlainCondition
 		contextPacket = "Retrieved conversation memory:\n" + longMemEvalRetrievedContext(sessions)
-	case longMemEvalRetrievalVermory:
+	case longMemEvalRetrievalVermory, longMemEvalRetrievalVector:
 		conditionName = longMemEvalQAVermoryCondition
+		if condition.Condition == longMemEvalRetrievalVector {
+			conditionName = longMemEvalQAVectorCondition
+		}
 		memories := make([]vermoryruntime.Memory, 0, len(sessions))
 		for _, session := range sessions {
 			memories = append(memories, vermoryruntime.Memory{Content: session.SemanticText()})

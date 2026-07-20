@@ -93,6 +93,36 @@ func TestAggregateLongMemEvalQACoversTerminalStatesPairsAndAttributionDeterminis
 	}
 }
 
+func TestAggregateLongMemEvalQALabelsLexicalVectorPairWithoutLegacyMisnaming(t *testing.T) {
+	fixture := writeLongMemEvalQAReaderFixture(t, 6)
+	opts := fixture.options(nil)
+	opts.Execution.Conditions = []string{longMemEvalQAVermoryCondition, longMemEvalQAVectorCondition}
+	checkpoints := longMemEvalQAAggregateFixture(*fixture.execution.Judge)
+	for index := range checkpoints {
+		if checkpoints[index].Condition == longMemEvalQAPlainCondition {
+			checkpoints[index].Condition = longMemEvalQAVermoryCondition
+		} else {
+			checkpoints[index].Condition = longMemEvalQAVectorCondition
+		}
+	}
+	summary := benchmark.LongMemEvalSummary{RecordCount: 6, ScoredRecordCount: 5, AbstentionRecordCount: 1, SessionCount: 72, TurnCount: 144, RecordSetSHA256: fixture.execution.RecordSetSHA256}
+
+	report, err := aggregateLongMemEvalQA(opts, summary, checkpoints)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if report.Paired.FirstCondition != longMemEvalQAVermoryCondition || report.Paired.SecondCondition != longMemEvalQAVectorCondition {
+		t.Fatalf("unexpected pair labels: %#v", report.Paired)
+	}
+	if report.Paired.FirstOnlyCorrect != 1 || report.Paired.SecondOnlyCorrect != 1 || report.Paired.PlainOnlyCorrect != 0 || report.Paired.VermoryOnlyCorrect != 0 {
+		t.Fatalf("generic or legacy pair counts are wrong: %#v", report.Paired)
+	}
+	markdown := markdownLongMemEvalQAReport(report)
+	if !strings.Contains(markdown, "`vermory_lexical_k10` only") || !strings.Contains(markdown, "`vermory_vector_k10` only") || strings.Contains(markdown, "plain only") {
+		t.Fatalf("vector pair markdown is mislabeled: %s", markdown)
+	}
+}
+
 func TestFinalizeLongMemEvalQAWritesCompleteArtifactsAndRejectsMissingCheckpoint(t *testing.T) {
 	fixture := writeLongMemEvalQAReaderFixture(t, 3)
 	readerOpts := fixture.options(&longMemEvalQARecordingProvider{})
@@ -135,6 +165,19 @@ func TestFinalizeLongMemEvalQAWritesCompleteArtifactsAndRejectsMissingCheckpoint
 	}
 	if err := benchmark.ValidateLongMemEvalQAExecution(fixture.qualification, manifest); err != nil {
 		t.Fatalf("final execution manifest is invalid: %v", err)
+	}
+	sourceData, err := os.ReadFile(filepath.Join(fixture.artifactRoot, "benchmarks", fixture.execution.RunID, "source.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var source struct {
+		Execution benchmark.ExecutionManifest `json:"execution"`
+	}
+	if err := json.Unmarshal(sourceData, &source); err != nil {
+		t.Fatal(err)
+	}
+	if source.Execution.RunID != report.RunID || source.Execution.ImplementationRev != report.ImplementationRevision {
+		t.Fatalf("source artifact did not freeze final execution identity: %#v", source.Execution)
 	}
 
 	missing, err := longMemEvalQACheckpointPath(fixture.artifactRoot, fixture.execution.RunID, "record-00", longMemEvalQAPlainCondition)

@@ -98,7 +98,7 @@ func longMemEvalQACheckpointPath(root, runID, recordID, condition string) (strin
 			return "", err
 		}
 	}
-	if condition != longMemEvalQAPlainCondition && condition != longMemEvalQAVermoryCondition {
+	if condition != longMemEvalQAPlainCondition && condition != longMemEvalQAVermoryCondition && condition != longMemEvalQAVectorCondition {
 		return "", fmt.Errorf("invalid LongMemEval QA condition %q", condition)
 	}
 	absoluteRoot, err := filepath.Abs(root)
@@ -216,7 +216,7 @@ func validateLongMemEvalQACheckpoint(checkpoint LongMemEvalQACheckpoint, task Lo
 		return fmt.Errorf("checkpoint abstention is %t, want %t", checkpoint.Abstention, task.Abstention)
 	}
 	if !slices.Equal(checkpoint.RankedOccurrenceKeys, task.RankedOccurrenceKeys) || !slices.Equal(checkpoint.RankedSessionIDs, task.RankedSessionIDs) {
-		return fmt.Errorf("checkpoint ranking differs from frozen W14 ranking")
+		return fmt.Errorf("checkpoint ranking differs from frozen retrieval ranking")
 	}
 	if len(checkpoint.Attempts) == 0 {
 		return fmt.Errorf("checkpoint attempts are required")

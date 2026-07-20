@@ -62,7 +62,7 @@ func RunLongMemEvalQAReader(ctx context.Context, opts LongMemEvalQAOptions) (Lon
 		return LongMemEvalQAReaderSummary{}, err
 	}
 	if len(retrieval) != opts.Qualification.Dataset.RecordCount {
-		return LongMemEvalQAReaderSummary{}, fmt.Errorf("W14 retrieval contains %d records, want %d", len(retrieval), opts.Qualification.Dataset.RecordCount)
+		return LongMemEvalQAReaderSummary{}, fmt.Errorf("retrieval input contains %d records, want %d", len(retrieval), opts.Qualification.Dataset.RecordCount)
 	}
 
 	workerCtx, cancel := context.WithCancel(ctx)
@@ -96,7 +96,7 @@ func RunLongMemEvalQAReader(ctx context.Context, opts LongMemEvalQAOptions) (Lon
 	_, scanErr := benchmark.ScanLongMemEval(sourcePath, func(record benchmark.LongMemEvalRecord) error {
 		result, exists := retrieval[record.QuestionID]
 		if !exists {
-			return fmt.Errorf("W14 retrieval is missing record %q", record.QuestionID)
+			return fmt.Errorf("retrieval input is missing record %q", record.QuestionID)
 		}
 		seen[record.QuestionID] = struct{}{}
 		built, err := BuildLongMemEvalQATasks(record, result, opts.Execution.RetrievalInput.K)
@@ -133,10 +133,11 @@ func RunLongMemEvalQAReader(ctx context.Context, opts LongMemEvalQAOptions) (Lon
 		return runtime.summary, err
 	}
 	if len(seen) != len(retrieval) {
-		return runtime.summary, fmt.Errorf("W14 retrieval contains records outside the qualified source")
+		return runtime.summary, fmt.Errorf("retrieval input contains records outside the qualified source")
 	}
-	if runtime.summary.Total != opts.Qualification.Dataset.RecordCount*2 {
-		return runtime.summary, fmt.Errorf("reader represented %d tasks, want %d", runtime.summary.Total, opts.Qualification.Dataset.RecordCount*2)
+	expectedTasks := opts.Qualification.Dataset.RecordCount * len(opts.Execution.Conditions)
+	if runtime.summary.Total != expectedTasks {
+		return runtime.summary, fmt.Errorf("reader represented %d tasks, want %d", runtime.summary.Total, expectedTasks)
 	}
 	return runtime.summary, nil
 }
@@ -173,10 +174,11 @@ func prepareLongMemEvalQAInputs(opts LongMemEvalQAOptions) (LongMemEvalQAOptions
 		opts.ArtifactRoot = "./artifacts"
 	}
 	runID := strings.TrimSpace(opts.RunID)
+	frozenRunID := strings.TrimSpace(opts.Execution.RunID)
 	if runID == "" {
-		runID = strings.TrimSpace(opts.Execution.RunID)
+		runID = frozenRunID
 	}
-	if runID != strings.TrimSpace(opts.Execution.RunID) {
+	if frozenRunID != "" && runID != frozenRunID {
 		return LongMemEvalQAOptions{}, longMemEvalQACheckpointContract{}, nil, "", fmt.Errorf("LongMemEval QA run ID %q differs from execution %q", runID, opts.Execution.RunID)
 	}
 	if err := validateLongMemEvalRetrievalSegment(runID, "run ID"); err != nil {

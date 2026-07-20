@@ -66,7 +66,7 @@ func RunLongMemEvalQAJudge(ctx context.Context, opts LongMemEvalQAOptions) (Long
 		return LongMemEvalQAJudgeSummary{}, err
 	}
 	if len(retrieval) != opts.Qualification.Dataset.RecordCount {
-		return LongMemEvalQAJudgeSummary{}, fmt.Errorf("W14 retrieval contains %d records, want %d", len(retrieval), opts.Qualification.Dataset.RecordCount)
+		return LongMemEvalQAJudgeSummary{}, fmt.Errorf("retrieval input contains %d records, want %d", len(retrieval), opts.Qualification.Dataset.RecordCount)
 	}
 	sleeper := opts.RetrySleeper
 	if sleeper == nil {
@@ -111,7 +111,7 @@ func RunLongMemEvalQAJudge(ctx context.Context, opts LongMemEvalQAOptions) (Long
 	_, scanErr := benchmark.ScanLongMemEval(sourcePath, func(record benchmark.LongMemEvalRecord) error {
 		result, exists := retrieval[record.QuestionID]
 		if !exists {
-			return fmt.Errorf("W14 retrieval is missing record %q", record.QuestionID)
+			return fmt.Errorf("retrieval input is missing record %q", record.QuestionID)
 		}
 		seen[record.QuestionID] = struct{}{}
 		built, err := BuildLongMemEvalQATasks(record, result, opts.Execution.RetrievalInput.K)
@@ -154,10 +154,11 @@ func RunLongMemEvalQAJudge(ctx context.Context, opts LongMemEvalQAOptions) (Long
 		return runtime.summary, err
 	}
 	if len(seen) != len(retrieval) {
-		return runtime.summary, fmt.Errorf("W14 retrieval contains records outside the qualified source")
+		return runtime.summary, fmt.Errorf("retrieval input contains records outside the qualified source")
 	}
-	if runtime.summary.Total != opts.Qualification.Dataset.RecordCount*2 {
-		return runtime.summary, fmt.Errorf("judge represented %d tasks, want %d", runtime.summary.Total, opts.Qualification.Dataset.RecordCount*2)
+	expectedTasks := opts.Qualification.Dataset.RecordCount * len(opts.Execution.Conditions)
+	if runtime.summary.Total != expectedTasks {
+		return runtime.summary, fmt.Errorf("judge represented %d tasks, want %d", runtime.summary.Total, expectedTasks)
 	}
 	return runtime.summary, nil
 }
