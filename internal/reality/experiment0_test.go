@@ -17,24 +17,24 @@ func TestBuildExperiment0ReportsFrozenPublicCoverage(t *testing.T) {
 	if !report.Pass || !report.PublicValidation.Pass {
 		t.Fatalf("expected public evidence to pass: %#v", report)
 	}
-	if len(report.PublicValidation.Results) != 19 {
-		t.Fatalf("expected nineteen cases, got %d", len(report.PublicValidation.Results))
+	if len(report.PublicValidation.Results) != 20 {
+		t.Fatalf("expected twenty cases, got %d", len(report.PublicValidation.Results))
 	}
 	for _, result := range report.PublicValidation.Results {
 		if result.LockSHA256 == "" {
 			t.Fatalf("case %s has no fixture lock hash", result.CaseID)
 		}
 	}
-	if len(report.ContinuityCoverage[string(LineWorkspace)]) != 6 || len(report.ContinuityCoverage[string(LineConversation)]) != 11 {
+	if len(report.ContinuityCoverage[string(LineWorkspace)]) != 6 || len(report.ContinuityCoverage[string(LineConversation)]) != 12 {
 		t.Fatalf("unexpected continuity coverage: %#v", report.ContinuityCoverage)
 	}
-	if len(report.ContinuityCoverage[string(LineBridge)]) != 6 {
-		t.Fatalf("expected six bridge cases, got %#v", report.ContinuityCoverage)
+	if len(report.ContinuityCoverage[string(LineBridge)]) != 7 {
+		t.Fatalf("expected seven bridge cases, got %#v", report.ContinuityCoverage)
 	}
 	if len(report.PressureCoverage["explicit_deletion"]) != 1 {
 		t.Fatalf("expected deletion pressure coverage: %#v", report.PressureCoverage)
 	}
-	if report.EvidenceLevels[string(EvidencePublic)] != 19 || report.SealedStatus != "unavailable" {
+	if report.EvidenceLevels[string(EvidencePublic)] != 20 || report.SealedStatus != "unavailable" {
 		t.Fatalf("unexpected evidence status: levels=%#v sealed=%q", report.EvidenceLevels, report.SealedStatus)
 	}
 	if !containsText(report.Limitations, "target discovery coverage remains incomplete") {
@@ -48,6 +48,12 @@ func TestBuildExperiment0ReportsFrozenPublicCoverage(t *testing.T) {
 	}
 	if got := report.HypothesisSignals["hermes_client_seed"]; len(got) != 1 || got[0] != "H01-hermes-linked-sessions" {
 		t.Fatalf("unexpected Hermes client seed: %#v", got)
+	}
+	if got := report.HypothesisSignals["bridge_seed"]; len(got) != 3 ||
+		got[0] != "B01-conversation-workspace-promotion" ||
+		got[1] != "B02-linked-conversations-workspace-rebind" ||
+		got[2] != "B03-three-client-conversation-bridge" {
+		t.Fatalf("unexpected bridge seed: %#v", got)
 	}
 	if got := report.HypothesisSignals["H-005"]; len(got) != 4 ||
 		got[0] != "C01-device-maintenance-continuity" ||

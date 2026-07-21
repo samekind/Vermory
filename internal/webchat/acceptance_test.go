@@ -406,6 +406,173 @@ func TestB02LinkedConversationsWorkspaceRebindAcceptance(t *testing.T) {
 	}
 }
 
+func TestB03ThreeClientConversationBridgeAcceptance(t *testing.T) {
+	caseDir := filepath.Join("..", "..", "reality", "cases", "B03-three-client-conversation-bridge")
+	manifest := loadFrozenManifest(t, filepath.Join(caseDir, "manifest.json"))
+	events := loadFrozenEvents(t, filepath.Join(caseDir, "events.jsonl"))
+	if manifest.ID != "B03-three-client-conversation-bridge" {
+		t.Fatalf("unexpected B03 manifest: %#v", manifest)
+	}
+
+	const tenantID = "b03"
+	store := openAcceptanceStore(t, true)
+	llm := &acceptanceProvider{final: func(request provider.GenerateRequest) string {
+		if strings.Contains(request.ContextPacket, "vermory-v8.tgz") {
+			return "The current release bundle is vermory-v8.tgz."
+		}
+		return "The current release bundle is unavailable in this isolated continuity."
+	}}
+	bridges := runtime.NewBridgeService(store, tenantID)
+	handler := NewHandlerWithGovernance(
+		runtime.NewConversationService(store, tenantID, llm, "acceptance-model", runtime.ConversationServiceConfig{}),
+		runtime.NewGlobalDefaultsService(store, tenantID),
+		bridges,
+	)
+
+	webAnchor := conversationInput{Channel: "web_chat", ThreadID: "release-matter"}
+	hermesAnchor := "release-matter"
+	openClawAnchor := "release-matter"
+	unrelatedAnchor := conversationInput{Channel: "web_chat", ThreadID: "unrelated-matter"}
+
+	webTurn := postChatTurn(t, handler, "b03-web-confirm-source", webAnchor, events[1])
+	confirmed := confirmObservation(t, handler, "b03-confirm-source", webAnchor, webTurn.UserObservationID)
+	if confirmed.MemoryID == "" || confirmed.Status != "active" {
+		t.Fatalf("B03 source fact was not confirmed: %#v", confirmed)
+	}
+	_ = postChatTurn(t, handler, "b03-web-raw", webAnchor, events[2])
+	_ = postChatTurn(t, handler, "b03-web-unrelated", unrelatedAnchor, events[3])
+
+	preLinkHermes := prepareHermesTurn(t, handler, "b03-hermes-prelink", hermesAnchor, "Continue this same-named release matter without an explicit bridge.")
+	preLinkOpenClaw := prepareOpenClawTurn(t, handler, "b03-openclaw-prelink", openClawAnchor, "Continue this same-named release matter without an explicit bridge.")
+	for name, prepared := range map[string]runtime.PreparedConversationTurn{
+		"Hermes":   preLinkHermes,
+		"OpenClaw": preLinkOpenClaw,
+	} {
+		if strings.Contains(prepared.Context, "vermory-v8.tgz") {
+			t.Fatalf("B03 same-named %s continuity auto-linked before governance: %s", name, prepared.Context)
+		}
+	}
+	_ = completeHermesTurn(t, handler, "b03-hermes-prelink", hermesAnchor, "The current release bundle is unavailable without an explicit bridge.", "test-hermes-model")
+	_ = completeOpenClawTurn(t, handler, "b03-openclaw-prelink", openClawAnchor, "The current release bundle is unavailable without an explicit bridge.", "test-openclaw-model")
+
+	hermesLink := performJSON(t, handler, http.MethodPost, "/v1/bridges/link", fmt.Sprintf(`{
+  "operation_id":"b03-link-hermes",
+  "primary_channel":"web_chat",
+  "primary_thread_id":"release-matter",
+  "linked_channel":"hermes",
+  "linked_thread_id":%q
+}`, hermesAnchor))
+	if hermesLink.Code != http.StatusOK {
+		t.Fatalf("B03 Hermes link failed: %d %s", hermesLink.Code, hermesLink.Body.String())
+	}
+	var hermesBridge runtime.BridgeReceipt
+	decodeResponse(t, hermesLink, &hermesBridge)
+	hermesReplay := performJSON(t, handler, http.MethodPost, "/v1/bridges/link", fmt.Sprintf(`{
+  "operation_id":"b03-link-hermes",
+  "primary_channel":"web_chat",
+  "primary_thread_id":"release-matter",
+  "linked_channel":"hermes",
+  "linked_thread_id":%q
+}`, hermesAnchor))
+	if hermesReplay.Code != http.StatusOK {
+		t.Fatalf("B03 Hermes link replay failed: %d %s", hermesReplay.Code, hermesReplay.Body.String())
+	}
+	var replayedHermesBridge runtime.BridgeReceipt
+	decodeResponse(t, hermesReplay, &replayedHermesBridge)
+	if !replayedHermesBridge.Replayed || replayedHermesBridge.ID != hermesBridge.ID {
+		t.Fatalf("B03 Hermes link replay was not idempotent: first=%#v replay=%#v", hermesBridge, replayedHermesBridge)
+	}
+
+	openClawLink := performJSON(t, handler, http.MethodPost, "/v1/bridges/link", `{
+  "operation_id":"b03-link-openclaw",
+  "primary_channel":"web_chat",
+  "primary_thread_id":"release-matter",
+  "linked_channel":"openclaw",
+  "linked_thread_id":"release-matter"
+}`)
+	if openClawLink.Code != http.StatusOK {
+		t.Fatalf("B03 OpenClaw link failed: %d %s", openClawLink.Code, openClawLink.Body.String())
+	}
+	var openClawBridge runtime.BridgeReceipt
+	decodeResponse(t, openClawLink, &openClawBridge)
+
+	hermesPrepared := prepareHermesTurn(t, handler, "b03-hermes-prepare-linked", hermesAnchor, events[5])
+	openClawPrepared := prepareOpenClawTurn(t, handler, "b03-openclaw-prepare-linked", openClawAnchor, events[6])
+	unrelatedPrepared := prepareHermesTurn(t, handler, "b03-hermes-prepare-unrelated-control", "unrelated-matter", "Check the release bundle in this separate Hermes matter.")
+	for name, prepared := range map[string]runtime.PreparedConversationTurn{
+		"Hermes":   hermesPrepared,
+		"OpenClaw": openClawPrepared,
+	} {
+		if !strings.Contains(prepared.Context, "vermory-v8.tgz") {
+			t.Fatalf("B03 %s did not receive linked governed memory: %s", name, prepared.Context)
+		}
+		for _, forbidden := range []string{"WEB_CHAT_RAW_ONLY", "UNRELATED_RELEASE_MATTER"} {
+			if strings.Contains(prepared.Context, forbidden) {
+				t.Fatalf("B03 %s received forbidden raw or unrelated content %q: %s", name, forbidden, prepared.Context)
+			}
+		}
+	}
+	if strings.Contains(unrelatedPrepared.Context, "vermory-v8.tgz") || strings.Contains(unrelatedPrepared.Context, "UNRELATED_RELEASE_MATTER") {
+		t.Fatalf("B03 unrelated Hermes control received cross-client or unrelated content: %s", unrelatedPrepared.Context)
+	}
+
+	for _, prepared := range []runtime.PreparedConversationTurn{hermesPrepared, openClawPrepared} {
+		if prepared.DeliveryID == "" || prepared.ContinuityID == "" {
+			t.Fatalf("B03 prepared turn lost delivery identity: %#v", prepared)
+		}
+	}
+	_ = completeHermesTurn(t, handler, "b03-hermes-prepare-linked", hermesAnchor, "The current release bundle is vermory-v8.tgz.", "test-hermes-model")
+	_ = completeOpenClawTurn(t, handler, "b03-openclaw-prepare-linked", openClawAnchor, "The current release bundle is vermory-v8.tgz.", "test-openclaw-model")
+
+	for operationID, bridgeID := range map[string]string{
+		"b03-reverse-hermes":   hermesBridge.ID,
+		"b03-reverse-openclaw": openClawBridge.ID,
+	} {
+		response := performJSON(t, handler, http.MethodPost, "/v1/bridges/reverse", fmt.Sprintf(`{"operation_id":%q,"bridge_id":%q}`, operationID, bridgeID))
+		if response.Code != http.StatusOK {
+			t.Fatalf("B03 reverse %s failed: %d %s", operationID, response.Code, response.Body.String())
+		}
+	}
+
+	postReverseHermes := prepareHermesTurn(t, handler, "b03-hermes-prepare-reversed", hermesAnchor, "Is the release bundle available after bridge reversal?")
+	postReverseOpenClaw := prepareOpenClawTurn(t, handler, "b03-openclaw-prepare-reversed", openClawAnchor, "Is the release bundle available after bridge reversal?")
+	for name, prepared := range map[string]runtime.PreparedConversationTurn{
+		"Hermes":   postReverseHermes,
+		"OpenClaw": postReverseOpenClaw,
+	} {
+		if strings.Contains(prepared.Context, "vermory-v8.tgz") {
+			t.Fatalf("B03 reversed %s bridge still delivered source fact: %s", name, prepared.Context)
+		}
+	}
+	webResolution, err := store.ResolveConversation(context.Background(), tenantID, runtime.ConversationAnchor{Channel: webAnchor.Channel, ThreadID: webAnchor.ThreadID})
+	if err != nil {
+		t.Fatal(err)
+	}
+	webMemories, err := store.SearchActiveConversationMemory(context.Background(), tenantID, webResolution.ContinuityID, "current release bundle", 5)
+	if err != nil || len(webMemories) != 1 || webMemories[0].ID != confirmed.MemoryID {
+		t.Fatalf("B03 reversal altered source memory: matches=%#v err=%v", webMemories, err)
+	}
+
+	for _, check := range manifest.Task.DeterministicChecks {
+		switch check {
+		case "contains:vermory-v8.tgz":
+			if !strings.Contains(hermesPrepared.Context+openClawPrepared.Context, "vermory-v8.tgz") {
+				t.Fatalf("B03 deterministic current-fact check failed")
+			}
+		case "not_contains:WEB_CHAT_RAW_ONLY", "not_contains:UNRELATED_RELEASE_MATTER":
+			if strings.Contains(hermesPrepared.Context+openClawPrepared.Context, strings.TrimPrefix(check, "not_contains:")) {
+				t.Fatalf("B03 deterministic isolation check failed: %s", check)
+			}
+		case "link_reversal:isolated":
+			if strings.Contains(postReverseHermes.Context+postReverseOpenClaw.Context, "vermory-v8.tgz") {
+				t.Fatalf("B03 deterministic reversal check failed")
+			}
+		default:
+			t.Fatalf("unsupported B03 deterministic check %q", check)
+		}
+	}
+}
+
 func TestO01OpenClawContinuityAcceptance(t *testing.T) {
 	caseDir := filepath.Join("..", "..", "reality", "cases", "O01-openclaw-home-maintenance")
 	manifest := loadFrozenManifest(t, filepath.Join(caseDir, "manifest.json"))

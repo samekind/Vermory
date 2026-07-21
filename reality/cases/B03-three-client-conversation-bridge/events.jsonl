@@ -1,0 +1,8 @@
+{"id":"b03-event-1","sequence":1,"actor":"user","channel":"web_chat","source_id":"b03-transcript","content":"The current release bundle is vermory-v8.tgz."}
+{"id":"b03-event-2","sequence":2,"actor":"user","channel":"web_chat","source_id":"b03-transcript","content":"WEB_CHAT_RAW_ONLY is local planning chatter."}
+{"id":"b03-event-3","sequence":3,"actor":"user","channel":"web_chat","source_id":"b03-transcript","content":"UNRELATED_RELEASE_MATTER belongs to another matter."}
+{"id":"b03-event-4","sequence":4,"actor":"operator","channel":"bridge_link","source_id":"b03-transcript","content":"Explicitly link Web Chat to Hermes and OpenClaw."}
+{"id":"b03-event-5","sequence":5,"actor":"evaluation_probe","channel":"hermes","source_id":"b03-transcript","content":"Ask Hermes for the current release bundle."}
+{"id":"b03-event-6","sequence":6,"actor":"evaluation_probe","channel":"openclaw","source_id":"b03-transcript","content":"Ask OpenClaw for the current release bundle."}
+{"id":"b03-event-7","sequence":7,"actor":"operator","channel":"bridge_reverse","source_id":"b03-transcript","content":"Reverse both client bridges."}
+{"id":"b03-event-8","sequence":8,"actor":"evaluation_probe","channel":"hermes_and_openclaw","source_id":"b03-transcript","content":"Verify a fresh prepare no longer receives the Web Chat fact."}

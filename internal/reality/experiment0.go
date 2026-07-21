@@ -102,7 +102,12 @@ func BuildExperiment0(options Experiment0Options) Experiment0Report {
 	report.HypothesisSignals["H-008"] = existingCases(caseIDs, "C01-device-maintenance-continuity", "F03-verified-tool-outcome-formation", "S01-deletion-and-source-injection")
 	report.HypothesisSignals["H-013"] = existingCases(caseIDs, "I01-authenticated-multitenant-rls")
 	report.HypothesisSignals["H-014"] = existingCases(caseIDs, "I02-postgresql-operations-recovery", "I03-postgresql-ha-pitr")
-	report.HypothesisSignals["bridge_seed"] = existingCases(caseIDs, "B01-conversation-workspace-promotion", "B02-linked-conversations-workspace-rebind")
+	report.HypothesisSignals["bridge_seed"] = existingCases(
+		caseIDs,
+		"B01-conversation-workspace-promotion",
+		"B02-linked-conversations-workspace-rebind",
+		"B03-three-client-conversation-bridge",
+	)
 	report.HypothesisSignals["hermes_client_seed"] = existingCases(caseIDs, "H01-hermes-linked-sessions")
 
 	if options.SealedAttestation != nil {

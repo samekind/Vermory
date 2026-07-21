@@ -1,0 +1,78 @@
+{
+  "version": 1,
+  "id": "B03-three-client-conversation-bridge",
+  "title": "Explicitly linked Web Chat, Hermes, and OpenClaw matter",
+  "evidence_level": "public",
+  "continuity_lines": ["conversation", "bridge"],
+  "pressures": [
+    "cross_client_link",
+    "raw_history_isolation",
+    "unrelated_thread_isolation",
+    "link_reversal",
+    "idempotent_replay"
+  ],
+  "sources": [
+    {
+      "id": "b03-transcript",
+      "kind": "authorized_transcript_excerpt",
+      "fixture_path": "fixtures/release-matter.md",
+      "original_ref": "authorized-synthetic:release-matter-three-clients",
+      "original_revision": "2026-07-21",
+      "sha256": "3d0b607378e90298f6faa037fd0381a4c8a1a777755369dc11c0d5a2032fa0b3",
+      "authorized": true,
+      "anonymization": "All filenames, channels, session identifiers, and task details are synthetic."
+    }
+  ],
+  "anchors": [
+    {
+      "kind": "conversation_id",
+      "value": "web_chat/release-matter",
+      "ambiguous": false
+    },
+    {
+      "kind": "conversation_id",
+      "value": "hermes/release-matter",
+      "ambiguous": false
+    },
+    {
+      "kind": "conversation_id",
+      "value": "openclaw/release-matter",
+      "ambiguous": false
+    },
+    {
+      "kind": "conversation_id",
+      "value": "web_chat/unrelated-matter",
+      "ambiguous": false
+    }
+  ],
+  "expectations": {
+    "current_facts": [
+      "The current release bundle is vermory-v8.tgz.",
+      "Only explicitly linked continuities share governed memory.",
+      "Reversing a client bridge stops future sharing without deleting source history."
+    ],
+    "forbidden_facts": [
+      "Matching thread names automatically link clients.",
+      "Web Chat raw history appears in Hermes or OpenClaw context.",
+      "The unrelated Web Chat matter receives the release bundle.",
+      "A reversed bridge continues delivering the release bundle."
+    ],
+    "expected_action": "Confirm the release bundle in Web Chat, explicitly link Hermes and OpenClaw one at a time, verify bounded delivery through both integration routes, replay the link idempotently, then reverse both links and verify future delivery is isolated."
+  },
+  "task": {
+    "prompt": "Continue the release matter across Web Chat, Hermes, and OpenClaw only after explicit bridge operations. Preserve raw-history and unrelated-thread boundaries, then reverse both client bridges and verify that future prepares no longer share the governed fact.",
+    "artifact_checks": [
+      "linked Hermes and OpenClaw deliveries contain the confirmed bundle",
+      "linked deliveries contain no Web Chat raw chatter",
+      "unrelated Web Chat delivery remains isolated",
+      "replayed link does not create a second bridge",
+      "reversed links stop future delivery"
+    ],
+    "deterministic_checks": [
+      "contains:vermory-v8.tgz",
+      "not_contains:WEB_CHAT_RAW_ONLY",
+      "not_contains:UNRELATED_RELEASE_MATTER",
+      "link_reversal:isolated"
+    ]
+  }
+}

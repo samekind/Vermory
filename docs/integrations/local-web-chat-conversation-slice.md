@@ -115,6 +115,22 @@ Provider failure leaves the user observation and a durable failed turn receipt. 
 
 The HTTP response exposes a stable `failure_code` but not raw CLI output, database URLs, SQL, credentials, or internal provider diagnostics.
 
+## Cross-client Conversation Bridges
+
+Web Chat, Hermes, and OpenClaw anchors remain isolated even when their visible
+thread names match. Create each continuity through its normal turn route, then
+use `POST /v1/bridges/link` to connect only the named pair. Linked clients
+receive governed active memory, not another client's raw conversation history.
+
+Each link has its own durable bridge ID. Replaying the same link operation is
+idempotent. `POST /v1/bridges/reverse` stops future sharing through that bridge
+without deleting either client's own continuity or transcript.
+
+The frozen `B03-three-client-conversation-bridge` acceptance case exercises
+the Web Chat, Hermes, OpenClaw, link, replay, completion, and reversal HTTP
+contracts together. This deterministic contract test is separate from the
+real-client Hermes and OpenClaw qualifications recorded in their own evidence.
+
 ## Verification Evidence
 
 Automated acceptance:
@@ -128,6 +144,7 @@ Frozen cases:
 
 - C01 resumes a device-maintenance matter from the verified final state after reopening PostgreSQL.
 - S01 removes a synthetic target from observations, governed memory, search projection, delivery history, turn receipts, inspection, and post-rebuild recall while retaining independent rotation guidance.
+- B03 keeps same-named Web Chat, Hermes, and OpenClaw matters isolated until explicit links are created, then removes future sharing after reversal.
 
 Real Grok request/response evidence is retained under `artifacts/runtime/C04-grok-webchat-runtime/`.
 
