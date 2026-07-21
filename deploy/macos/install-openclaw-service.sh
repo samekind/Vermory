@@ -15,6 +15,11 @@ if [ ! -x "$OPENCLAW_CLI" ] || [ ! -f "$PLUGIN_DIR/dist/index.js" ]; then
   echo "OpenClaw runtime or built Vermory plugin is missing: $PLUGIN_DIR" >&2
   exit 2
 fi
+OPENCLAW_BUNDLED_PLUGINS_DIR="$PLUGIN_DIR/node_modules/openclaw/dist/extensions"
+if [ ! -d "$OPENCLAW_BUNDLED_PLUGINS_DIR" ]; then
+  echo "OpenClaw bundled plugin runtime is missing: $OPENCLAW_BUNDLED_PLUGINS_DIR" >&2
+  exit 2
+fi
 
 APP_DIR=${VERMORY_APP_DIR:-"$HOME/Library/Application Support/Vermory"}
 OPENCLAW_DIR="$APP_DIR/openclaw"
@@ -145,6 +150,7 @@ export COREPACK_HOME="$APP_DIR/corepack"
 export XDG_CACHE_HOME="$APP_DIR/cache"
 export OPENCLAW_STATE_DIR="$STATE_DIR"
 export OPENCLAW_CONFIG_PATH="$CONFIG_PATH"
+export OPENCLAW_BUNDLED_PLUGINS_DIR
 
 if ! "$OPENCLAW_CLI" plugins inspect vermory --json >/dev/null 2>&1; then
   "$OPENCLAW_CLI" plugins install --link "$PLUGIN_DIR"
@@ -159,6 +165,7 @@ export COREPACK_HOME="$APP_DIR/corepack"
 export XDG_CACHE_HOME="$APP_DIR/cache"
 export OPENCLAW_STATE_DIR="$STATE_DIR"
 export OPENCLAW_CONFIG_PATH="$CONFIG_PATH"
+export OPENCLAW_BUNDLED_PLUGINS_DIR="$OPENCLAW_BUNDLED_PLUGINS_DIR"
 exec "$OPENCLAW_CLI" "\$@"
 EOF
 /bin/chmod 0755 "$WRAPPER_PATH"

@@ -26,6 +26,9 @@ func TestInstallOpenClawServicePreservesGeneratedAuthAndExistingConfig(t *testin
 	if err := os.MkdirAll(filepath.Join(pluginDir, "dist"), 0o755); err != nil {
 		t.Fatal(err)
 	}
+	if err := os.MkdirAll(filepath.Join(pluginDir, "node_modules", "openclaw", "dist", "extensions"), 0o755); err != nil {
+		t.Fatal(err)
+	}
 	if err := os.WriteFile(filepath.Join(pluginDir, "dist", "index.js"), []byte("export default {};\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
@@ -314,6 +317,7 @@ set -eu
 
 CONFIG=${OPENCLAW_CONFIG_PATH:?}
 ROOT=${FAKE_OPENCLAW_ROOT:?}
+test "${OPENCLAW_BUNDLED_PLUGINS_DIR:?}" = "$ROOT/plugin/node_modules/openclaw/dist/extensions"
 
 case "$*" in
   "plugins inspect vermory --json")

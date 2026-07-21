@@ -167,7 +167,7 @@ PATH="/opt/homebrew/opt/node@24/bin:$PATH" \
   pnpm -C integrations/openclaw exec openclaw plugins inspect vermory --runtime --json
 ```
 
-Runtime inspection must show `before_prompt_build`, `after_tool_call`, and `agent_end`. It must not show memory-slot ownership. The macOS installer uses an explicit Gateway `stop`, waits for the loopback port to be released, and then calls `start`; it does not rely on the OpenClaw `restart` command or kill an occupied port.
+Runtime inspection must show `before_prompt_build`, `after_tool_call`, and `agent_end`. It must not show memory-slot ownership. The macOS installer uses an explicit Gateway `stop`, waits for the loopback port to be released, and then calls `start`; it does not rely on the OpenClaw `restart` command or kill an occupied port. The generated wrapper also pins `OPENCLAW_BUNDLED_PLUGINS_DIR` to the bundled tree shipped inside the same OpenClaw package. This avoids the known OpenClaw `2026.6.11` default-root mismatch without modifying OpenClaw files, enabling channels, or changing user configuration.
 
 ## Run OpenClaw
 
