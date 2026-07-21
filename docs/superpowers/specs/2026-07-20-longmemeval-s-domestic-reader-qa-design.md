@@ -116,6 +116,18 @@ The automatic terminal-failure bound was added after this observation. It does
 not retroactively qualify, resume, or alter v1. A fresh run requires sufficient
 provider credit plus a new exact-head runtime and run identity.
 
+## Post-Fix Exact-Head Availability Check
+
+Revision `34d04025c146b0ae83ef42956a9e557838fc0707` was built and independently
+verified as a signed ARM64 snapshot after the terminal-failure changes. A new
+one-shot LaunchAgent then probed both frozen model routes through that exact
+runtime and the Keychain wrapper. Both calls returned `403` / code `30001` for
+insufficient account balance, so no v2 reader run was created. The probe also
+showed that the then-current CLI wrote correct per-model `error` results but
+returned exit `0`; later source fixes that automation boundary without changing
+the provider result or qualifying W30. See
+[`2026-07-21-w30-provider-availability-34d0402.md`](../../evidence/2026-07-21-w30-provider-availability-34d0402.md).
+
 ## Hard Gates
 
 W30 qualifies only when:

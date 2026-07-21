@@ -102,6 +102,17 @@ therefore remains an explicit operational cost rather than a hidden success
 condition. The candidate remains inactive and lexical remains the default. See
 [LongMemEval-S Full Vector Retrieval Evidence](docs/evidence/2026-07-20-longmemeval-s-full-vector-retrieval.md).
 
+W30 then attempted to replay the frozen lexical and vector rankings through
+direct domestic reader and judge models. The v1 reader completed 32 tasks
+before the SiliconFlow account began returning `403` / code `30001` for
+insufficient balance; 45 terminal failures were retained and the judge was not
+started. A later exact-head `34d0402` availability check reached both frozen
+models and received the same account response, so v2 was not created. Neither
+run contributes an answer-quality score. See the
+[rejected v1 evidence](docs/evidence/2026-07-20-longmemeval-s-domestic-vector-reader-qa-rejected-v1.md)
+and the
+[exact-head availability check](docs/evidence/2026-07-21-w30-provider-availability-34d0402.md).
+
 W16 then qualified a dedicated PostgreSQL 18 physical-recovery trajectory. A
 streaming standby reached the primary flush LSN, the dedicated primary was
 stopped with immediate mode, the transition Web Chat request produced zero

@@ -726,6 +726,36 @@ lexical `72ms`. W28 therefore justifies a separately identified frozen-vector
 reader replay, but it does not activate the candidate or switch the default.
 See [the W28 evidence](evidence/2026-07-20-longmemeval-s-full-vector-retrieval.md).
 
+## LongMemEval-S Domestic Reader QA W30
+
+W30 freezes the W28 `vermory_lexical_k10` and `vermory_vector_k10`
+rankings and assigns one direct domestic reader plus a distinct direct custom
+judge. It is a provider compatibility and downstream-context utility run, not
+a model ranking.
+
+| Gate | Result |
+|---|---|
+| Frozen reader | SiliconFlow `deepseek-ai/DeepSeek-V4-Flash` |
+| Frozen judge | SiliconFlow `Qwen/Qwen3-30B-A3B-Instruct-2507` |
+| v1 reader completed | `32 / 1,000` |
+| v1 terminal reader failures | `45` |
+| v1 judge tasks | not started |
+| v1 paired eligible records | `0` |
+| exact-head `34d0402` reader probe | `403`, code `30001` |
+| exact-head `34d0402` judge probe | `403`, code `30001` |
+| v2 | not created |
+| W30 qualification | **blocked / not qualified** |
+
+The provider classified every retained failure as insufficient account
+balance. The partial reader prefix is not randomized and no judge ran, so it
+does not produce lexical-versus-vector evidence. The exact-head availability
+check also exposed that the old probe CLI returned exit `0` even when every
+per-model result was `error`; the CLI now preserves the report and returns
+nonzero for any failed model. See the
+[rejected v1 evidence](evidence/2026-07-20-longmemeval-s-domestic-vector-reader-qa-rejected-v1.md)
+and the
+[exact-head availability check](evidence/2026-07-21-w30-provider-availability-34d0402.md).
+
 ## PostgreSQL HA And PITR Qualification
 
 W16 executes the frozen `I03-postgresql-ha-pitr` operations trajectory against

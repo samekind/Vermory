@@ -394,11 +394,18 @@ func newRootCommand() *cobra.Command {
 				return err
 			}
 			fmt.Fprintf(cmd.OutOrStdout(), "provider_mode=%s provider=%s report=%s\n", report.ProviderMode, report.ProviderName, report.ReportURI)
+			var failedModels []string
 			for _, result := range report.Results {
 				fmt.Fprintf(cmd.OutOrStdout(), "model=%s status=%s preview=%s\n", result.Model, result.Status, result.OutputPreview)
 				if result.Error != "" {
 					fmt.Fprintf(cmd.OutOrStdout(), "model=%s error=%s\n", result.Model, result.Error)
 				}
+				if result.Status != "ok" {
+					failedModels = append(failedModels, result.Model)
+				}
+			}
+			if len(failedModels) > 0 {
+				return fmt.Errorf("provider probe failed for %d model(s): %s", len(failedModels), strings.Join(failedModels, ", "))
 			}
 			return nil
 		},
