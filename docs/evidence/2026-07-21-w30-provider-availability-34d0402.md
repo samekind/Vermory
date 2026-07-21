@@ -54,6 +54,45 @@ the report. That exit-status defect is treated as a separate automation
 failure and is covered by a regression test: any failed model now makes the
 CLI return nonzero after preserving its report.
 
+## Post-Fix Cross-Host Verification
+
+Revision `e1449c36e9aaefe99d1ab3b47945902333637ccc` implemented the CLI
+failure boundary and passed both protected pull-request jobs in CI run
+`29855114425`. The signed snapshot was downloaded locally, verified, and then
+transferred to the Mac mini over the managed FRP SSH route. The Mac mini did
+not download or rebuild the payload.
+
+| Artifact or runtime | SHA-256 / result |
+|---|---|
+| Signed release manifest | `79d6bb3678b84a79684a5553edd02dd0f4b7a83cec880c02eb85690297d89b50` |
+| Sigstore bundle | `18a14e8f403f45e35ad5607732cb5eed391e0e4034cf533b6da69cdf068694dc` |
+| Sigstore verification | `Verified OK` for the PR CI workflow identity and GitHub Actions issuer |
+| Darwin ARM64 archive | `f6be94809027be01417e660e33612c12b833cefc848ff498f693a3dfb9ee772a` |
+| Extracted ARM64 binary | `2d0c4baf06c4dfc4633bf336c55e83c9b0afc6fe75fed998d3c302cc03f7bd9a` |
+| Exact source archive | `7f795d06d91b0a1ce2563acf0a283b4d3a1d3d6dec4e6bf7e5d128f89425bbe6` |
+| Runtime identity | `0.0.0-SNAPSHOT-e1449c3`, revision `e1449c36e9aaefe99d1ab3b47945902333637ccc` |
+
+The new one-shot LaunchAgent used label
+`org.vermory.w30.probe-final.e1449c3` and run ID
+`w30-siliconflow-reader-judge-probe-20260721-final-v3`. It ran once and
+terminated with exit code `1`. Both per-model results still contained the same
+provider-account `403` / code `30001`, while stderr contained the bounded
+two-model failure summary.
+
+| Retained post-fix artifact | SHA-256 |
+|---|---|
+| Probe `report.json` | `611c6527509b69b883ce3cd91b41cd030232e0578c4cfeb2ce2eb53131e5070f` |
+| Probe `report.md` | `cb910cb73b34e3913b3fc9c14c8eae5fc9798d5fca647796355c28367be8c3bc` |
+| Launch stdout | `cd3fa06d3cf543e6bd6843cff42e4deafc32122880b5a86d1b39ed9511e7134a` |
+| Launch stderr | `ae6cb9c765c04495548606a2e1450444206d39cb32bc416eb8f31c719266ae31` |
+| LaunchAgent plist | `8a4a242287ac0969c5ef77b4f59585233d3ab2aebfb94c524fef954fa4672eec` |
+
+The post-fix credential-shape scan found zero matching files, and the
+LaunchAgent was unloaded after inspection. The retained report still carried
+the historical `ContextMesh` heading; a subsequent source-only correction
+changes active probe reports to the Vermory product name without changing this
+runtime result.
+
 ## Decision
 
 - Do not create or start

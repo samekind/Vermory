@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"vermory/internal/artifact"
+	"vermory/internal/brand"
 	"vermory/internal/provider"
 )
 
@@ -159,7 +160,7 @@ func probeArtifactKey(parts ...string) string {
 
 func markdownProbeReport(report ProbeReport) string {
 	var b strings.Builder
-	b.WriteString("# ContextMesh Provider Probe Report\n\n")
+	b.WriteString("# " + brand.Name + " Provider Probe Report\n\n")
 	b.WriteString(fmt.Sprintf("- Run ID: `%s`\n", report.RunID))
 	b.WriteString(fmt.Sprintf("- Provider mode: `%s`\n", report.ProviderMode))
 	b.WriteString(fmt.Sprintf("- Provider: `%s`\n", report.ProviderName))

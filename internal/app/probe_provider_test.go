@@ -41,6 +41,13 @@ func TestProbeProviderMockWritesPerModelArtifacts(t *testing.T) {
 	if _, err := os.Stat(filepath.Join(root, "provider-probes", "probe-mock", "report.md")); err != nil {
 		t.Fatalf("expected report artifact: %v", err)
 	}
+	reportMarkdown, err := os.ReadFile(filepath.Join(root, "provider-probes", "probe-mock", "report.md"))
+	if err != nil {
+		t.Fatalf("read report artifact: %v", err)
+	}
+	if !strings.HasPrefix(string(reportMarkdown), "# Vermory Provider Probe Report\n") {
+		t.Fatalf("unexpected report title:\n%s", reportMarkdown)
+	}
 }
 
 func TestProbeProviderRequiresModels(t *testing.T) {
