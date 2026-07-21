@@ -140,12 +140,14 @@ Use this OpenClaw configuration. JSON5 syntax is accepted:
           allowConversationAccess: true,
           timeouts: {
             before_prompt_build: 15000,
+            after_tool_call: 15000,
             agent_end: 30000,
           },
         },
         config: {
           baseUrl: "http://127.0.0.1:8787",
           timeoutMs: 5000,
+          toolAllowlist: [],
         },
       },
     },
@@ -153,7 +155,7 @@ Use this OpenClaw configuration. JSON5 syntax is accepted:
 }
 ```
 
-`allowConversationAccess` is required by OpenClaw for a non-bundled `agent_end` hook. `allowPromptInjection` permits `before_prompt_build` to return `prependContext`. Vermory config accepts only `enabled`, `baseUrl`, and `timeoutMs`; tenant, continuity, channel, API key, and model fields are rejected.
+`allowConversationAccess` is required by OpenClaw for a non-bundled `agent_end` hook. `allowPromptInjection` permits `before_prompt_build` to return `prependContext`. `toolAllowlist` contains exact tool names whose successful text results may be proposed for review through `after_tool_call`; an empty list disables that path. Tenant, continuity, channel, API key, and model fields are rejected.
 
 Validate and inspect the loaded runtime:
 
@@ -165,7 +167,7 @@ PATH="/opt/homebrew/opt/node@24/bin:$PATH" \
   pnpm -C integrations/openclaw exec openclaw plugins inspect vermory --runtime --json
 ```
 
-Runtime inspection must show `before_prompt_build` and `agent_end`. It must not show memory-slot ownership.
+Runtime inspection must show `before_prompt_build`, `after_tool_call`, and `agent_end`. It must not show memory-slot ownership. The macOS installer uses an explicit Gateway `stop`, waits for the loopback port to be released, and then calls `start`; it does not rely on the OpenClaw `restart` command or kill an occupied port.
 
 ## Run OpenClaw
 

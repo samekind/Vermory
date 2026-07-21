@@ -19,6 +19,7 @@ func TestInstallOpenClawServicePreservesGeneratedAuthAndExistingConfig(t *testin
 	home := filepath.Join(root, "home")
 	pluginDir := filepath.Join(root, "plugin")
 	cliPath := filepath.Join(pluginDir, "node_modules", ".bin", "openclaw")
+	lsofPath := filepath.Join(root, "lsof")
 	if err := os.MkdirAll(filepath.Dir(cliPath), 0o755); err != nil {
 		t.Fatal(err)
 	}
@@ -29,6 +30,9 @@ func TestInstallOpenClawServicePreservesGeneratedAuthAndExistingConfig(t *testin
 		t.Fatal(err)
 	}
 	if err := os.WriteFile(cliPath, []byte(fakeOpenClawCLI), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(lsofPath, []byte("#!/bin/sh\nexit 1\n"), 0o755); err != nil {
 		t.Fatal(err)
 	}
 
@@ -50,9 +54,15 @@ func TestInstallOpenClawServicePreservesGeneratedAuthAndExistingConfig(t *testin
 			"VERMORY_OPENCLAW_BASE_URL=http://127.0.0.1:8793",
 			`VERMORY_OPENCLAW_TOOL_ALLOWLIST_JSON=["device.storage_check","device.remove_bundle"]`,
 			"FAKE_OPENCLAW_ROOT="+root,
+			"LSOF="+lsofPath,
 		)
 		if output, err := command.CombinedOutput(); err != nil {
 			t.Fatalf("installer run %d failed: %v\n%s", run, err, output)
+		}
+	}
+	for _, marker := range []string{"gateway-stop-called", "gateway-start-called"} {
+		if _, err := os.Stat(filepath.Join(root, marker)); err != nil {
+			t.Fatalf("installer did not complete the explicit gateway stop/start lifecycle: %v", err)
 		}
 	}
 
@@ -334,8 +344,17 @@ case "$*" in
       "$CONFIG" > "$temp"
     /bin/mv "$temp" "$CONFIG"
     ;;
-  "gateway restart")
-    ;;
+	"gateway stop --json")
+		/usr/bin/touch "$ROOT/gateway-stop-called"
+		;;
+	"gateway start --json")
+		test -f "$ROOT/gateway-stop-called"
+		/usr/bin/touch "$ROOT/gateway-start-called"
+		;;
+	"gateway restart"*)
+		/usr/bin/printf 'gateway restart must not be used during installation\n' >&2
+		exit 65
+		;;
   "gateway health --json")
     /usr/bin/printf '{"ok":true}\n'
     ;;

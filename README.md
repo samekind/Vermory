@@ -473,7 +473,7 @@ See [LongMemEval-S Full Reader QA Evidence](docs/evidence/2026-07-15-longmemeval
 
 The local workspace MCP path has also been executed by the official Codex CLI. Codex called `prepare_context`, created and verified a repository artifact from the governed current fact, and called `commit_observation`; PostgreSQL retained the write-back as `proposed`. See [Codex MCP Real-Client Evidence](docs/evidence/2026-07-14-codex-mcp-real-client.md).
 
-The `@vermory/openclaw` lifecycle plugin uses OpenClaw's canonical `sessionKey` and `runId`, injects governed semantic context during `before_prompt_build`, and records the final turn lifecycle during `agent_end`. Completed turns enqueue asynchronous formation. A direct `/vermory` command uses a separate operator token for review and governance; it is not registered as a model tool. The plugin does not replace OpenClaw transcript storage, memory slots, channels, or model routing.
+The `@vermory/openclaw` lifecycle plugin uses OpenClaw's canonical `sessionKey` and `runId`, injects governed semantic context during `before_prompt_build`, captures allowlisted successful tool outcomes during `after_tool_call`, and records the final turn lifecycle during `agent_end`. Completed turns enqueue asynchronous formation. A direct `/vermory` command uses a separate operator token for review and governance; it is not registered as a model tool. The plugin does not replace OpenClaw transcript storage, memory slots, channels, or model routing.
 
 Build and check the plugin:
 

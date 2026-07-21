@@ -26,6 +26,7 @@ WRAPPER_PATH="$OPENCLAW_DIR/openclaw-vermory"
 GROK_WRAPPER_PATH=${VERMORY_GROK_WRAPPER_PATH:-"$APP_DIR/grok/grok-vermory-isolated"}
 PORT=${OPENCLAW_GATEWAY_PORT:-18789}
 JQ=${JQ:-/usr/bin/jq}
+LSOF=${LSOF:-/usr/sbin/lsof}
 VERMORY_BASE_URL=${VERMORY_OPENCLAW_BASE_URL:-http://127.0.0.1:8787}
 TOOL_ALLOWLIST_JSON=${VERMORY_OPENCLAW_TOOL_ALLOWLIST_JSON:-[]}
 
@@ -34,6 +35,10 @@ case "$PORT" in
 esac
 if [ ! -x "$JQ" ]; then
   echo "jq is unavailable: $JQ" >&2
+  exit 2
+fi
+if [ ! -x "$LSOF" ]; then
+  echo "lsof is unavailable: $LSOF" >&2
   exit 2
 fi
 if ! "$JQ" -en --arg url "$VERMORY_BASE_URL" '
@@ -161,7 +166,25 @@ EOF
 "$WRAPPER_PATH" config validate
 "$WRAPPER_PATH" plugins inspect vermory --runtime --json >"$OPENCLAW_DIR/vermory-plugin-runtime.json"
 "$WRAPPER_PATH" gateway install --force --runtime node --port "$PORT" --wrapper "$WRAPPER_PATH" --json >/dev/null
-"$WRAPPER_PATH" gateway restart >/dev/null
+
+if ! "$WRAPPER_PATH" gateway stop --json >/dev/null; then
+  if "$LSOF" -nP -iTCP:"$PORT" -sTCP:LISTEN -t >/dev/null 2>&1; then
+    echo "OpenClaw Gateway stop failed while port $PORT remained occupied" >&2
+    exit 1
+  fi
+fi
+
+attempt=0
+while [ "$attempt" -lt 30 ] && "$LSOF" -nP -iTCP:"$PORT" -sTCP:LISTEN -t >/dev/null 2>&1; do
+  attempt=$((attempt + 1))
+  /bin/sleep 1
+done
+if "$LSOF" -nP -iTCP:"$PORT" -sTCP:LISTEN -t >/dev/null 2>&1; then
+  echo "OpenClaw Gateway port $PORT did not become free after stop" >&2
+  exit 1
+fi
+
+"$WRAPPER_PATH" gateway start --json >/dev/null
 
 attempt=0
 while [ "$attempt" -lt 30 ]; do
