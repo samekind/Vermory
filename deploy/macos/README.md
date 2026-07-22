@@ -88,6 +88,24 @@ migration. The same `VERMORY_APP_DIR`, path, label, health-attempt, and command
 override variables accepted by the installer can be supplied to an isolated
 qualification run.
 
+Run the frozen real-host lifecycle with two separately verified Darwin
+binaries and a new evidence path:
+
+```bash
+VERMORY_I11_RUN_ID=i11-20260723 \
+  ./deploy/macos/run-i11-acceptance.sh \
+    "$PWD" \
+    /path/to/base/vermory \
+    /path/to/candidate/vermory \
+    "$HOME/Library/Application Support/Vermory/evidence/i11-reports/i11-20260723"
+```
+
+The runner creates an isolated database, restricted runtime role, loopback
+port, application root, and user LaunchAgent. It uses the deterministic
+provider so deployment qualification does not depend on model account state.
+On success it removes the temporary runtime and database while retaining only
+the credential-free, checksum-bound report.
+
 ## OpenClaw Gateway
 
 After installing dependencies and building `integrations/openclaw`, install the

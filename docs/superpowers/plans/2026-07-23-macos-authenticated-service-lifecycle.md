@@ -6,6 +6,7 @@
 - [x] Add automatic restoration after candidate activation failure.
 - [x] Add explicit compatible rollback with health verification.
 - [x] Run focused macOS tests and ShellCheck validation.
+- [x] Add a reproducible real-host I11 acceptance runner and contract test.
 - [ ] Execute the complete isolated trajectory on the Mac mini.
 - [ ] Commit normalized evidence and capability-matrix status.
 - [ ] Run the full protected verification chain and push the exact head.

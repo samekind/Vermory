@@ -75,9 +75,9 @@ fresh isolated database and user LaunchAgent
 -> reject an incompatible candidate with no live-file change
 -> install compatible candidate
 -> verify restart and state preservation
--> simulate a compatible candidate health failure and automatic restoration
--> reinstall compatible candidate
 -> explicit rollback to base
+-> reinstall compatible candidate
+-> simulate a compatible candidate health failure and automatic restoration
 -> verify service, authentication, governed state, and loopback binding
 ```
 
