@@ -46,10 +46,13 @@ grep -Fq 'cursor-agent' docs/superpowers/specs/2026-07-11-vermory-reality-progra
 bash scripts/capability-matrix-check.sh
 bash scripts/b03-real-client-evidence-check.sh
 
+scan_file="${TMPDIR:-/tmp}/vermory-repository-secret-scan.$$"
+trap 'rm -f "$scan_file"' EXIT
+
 if rg -n 'sk-[A-Za-z0-9]{12,}|BEGIN [A-Z ]*PRIVATE KEY|github_pat_[A-Za-z0-9_]+|gh[opusr]_[A-Za-z0-9]+' \
   AGENTS.md ARCHITECTURE.md CODE_OF_CONDUCT.md CONTRIBUTING.md DEVELOPMENT.md \
-  GOVERNANCE.md SECURITY.md .github docs/collaboration >/tmp/vermory-repository-secret-scan.txt; then
-  cat /tmp/vermory-repository-secret-scan.txt >&2
+  GOVERNANCE.md SECURITY.md .github docs/collaboration >"$scan_file"; then
+  cat "$scan_file" >&2
   echo "repository policy: credential-like content found" >&2
   exit 1
 fi

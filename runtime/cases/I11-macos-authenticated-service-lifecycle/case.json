@@ -1,0 +1,33 @@
+{
+  "version": "1",
+  "id": "I11-macos-authenticated-service-lifecycle",
+  "hard_gate_count": 20,
+  "hard_gates": [
+    "the candidate binary reports a valid Vermory version before live-file replacement",
+    "the candidate binary passes read-only database compatibility before live-file replacement",
+    "an incompatible candidate leaves the current binary, runner, environment, and service unchanged",
+    "the service remains a user LaunchAgent and never invokes sudo",
+    "the service listener remains loopback-only",
+    "the environment file remains mode 0600 and its contents never enter the plist",
+    "a complete current installation is copied into one protected rollback slot before replacement",
+    "a partial current installation is rejected without activation",
+    "candidate files replace live files atomically through stable paths",
+    "candidate acceptance requires the root endpoint to return 200",
+    "candidate acceptance requires the unauthenticated session endpoint to return 401",
+    "candidate activation failure automatically restores the complete previous installation",
+    "automatic restoration verifies the previous service before the installer exits nonzero",
+    "explicit rollback checks previous-binary database compatibility before changing live files",
+    "an incompatible rollback leaves the current installation running",
+    "a compatible explicit rollback restores the previous binary, runner, and environment",
+    "successful explicit rollback consumes the rollback slot",
+    "tenant, continuity, governed memory, audit, authentication, and projection state survive restart, upgrade, and rollback",
+    "the Mac mini runtime and evidence remain in isolated user-owned paths without model-provider dependence",
+    "normalized evidence is checksum-bound and contains no credential, private path, environment dump, or provider token"
+  ],
+  "qualification_boundaries": [
+    "no database down migration or arbitrary historical rollback is performed",
+    "no zero-downtime restart or long-duration service-level objective is qualified",
+    "OpenClaw and Hermes keep ownership of their own transcripts and client state",
+    "no model availability, model quality, public Internet exposure, or system-wide installation is qualified"
+  ]
+}

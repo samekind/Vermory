@@ -69,6 +69,25 @@ The LaunchAgent plist contains the environment-file path, not its contents.
 The service remains on loopback so a separately managed HTTPS entrypoint can
 terminate TLS without exposing a direct cleartext listener.
 
+An update is accepted only after the candidate binary reports its version,
+passes the read-only database compatibility check, starts through the existing
+user LaunchAgent, and reaches the authenticated health boundary. A complete
+previous installation is retained in one protected rollback slot. If candidate
+activation fails, the installer restores and verifies that previous
+installation before returning an error.
+
+Roll back explicitly to the immediately preceding compatible installation:
+
+```bash
+./deploy/macos/rollback-authenticated-user-service.sh
+```
+
+Rollback checks schema compatibility before changing live files, restores the
+binary, runner, and environment together, and never performs a database down
+migration. The same `VERMORY_APP_DIR`, path, label, health-attempt, and command
+override variables accepted by the installer can be supplied to an isolated
+qualification run.
+
 ## OpenClaw Gateway
 
 After installing dependencies and building `integrations/openclaw`, install the
