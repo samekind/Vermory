@@ -10,7 +10,6 @@ import (
 	"strings"
 	"time"
 
-	"vermory/internal/brand"
 	"vermory/internal/provider"
 	"vermory/internal/runtime"
 	"vermory/internal/webchat"
@@ -68,22 +67,11 @@ func newWebChatCommand() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			store, err := runtime.OpenStoreWithOptions(
-				command.Context(),
-				options.DatabaseURL,
-				runtime.StoreOptions{EnforceTenantContext: true},
-			)
+			store, err := openStandaloneRuntimeStore(command.Context(), options.DatabaseURL, "Web Chat")
 			if err != nil {
-				return fmt.Errorf("open Web Chat runtime store")
+				return err
 			}
 			defer store.Close()
-			compatibility, err := store.RuntimeSchemaCompatibility(command.Context(), brand.Revision)
-			if err != nil {
-				return fmt.Errorf("Web Chat runtime schema compatibility preflight")
-			}
-			if err := compatibility.ErrorIfIncompatible(); err != nil {
-				return fmt.Errorf("Web Chat runtime schema compatibility preflight: %w", err)
-			}
 			retriever, err := buildRuntimeRetriever(store, options.Retrieval)
 			if err != nil {
 				return err

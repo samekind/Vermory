@@ -144,22 +144,11 @@ func newRootCommand() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			store, err := runtime.OpenStoreWithOptions(
-				cmd.Context(),
-				mcpDatabaseURL,
-				runtime.StoreOptions{EnforceTenantContext: true},
-			)
+			store, err := openStandaloneRuntimeStore(cmd.Context(), mcpDatabaseURL, "MCP")
 			if err != nil {
-				return fmt.Errorf("open MCP runtime store")
+				return err
 			}
 			defer store.Close()
-			compatibility, err := store.RuntimeSchemaCompatibility(cmd.Context(), brand.Revision)
-			if err != nil {
-				return fmt.Errorf("MCP runtime schema compatibility preflight")
-			}
-			if err := compatibility.ErrorIfIncompatible(); err != nil {
-				return fmt.Errorf("MCP runtime schema compatibility preflight: %w", err)
-			}
 			retriever, err := buildRuntimeRetriever(store, mcpRetrieval)
 			if err != nil {
 				return err
