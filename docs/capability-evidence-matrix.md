@@ -25,15 +25,15 @@ Status meanings are deliberately narrow:
   the case's acceptance boundary. The failure is retained and no pass is
   inferred.
 
-Frozen public reality cases: `22`.
+Frozen public reality cases: `21`.
 
 | Continuity line | Cases containing the line |
 |---|---:|
 | Workspace | 6 |
-| Conversation | 13 |
+| Conversation | 12 |
 | Global Defaults | 6 |
 | Bridge | 7 |
-| Security | 15 |
+| Security | 14 |
 
 A case may cover more than one line, so these counts intentionally overlap.
 
