@@ -121,6 +121,7 @@ func TestCIWorkflowKeepsOIDCOutOfTestJobAndSignsCompleteSnapshot(t *testing.T) {
 		"fedora:43@sha256:762d73ba1c455232b0272c5d445a34f36c4b9f421cbc05ce8102552325b6a222",
 		"runner: ubuntu-latest",
 		"runner: ubuntu-24.04-arm",
+		`git -c safe.directory="$GITHUB_WORKSPACE" rev-parse HEAD`,
 		"name: vermory-i06-linux-package-rpm-${{ matrix.arch }}-${{ env.SOURCE_SHA }}",
 		"scripts/build-linux-repository.sh",
 		"deploy/linux/run-i08-repository-acceptance.sh",

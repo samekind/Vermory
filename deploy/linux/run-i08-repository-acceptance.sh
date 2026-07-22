@@ -49,7 +49,7 @@ case "$repository_kind:$architecture:$expected_machine" in
   *) fail "unsupported repository, architecture, and machine combination" ;;
 esac
 
-for command in gpg sha256sum jq tar gzip; do
+for command in gpg gpgv sha256sum jq tar gzip; do
   command -v "$command" >/dev/null || fail "$command is required"
 done
 command -v "$package_manager" >/dev/null || fail "$package_manager is required"
@@ -101,6 +101,14 @@ public_key=$repository/$public_key_relative
 [[ "$(hash_file "$metadata")" == "$metadata_sha256" ]] || fail "repository metadata hash mismatch"
 [[ "$(hash_file "$signature")" == "$signature_sha256" ]] || fail "repository signature hash mismatch"
 
+work=$(mktemp -d "${TMPDIR:-/tmp}/vermory-i08-acceptance.XXXXXX")
+cleanup() {
+  rm -rf "$work"
+}
+trap cleanup EXIT
+export GNUPGHOME=$work/gnupg
+mkdir -m 0700 "$GNUPGHOME"
+
 actual_fingerprint=$(gpg --batch --show-keys --with-colons "$public_key" \
   | awk -F: '$1 == "fpr" { print $10; exit }')
 [[ "$actual_fingerprint" == "$key_fingerprint" ]] || fail "bundled public key fingerprint mismatch"
@@ -131,12 +139,6 @@ private_material=$(find "$repository_root" \
   -print -quit)
 [[ -z "$private_material" ]] || fail "repository bundle contains private signing key material"
 
-work=$(mktemp -d "${TMPDIR:-/tmp}/vermory-i08-acceptance.XXXXXX")
-cleanup() {
-  rm -rf "$work"
-}
-trap cleanup EXIT
-
 downloads=$work/downloads
 mkdir -p "$downloads"
 repository_url=file://$(realpath "$repository")
@@ -158,12 +160,11 @@ case "$repository_kind" in
       -o "Dir::State::lists=$apt_lists"
       -o "Dir::Cache::archives=$apt_archives"
       -o "Acquire::Languages=none"
+      -o "APT::Sandbox::User=root"
     )
     apt-get "${apt_options[@]}" update >/dev/null
     apt-get "${apt_options[@]}" --download-only --yes --no-install-recommends install vermory >/dev/null
-    shopt -s nullglob
-    downloaded_packages=("$apt_archives"/vermory_*.deb)
-    shopt -u nullglob
+    mapfile -t downloaded_packages < <(find "$apt_archives" -type f -name 'vermory_*.deb' -print)
     [[ ${#downloaded_packages[@]} -eq 1 ]] || fail "APT did not download exactly one Vermory package"
     downloaded_package=${downloaded_packages[0]}
     [[ "$(hash_file "$downloaded_package")" == "$package_sha256" ]] || fail "APT downloaded package hash mismatch"
@@ -188,6 +189,7 @@ case "$repository_kind" in
       -o "Dir::State::lists=$tampered_lists" \
       -o "Dir::Cache::archives=$tampered_archives" \
       -o "Acquire::Languages=none" \
+      -o "APT::Sandbox::User=root" \
       update >/dev/null 2>&1; then
       fail "APT accepted tampered repository metadata"
     fi
