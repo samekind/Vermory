@@ -19,7 +19,7 @@ func TestCIWorkflowKeepsOIDCOutOfTestJobAndSignsCompleteSnapshot(t *testing.T) {
 
 	signing := workflowSection(t, workflow, "  sign-snapshot:", "")
 	for _, required := range []string{
-		"needs: test",
+		"needs: [test, linux-service-lifecycle]",
 		"id-token: write",
 		"github.event.pull_request.head.repo.full_name == github.repository",
 		"SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}",
@@ -38,6 +38,19 @@ func TestCIWorkflowKeepsOIDCOutOfTestJobAndSignsCompleteSnapshot(t *testing.T) {
 	} {
 		if !strings.Contains(signing, required) {
 			t.Fatalf("sign-snapshot is missing %q", required)
+		}
+	}
+
+	lifecycle := workflowSection(t, workflow, "  linux-service-lifecycle:", "\n  sign-snapshot:")
+	for _, required := range []string{
+		"SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}",
+		"ref: ${{ env.SOURCE_SHA }}",
+		"Verify lifecycle source revision",
+		"deploy/linux/run-i05-acceptance.sh",
+		"vermory-i05-linux-service-${{ env.SOURCE_SHA }}",
+	} {
+		if !strings.Contains(lifecycle, required) {
+			t.Fatalf("linux-service-lifecycle is missing %q", required)
 		}
 	}
 

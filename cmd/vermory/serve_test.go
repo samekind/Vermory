@@ -56,6 +56,50 @@ func TestServeCommandExposesNoTenantOrImplicitMigrationControls(t *testing.T) {
 	}
 }
 
+func TestServeOptionsUseProtectedEnvironmentDefaults(t *testing.T) {
+	t.Setenv("VERMORY_DATABASE_URL", " service=vermory-runtime ")
+	t.Setenv("VERMORY_LISTEN", "127.0.0.1:9797")
+	t.Setenv("VERMORY_TLS_CERT", "/etc/vermory/tls.crt")
+	t.Setenv("VERMORY_TLS_KEY", "/etc/vermory/tls.key")
+	t.Setenv("VERMORY_PROVIDER", "external")
+	t.Setenv("VERMORY_MODEL", "server-model")
+	t.Setenv("VERMORY_PROVIDER_BASE_URL", "https://provider.example/v1")
+	t.Setenv("VERMORY_PROVIDER_API_KEY_ENV", "VERMORY_PROVIDER_SECRET")
+	t.Setenv("VERMORY_GROK_COMMAND", "/usr/local/bin/grok-wrapper")
+
+	options := serveOptionsFromEnvironment()
+	if options.DatabaseURL != "service=vermory-runtime" ||
+		options.Listen != "127.0.0.1:9797" ||
+		options.TLSCert != "/etc/vermory/tls.crt" ||
+		options.TLSKey != "/etc/vermory/tls.key" ||
+		options.Provider.Name != "external" ||
+		options.Provider.Model != "server-model" ||
+		options.Provider.BaseURL != "https://provider.example/v1" ||
+		options.Provider.APIKeyEnv != "VERMORY_PROVIDER_SECRET" ||
+		options.Provider.GrokCommand != "/usr/local/bin/grok-wrapper" {
+		t.Fatalf("serve environment defaults drifted: %#v", options)
+	}
+
+	command := newServeCommand()
+	if err := command.Flags().Set("listen", "127.0.0.1:9898"); err != nil {
+		t.Fatal(err)
+	}
+	if got, err := command.Flags().GetString("listen"); err != nil || got != "127.0.0.1:9898" {
+		t.Fatalf("explicit flag did not override environment default: got=%q err=%v", got, err)
+	}
+}
+
+func TestServeEnvironmentKeepsSafeDefaultsWhenUnsetOrBlank(t *testing.T) {
+	t.Setenv("VERMORY_DATABASE_URL", "")
+	t.Setenv("VERMORY_LISTEN", "  ")
+	t.Setenv("VERMORY_PROVIDER", "")
+
+	options := serveOptionsFromEnvironment()
+	if options.DatabaseURL != "" || options.Listen != "127.0.0.1:8788" || options.Provider.Name != "mock" {
+		t.Fatalf("blank environment changed safe defaults: %#v", options)
+	}
+}
+
 func TestServeRejectsUnsafeDatabaseRoleBeforeListening(t *testing.T) {
 	databaseURL := os.Getenv("VERMORY_TEST_DATABASE_URL")
 	if databaseURL == "" {

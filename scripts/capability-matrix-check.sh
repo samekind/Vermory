@@ -21,12 +21,12 @@ find reality/cases -mindepth 2 -maxdepth 2 -name manifest.json -print |
   done >"$case_list"
 
 case_count="$(wc -l <"$case_list" | tr -d ' ')"
-[[ "$case_count" -eq 20 ]] || {
-  echo "capability matrix: expected 20 frozen cases, found $case_count" >&2
+[[ "$case_count" -eq 21 ]] || {
+  echo "capability matrix: expected 21 frozen cases, found $case_count" >&2
   exit 1
 }
 
-grep -Fq 'Frozen public reality cases: `20`.' "$matrix"
+grep -Fq 'Frozen public reality cases: `21`.' "$matrix"
 
 while IFS= read -r case_id; do
   count="$(grep -Fc "| \`$case_id\` |" "$matrix")"
@@ -62,6 +62,7 @@ done < <(rg -o '\]\((evidence/[^)#]+\.md)\)' "$matrix" | sed -E 's/^.*\]\(([^)]+
 
 grep -Fq '| `B03-three-client-conversation-bridge` | `client-qualified` |' "$matrix"
 grep -Fq '| `W04-canonical-repository-cross-client` | `external-blocked` |' "$matrix"
+grep -Fq '| `I05-durable-linux-service-lifecycle` | `contract-only` |' "$matrix"
 grep -Fq '[Capability And Evidence Matrix](docs/capability-evidence-matrix.md)' README.md
 grep -Fq '[能力与证据矩阵](docs/capability-evidence-matrix.md)' README.zh-CN.md
 grep -Fq '[Capability And Evidence Matrix](docs/capability-evidence-matrix.md)' ARCHITECTURE.md

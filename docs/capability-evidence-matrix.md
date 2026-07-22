@@ -25,7 +25,7 @@ Status meanings are deliberately narrow:
   the case's acceptance boundary. The failure is retained and no pass is
   inferred.
 
-Frozen public reality cases: `20`.
+Frozen public reality cases: `21`.
 
 | Continuity line | Cases containing the line |
 |---|---:|
@@ -33,7 +33,7 @@ Frozen public reality cases: `20`.
 | Conversation | 12 |
 | Global Defaults | 6 |
 | Bridge | 7 |
-| Security | 13 |
+| Security | 14 |
 
 A case may cover more than one line, so these counts intentionally overlap.
 
@@ -71,6 +71,7 @@ A case may cover more than one line, so these counts intentionally overlap.
 | `I02-postgresql-operations-recovery` | `runtime-qualified` | Migration replay, dump/restore, projection rebuild, runtime-role restoration, and bounded outage recovery pass | PostgreSQL 18 and Linux runtime; model use is not required | [PostgreSQL operations and recovery](evidence/2026-07-14-postgresql-operations-recovery.md), [Linux portability](evidence/2026-07-14-linux-runtime-portability.md) | Does not define a universal HA topology or service SLO. |
 | `I03-postgresql-ha-pitr` | `runtime-qualified` | Streaming standby promotion and exact-LSN PITR restore the expected authoritative state without reviving later deletion/revocation changes | PostgreSQL 18; authenticated Web Chat recovery probe; no model-quality claim | [PostgreSQL HA and PITR](evidence/2026-07-16-postgresql-ha-pitr.md) | One measured local topology is qualified, not every distributed deployment. |
 | `I04-protected-artifact-signing` | `runtime-qualified` | Untrusted test job builds complete payload manifest; separate OIDC job signs it; identity, issuer, tamper, and cross-host verification pass | GitHub Actions, Cosign, ARM64 Mac mini; model use is not applicable | [Protected artifact signing](evidence/2026-07-18-protected-artifact-signing.md) | The signed subject is the release manifest, not a claim that every runtime trajectory was replayed on that exact head. |
+| `I05-durable-linux-service-lifecycle` | `contract-only` | The frozen install, upgrade, automatic rollback, explicit rollback, backup, empty-target restore, runtime-role, projection-rebuild, and restored-authentication contract is wired into an exact-head Ubuntu systemd job | GitHub-hosted Ubuntu AMD64, systemd, PostgreSQL 18; first protected run pending | [Durable Linux lifecycle design](superpowers/specs/2026-07-22-durable-linux-service-lifecycle-design.md) | No runtime qualification is claimed until the protected exact-head job passes; an ephemeral runner will not prove uptime, an SLA, Linux ARM64, or package-manager integration. |
 
 ## Public Benchmark And Comparison Evidence
 
@@ -108,8 +109,9 @@ and the [rejected domestic reader run](evidence/2026-07-20-longmemeval-s-domesti
 
 ## Protected Delivery Rule
 
-Every publishable pull-request head must pass the protected `test` and
-`sign-snapshot` jobs. The exact live head, run, jobs, and signed artifact belong
+Every publishable pull-request head must pass the protected `test`,
+`linux-service-lifecycle`, and `sign-snapshot` jobs. The exact live head, run,
+jobs, and signed artifact belong
 in GitHub's protected check record and PR evidence comment rather than a
 manually copied static status. A green CI badge alone does not upgrade a
 `contract-only` or `external-blocked` case to `client-qualified`.
@@ -125,8 +127,8 @@ The following remain explicit work, not hidden implementation details:
    actual local Git worktree, same-name repository, clone, physical move,
    namespace, tenant, adopt, rebind, replay, and reversal behavior without a
    model.
-3. Qualify a durable Linux service installation, upgrade, rollback, backup,
-   and restore profile in addition to binary portability and database recovery.
+3. Run the new I05 exact-head Ubuntu job, retain its normalized artifact, and
+   promote the case only if every service lifecycle hard gate passes.
 4. Add a genuine withheld external evaluation; public cases and internal blind
    splits are not called sealed evidence.
 5. Complete blocked real-provider reader runs only when their original frozen

@@ -55,6 +55,42 @@ archives:
           owner: root
           mode: 0644
           mtime: "{{ .CommitDate }}"
+      - src: deploy/linux/README.md
+        info:
+          group: root
+          owner: root
+          mode: 0644
+          mtime: "{{ .CommitDate }}"
+      - src: deploy/linux/vermory.service
+        info:
+          group: root
+          owner: root
+          mode: 0644
+          mtime: "{{ .CommitDate }}"
+      - src: deploy/linux/install-system-service.sh
+        info:
+          group: root
+          owner: root
+          mode: 0755
+          mtime: "{{ .CommitDate }}"
+      - src: deploy/linux/rollback-system-service.sh
+        info:
+          group: root
+          owner: root
+          mode: 0755
+          mtime: "{{ .CommitDate }}"
+      - src: deploy/linux/backup-postgresql.sh
+        info:
+          group: root
+          owner: root
+          mode: 0755
+          mtime: "{{ .CommitDate }}"
+      - src: deploy/linux/restore-postgresql.sh
+        info:
+          group: root
+          owner: root
+          mode: 0755
+          mtime: "{{ .CommitDate }}"
 
 checksum:
   name_template: checksums.txt

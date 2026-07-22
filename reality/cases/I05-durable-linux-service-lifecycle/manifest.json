@@ -1,0 +1,111 @@
+{
+  "version": 1,
+  "id": "I05-durable-linux-service-lifecycle",
+  "title": "Durable Linux systemd installation, reversible release lifecycle, and restored PostgreSQL service",
+  "evidence_level": "public",
+  "continuity_lines": [
+    "security"
+  ],
+  "pressures": [
+    "systemd_system_service",
+    "versioned_release_install",
+    "restricted_service_identity",
+    "loopback_default",
+    "environment_file_secret_boundary",
+    "real_service_restart",
+    "in_place_upgrade",
+    "failed_upgrade_auto_rollback",
+    "manual_release_rollback",
+    "native_backup",
+    "empty_target_restore",
+    "runtime_role_reprovision",
+    "projection_rebuild",
+    "restored_authenticated_probe",
+    "artifact_checksum_verification",
+    "credential_hygiene"
+  ],
+  "sources": [
+    {
+      "id": "i05-linux-lifecycle-contract",
+      "kind": "authorized_linux_service_lifecycle_contract",
+      "fixture_path": "fixtures/lifecycle-contract.md",
+      "original_ref": "vermory-design:i05-durable-linux-service-lifecycle",
+      "original_revision": "2026-07-22",
+      "sha256": "63935ee25c4062d2ba47e5627b859833c32507451d33d3a9a85513a1d5c90095",
+      "authorized": true,
+      "anonymization": "Every release, service, database, role, tenant, token metadata item, fact, and failure input is synthetic; credentials, raw tokens, private routes, private paths, and user data are excluded."
+    }
+  ],
+  "anchors": [
+    {
+      "kind": "service_identity",
+      "value": "vermory-i05.service",
+      "ambiguous": false
+    },
+    {
+      "kind": "release_revision",
+      "value": "vermory-i05/exact-protected-head",
+      "ambiguous": false
+    },
+    {
+      "kind": "dedicated_database_scope",
+      "value": "vermory-i05/source-and-restored-target",
+      "ambiguous": false
+    }
+  ],
+  "expectations": {
+    "current_facts": [
+      "A checksummed Linux release is installed into a root-owned immutable versioned directory before activation.",
+      "The systemd service runs under a dedicated non-login identity with a restricted runtime PostgreSQL role and a loopback listener by default.",
+      "A failed upgrade restores and verifies the previously healthy release before returning failure.",
+      "An explicit release rollback is reversible and does not pretend to reverse PostgreSQL migrations.",
+      "A native PostgreSQL backup is checksum-bound, private, and restored only into an empty target.",
+      "Restore re-provisions the runtime role, rebuilds disposable projections, and passes an authenticated governed-state probe."
+    ],
+    "forbidden_facts": [
+      "A portable Linux ELF or successful CLI help command alone proves a durable service installation.",
+      "The systemd unit or process arguments contain an admin database credential, provider key, or raw API token.",
+      "Vermory deployment scripts invoke sudo internally or trigger repeated privilege prompts.",
+      "A failed release remains the active current target after the installer reports rollback.",
+      "Binary pointer rollback automatically reverses forward PostgreSQL migrations.",
+      "PostgreSQL custom-format backup is encrypted by the dump format.",
+      "Restore overwrites a non-empty target or accepts a digest mismatch.",
+      "A restored database resumes traffic before runtime-role validation and projection rebuild.",
+      "An ephemeral Ubuntu qualification is described as measured long-duration uptime or a cloud SLA."
+    ],
+    "allowed_unknowns": [
+      "Which DEB, RPM, OCI, or package-repository distribution channels may be added later.",
+      "Which encrypted backup storage, scheduler, retention policy, and key-management system each operator will use.",
+      "Which native Linux ARM64 distribution will receive a later systemd lifecycle run.",
+      "Which non-backward-compatible schema migrations may require release-specific rollback procedures."
+    ],
+    "expected_action": "Install and run the exact protected Linux release as a restricted systemd service, prove successful upgrade and both automatic and explicit rollback, then create and verify a private native backup, restore it into an empty target, re-provision runtime authority, rebuild projections, and pass an authenticated restored-state probe."
+  },
+  "task": {
+    "prompt": "Qualify one exact-head Linux systemd deployment through first install, current-state access, upgrade, failed-upgrade rollback, explicit rollback, native backup, empty-target restore, runtime-role re-provisioning, projection rebuild, and restored authenticated access.",
+    "artifact_checks": [
+      "archive and installed binary digests are recorded and match the selected release IDs",
+      "effective service UID, loopback listener, hardening properties, and release pointers are recorded",
+      "failed upgrade returns nonzero while the previous release is healthy and active",
+      "backup digest, private modes, schema version, native tool versions, and empty-target refusal controls are recorded",
+      "restored service authenticates the synthetic token digest and returns the governed synthetic default",
+      "normalized evidence contains no environment file, database password, raw token, private path, or private host route"
+    ],
+    "deterministic_checks": [
+      "install:archive_digest_verified",
+      "install:immutable_versioned_release",
+      "systemd:dedicated_uid_and_hardening",
+      "systemd:loopback_authenticated_boundary",
+      "upgrade:new_release_active_and_state_preserved",
+      "upgrade:failed_release_auto_rollback",
+      "rollback:explicit_bidirectional_release_swap",
+      "backup:custom_format_private_and_checksum_valid",
+      "restore:digest_mismatch_rejected",
+      "restore:nonempty_target_rejected",
+      "restore:runtime_role_reprovisioned",
+      "restore:active_projection_rebuilt",
+      "restore:authenticated_governed_state_visible",
+      "privacy:no_admin_secret_raw_token_or_private_route"
+    ]
+  }
+}

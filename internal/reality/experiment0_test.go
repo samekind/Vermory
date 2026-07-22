@@ -17,8 +17,8 @@ func TestBuildExperiment0ReportsFrozenPublicCoverage(t *testing.T) {
 	if !report.Pass || !report.PublicValidation.Pass {
 		t.Fatalf("expected public evidence to pass: %#v", report)
 	}
-	if len(report.PublicValidation.Results) != 20 {
-		t.Fatalf("expected twenty cases, got %d", len(report.PublicValidation.Results))
+	if len(report.PublicValidation.Results) != 21 {
+		t.Fatalf("expected twenty-one cases, got %d", len(report.PublicValidation.Results))
 	}
 	for _, result := range report.PublicValidation.Results {
 		if result.LockSHA256 == "" {
@@ -34,7 +34,7 @@ func TestBuildExperiment0ReportsFrozenPublicCoverage(t *testing.T) {
 	if len(report.PressureCoverage["explicit_deletion"]) != 1 {
 		t.Fatalf("expected deletion pressure coverage: %#v", report.PressureCoverage)
 	}
-	if report.EvidenceLevels[string(EvidencePublic)] != 20 || report.SealedStatus != "unavailable" {
+	if report.EvidenceLevels[string(EvidencePublic)] != 21 || report.SealedStatus != "unavailable" {
 		t.Fatalf("unexpected evidence status: levels=%#v sealed=%q", report.EvidenceLevels, report.SealedStatus)
 	}
 	if !containsText(report.Limitations, "target discovery coverage remains incomplete") {

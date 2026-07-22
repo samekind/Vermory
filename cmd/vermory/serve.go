@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
@@ -45,7 +46,7 @@ func (options serveOptions) Validate() error {
 }
 
 func newServeCommand() *cobra.Command {
-	options := serveOptions{Retrieval: defaultRetrievalRuntimeOptions()}
+	options := serveOptionsFromEnvironment()
 	command := &cobra.Command{
 		Use:   "serve",
 		Short: "Run the authenticated multi-tenant Vermory API",
@@ -109,6 +110,30 @@ func newServeCommand() *cobra.Command {
 	command.Flags().StringVar(&options.Provider.GrokCommand, "grok-command", "", "authenticated Grok CLI command")
 	addSharedRetrievalFlags(command, &options.Retrieval)
 	return command
+}
+
+func serveOptionsFromEnvironment() serveOptions {
+	return serveOptions{
+		DatabaseURL: strings.TrimSpace(os.Getenv("VERMORY_DATABASE_URL")),
+		Listen:      environmentDefault("VERMORY_LISTEN", "127.0.0.1:8788"),
+		TLSCert:     strings.TrimSpace(os.Getenv("VERMORY_TLS_CERT")),
+		TLSKey:      strings.TrimSpace(os.Getenv("VERMORY_TLS_KEY")),
+		Provider: webChatProviderOptions{
+			Name:        environmentDefault("VERMORY_PROVIDER", "mock"),
+			Model:       strings.TrimSpace(os.Getenv("VERMORY_MODEL")),
+			BaseURL:     strings.TrimSpace(os.Getenv("VERMORY_PROVIDER_BASE_URL")),
+			APIKeyEnv:   strings.TrimSpace(os.Getenv("VERMORY_PROVIDER_API_KEY_ENV")),
+			GrokCommand: strings.TrimSpace(os.Getenv("VERMORY_GROK_COMMAND")),
+		},
+		Retrieval: defaultRetrievalRuntimeOptions(),
+	}
+}
+
+func environmentDefault(name, fallback string) string {
+	if value := strings.TrimSpace(os.Getenv(name)); value != "" {
+		return value
+	}
+	return fallback
 }
 
 func isLoopbackHost(host string) bool {

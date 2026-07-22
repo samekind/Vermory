@@ -451,6 +451,41 @@ func TestI03PostgreSQLHAPITRCaseIsFrozen(t *testing.T) {
 	}
 }
 
+func TestI05DurableLinuxServiceLifecycleCaseIsFrozen(t *testing.T) {
+	c, err := LoadCase("../../reality/cases/I05-durable-linux-service-lifecycle")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got := ValidateCase(c); len(got) != 0 {
+		t.Fatalf("expected valid I05 case, got violations: %#v", got)
+	}
+
+	requireStrings(t, c.Manifest.Pressures,
+		"systemd_system_service",
+		"versioned_release_install",
+		"restricted_service_identity",
+		"environment_file_secret_boundary",
+		"in_place_upgrade",
+		"failed_upgrade_auto_rollback",
+		"manual_release_rollback",
+		"native_backup",
+		"empty_target_restore",
+		"runtime_role_reprovision",
+		"projection_rebuild",
+		"restored_authenticated_probe",
+		"artifact_checksum_verification",
+		"credential_hygiene",
+	)
+	requireStrings(t, c.Manifest.Expectations.ForbiddenFacts,
+		"A portable Linux ELF or successful CLI help command alone proves a durable service installation.",
+		"Vermory deployment scripts invoke sudo internally or trigger repeated privilege prompts.",
+		"A failed release remains the active current target after the installer reports rollback.",
+		"Binary pointer rollback automatically reverses forward PostgreSQL migrations.",
+		"Restore overwrites a non-empty target or accepts a digest mismatch.",
+		"An ephemeral Ubuntu qualification is described as measured long-duration uptime or a cloud SLA.",
+	)
+}
+
 func loadValidCase(t *testing.T) Case {
 	t.Helper()
 	c, err := LoadCase("../../reality/testdata/valid-public")

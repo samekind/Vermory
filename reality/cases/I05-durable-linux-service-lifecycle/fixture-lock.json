@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "case_id": "I05-durable-linux-service-lifecycle",
+  "manifest_sha256": "aeb1994d5e504eb5e741e1c1523e279a4490f27a1eaf56eadeae465a6255ef10",
+  "events_sha256": "21afd8fc020875346af821c8b9eb20a47e70d001e704dcdaf56021cbe64126f8",
+  "files": [
+    {
+      "path": "fixtures/lifecycle-contract.md",
+      "sha256": "63935ee25c4062d2ba47e5627b859833c32507451d33d3a9a85513a1d5c90095",
+      "bytes": 3119
+    }
+  ]
+}
