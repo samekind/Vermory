@@ -70,8 +70,12 @@ safe_relative_path() {
 
 assert_service_dormant() {
   if command -v systemctl >/dev/null; then
-    systemctl is-active --quiet vermory.service && fail "service became active"
-    systemctl is-enabled --quiet vermory.service && fail "service became enabled"
+    if systemctl is-active --quiet vermory.service 2>/dev/null; then
+      fail "service became active"
+    fi
+    if systemctl is-enabled --quiet vermory.service 2>/dev/null; then
+      fail "service became enabled"
+    fi
   fi
 }
 

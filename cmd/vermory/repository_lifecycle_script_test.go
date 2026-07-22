@@ -105,6 +105,8 @@ func TestI09ScriptsRequireNativeUpgradeRollbackAndRetentionSemantics(t *testing.
 		"dnf",
 		"downgrade",
 		"upgrade",
+		"if systemctl is-active --quiet vermory.service",
+		"if systemctl is-enabled --quiet vermory.service",
 		"repo_gpgcheck=1",
 		"signed-by=",
 		"operator-owned-i09",
