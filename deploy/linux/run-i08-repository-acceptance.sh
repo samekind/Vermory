@@ -237,7 +237,7 @@ EOF
       --setopt=install_weak_deps=False
     )
     dnf "${dnf_options[@]}" makecache >/dev/null
-    dnf "${dnf_options[@]}" install --downloadonly --downloaddir="$downloads" vermory >/dev/null
+    dnf "${dnf_options[@]}" download --destdir="$downloads" vermory >/dev/null
     shopt -s nullglob
     downloaded_packages=("$downloads"/vermory-*.rpm)
     shopt -u nullglob

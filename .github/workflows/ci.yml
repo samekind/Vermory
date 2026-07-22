@@ -458,7 +458,7 @@ jobs:
           dnf install --assumeyes
           createrepo_c
           bzip2
-          dnf-plugins-core
+          dnf5-plugins
           findutils
           git
           gnupg2
