@@ -197,12 +197,12 @@ Names, payloads, streaming behavior, and transport remain versioned rather than 
 
 ### H-016: Deterministic release/database compatibility preflight
 
-- Status: `candidate`
+- Status: `supported` for the exact schema-24 release profile
 - Candidate: each binary declares an inclusive PostgreSQL schema support interval and checks it through a restricted, read-only database function before opening a production listener.
 - Reason: discovering schema drift through a later table query produces ambiguous service failures and permits unsafe assumptions about package or binary rollback.
-- Evidence needed: real old/current/future schema decisions, a restricted login role that can inspect only the bounded version function, no-listener/no-write negative controls, PostgreSQL 17 local execution, PostgreSQL 18 exact-head CI, and package scripts that remain migration-free.
+- Existing evidence: I07 ran the exact `45dbdee` binary against PostgreSQL 17.10 schema fixtures `23`, `24`, and synthetic `25`, producing `migration_required`, `compatible`, and `binary_too_old` respectively. The restricted runtime role could execute only `vermory_auth.schema_version()` and could not read or mutate `goose_db_version`; compatible `serve` reached authenticated `401`, while old, future, and unreadable states opened no listener and left business writes at zero. PostgreSQL 18 exact-head CI passed the complete test suite, both native service lifecycle jobs, all four package legs, and the dependent OIDC-signed snapshot. Package and systemd scripts remained migration-free.
 - Falsifier: the preflight leaks migration metadata or credentials, expands runtime authority, performs a hidden migration, permits an unsupported schema to listen, or blocks a declared-compatible schema.
-- Decision gate: after `I07-release-database-compatibility` passes all hard gates on an exact protected head. Binary-only rollback remains conditional on the older binary's support interval; incompatible schema rollback uses PostgreSQL backup or PITR rather than an assumed automatic down migration.
+- Decision gate: passed for the exact schema-24 profile on protected head `45dbdee`. Binary-only rollback remains conditional on the older binary's support interval; incompatible schema rollback uses PostgreSQL backup or PITR rather than an assumed automatic down migration. Reopen for a widened support interval, zero-downtime upgrades, arbitrary schema rollback, or another database topology.
 
 ## 3. Decision Records
 

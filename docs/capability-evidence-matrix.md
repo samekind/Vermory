@@ -73,6 +73,7 @@ A case may cover more than one line, so these counts intentionally overlap.
 | `I04-protected-artifact-signing` | `runtime-qualified` | Untrusted test job builds complete payload manifest; separate OIDC job signs it; identity, issuer, tamper, and cross-host verification pass | GitHub Actions, Cosign, ARM64 Mac mini; model use is not applicable | [Protected artifact signing](evidence/2026-07-18-protected-artifact-signing.md) | The signed subject is the release manifest, not a claim that every runtime trajectory was replayed on that exact head. |
 | `I05-durable-linux-service-lifecycle` | `runtime-qualified` | Exact-head install, authenticated startup, upgrade, automatic and explicit rollback, private backup, digest/non-empty-target rejection, empty-target restore, runtime-role recovery, projection rebuild, restored authentication/default access, and credential scans passed on both native architectures | GitHub-hosted Ubuntu 24.04 AMD64 and ARM64, systemd, PostgreSQL 18; model use is not applicable | [Durable Linux lifecycle qualification](evidence/2026-07-22-durable-linux-service-lifecycle.md) | The ephemeral runners do not qualify long-duration uptime/SLA, APT/DNF repository distribution, backup encryption, or PostgreSQL migration rollback. |
 | `I06-linux-native-packages` | `runtime-qualified` | Exact-head DEB and RPM packages install and remove on native AMD64/ARM64 runners; binary revision, service identity, non-activation, operator-state preservation, and 16 hard gates pass; the exact accepted bytes enter the OIDC-signed 12-entry snapshot | GitHub-hosted Ubuntu `x86_64` and Ubuntu 24.04 `aarch64`, dpkg/rpm, GoReleaser, GitHub Actions, Cosign; model use is not applicable | [Native Linux package qualification](evidence/2026-07-22-linux-native-packages.md) | Qualifies signed package artifacts, not APT/DNF repository metadata or signing, tagged publication, distribution-specific DNF upgrades, uptime/SLA, or database migration rollback. |
+| `I07-release-database-compatibility` | `runtime-qualified` | Exact schema-24 binary reports the inclusive `24..24` interval; schema `23` returns `migration_required`, schema `25` returns `binary_too_old`, unreadable schema fails closed, restricted runtime access cannot read or mutate `goose_db_version`, compatible `serve` reaches authenticated `401`, incompatible `serve` opens no listener, and package/systemd paths remain migration-free | PostgreSQL 17.10 local ARM64, PostgreSQL 18 protected CI, restricted runtime role, exact-head Linux packages and systemd lifecycle; model use is not applicable | [Release/database compatibility](evidence/2026-07-22-release-database-compatibility.md) | Qualifies the exact schema-24 preflight and rollback boundary; it does not claim universal automatic down migration, zero-downtime upgrades, tagged publication, repositories, or arbitrary future-schema rollback. |
 
 ## Public Benchmark And Comparison Evidence
 
@@ -132,8 +133,9 @@ The following remain explicit work, not hidden implementation details:
    replay, and reversal without substituting for another client or host.
 3. Extend I05/I06 beyond their qualified ephemeral Ubuntu AMD64 and ARM64
    runners to long-duration uptime/SLA evidence, APT/DNF repository metadata,
-   signing and retention, distribution-specific upgrade behavior, and an
-   explicit database-migration rollback policy.
+   signing and retention, and distribution-specific upgrade behavior. I07 now
+   qualifies the deterministic schema-24 compatibility and backup/PITR rollback
+   boundary; it does not promise a universal automatic down migration.
 4. Add a genuine withheld external evaluation; public cases and internal blind
    splits are not called sealed evidence.
 5. Complete blocked real-provider reader runs only when their original frozen
