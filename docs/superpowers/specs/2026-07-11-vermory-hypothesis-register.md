@@ -195,6 +195,15 @@ Names, payloads, streaming behavior, and transport remain versioned rather than 
 - Falsifier: an adapter cannot preserve constitutional deletion or isolation even when treated as disposable; that adapter is removed rather than weakening the constitution.
 - Decision gate: independently for each adapter before supported-release status.
 
+### H-016: Deterministic release/database compatibility preflight
+
+- Status: `candidate`
+- Candidate: each binary declares an inclusive PostgreSQL schema support interval and checks it through a restricted, read-only database function before opening a production listener.
+- Reason: discovering schema drift through a later table query produces ambiguous service failures and permits unsafe assumptions about package or binary rollback.
+- Evidence needed: real old/current/future schema decisions, a restricted login role that can inspect only the bounded version function, no-listener/no-write negative controls, PostgreSQL 17 local execution, PostgreSQL 18 exact-head CI, and package scripts that remain migration-free.
+- Falsifier: the preflight leaks migration metadata or credentials, expands runtime authority, performs a hidden migration, permits an unsupported schema to listen, or blocks a declared-compatible schema.
+- Decision gate: after `I07-release-database-compatibility` passes all hard gates on an exact protected head. Binary-only rollback remains conditional on the older binary's support interval; incompatible schema rollback uses PostgreSQL backup or PITR rather than an assumed automatic down migration.
+
 ## 3. Decision Records
 
 When a hypothesis changes status, record:
