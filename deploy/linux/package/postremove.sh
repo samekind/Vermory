@@ -1,7 +1,7 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
-set -euo pipefail
+set -eu
 
-if command -v systemctl >/dev/null && [[ -d /run/systemd/system ]]; then
+if command -v systemctl >/dev/null && [ -d /run/systemd/system ]; then
   systemctl daemon-reload
 fi

@@ -1,8 +1,8 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
-set -euo pipefail
+set -eu
 
-if [[ ${EUID:-$(id -u)} -ne 0 ]]; then
+if [ "$(id -u)" -ne 0 ]; then
   echo "vermory package: effective UID 0 is required" >&2
   exit 1
 fi
@@ -22,17 +22,23 @@ if ! getent passwd vermory >/dev/null; then
 fi
 
 entry=$(getent passwd vermory)
-IFS=: read -r _ _ uid gid _ home shell <<<"$entry"
+uid=$(printf '%s\n' "$entry" | cut -d: -f3)
+gid=$(printf '%s\n' "$entry" | cut -d: -f4)
+home=$(printf '%s\n' "$entry" | cut -d: -f6)
+shell=$(printf '%s\n' "$entry" | cut -d: -f7)
 group_gid=$(getent group vermory | cut -d: -f3)
-[[ "$uid" != 0 && "$gid" == "$group_gid" ]] || {
+[ "$uid" != 0 ] && [ "$gid" = "$group_gid" ] || {
   echo "vermory package: existing service identity is unsafe" >&2
   exit 1
 }
-[[ "$home" == /nonexistent ]] || {
+[ "$home" = /nonexistent ] || {
   echo "vermory package: existing service home is unsafe" >&2
   exit 1
 }
-[[ "$shell" == /usr/sbin/nologin || "$shell" == /sbin/nologin ]] || {
-  echo "vermory package: existing service shell is unsafe" >&2
-  exit 1
-}
+case "$shell" in
+  /usr/sbin/nologin | /sbin/nologin) ;;
+  *)
+    echo "vermory package: existing service shell is unsafe" >&2
+    exit 1
+    ;;
+esac

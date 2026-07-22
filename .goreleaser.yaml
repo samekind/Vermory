@@ -135,7 +135,6 @@ nfpms:
     overrides:
       deb:
         dependencies:
-          - bash
           - passwd
           - systemd
         scripts:
@@ -145,7 +144,6 @@ nfpms:
           postremove: deploy/linux/package/postremove.sh
       rpm:
         dependencies:
-          - bash
           - shadow-utils
           - systemd
         scripts:

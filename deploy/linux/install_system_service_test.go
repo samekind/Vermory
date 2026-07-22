@@ -238,9 +238,15 @@ func TestLinuxNativePackagesKeepInstallationNonActivating(t *testing.T) {
 
 	for _, name := range []string{"preinstall.sh", "postinstall.sh", "preremove-deb.sh", "preremove-rpm.sh", "postremove.sh"} {
 		script := readFile(t, filepath.Join("package", name))
+		requireContains(t, script, "#!/bin/sh")
 		for _, forbidden := range []string{"sudo ", "database migrate", "systemctl enable", "systemctl start", "systemctl restart"} {
 			if strings.Contains(script, forbidden) {
 				t.Fatalf("package script %s contains forbidden action %q", name, forbidden)
+			}
+		}
+		for _, nonPOSIX := range []string{"[[", "pipefail", "${EUID", "<<<"} {
+			if strings.Contains(script, nonPOSIX) {
+				t.Fatalf("package script %s contains non-POSIX syntax %q", name, nonPOSIX)
 			}
 		}
 	}

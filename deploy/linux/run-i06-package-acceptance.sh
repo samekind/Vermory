@@ -98,8 +98,8 @@ fi
 if grep -R -E '(postgresql://|API_KEY|PASSWORD=|PRIVATE KEY|sk-[A-Za-z0-9])' "$PACKAGE_SCRIPT_ROOT"/*.sh; then
   fail "package script contains credential material"
 fi
-grep -Fq "[[ \${1:-} == remove ]]" "$PACKAGE_SCRIPT_ROOT/preremove-deb.sh"
-grep -Fq "[[ \${1:-1} == 0 ]]" "$PACKAGE_SCRIPT_ROOT/preremove-rpm.sh"
+grep -Fq "if [ \"\${1:-}\" = remove ]" "$PACKAGE_SCRIPT_ROOT/preremove-deb.sh"
+grep -Fq "if [ \"\${1:-1}\" = 0 ]" "$PACKAGE_SCRIPT_ROOT/preremove-rpm.sh"
 
 install -d -o root -g root -m 0755 /etc/vermory
 printf '%s\n' 'operator-owned-i06' >/etc/vermory/vermory.env
