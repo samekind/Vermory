@@ -945,6 +945,58 @@ repository, mirrors, retention, cross-version upgrades or rollback, tagged
 publication, or RPM payload signatures. See
 [the I08 evidence](evidence/2026-07-23-linux-package-repository.md).
 
+## Cross-Version Linux Repository Lifecycle Qualification I09
+
+I09 keeps I08's signed repository boundary and adds one frozen cross-version
+lifecycle. Exact base packages from
+`858e5afc05b8136fd81d46a88164f799f2925197` and exact candidate packages from
+`b2076981351f3e4f2f31c86a1abcd22c04cd71ec` are assigned qualification-only
+versions, retained together in the full repository snapshot, and exercised by
+native APT and DNF on both architectures.
+
+| Gate | Result |
+|---|---:|
+| accepted complete CI run | `29959050993` |
+| APT native lifecycle legs | `2 / 2` pass |
+| DNF native lifecycle legs | `2 / 2` pass |
+| hard gates per leg | `26 / 26` |
+| base source-revision mismatches | `0` |
+| candidate source-revision mismatches | `0` |
+| normal candidate upgrades | `4 / 4` pass |
+| implicit downgrades observed | `0` |
+| explicit retained-base rollbacks | `4 / 4` pass |
+| normal candidate re-upgrades | `4 / 4` pass |
+| operator configuration losses | `0` |
+| service identity changes | `0` |
+| service activations or enables | `0` |
+| package-triggered database migrations | `0` |
+| private signing keys in bundles | `0` |
+| downloaded artifact digest mismatches | `0` |
+| complete release-manifest entries | `16` |
+| I09 qualification bundles presented as release payloads | `0` |
+| exact workflow identity and issuer | pass |
+| modified manifest accepted | `0` |
+| wrong workflow identity accepted | `0` |
+
+The accepted lifecycle is `base install -> normal candidate upgrade -> normal
+update without downgrade -> explicit base rollback -> normal candidate
+re-upgrade -> removal`. Operator configuration and the non-login service
+UID/GID survive every transition, while the service remains inactive and
+disabled. Both repository snapshots in one leg use the same ephemeral
+qualification key; unrelated repositories are disabled.
+
+The first workflow attempt is retained as a GitHub hosted-runner delay during a
+published Actions incident. Its rerun is also retained: all four lifecycle legs
+exited after the correct dormant-service result because a `set -e` shell check
+treated the expected non-zero `systemctl` status as failure. The accepted head
+uses explicit `if` checks and includes a regression contract test.
+
+This qualification does not claim a stable production key, public hosted
+repository, mirror or retention policy, release tag, public semantic-version
+promise, unattended update policy, database migration or rollback, or RPM
+payload signature. See
+[the I09 evidence](evidence/2026-07-23-linux-repository-lifecycle.md).
+
 
 ## Duojie Core Matrix Findings
 

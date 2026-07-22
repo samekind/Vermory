@@ -191,6 +191,23 @@ snapshot，签名包哈希逐一等于原生验收报告。该证据验证的是
 或数据库 migration rollback。详见
 [原生 Linux Package 实证](docs/evidence/2026-07-22-linux-native-packages.md)。
 
+I08 在不替换 I06 已验收 package 字节的前提下完成原生软件包仓库资格验证。
+AMD64 与 ARM64 的签名 APT/DNF bundle 均由原生包管理器通过 `file://` 消费，
+强制校验仓库元数据签名，拒绝篡改元数据，并在四条执行腿上各通过 18 个硬门。
+四个精确 bundle 被纳入 16 项 GitHub OIDC 签名 snapshot。该证据不宣称稳定生产
+签名密钥、公共托管仓库、镜像、长期保留、跨版本升级/回滚、tagged release 或
+RPM payload 签名。详见
+[原生 Linux 软件包仓库实证](docs/evidence/2026-07-23-linux-package-repository.md)。
+
+I09 进一步完成一条明确的跨版本仓库生命周期。冻结 base 与 exact candidate 的
+DEB/RPM package 在原生 AMD64/ARM64 APT/DNF 上依次完成 base 安装、普通升级、
+禁止隐式降级、显式回滚到保留的 base、再次普通升级和最终卸载。四条执行腿均通过
+26 个硬门，operator 配置与服务身份始终保留，服务全程 inactive/disabled，package
+操作不执行数据库 migration。资格测试版本不是 release 承诺；该证据也不宣称稳定
+生产签名密钥、公共托管、长期保留、无人值守升级、数据库 migration rollback、
+tagged release 或 RPM payload 签名。详见
+[跨版本 Linux 仓库生命周期实证](docs/evidence/2026-07-23-linux-repository-lifecycle.md)。
+
 当前准确能力边界见[能力与证据矩阵](docs/capability-evidence-matrix.md)；
 [Experiment 0 读数](docs/experiment-0-readout.md)保留为最初的证据冻结基线。
 
@@ -300,7 +317,7 @@ Web Chat、shadow 字节等价、cursor lag、HTTP 503、vector 清空重建、R
 
 每个 Pull Request 都会生成保留 7 天的可下载签名 snapshot，包括带 SHA-256 校验的 `linux/amd64`、`linux/arm64`、`darwin/amd64`、`darwin/arm64` 归档，以及独立的 `@vermory/openclaw` 包和确定性的 `vermory-hermes-0.1.0.tar.gz` provider 包。每个 Go 归档固定包含 `vermory`、`LICENSE`、`README.md` 和 `README.zh-CN.md`。
 
-snapshot 还包含恰好覆盖 8 个 payload 的 `release-manifest.sha256`，以及绑定精确 GitHub workflow identity 的 keyless Sigstore bundle `release-manifest.sigstore.json`。普通 test job 没有 OIDC 权限，只有在受保护测试成功后，独立 `sign-snapshot` job 才能签名。
+当前 snapshot 的 `release-manifest.sha256` 恰好覆盖 16 个 payload：8 个 GoReleaser 平台/软件包产物、4 个已验收 APT/DNF 仓库 bundle、GoReleaser `checksums.txt`、OpenClaw、Hermes 与 Hermes checksum sidecar。`release-manifest.sigstore.json` 是绑定精确 GitHub workflow identity 的 keyless Sigstore bundle。普通 test job 没有 OIDC 权限；包括 I09 仓库生命周期在内的受保护测试全部成功后，独立 `sign-snapshot` job 才能签名。
 
 ```bash
 vermory version

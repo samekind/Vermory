@@ -245,6 +245,18 @@ public hosting, mirrors, retention, cross-version upgrades or rollback, tagged
 publication, or RPM payload signatures. See
 [Native Linux Package Repository Qualification](docs/evidence/2026-07-23-linux-package-repository.md).
 
+I09 qualifies one explicit cross-version repository lifecycle. Frozen base and
+exact candidate DEB/RPM packages were installed through native APT/DNF on
+AMD64/ARM64, normally upgraded, protected from implicit downgrade, explicitly
+rolled back to the retained base, normally upgraded again, and finally removed.
+All four legs passed 26 hard gates while preserving operator configuration and
+the service identity, keeping the service inactive and disabled, and performing
+no database migration. The qualification-only versions are not release
+promises, and this does not claim a stable production signing key, public
+hosting, retention, unattended updates, database migration rollback, tagged
+publication, or RPM payload signatures. See
+[Cross-Version Linux Repository Lifecycle Qualification](docs/evidence/2026-07-23-linux-repository-lifecycle.md).
+
 Read the current [Capability And Evidence Matrix](docs/capability-evidence-matrix.md)
 for exact qualification boundaries. The
 [Experiment 0 report](docs/experiment-0-readout.md) is retained as the initial
@@ -464,10 +476,13 @@ archives plus the independent `@vermory/openclaw` package and deterministic
 `vermory-hermes-0.1.0.tar.gz` provider package. Each Go archive contains
 `vermory`, `LICENSE`, `README.md`, and `README.zh-CN.md`.
 
-The snapshot includes `release-manifest.sha256` with exactly eight payload
-records and `release-manifest.sigstore.json`, a GitHub OIDC keyless Sigstore
-bundle bound to the exact workflow identity. The ordinary test job has no OIDC
-permission; signing happens only after protected tests in `sign-snapshot`.
+The current snapshot includes `release-manifest.sha256` with exactly 16 payload
+records: eight GoReleaser platform/package outputs, four accepted APT/DNF
+repository bundles, GoReleaser `checksums.txt`, OpenClaw, Hermes, and the Hermes
+checksum sidecar. `release-manifest.sigstore.json` is a GitHub OIDC keyless
+Sigstore bundle bound to the exact workflow identity. The ordinary test job has
+no OIDC permission; signing happens only after protected tests, including the
+I09 repository-lifecycle gates, in `sign-snapshot`.
 
 ```bash
 vermory version
