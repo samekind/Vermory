@@ -12,6 +12,8 @@ The current public batch covers workspace continuity and trusted attachment,
 conversation continuity, thin Global Defaults, governed bridges, deletion and
 source-injection safety, authenticated tenant isolation, PostgreSQL recovery,
 OpenClaw, the Hermes real-client continuity contract, and an explicit
-three-client Web Chat/Hermes/OpenClaw bridge contract. A frozen case remains a
+three-client Web Chat/Hermes/OpenClaw bridge contract. I10 separately freezes
+the external withheld-evaluation handoff and verifier protocol without
+claiming that an independent private suite has run. A frozen case remains a
 contract until its separate execution evidence records the exact client,
-model, runtime, and hard gates that were actually exercised.
+model, runtime, evaluator, and hard gates that were actually exercised.

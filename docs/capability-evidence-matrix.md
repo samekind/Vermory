@@ -19,13 +19,16 @@ Status meanings are deliberately narrow:
   but that run was a provider evaluation rather than a named client workflow.
 - `runtime-qualified`: the exact case passed its runtime, database, recovery,
   security, or delivery contract; no real-model claim is needed or made.
+- `protocol-qualified`: the public external-evaluation handoff and verifier
+  passed positive and negative controls, but no private external run is
+  inferred.
 - `contract-only`: the case is frozen and its deterministic contract passes,
   but the complete external trajectory has not been qualified.
 - `external-blocked`: the required external client or provider failed before
   the case's acceptance boundary. The failure is retained and no pass is
   inferred.
 
-Frozen public reality cases: `21`.
+Frozen public reality cases: `22`.
 
 | Continuity line | Cases containing the line |
 |---|---:|
@@ -33,7 +36,7 @@ Frozen public reality cases: `21`.
 | Conversation | 12 |
 | Global Defaults | 6 |
 | Bridge | 7 |
-| Security | 14 |
+| Security | 15 |
 
 A case may cover more than one line, so these counts intentionally overlap.
 
@@ -76,6 +79,7 @@ A case may cover more than one line, so these counts intentionally overlap.
 | `I07-release-database-compatibility` | `runtime-qualified` | Exact schema-24 binary reports the inclusive `24..24` interval; schema `23` returns `migration_required`, schema `25` returns `binary_too_old`, unreadable schema fails closed, restricted runtime access cannot read or mutate `goose_db_version`, compatible `serve` reaches authenticated `401`, incompatible `serve` opens no listener, and package/systemd paths remain migration-free | PostgreSQL 17.10 local ARM64, PostgreSQL 18 protected CI, restricted runtime role, exact-head Linux packages and systemd lifecycle; model use is not applicable | [Release/database compatibility](evidence/2026-07-22-release-database-compatibility.md) | Qualifies the exact schema-24 preflight and rollback boundary; it does not claim universal automatic down migration, zero-downtime upgrades, tagged publication, repositories, or arbitrary future-schema rollback. |
 | `I08-linux-package-repository` | `runtime-qualified` | Exact I06 package bytes are published in signed APT/DNF repository bundles for AMD64/ARM64; native package managers install from `file://`, enforce repository metadata signatures, reject tampered metadata, and pass 18 hard gates; the exact bundles enter the OIDC-signed 16-entry snapshot | GitHub-hosted Ubuntu AMD64/ARM64 runners, Fedora 43 DNF containers, APT, DNF5, GnuPG, GitHub Actions, Cosign; model use is not applicable | [Native Linux package repository qualification](evidence/2026-07-23-linux-package-repository.md) | Qualifies ephemeral CI repository metadata signing and exact bundles, not a stable production key, public hosted repository, mirrors, retention, cross-version lifecycle, tagged publication, or RPM payload signatures. |
 | `I09-linux-repository-lifecycle` | `runtime-qualified` | Frozen base and exact candidate DEB/RPM packages complete native APT/DNF install, normal upgrade, no implicit downgrade, explicit rollback, normal re-upgrade, and final removal on AMD64/ARM64; operator configuration and service identity remain preserved, the service remains dormant, and all four legs pass 26 hard gates | GitHub-hosted Ubuntu AMD64/ARM64 runners, Fedora 43 DNF containers, APT, DNF5, GoReleaser, GnuPG, GitHub Actions, Cosign; model use is not applicable | [Cross-version Linux repository lifecycle](evidence/2026-07-23-linux-repository-lifecycle.md) | Qualification-only versions are not release promises. No stable key, public repository, retention SLA, unattended updates, database migration/rollback, RPM payload signature, or tagged release is qualified. |
+| `I10-external-withheld-evaluation-protocol` | `protocol-qualified` | A strict credential-free submission binds one exact artifact and evaluator execution boundary; version-2 attestation verification binds the exact evaluator key, submission, implementation, protocol, suite profile, validity interval, counts, hard gates, result digest, and signature while preserving version-1 verification | Public CLI, JSON schemas, Ed25519 verifier, deterministic positive and negative controls; no external evaluator or model result is claimed | [External withheld evaluation protocol](evidence/2026-07-23-external-withheld-evaluation-protocol.md) | Protocol qualification is not an externally recorded run and is not sealed qualification. Private cases, expected answers, evaluator credentials, and detailed reports remain outside this repository. |
 
 ## Public Benchmark And Comparison Evidence
 
@@ -145,8 +149,9 @@ The following remain explicit work, not hidden implementation details:
    explicit rollback, and normal re-upgrade for the current APT/DNF matrix. I07
    qualifies the deterministic schema-24 compatibility and backup/PITR
    rollback boundary; it does not promise a universal automatic down migration.
-4. Add a genuine withheld external evaluation; public cases and internal blind
-   splits are not called sealed evidence.
+4. Run a genuine withheld external evaluation through the I10-qualified
+   submission and attestation protocol. Public cases, internal blind splits,
+   and self-controlled signatures are not called sealed evidence.
 5. Complete blocked real-provider reader runs only when their original frozen
    provider and account requirements are available; do not replace them with a
    different client or model and keep the same claim.

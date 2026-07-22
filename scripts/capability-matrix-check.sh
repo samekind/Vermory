@@ -21,12 +21,12 @@ find reality/cases -mindepth 2 -maxdepth 2 -name manifest.json -print |
   done >"$case_list"
 
 case_count="$(wc -l <"$case_list" | tr -d ' ')"
-[[ "$case_count" -eq 21 ]] || {
-  echo "capability matrix: expected 21 frozen cases, found $case_count" >&2
+[[ "$case_count" -eq 22 ]] || {
+  echo "capability matrix: expected 22 frozen cases, found $case_count" >&2
   exit 1
 }
 
-grep -Fq 'Frozen public reality cases: `21`.' "$matrix"
+grep -Fq 'Frozen public reality cases: `22`.' "$matrix"
 
 while IFS= read -r case_id; do
   count="$(grep -Fc "| \`$case_id\` |" "$matrix")"
@@ -95,6 +95,7 @@ jq -e '
   (.report.hard_gates | to_entries | all(.value == true))
 ' "$i05_arm64_snapshot" >/dev/null
 grep -Fq '| `I06-linux-native-packages` | `runtime-qualified` |' "$matrix"
+grep -Fq '| `I10-external-withheld-evaluation-protocol` | `protocol-qualified` |' "$matrix"
 i06_snapshot="docs/evidence/snapshots/2026-07-22-linux-native-packages.json"
 jq -e '
   .source_head as $source_head |

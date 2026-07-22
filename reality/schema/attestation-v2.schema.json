@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vermory.dev/schema/reality-attestation-v2.json",
+  "title": "Vermory Submission-Bound External Evaluation Attestation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "evaluator_id",
+    "evaluator_key_id",
+    "suite_version",
+    "suite_profile",
+    "protocol_version",
+    "submission_digest",
+    "implementation_digest",
+    "run_id",
+    "run_at",
+    "hard_gates_pass",
+    "counts",
+    "hard_gate_results",
+    "result_digest",
+    "signature"
+  ],
+  "properties": {
+    "version": {
+      "const": 2
+    },
+    "evaluator_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "evaluator_key_id": {
+      "$ref": "#/$defs/sha256"
+    },
+    "suite_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "suite_profile": {
+      "$ref": "#/$defs/token"
+    },
+    "protocol_version": {
+      "const": "vermory.external-evaluation/v1"
+    },
+    "submission_digest": {
+      "$ref": "#/$defs/sha256"
+    },
+    "implementation_digest": {
+      "$ref": "#/$defs/sha256"
+    },
+    "run_id": {
+      "$ref": "#/$defs/token"
+    },
+    "run_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "hard_gates_pass": {
+      "type": "boolean"
+    },
+    "counts": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": 0
+      },
+      "required": [
+        "cases",
+        "passed",
+        "failed",
+        "hard_gates",
+        "hard_gates_passed",
+        "hard_gates_failed",
+        "hard_gates_not_run"
+      ]
+    },
+    "hard_gate_results": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": {
+        "$ref": "#/$defs/token"
+      },
+      "additionalProperties": {
+        "enum": ["pass", "fail", "not_run"]
+      }
+    },
+    "failure_categories": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/token"
+      }
+    },
+    "result_digest": {
+      "$ref": "#/$defs/sha256"
+    },
+    "signature": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "token": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[a-z0-9][a-z0-9._:/-]*$"
+    }
+  }
+}

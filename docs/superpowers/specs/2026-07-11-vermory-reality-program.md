@@ -123,7 +123,19 @@ The coding agent and implementation process must not have read access to sealed 
 
 Before that boundary exists, an owner-controlled directory outside the repository may be used only as a `withheld_local` holdout. It is not reported as blind or sealed if the implementation process could technically read it.
 
-External sealed results use `reality/schema/attestation.schema.json`. Vermory accepts only a versioned Ed25519-signed attestation that names the evaluator, suite, implementation digest, run time, hard-gate result, counts, and optional failure categories. The repository provides verification only; it does not provide a command that signs a local case or upgrades readable evidence to sealed evidence.
+Historical external results use `reality/schema/attestation.schema.json`.
+New external runs use
+`reality/schema/external-evaluation-submission-v1.schema.json` and
+`reality/schema/attestation-v2.schema.json`. The public submission binds an
+exact immutable artifact, protocol, suite profile, validity interval, declared
+interfaces, runtime platforms, and evaluator-controlled execution boundary.
+The version-2 Ed25519 attestation additionally binds the evaluator key,
+submission digest, implementation digest, run identity, aggregate counts,
+named hard-gate results, and evaluator-owned detailed-result digest. The
+repository provides submission creation and verification plus attestation
+verification only; it does not provide a command that signs a local result or
+upgrades readable evidence to sealed evidence. See the
+[external evaluator handoff](../../integrations/external-evaluator.md).
 
 Experiment 0 may complete while a genuine external sealed evaluator is unavailable. In that state, the readout must report sealed infrastructure as unavailable and retain the limitation explicitly; it must not substitute `withheld_local` or a repository directory for sealed evidence.
 

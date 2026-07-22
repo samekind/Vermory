@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "case_id": "I10-external-withheld-evaluation-protocol",
+  "manifest_sha256": "d678c0c91b1df512b62ab0900d47f21239b432269c577c6b6cf83cde081e9c0f",
+  "events_sha256": "02c530b795ed20852673eca79a1aa0b2d94ecff1167358e5f2173d253c729bf9",
+  "files": [
+    {
+      "path": "fixtures/evaluation-boundary.md",
+      "sha256": "497102448665f49f611dc2ca35c6b2886446282449f5e290cb4d1aaf4ae12fb7",
+      "bytes": 2640
+    }
+  ]
+}

@@ -823,9 +823,12 @@ func newRootCommand() *cobra.Command {
 	realityValidateCmd.Flags().StringVar(&realityArtifactRoot, "artifact-root", "./artifacts", "artifact output root")
 	realityValidateCmd.Flags().StringVar(&realityRunID, "run-id", "experiment-0-public", "stable reality validation run id")
 	rootCmd.AddCommand(realityValidateCmd)
+	rootCmd.AddCommand(newRealitySubmissionCreateCommand())
+	rootCmd.AddCommand(newRealitySubmissionVerifyCommand())
 
 	var attestationInput string
 	var attestationPublicKey string
+	var attestationSubmissionInput string
 	attestationVerifyCmd := &cobra.Command{
 		Use:   "reality-attestation-verify",
 		Short: "Verify an attestation signed by an external sealed evaluator",
@@ -839,12 +842,24 @@ func newRootCommand() *cobra.Command {
 			if err != nil {
 				return fmt.Errorf("decode public key: %w", err)
 			}
-			attestation, err := reality.VerifyAttestation(data, publicKey)
+			var attestation reality.Attestation
+			if strings.TrimSpace(attestationSubmissionInput) != "" {
+				submissionData, err := os.ReadFile(attestationSubmissionInput)
+				if err != nil {
+					return err
+				}
+				attestation, err = reality.VerifyAttestationForSubmission(data, publicKey, submissionData)
+			} else {
+				attestation, err = reality.VerifyAttestation(data, publicKey)
+				if err == nil && attestation.Version == 2 {
+					return fmt.Errorf("version 2 attestation requires --submission")
+				}
+			}
 			if err != nil {
 				return err
 			}
-			fmt.Fprintf(cmd.OutOrStdout(), "evaluator=%s suite=%s implementation=%s hard_gates_pass=%t\n",
-				attestation.EvaluatorID, attestation.SuiteVersion, attestation.ImplementationDigest, attestation.HardGatesPass)
+			fmt.Fprintf(cmd.OutOrStdout(), "version=%d evaluator=%s suite=%s implementation=%s hard_gates_pass=%t\n",
+				attestation.Version, attestation.EvaluatorID, attestation.SuiteVersion, attestation.ImplementationDigest, attestation.HardGatesPass)
 			keys := make([]string, 0, len(attestation.Counts))
 			for key := range attestation.Counts {
 				keys = append(keys, key)
@@ -858,6 +873,7 @@ func newRootCommand() *cobra.Command {
 	}
 	attestationVerifyCmd.Flags().StringVar(&attestationInput, "input", "", "external attestation JSON path")
 	attestationVerifyCmd.Flags().StringVar(&attestationPublicKey, "public-key", "", "base64-encoded Ed25519 public key")
+	attestationVerifyCmd.Flags().StringVar(&attestationSubmissionInput, "submission", "", "version 2 external evaluation submission JSON path")
 	_ = attestationVerifyCmd.MarkFlagRequired("input")
 	_ = attestationVerifyCmd.MarkFlagRequired("public-key")
 	rootCmd.AddCommand(attestationVerifyCmd)
