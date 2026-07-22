@@ -150,12 +150,20 @@ func TestLinuxAcceptanceExercisesTheCompleteI05Boundary(t *testing.T) {
 		"restore accepted a non-empty target",
 		"restored token or governed default probe failed",
 		"unit_process_journal_secret_free",
+		`chmod 0644 "$EVIDENCE_DIRECTORY/report.json"`,
+		`chmod 0755 "$EVIDENCE_DIRECTORY"`,
 	)
 	if strings.Contains(script, "sudo ") {
 		t.Fatal("acceptance script must execute inside one externally established root boundary")
 	}
 	if strings.Contains(script, `git -C "$REPOSITORY_ROOT"`) {
 		t.Fatal("root acceptance must not refresh the repository index")
+	}
+	reportMode := strings.Index(script, `chmod 0644 "$EVIDENCE_DIRECTORY/report.json"`)
+	credentialScan := strings.Index(script, `grep -Fq "$secret" "$EVIDENCE_DIRECTORY/report.json"`)
+	directoryMode := strings.Index(script, `chmod 0755 "$EVIDENCE_DIRECTORY"`)
+	if reportMode < 0 || credentialScan <= reportMode || directoryMode <= credentialScan {
+		t.Fatal("normalized evidence must remain root-confined until its credential scan passes")
 	}
 }
 

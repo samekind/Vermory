@@ -401,4 +401,5 @@ for secret in "$POSTGRES_PASSWORD" "$SOURCE_RUNTIME_PASSWORD" "$RESTORE_RUNTIME_
   grep -Fq "$secret" "$EVIDENCE_DIRECTORY/report.json" && fail "credential material appeared in normalized report"
 done
 jq -e '.hard_gates | to_entries | all(.value == true)' "$EVIDENCE_DIRECTORY/report.json" >/dev/null
+chmod 0755 "$EVIDENCE_DIRECTORY"
 echo "I05 acceptance passed for $SOURCE_SHA"
