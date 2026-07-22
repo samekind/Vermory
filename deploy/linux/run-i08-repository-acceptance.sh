@@ -163,8 +163,11 @@ case "$repository_kind" in
       -o "APT::Sandbox::User=root"
     )
     apt-get "${apt_options[@]}" update >/dev/null
-    apt-get "${apt_options[@]}" --download-only --yes --no-install-recommends install vermory >/dev/null
-    mapfile -t downloaded_packages < <(find "$apt_archives" -type f -name 'vermory_*.deb' -print)
+    (
+      cd "$downloads"
+      apt-get "${apt_options[@]}" download vermory >/dev/null
+    )
+    mapfile -t downloaded_packages < <(find "$downloads" -type f -name 'vermory_*.deb' -print)
     [[ ${#downloaded_packages[@]} -eq 1 ]] || fail "APT did not download exactly one Vermory package"
     downloaded_package=${downloaded_packages[0]}
     [[ "$(hash_file "$downloaded_package")" == "$package_sha256" ]] || fail "APT downloaded package hash mismatch"

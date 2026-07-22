@@ -111,6 +111,7 @@ func TestLinuxRepositoryScriptsRequireNativeSignedRepositorySemantics(t *testing
 		"apt-ftparchive",
 		"--clearsign",
 		"createrepo_c",
+		"--compress-type gz",
 		"repomd.xml.asc",
 		"I06-linux-native-packages",
 		"ephemeral-ci-qualification",

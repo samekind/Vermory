@@ -159,7 +159,7 @@ case "$repository_kind" in
     package_relative=packages/$package_name
     mkdir -p "$repository/packages"
     install -m 0644 "$source_package" "$repository/$package_relative"
-    createrepo_c --checksum sha256 "$repository" >/dev/null
+    createrepo_c --checksum sha256 --compress-type gz "$repository" >/dev/null
     primary_metadata=$(find "$repository/repodata" -maxdepth 1 -type f -name '*-primary.xml.gz' -print -quit)
     [[ -n "$primary_metadata" ]] || fail "DNF primary metadata is missing"
     gzip -dc "$primary_metadata" | grep -Fq "$package_sha256" \
