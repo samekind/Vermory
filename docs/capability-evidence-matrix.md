@@ -137,10 +137,12 @@ The following remain explicit work, not hidden implementation details:
    attachment, explicit rebind, tenant isolation, replay, and reversal, but its
    four Grok generation gates remain externally blocked and cannot be replaced
    by the independent SDK trajectory.
-3. Extend I05/I06/I08 beyond qualified ephemeral AMD64 and ARM64 runners and
-   `file://` repository bundles to long-duration uptime/SLA evidence, a stable
-   production repository signing-key lifecycle, public hosted repositories,
-   mirrors, retention, and distribution-specific upgrade behavior. I07
+3. Extend I05/I06/I08/I09 beyond qualified ephemeral AMD64 and ARM64 runners
+   and `file://` repository bundles to long-duration uptime/SLA evidence, a
+   stable production repository signing-key lifecycle, public hosted
+   repositories, mirrors, retention, unattended update policy, and a broader
+   distribution matrix. I09 qualifies normal upgrade, no implicit downgrade,
+   explicit rollback, and normal re-upgrade for the current APT/DNF matrix. I07
    qualifies the deterministic schema-24 compatibility and backup/PITR
    rollback boundary; it does not promise a universal automatic down migration.
 4. Add a genuine withheld external evaluation; public cases and internal blind
