@@ -237,10 +237,11 @@ EOF
       --setopt=install_weak_deps=False
     )
     dnf "${dnf_options[@]}" makecache >/dev/null
-    dnf "${dnf_options[@]}" download --destdir="$downloads" vermory >/dev/null
-    shopt -s nullglob
-    downloaded_packages=("$downloads"/vermory-*.rpm)
-    shopt -u nullglob
+    (
+      cd "$downloads"
+      dnf "${dnf_options[@]}" download vermory >/dev/null
+    )
+    mapfile -t downloaded_packages < <(find "$downloads" -type f -name 'vermory*.rpm' -print)
     [[ ${#downloaded_packages[@]} -eq 1 ]] || fail "DNF did not download exactly one Vermory package"
     downloaded_package=${downloaded_packages[0]}
     [[ "$(hash_file "$downloaded_package")" == "$package_sha256" ]] || fail "DNF downloaded package hash mismatch"
