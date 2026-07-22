@@ -99,5 +99,6 @@ future architecture.
 - [Reality-First Platform Design](docs/superpowers/specs/2026-07-11-vermory-reality-first-memory-platform-design.md)
 - [Reality Program](docs/superpowers/specs/2026-07-11-vermory-reality-program.md)
 - [Hypothesis Register](docs/superpowers/specs/2026-07-11-vermory-hypothesis-register.md)
-- [Evaluation Matrix](docs/evaluation-matrix.md)
+- [Capability And Evidence Matrix](docs/capability-evidence-matrix.md)
+- [Legacy Provider Evaluation Matrix](docs/evaluation-matrix.md)
 - [Repository Workflow](docs/collaboration/repository-workflow.md)

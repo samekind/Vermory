@@ -1,6 +1,10 @@
 # Legacy ContextMesh Evaluation Matrix
 
-> Historical self-case evidence retained for reproducibility. This document does not rank the models for Vermory and does not report results for the frozen Experiment 0 reality cases.
+> Historical self-case and provider evidence retained for reproducibility. It
+> is not the authority for current Vermory capability claims. Use the
+> [Vermory Capability And Evidence Matrix](capability-evidence-matrix.md) for
+> frozen-case execution state, real-client coverage, blocked qualifications,
+> protected delivery, and explicit non-claims.
 
 ## Purpose
 
