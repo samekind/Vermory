@@ -50,6 +50,25 @@ Every install path must remain inside the current user's home directory. The
 installer only operates in the user's `gui/<uid>` launchd domain and never
 invokes `sudo`.
 
+## Authenticated Web Chat
+
+`install-authenticated-user-service.sh` installs the multi-tenant `serve`
+profile as a separate unprivileged LaunchAgent. It does not migrate the
+database or grant PostgreSQL privileges. Provision those boundaries with an
+administrator connection first, then place only runtime settings and provider
+credentials in a `0600` environment file under the service user's home.
+
+```bash
+chmod 600 "$HOME/Library/Application Support/Vermory/vermory-authenticated.env"
+./deploy/macos/install-authenticated-user-service.sh \
+  ./bin/vermory \
+  "$HOME/Library/Application Support/Vermory/vermory-authenticated.env"
+```
+
+The LaunchAgent plist contains the environment-file path, not its contents.
+The service remains on loopback so a separately managed HTTPS entrypoint can
+terminate TLS without exposing a direct cleartext listener.
+
 ## OpenClaw Gateway
 
 After installing dependencies and building `integrations/openclaw`, install the

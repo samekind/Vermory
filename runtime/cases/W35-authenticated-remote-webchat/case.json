@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "id": "W35-authenticated-remote-webchat",
+  "title": "Authenticated remote Web Chat isolation, authority, restart, and revocation",
+  "surface": "real_remote_chrome_https_multi_tenant_web_chat",
+  "provider_boundary": "deterministic_provider_for_deployment_and_authority_contract",
+  "hard_gate_count": 26,
+  "hard_gates": [
+    "the remote browser reaches Vermory only through an authenticated HTTPS origin",
+    "the Vermory backend listens only on loopback and exposes no direct cleartext remote listener",
+    "the browser application shell and same-origin assets load without an API credential",
+    "every protected API request rejects a missing, malformed, expired, unknown, or revoked credential with 401",
+    "successful browser authentication returns only the minimum session capability needed by the UI",
+    "the raw credential is retained only in the current page memory and is absent from local storage, session storage, URLs, rendered DOM, logs, evidence, PostgreSQL content, and model context",
+    "a clean page refresh requires reauthentication rather than recovering a persisted credential",
+    "after reauthentication, refresh recovers the selected thread and authoritative server transcript",
+    "a pending operation identifier is persisted before the network request starts without persisting the credential",
+    "retry after an uncertain response reuses the original operation identifier and creates no duplicate turn",
+    "two tenants using the same channel and thread identifier resolve to different continuity identifiers",
+    "tenant A cannot retrieve, mutate, infer, or receive tenant B observations or governed memories",
+    "a client identity can send a chat turn and inspect only the requested conversation within its own tenant",
+    "a client identity cannot list candidates, confirm, correct, forget, manage defaults, or operate bridges",
+    "an operator identity can review candidates and confirm, correct, and forget governed memory within its own tenant",
+    "the browser hides or disables governance controls when the authenticated role lacks operator authority",
+    "a correction is visible in a fresh authenticated turn and the superseded value is not delivered as current",
+    "forgotten memory is absent from fresh recall, the browser current-memory view, lexical projection, and vector projection without erasing the source transcript",
+    "revoking the active token makes the next protected browser request return 401 and returns the UI to the signed-out state",
+    "token revocation does not reveal the token or erase authoritative tenant memory",
+    "restarting the Vermory process preserves PostgreSQL continuity, transcript, governed memory, and token lifecycle state",
+    "a backend outage produces an explicit recoverable browser failure and no phantom assistant answer",
+    "loss of the HTTPS relay or reverse entrypoint creates no successful receipt or committed turn",
+    "the service runs as an unprivileged user-level process and requires no root-scoped runtime deployment",
+    "same-origin assets retain restrictive CSP, no-referrer, nosniff, and frame-ancestor protections over the remote HTTPS origin",
+    "the final remote Chrome run has no cross-origin credential exposure, mixed content, console error, or unexpected warning"
+  ],
+  "non_claims": [
+    "the deterministic provider run is not a real-model quality qualification",
+    "the browser does not become the memory or identity authority",
+    "this case does not qualify browsers other than the accepted Chrome version",
+    "this case does not qualify Internet-scale availability or a general-purpose identity product"
+  ]
+}

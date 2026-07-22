@@ -2,6 +2,8 @@ package webchat
 
 import (
 	"bytes"
+	"crypto/sha256"
+	"encoding/hex"
 	"errors"
 	"net/http"
 	"strings"
@@ -18,6 +20,7 @@ type authenticatedHandler struct {
 	model         string
 	authenticator authn.Authenticator
 	retriever     runtime.MemoryRetriever
+	browser       http.Handler
 }
 
 type routeAccess int
@@ -29,14 +32,18 @@ const (
 )
 
 func NewAuthenticatedHandler(store *runtime.Store, llm provider.Provider, model string, authenticator authn.Authenticator) http.Handler {
-	return &authenticatedHandler{store: store, provider: llm, model: model, authenticator: authenticator}
+	return &authenticatedHandler{store: store, provider: llm, model: model, authenticator: authenticator, browser: newBrowserAppHandler("authenticated")}
 }
 
 func NewAuthenticatedHandlerWithRetriever(store *runtime.Store, llm provider.Provider, model string, authenticator authn.Authenticator, retriever runtime.MemoryRetriever) http.Handler {
-	return &authenticatedHandler{store: store, provider: llm, model: model, authenticator: authenticator, retriever: retriever}
+	return &authenticatedHandler{store: store, provider: llm, model: model, authenticator: authenticator, retriever: retriever, browser: newBrowserAppHandler("authenticated")}
 }
 
 func (handler *authenticatedHandler) ServeHTTP(response http.ResponseWriter, request *http.Request) {
+	if authenticatedBrowserPath(request.URL.Path) {
+		handler.browser.ServeHTTP(response, request)
+		return
+	}
 	raw, ok := bearerCredential(request)
 	if !ok || handler.authenticator == nil || handler.store == nil {
 		writeError(response, http.StatusUnauthorized, "unauthorized", "authentication is required")
@@ -62,6 +69,14 @@ func (handler *authenticatedHandler) ServeHTTP(response http.ResponseWriter, req
 	}
 	if access == routeOperator && principal.Role == authn.RoleClient {
 		writeError(response, http.StatusForbidden, "forbidden", "this identity cannot perform that operation")
+		return
+	}
+	if request.Method == http.MethodGet && request.URL.Path == "/v1/session" {
+		response.Header().Set("Cache-Control", "no-store")
+		writeJSON(response, http.StatusOK, map[string]string{
+			"role":          principal.Role.String(),
+			"storage_scope": browserStorageScope(principal.TenantID),
+		})
 		return
 	}
 
@@ -96,7 +111,9 @@ func bearerCredential(request *http.Request) (string, bool) {
 
 func authenticatedRouteAccess(method, path string) routeAccess {
 	clientRoutes := map[string]struct{}{
+		"GET /v1/session":                                   {},
 		"POST /v1/chat/turn":                                {},
+		"GET /v1/conversations/inspect":                     {},
 		"POST /v1/integrations/openclaw/turns/prepare":      {},
 		"POST /v1/integrations/openclaw/turns/complete":     {},
 		"POST /v1/integrations/openclaw/turns/fail":         {},
@@ -112,7 +129,6 @@ func authenticatedRouteAccess(method, path string) routeAccess {
 		"POST /v1/memories/candidates/reject": {},
 		"POST /v1/memories/correct":           {},
 		"POST /v1/memories/forget":            {},
-		"GET /v1/conversations/inspect":       {},
 		"GET /v1/defaults":                    {},
 		"POST /v1/defaults/set":               {},
 		"POST /v1/defaults/correct":           {},
@@ -135,6 +151,20 @@ func authenticatedRouteAccess(method, path string) routeAccess {
 		return routeOperator
 	}
 	return routeUnknown
+}
+
+func authenticatedBrowserPath(path string) bool {
+	switch path {
+	case "/", "/assets/app.css", "/assets/app.js", "/v1/browser/runtime":
+		return true
+	default:
+		return false
+	}
+}
+
+func browserStorageScope(tenantID string) string {
+	digest := sha256.Sum256([]byte("vermory-browser-storage-v1\x00" + strings.TrimSpace(tenantID)))
+	return hex.EncodeToString(digest[:16])
 }
 
 type bufferedResponse struct {

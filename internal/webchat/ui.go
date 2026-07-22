@@ -15,9 +15,20 @@ var browserAppCSS []byte
 var browserAppJS []byte
 
 func (h *Handler) registerBrowserApp() {
-	h.mux.HandleFunc("GET /{$}", serveBrowserAsset("text/html; charset=utf-8", browserAppHTML))
-	h.mux.HandleFunc("GET /assets/app.css", serveBrowserAsset("text/css; charset=utf-8", browserAppCSS))
-	h.mux.HandleFunc("GET /assets/app.js", serveBrowserAsset("text/javascript; charset=utf-8", browserAppJS))
+	registerBrowserAppRoutes(h.mux, "local")
+}
+
+func newBrowserAppHandler(mode string) http.Handler {
+	mux := http.NewServeMux()
+	registerBrowserAppRoutes(mux, mode)
+	return mux
+}
+
+func registerBrowserAppRoutes(mux *http.ServeMux, mode string) {
+	mux.HandleFunc("GET /{$}", serveBrowserAsset("text/html; charset=utf-8", browserAppHTML))
+	mux.HandleFunc("GET /assets/app.css", serveBrowserAsset("text/css; charset=utf-8", browserAppCSS))
+	mux.HandleFunc("GET /assets/app.js", serveBrowserAsset("text/javascript; charset=utf-8", browserAppJS))
+	mux.HandleFunc("GET /v1/browser/runtime", serveBrowserAsset("application/json", []byte("{\"mode\":\""+mode+"\"}\n")))
 }
 
 func serveBrowserAsset(contentType string, body []byte) http.HandlerFunc {

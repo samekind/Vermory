@@ -1,9 +1,17 @@
 (() => {
   "use strict";
 
-  const storageKey = "vermory.webchat.v1";
+  const localStorageKey = "vermory.webchat.v1";
   const channel = "web_chat";
   const elements = {
+    appShell: document.querySelector("#app-shell"),
+    authGate: document.querySelector("#auth-gate"),
+    authForm: document.querySelector("#auth-form"),
+    apiToken: document.querySelector("#api-token"),
+    authError: document.querySelector("#auth-error"),
+    sessionControls: document.querySelector("#session-controls"),
+    sessionRole: document.querySelector("#session-role"),
+    signOut: document.querySelector("#sign-out"),
     workspace: document.querySelector(".workspace"),
     mobileTabs: [...document.querySelectorAll("[data-view]")],
     threadList: document.querySelector("#thread-list"),
@@ -21,10 +29,15 @@
     mobileMemoryCount: document.querySelector("#mobile-memory-count"),
     reviewCount: document.querySelector("#review-count"),
     memoryTabs: [...document.querySelectorAll("[data-memory-view]")],
+    memoryTabsContainer: document.querySelector("#memory-tabs"),
     toast: document.querySelector("#toast"),
   };
 
-  let state = loadState();
+  let activeStorageKey = "";
+  let apiCredential = "";
+  let runtimeMode = "probing";
+  let authenticatedRole = "";
+  let state = freshState();
   let inspection = emptyInspection();
   let candidates = [];
   let memoryView = "remembered";
@@ -37,9 +50,15 @@
     return { observations: [], memories: [] };
   }
 
+  function freshState() {
+    const first = newThread();
+    return { version: 1, threads: [first], activeThreadID: first.id };
+  }
+
   function loadState() {
+    if (!activeStorageKey) return freshState();
     try {
-      const stored = JSON.parse(localStorage.getItem(storageKey));
+      const stored = JSON.parse(localStorage.getItem(activeStorageKey));
       if (stored && stored.version === 1 && Array.isArray(stored.threads)) {
         const threads = stored.threads.filter(validThread).map((thread) => ({
           id: thread.id,
@@ -57,10 +76,9 @@
         }
       }
     } catch (_) {
-      localStorage.removeItem(storageKey);
+      localStorage.removeItem(activeStorageKey);
     }
-    const first = newThread();
-    return { version: 1, threads: [first], activeThreadID: first.id };
+    return freshState();
   }
 
   function validThread(thread) {
@@ -86,7 +104,7 @@
   }
 
   function persistState() {
-    localStorage.setItem(storageKey, JSON.stringify(state));
+    if (activeStorageKey) localStorage.setItem(activeStorageKey, JSON.stringify(state));
   }
 
   function setConnection(online, label) {
@@ -98,6 +116,84 @@
   function setSync(label, busy = false) {
     elements.syncState.textContent = label;
     elements.transcript.setAttribute("aria-busy", busy ? "true" : "false");
+  }
+
+  function canGovern() {
+    return runtimeMode === "local" || authenticatedRole === "operator" || authenticatedRole === "owner";
+  }
+
+  function activateStorage(storageScope) {
+    activeStorageKey = storageScope === "local" ? localStorageKey : `${localStorageKey}.${storageScope}`;
+    state = loadState();
+    inspection = emptyInspection();
+    candidates = [];
+    memoryView = "remembered";
+    editingMemoryID = "";
+    confirmingForgetID = "";
+  }
+
+  function applyAuthorityUI() {
+    const governed = canGovern();
+    elements.memoryTabsContainer.hidden = !governed;
+    if (!governed) memoryView = "remembered";
+    elements.sessionControls.hidden = runtimeMode !== "authenticated";
+    elements.sessionRole.textContent = authenticatedRole === "client" ? "Chat access" : "Memory operator";
+  }
+
+  function renderApplication() {
+    applyAuthorityUI();
+    renderThreads();
+    renderTranscript();
+    renderMemory();
+    syncComposerToThread();
+  }
+
+  function showApplication() {
+    elements.authGate.hidden = true;
+    elements.appShell.hidden = false;
+    elements.authError.hidden = true;
+    elements.authError.textContent = "";
+    renderApplication();
+  }
+
+  function showAuthentication(message = "") {
+    for (const thread of state.threads) {
+      if (thread.pending?.phase === "sending") thread.pending.phase = "failed";
+    }
+    persistState();
+    apiCredential = "";
+    authenticatedRole = "";
+    activeStorageKey = "";
+    state = freshState();
+    inspection = emptyInspection();
+    candidates = [];
+    elements.appShell.hidden = true;
+    elements.authGate.hidden = false;
+    elements.authError.textContent = message;
+    elements.authError.hidden = !message;
+    elements.apiToken.value = "";
+    requestAnimationFrame(() => elements.apiToken.focus());
+  }
+
+  async function enterAuthenticatedMode(session) {
+    if (!session || !["client", "operator", "owner"].includes(session.role) || !/^[a-f0-9]{32}$/.test(session.storage_scope || "")) {
+      throw new Error("The server returned an invalid access session.");
+    }
+    runtimeMode = "authenticated";
+    authenticatedRole = session.role;
+    activateStorage(session.storage_scope);
+    showApplication();
+    setConnection(navigator.onLine, navigator.onLine ? "Connected" : "Offline");
+    await refreshCurrent({ quiet: true });
+  }
+
+  function enterLocalMode() {
+    runtimeMode = "local";
+    authenticatedRole = "operator";
+    activateStorage("local");
+    showApplication();
+    setConnection(navigator.onLine, navigator.onLine ? "Connected" : "Offline");
+    void refreshCurrent();
   }
 
   function setMobileView(view) {
@@ -235,7 +331,7 @@
         retry.textContent = "Retry";
         meta.append(retry);
       }
-    } else {
+    } else if (canGovern()) {
       const remember = document.createElement("button");
       remember.type = "button";
       remember.className = "message-action";
@@ -293,14 +389,17 @@
     const copy = document.createElement("p");
     copy.className = "memory-copy";
     copy.textContent = memory.content;
-    const actions = document.createElement("div");
-    actions.className = "memory-actions";
-    actions.append(actionButton("Correct", "edit-memory"));
-    const forget = actionButton(confirmingForgetID === memory.id ? "Confirm forget" : "Forget", "forget-memory");
-    forget.classList.add("danger");
-    actions.append(forget);
-    if (confirmingForgetID === memory.id) actions.append(actionButton("Cancel", "cancel-forget"));
-    article.append(copy, actions);
+    article.append(copy);
+    if (canGovern()) {
+      const actions = document.createElement("div");
+      actions.className = "memory-actions";
+      actions.append(actionButton("Correct", "edit-memory"));
+      const forget = actionButton(confirmingForgetID === memory.id ? "Confirm forget" : "Forget", "forget-memory");
+      forget.classList.add("danger");
+      actions.append(forget);
+      if (confirmingForgetID === memory.id) actions.append(actionButton("Cancel", "cancel-forget"));
+      article.append(actions);
+    }
     return article;
   }
 
@@ -340,7 +439,11 @@
   async function requestJSON(path, options = {}) {
     const response = await fetch(path, {
       ...options,
-      headers: options.body ? { "Content-Type": "application/json", ...(options.headers || {}) } : options.headers,
+      headers: {
+        ...(options.body ? { "Content-Type": "application/json" } : {}),
+        ...(apiCredential ? { Authorization: `Bearer ${apiCredential}` } : {}),
+        ...(options.headers || {}),
+      },
     });
     let body = null;
     try {
@@ -349,8 +452,11 @@
       body = null;
     }
     if (!response.ok) {
-      const error = new Error(body?.message || "The request could not be completed.");
+      const error = new Error(body?.error?.message || body?.message || "The request could not be completed.");
       error.status = response.status;
+      if (response.status === 401 && runtimeMode === "authenticated") {
+        showAuthentication("Your access is no longer valid. Enter an active token to continue.");
+      }
       throw error;
     }
     return body;
@@ -384,7 +490,7 @@
       const query = conversationQuery(threadID);
       const [nextInspection, inbox] = await Promise.all([
         requestJSON(`/v1/conversations/inspect?${query}`),
-        requestJSON(`/v1/memories/candidates?${query}`),
+        canGovern() ? requestJSON(`/v1/memories/candidates?${query}`) : Promise.resolve({ candidates: [] }),
       ]);
       if (!refreshStillCurrent()) return;
       inspection = nextInspection || emptyInspection();
@@ -486,6 +592,7 @@
   }
 
   async function rememberObservation(observationID, button) {
+    if (!canGovern()) return;
     button.disabled = true;
     try {
       await requestJSON("/v1/memories/confirm", {
@@ -501,6 +608,7 @@
   }
 
   async function reviewCandidate(candidateID, accept, button) {
+    if (!canGovern()) return;
     button.disabled = true;
     try {
       await requestJSON(`/v1/memories/candidates/${accept ? "accept" : "reject"}`, {
@@ -516,6 +624,7 @@
   }
 
   async function correctMemory(memoryID, content, form) {
+    if (!canGovern()) return;
     const submit = form.querySelector('button[type="submit"]');
     submit.disabled = true;
     try {
@@ -533,6 +642,7 @@
   }
 
   async function forgetMemory(memoryID, button) {
+    if (!canGovern()) return;
     button.disabled = true;
     try {
       await requestJSON("/v1/memories/forget", {
@@ -601,6 +711,52 @@
     elements.messageInput.value = activeThread().pending?.message || "";
     resizeComposer();
   }
+
+  async function probeRuntime() {
+    try {
+      const response = await fetch("/v1/browser/runtime", {
+        cache: "no-store",
+        headers: { Accept: "application/json" },
+      });
+      const runtime = response.ok ? await response.json() : null;
+      if (runtime?.mode === "local") {
+        enterLocalMode();
+        return;
+      }
+      if (runtime?.mode === "authenticated") {
+        runtimeMode = "authenticated";
+        showAuthentication();
+        return;
+      }
+      showAuthentication("The Vermory service returned an unexpected authentication response.");
+    } catch (_) {
+      runtimeMode = "authenticated";
+      showAuthentication("Vermory is not reachable. Check the secure connection and try again.");
+    }
+  }
+
+  elements.authForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const submit = elements.authForm.querySelector('button[type="submit"]');
+    const credential = elements.apiToken.value.trim();
+    elements.apiToken.value = "";
+    if (!credential) return;
+    runtimeMode = "authenticated";
+    apiCredential = credential;
+    submit.disabled = true;
+    elements.authError.hidden = true;
+    try {
+      const session = await requestJSON("/v1/session", { method: "GET" });
+      await enterAuthenticatedMode(session);
+    } catch (error) {
+      apiCredential = "";
+      showAuthentication(error.status === 401 ? "That access token is not active." : error.message);
+    } finally {
+      submit.disabled = false;
+    }
+  });
+
+  elements.signOut.addEventListener("click", () => showAuthentication());
 
   document.querySelector("#new-thread").addEventListener("click", createConversation);
   document.querySelector("#new-thread-compact").addEventListener("click", createConversation);
@@ -691,14 +847,9 @@
 
   window.addEventListener("online", () => {
     setConnection(true, "Connected");
-    void refreshCurrent({ quiet: true });
+    if (runtimeMode === "local" || apiCredential) void refreshCurrent({ quiet: true });
   });
   window.addEventListener("offline", () => setConnection(false, "Offline"));
 
-  setConnection(navigator.onLine, navigator.onLine ? "Connecting" : "Offline");
-  renderThreads();
-  renderTranscript();
-  renderMemory();
-  syncComposerToThread();
-  void refreshCurrent();
+  void probeRuntime();
 })();

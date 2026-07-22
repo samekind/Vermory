@@ -110,7 +110,7 @@ Expired, revoked, unknown, malformed, or missing tokens receive `401`. Authentic
 |---|---:|---:|---:|
 | Chat turn | Allow | Allow | Allow |
 | OpenClaw prepare/complete/fail | Allow | Allow | Allow |
-| Conversation inspection | Deny | Allow | Allow |
+| Conversation inspection | Allow | Allow | Allow |
 | Confirm/correct/forget memory | Deny | Allow | Allow |
 | Global Defaults | Deny | Allow | Allow |
 | Bridge create/inspect/reverse | Deny | Allow | Allow |

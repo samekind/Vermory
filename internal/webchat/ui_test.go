@@ -21,7 +21,7 @@ func TestBrowserAppServesSameOriginAssetsWithRestrictiveHeaders(t *testing.T) {
 		{
 			path:        "/",
 			contentType: "text/html; charset=utf-8",
-			contains:    []string{"<title>Vermory</title>", `src="/assets/app.js"`, `href="/assets/app.css"`, `id="transcript"`, `id="memory-content"`},
+			contains:    []string{"<title>Vermory</title>", `rel="icon"`, `src="/assets/app.js"`, `href="/assets/app.css"`, `id="transcript"`, `id="memory-content"`, `id="auth-gate"`, `id="api-token"`, `id="sign-out"`},
 		},
 		{
 			path:        "/assets/app.css",
@@ -31,7 +31,12 @@ func TestBrowserAppServesSameOriginAssetsWithRestrictiveHeaders(t *testing.T) {
 		{
 			path:        "/assets/app.js",
 			contentType: "text/javascript; charset=utf-8",
-			contains:    []string{storageKeyForTest, "operationID", "persistState();", `requestJSON("/v1/chat/turn"`, `data-action="save-correction"`},
+			contains:    []string{storageKeyForTest, "operationID", "persistState();", `fetch("/v1/browser/runtime"`, `requestJSON("/v1/chat/turn"`, `data-action="save-correction"`},
+		},
+		{
+			path:        "/v1/browser/runtime",
+			contentType: "application/json",
+			contains:    []string{`{"mode":"local"}`},
 		},
 	}
 
@@ -79,7 +84,7 @@ func TestBrowserAppDoesNotUseInlineExecutableContentOrCrossOriginDependencies(t 
 
 func TestBrowserAppAssetsRejectUnsupportedMethods(t *testing.T) {
 	handler, _ := testHandler(t, provider.Mock{Output: "unused"})
-	for _, path := range []string{"/", "/assets/app.css", "/assets/app.js"} {
+	for _, path := range []string{"/", "/assets/app.css", "/assets/app.js", "/v1/browser/runtime"} {
 		response := httptest.NewRecorder()
 		handler.ServeHTTP(response, httptest.NewRequest(http.MethodPost, path, nil))
 		if response.Code != http.StatusMethodNotAllowed {
@@ -129,6 +134,34 @@ func TestBrowserAppRejectsStaleRefreshesAfterThreadSwitch(t *testing.T) {
 	}
 }
 
+func TestBrowserAppKeepsAuthenticatedCredentialEphemeral(t *testing.T) {
+	script := string(browserAppJS)
+	for _, expected := range []string{
+		`let apiCredential = "";`,
+		`fetch("/v1/browser/runtime"`,
+		`Authorization: `,
+		`Bearer ${apiCredential}`,
+		`requestJSON("/v1/session"`,
+		`apiCredential = "";`,
+	} {
+		if !strings.Contains(script, expected) {
+			t.Errorf("browser app omitted ephemeral authentication behavior %q", expected)
+		}
+	}
+	for _, forbidden := range []string{
+		"sessionStorage",
+		"localStorage.setItem(credential",
+		"localStorage.setItem(token",
+		"api_token=",
+		"access_token=",
+		"?token=",
+	} {
+		if strings.Contains(script, forbidden) {
+			t.Errorf("browser app contains credential persistence or URL transport %q", forbidden)
+		}
+	}
+}
+
 const storageKeyForTest = "vermory.webchat.v1"
 
 func TestW32BrowserContractManifestRemainsFrozen(t *testing.T) {
@@ -155,5 +188,32 @@ func TestW32BrowserContractManifestRemainsFrozen(t *testing.T) {
 	}
 	if len(manifest.NonClaims) != 3 {
 		t.Fatalf("unexpected W32 non-claim count: %d", len(manifest.NonClaims))
+	}
+}
+
+func TestW35AuthenticatedRemoteBrowserContractManifestRemainsFrozen(t *testing.T) {
+	payload, err := os.ReadFile("../../runtime/cases/W35-authenticated-remote-webchat/case.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	var manifest struct {
+		Version       int      `json:"version"`
+		ID            string   `json:"id"`
+		Surface       string   `json:"surface"`
+		HardGateCount int      `json:"hard_gate_count"`
+		HardGates     []string `json:"hard_gates"`
+		NonClaims     []string `json:"non_claims"`
+	}
+	if err := json.Unmarshal(payload, &manifest); err != nil {
+		t.Fatal(err)
+	}
+	if manifest.Version != 1 || manifest.ID != "W35-authenticated-remote-webchat" || manifest.Surface != "real_remote_chrome_https_multi_tenant_web_chat" {
+		t.Fatalf("unexpected W35 identity: %#v", manifest)
+	}
+	if manifest.HardGateCount != 26 || len(manifest.HardGates) != manifest.HardGateCount {
+		t.Fatalf("unexpected W35 hard gates: count=%d gates=%d", manifest.HardGateCount, len(manifest.HardGates))
+	}
+	if len(manifest.NonClaims) != 4 {
+		t.Fatalf("unexpected W35 non-claim count: %d", len(manifest.NonClaims))
 	}
 }

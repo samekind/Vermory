@@ -60,6 +60,66 @@ func TestAuthenticatedHandlerRejectsMissingMalformedUnknownExpiredAndRevokedToke
 	}
 }
 
+func TestAuthenticatedBrowserAssetsAndSessionBoundary(t *testing.T) {
+	store := &runtime.Store{}
+	authenticator := staticAuthenticator{principals: map[string]authn.Principal{
+		"client-a":   principal("identity-a", authn.RoleClient),
+		"operator-a": principal("identity-a", authn.RoleOperator),
+		"client-b":   principal("identity-b", authn.RoleClient),
+	}}
+	handler := NewAuthenticatedHandler(store, provider.Mock{Output: "unused"}, "test-model", authenticator)
+
+	for _, path := range []string{"/", "/assets/app.css", "/assets/app.js", "/v1/browser/runtime"} {
+		response := httptest.NewRecorder()
+		handler.ServeHTTP(response, httptest.NewRequest(http.MethodGet, path, nil))
+		if response.Code != http.StatusOK {
+			t.Fatalf("anonymous browser asset %s returned %d: %s", path, response.Code, response.Body.String())
+		}
+		if response.Header().Get("Content-Security-Policy") == "" {
+			t.Fatalf("anonymous browser asset %s omitted browser protections", path)
+		}
+	}
+	runtimeResponse := httptest.NewRecorder()
+	handler.ServeHTTP(runtimeResponse, httptest.NewRequest(http.MethodGet, "/v1/browser/runtime", nil))
+	if runtimeResponse.Code != http.StatusOK || runtimeResponse.Body.String() != "{\"mode\":\"authenticated\"}\n" {
+		t.Fatalf("anonymous browser runtime returned %d: %s", runtimeResponse.Code, runtimeResponse.Body.String())
+	}
+
+	missing := httptest.NewRecorder()
+	handler.ServeHTTP(missing, httptest.NewRequest(http.MethodGet, "/v1/session", nil))
+	if missing.Code != http.StatusUnauthorized {
+		t.Fatalf("anonymous session returned %d: %s", missing.Code, missing.Body.String())
+	}
+
+	sessions := make(map[string]map[string]any)
+	for _, token := range []string{"client-a", "operator-a", "client-b"} {
+		response := performAuthenticatedJSON(t, handler, token, http.MethodGet, "/v1/session", "")
+		if response.Code != http.StatusOK {
+			t.Fatalf("session %s returned %d: %s", token, response.Code, response.Body.String())
+		}
+		if response.Header().Get("Cache-Control") != "no-store" {
+			t.Fatalf("session %s may be cached: %q", token, response.Header().Get("Cache-Control"))
+		}
+		var payload map[string]any
+		decodeResponse(t, response, &payload)
+		if len(payload) != 2 || payload["role"] == "" || payload["storage_scope"] == "" {
+			t.Fatalf("session %s exposed the wrong capability shape: %#v", token, payload)
+		}
+		for _, forbidden := range []string{"tenant_id", "subject_id", "token_id", "expires_at", "token", "credential"} {
+			if _, ok := payload[forbidden]; ok {
+				t.Fatalf("session %s exposed %s: %#v", token, forbidden, payload)
+			}
+		}
+		sessions[token] = payload
+	}
+	if sessions["client-a"]["storage_scope"] != sessions["operator-a"]["storage_scope"] {
+		t.Fatal("same-tenant browser identities received different storage scopes")
+	}
+	if sessions["client-a"]["storage_scope"] == sessions["client-b"]["storage_scope"] {
+		t.Fatal("different tenants received the same browser storage scope")
+	}
+}
+
 func TestAuthenticatedHandlerUsesPrincipalTenantAndRolePolicy(t *testing.T) {
 	_, store := testHandler(t, provider.Mock{Output: "unused"})
 	authenticator := staticAuthenticator{principals: map[string]authn.Principal{
@@ -76,6 +136,10 @@ func TestAuthenticatedHandlerUsesPrincipalTenantAndRolePolicy(t *testing.T) {
 }`)
 	if chat.Code != http.StatusOK {
 		t.Fatalf("client chat failed: %d %s", chat.Code, chat.Body.String())
+	}
+	clientInspection := performAuthenticatedJSON(t, handler, "client-a", http.MethodGet, "/v1/conversations/inspect?channel=web_chat&thread_id=shared-anchor", "")
+	if clientInspection.Code != http.StatusOK {
+		t.Fatalf("client conversation inspection failed: %d %s", clientInspection.Code, clientInspection.Body.String())
 	}
 	resolution, err := store.ResolveConversation(context.Background(), "identity-a", runtime.ConversationAnchor{Channel: "web_chat", ThreadID: "shared-anchor"})
 	if err != nil || resolution.Status != runtime.ResolutionResolved {
