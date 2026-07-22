@@ -62,6 +62,7 @@ done < <(rg -o '\]\((evidence/[^)#]+\.md)\)' "$matrix" | sed -E 's/^.*\]\(([^)]+
 
 grep -Fq '| `B03-three-client-conversation-bridge` | `client-qualified` |' "$matrix"
 grep -Fq '| `W04-canonical-repository-cross-client` | `external-blocked` |' "$matrix"
+grep -Fq '[remote Git topology](evidence/2026-07-22-remote-git-workspace-topology.md)' "$matrix"
 grep -Fq '| `I05-durable-linux-service-lifecycle` | `runtime-qualified` |' "$matrix"
 i05_snapshot="docs/evidence/snapshots/2026-07-22-durable-linux-service-lifecycle.json"
 jq -e '
