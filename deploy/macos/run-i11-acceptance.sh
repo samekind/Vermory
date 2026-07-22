@@ -44,8 +44,8 @@ done
 hard_gate_count=$(jq -er '.hard_gate_count' "$case_file")
 [[ "$hard_gate_count" == "20" ]] || die "I11 hard gate count changed: $hard_gate_count"
 
-base_info=$($base_binary version)
-candidate_info=$($candidate_binary version)
+base_info=$("$base_binary" version)
+candidate_info=$("$candidate_binary" version)
 base_revision=$(jq -er '.revision' <<<"$base_info")
 candidate_revision=$(jq -er '.revision' <<<"$candidate_info")
 base_version=$(jq -er '.version' <<<"$base_info")
@@ -139,7 +139,7 @@ export VERMORY_HEALTH_ATTEMPTS=15
 export VERMORY_HEALTH_SLEEP_SECONDS=1
 
 "$installer" "$base_binary" "$environment_source" >"$raw_root/install-base.log" 2>&1
-[[ $($installed_binary version | jq -r '.revision') == "$base_revision" ]] || die "base installation revision mismatch"
+[[ $("$installed_binary" version | jq -r '.revision') == "$base_revision" ]] || die "base installation revision mismatch"
 
 token_receipt="$raw_root/token-issue.private.json"
 expires_at=$(date -u -v+7d '+%Y-%m-%dT%H:%M:%SZ')
@@ -292,14 +292,25 @@ if grep -Fq "$runtime_password" "$plist" || grep -Fq "$api_token" "$plist"; then
   plist_secret_matches=1
 fi
 runtime_secret_matches=0
+protected_environment_files=0
 while IFS= read -r -d '' file; do
-  [[ "$file" == "$runtime_root/vermory-authenticated.env" ]] && continue
+  case "$file" in
+    "$runtime_root/vermory-authenticated.env"|"$runtime_root/rollback/vermory-authenticated.env")
+      [[ $(stat -f '%Lp' "$file") == "600" ]] || die "protected runtime environment mode changed"
+      if grep -aFq "$api_token" "$file" 2>/dev/null; then
+        die "API token entered a runtime environment file"
+      fi
+      protected_environment_files=$((protected_environment_files + 1))
+      continue
+      ;;
+  esac
   if grep -aFq "$runtime_password" "$file" 2>/dev/null || grep -aFq "$api_token" "$file" 2>/dev/null; then
     runtime_secret_matches=$((runtime_secret_matches + 1))
   fi
 done < <(find "$runtime_root" "$logs_root" -type f -print0)
 [[ $plist_secret_matches -eq 0 ]] || die "credential material entered the LaunchAgent plist"
 [[ $runtime_secret_matches -eq 0 ]] || die "credential material entered non-secret runtime files"
+[[ $protected_environment_files -eq 2 ]] || die "unexpected protected runtime environment count: $protected_environment_files"
 
 environment_mode=$(stat -f '%Lp' "$runtime_root/vermory-authenticated.env")
 [[ "$environment_mode" == "600" ]] || die "installed environment mode changed: $environment_mode"
@@ -324,6 +335,7 @@ jq -n \
   --arg final_counts "$final_counts" \
   --argjson hard_gate_count "$hard_gate_count" \
   --argjson environment_mode "$environment_mode" \
+  --argjson protected_environment_files "$protected_environment_files" \
   --argjson plist_secret_matches "$plist_secret_matches" \
   --argjson runtime_secret_matches "$runtime_secret_matches" \
   '{
@@ -335,7 +347,7 @@ jq -n \
     candidate:{revision:$candidate_revision,version:$candidate_version,sha256:$candidate_sha256},
     runtime:{os:"macOS",os_version:$os_version,machine:$machine,postgres:$postgres_version,launchd_label:$label,loopback_only:true,unprivileged:true},
     state:{token_public_id:$token_public_id,memory_id:$memory_id,marker_sha256:$marker_sha256,baseline_counts:$baseline_counts,final_counts:$final_counts},
-    security:{environment_mode:$environment_mode,plist_secret_matches:$plist_secret_matches,runtime_secret_matches:$runtime_secret_matches},
+    security:{environment_mode:$environment_mode,protected_environment_files:$protected_environment_files,plist_secret_matches:$plist_secret_matches,runtime_secret_matches:$runtime_secret_matches},
     hard_gate_count:$hard_gate_count,
     hard_gates:{
       candidate_version_preflight:true,
@@ -363,7 +375,7 @@ jq -n \
     non_claims:["database down migration","arbitrary historical rollback","zero-downtime restart","long-duration SLA","model availability","system-wide installation"]
   }' >"$report"
 
-jq -e '(.hard_gates | length) == .hard_gate_count and (.hard_gates | to_entries | all(.value == true)) and .security.environment_mode == 600 and .security.plist_secret_matches == 0 and .security.runtime_secret_matches == 0' "$report" >/dev/null
+jq -e '(.hard_gates | length) == .hard_gate_count and (.hard_gates | to_entries | all(.value == true)) and .security.environment_mode == 600 and .security.protected_environment_files == 2 and .security.plist_secret_matches == 0 and .security.runtime_secret_matches == 0' "$report" >/dev/null
 shasum -a 256 "$report" >"$report_root/report.json.sha256"
 if grep -aFq "$runtime_password" "$report" || grep -aFq "$api_token" "$report"; then
   die "normalized report contains credential material"
