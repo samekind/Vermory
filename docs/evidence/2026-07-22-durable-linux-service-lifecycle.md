@@ -14,8 +14,11 @@ Linux lifecycle job: [`88910623425`](https://github.com/samekind/Vermory/actions
 
 Evidence level: `public`
 
-The machine-readable result is retained in the
+The original AMD64 machine-readable result is retained in the
 [I05 lifecycle snapshot](snapshots/2026-07-22-durable-linux-service-lifecycle.json).
+The subsequent native ARM64 result is retained separately in the
+[I05 ARM64 lifecycle snapshot](snapshots/2026-07-22-durable-linux-service-lifecycle-arm64.json),
+so the earlier evidence is not rewritten.
 
 ## Qualified Contract
 
@@ -65,6 +68,38 @@ hard gates to exist and equal `true`; it also checked the release and backup
 digests, non-empty backup size, schema version, service boundary, and restored
 state. A separate credential scan found no database URL, password, bearer value,
 API key, access token, or raw token field.
+
+## Native ARM64 Qualification
+
+Source revision `4be21afb6d829c2c63161475e24b4ba58d8a8204` extended the same
+frozen I05 contract to GitHub's native Ubuntu 24.04 ARM64 runner. Protected run
+[`29918264712`](https://github.com/samekind/Vermory/actions/runs/29918264712)
+completed the native ARM64 job
+[`88917132816`](https://github.com/samekind/Vermory/actions/runs/29918264712/job/88917132816)
+in 1 minute 30 seconds. The job verified `uname -m == aarch64`, Go host and
+target architecture `arm64`, and recorded `runtime.native == true` before the
+report could pass.
+
+The ARM64 artifact `8528827014`, named
+`vermory-i05-linux-service-arm64-4be21afb6d829c2c63161475e24b4ba58d8a8204`,
+was 1,371 stored bytes. Its GitHub digest and independently downloaded ZIP
+SHA-256 both equal
+`983c9b32c6d0291978a6c52e5676dc8d685b3f5cb62d5eb0a879a56bfebe10cb`.
+The extracted report SHA-256 is
+`f41fe1d54d035beb3d6cc6509bf0e15cb3d13a67c095feb694be02476bd84fcf`.
+It bound all 16 hard gates to the exact source head, PostgreSQL schema version
+23, a non-empty native custom backup, the hardened systemd service, restored
+authentication/default access, and a clean credential scan.
+
+The same run independently passed AMD64 lifecycle job `88917132835`, full test
+job `88917132916`, and dependent signing job `88917909918`. Signed snapshot
+artifact `8528914598` had GitHub and downloaded ZIP SHA-256
+`5002eafb88d3a6ac49d099e714ae8d09af10434c8a3889abb00ea3dcde1096b5`.
+All eight release-manifest payloads verified, and Cosign verification returned
+`Verified OK` for the PR `ci.yml` identity and GitHub Actions OIDC issuer. The
+signed Linux ARM64 payload is a static AArch64 ELF; this artifact check is
+delivery evidence, while the native systemd lifecycle report is the runtime
+qualification evidence.
 
 ## Service And Release Evidence
 
@@ -138,11 +173,12 @@ a pass or removed from the evidence history.
 
 ## Claim Boundary
 
-I05 qualifies this exact Ubuntu AMD64 systemd lifecycle: installation, service
-hardening, authenticated loopback startup, upgrade, binary rollback, native
-backup, empty-target restore, runtime-role recovery, projection rebuild, restored
+I05 qualifies this exact Ubuntu AMD64 and native ARM64 systemd lifecycle:
+installation, service hardening, authenticated loopback startup, upgrade,
+binary rollback, native backup, empty-target restore, runtime-role recovery,
+projection rebuild, restored
 authentication, and credential scans.
 
-It does not qualify long-duration uptime or an SLA, native Linux ARM64 systemd,
-DEB/RPM or package-repository distribution, cross-host production failover,
-encrypted backups, or reversal of PostgreSQL migrations during binary rollback.
+It does not qualify long-duration uptime or an SLA, DEB/RPM or
+package-repository distribution, cross-host production failover, encrypted
+backups, or reversal of PostgreSQL migrations during binary rollback.

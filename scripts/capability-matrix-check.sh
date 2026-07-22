@@ -75,6 +75,24 @@ jq -e '
   (.report.hard_gates | length == 16) and
   (.report.hard_gates | to_entries | all(.value == true))
 ' "$i05_snapshot" >/dev/null
+i05_arm64_snapshot="docs/evidence/snapshots/2026-07-22-durable-linux-service-lifecycle-arm64.json"
+jq -e '
+  .github.repository == "samekind/Vermory" and
+  .github.run_id == 29918264712 and
+  .github.job_id == 88917132816 and
+  .github.artifact_id == 8528827014 and
+  .github.head_sha == .report.source_sha and
+  .github.artifact_sha256 == "983c9b32c6d0291978a6c52e5676dc8d685b3f5cb62d5eb0a879a56bfebe10cb" and
+  .github.report_sha256 == "f41fe1d54d035beb3d6cc6509bf0e15cb3d13a67c095feb694be02476bd84fcf" and
+  .github.artifact_sha256 == .github.downloaded_zip_sha256 and
+  .report.case_id == "I05-durable-linux-service-lifecycle" and
+  .report.qualification == "github-hosted-ubuntu-systemd-arm64" and
+  .report.runtime.machine == "aarch64" and
+  .report.runtime.goarch == "arm64" and
+  .report.runtime.native == true and
+  (.report.hard_gates | length == 16) and
+  (.report.hard_gates | to_entries | all(.value == true))
+' "$i05_arm64_snapshot" >/dev/null
 grep -Fq '[Capability And Evidence Matrix](docs/capability-evidence-matrix.md)' README.md
 grep -Fq '[能力与证据矩阵](docs/capability-evidence-matrix.md)' README.zh-CN.md
 grep -Fq '[Capability And Evidence Matrix](docs/capability-evidence-matrix.md)' ARCHITECTURE.md

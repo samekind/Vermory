@@ -1,0 +1,96 @@
+{
+  "evidence_version": 1,
+  "github": {
+    "repository": "samekind/Vermory",
+    "run_id": 29918264712,
+    "job_id": 88917132816,
+    "head_sha": "4be21afb6d829c2c63161475e24b4ba58d8a8204",
+    "artifact_id": 8528827014,
+    "artifact_name": "vermory-i05-linux-service-arm64-4be21afb6d829c2c63161475e24b4ba58d8a8204",
+    "artifact_size_bytes": 1371,
+    "artifact_sha256": "983c9b32c6d0291978a6c52e5676dc8d685b3f5cb62d5eb0a879a56bfebe10cb",
+    "downloaded_zip_sha256": "983c9b32c6d0291978a6c52e5676dc8d685b3f5cb62d5eb0a879a56bfebe10cb",
+    "report_sha256": "f41fe1d54d035beb3d6cc6509bf0e15cb3d13a67c095feb694be02476bd84fcf"
+  },
+  "report": {
+    "version": 1,
+    "case_id": "I05-durable-linux-service-lifecycle",
+    "source_sha": "4be21afb6d829c2c63161475e24b4ba58d8a8204",
+    "qualification": "github-hosted-ubuntu-systemd-arm64",
+    "runtime": {
+      "machine": "aarch64",
+      "goarch": "arm64",
+      "native": true
+    },
+    "service": {
+      "name": "vermory-i05.service",
+      "user": "vermory-i05",
+      "listen": "127.0.0.1:18788",
+      "unauthenticated_status": 401,
+      "properties": {
+        "Group": "vermory-i05",
+        "NoNewPrivileges": "yes",
+        "PrivateTmp": "yes",
+        "ProtectHome": "yes",
+        "ProtectSystem": "strict",
+        "RestrictAddressFamilies": "AF_INET AF_INET6 AF_UNIX",
+        "RestrictSUIDSGID": "yes",
+        "User": "vermory-i05"
+      }
+    },
+    "releases": {
+      "initial": {
+        "id": "i05-v1",
+        "binary_sha256": "b7acf06b7bd7d444f0ae32cb522cb9e9971d2f0a6ae182803121005b1cef9cdb"
+      },
+      "upgraded": {
+        "id": "i05-v2",
+        "binary_sha256": "d7435d58a5aaa407c91bee6de09ca59e69439e45b1d359c5c881f46ebb44cc50"
+      },
+      "rejected": {
+        "id": "i05-failing",
+        "archive_sha256": "55de592ac9198d0a29ae6f25c2d97ce1d861acccc5478b24a7966db5f080af52",
+        "log_sha256": "70cb0af707fafc1c64a76dbcee443cc89c13970446aef765791e095e01901e2c"
+      },
+      "final_active": "i05-v2"
+    },
+    "backup": {
+      "format": "postgresql-custom",
+      "bytes": 164360,
+      "sha256": "1386a2f0459b3145aa0e61da67dff6a9c23b17db8fff044a7982b2c7c61fae40",
+      "schema_version": 23,
+      "encrypted_by_format": false
+    },
+    "restore": {
+      "target_started_empty": true,
+      "runtime_role_reprovisioned": true,
+      "projections_rebuilt": true,
+      "restored_token_authenticated": true,
+      "governed_default_visible": true
+    },
+    "hard_gates": {
+      "exact_head": true,
+      "dedicated_service_identity": true,
+      "restricted_runtime_database_role": true,
+      "root_owned_versioned_releases": true,
+      "authenticated_loopback_boundary": true,
+      "successful_upgrade_preserved_state": true,
+      "failed_upgrade_rolled_back": true,
+      "explicit_rollback_bidirectional": true,
+      "native_private_backup": true,
+      "digest_mismatch_rejected": true,
+      "nonempty_target_rejected": true,
+      "empty_target_restored": true,
+      "runtime_role_reprovisioned": true,
+      "projections_rebuilt": true,
+      "restored_token_and_default_verified": true,
+      "unit_process_journal_secret_free": true
+    },
+    "limitations": [
+      "The GitHub-hosted Ubuntu runner is ephemeral and does not prove long-duration uptime or an SLA.",
+      "This report qualifies only the recorded native architecture, not other architectures or distribution packages.",
+      "PostgreSQL custom format is not encrypted by the dump format.",
+      "Binary pointer rollback does not reverse PostgreSQL migrations."
+    ]
+  }
+}

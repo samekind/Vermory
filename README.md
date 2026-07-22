@@ -210,15 +210,16 @@ PostgreSQL authority. The deterministic provider isolates the browser contract
 and is not a model-quality claim. See
 [Browser Web Chat Lifecycle Qualification](docs/evidence/2026-07-22-browser-webchat-lifecycle.md).
 
-I05 qualifies the durable service lifecycle on an exact-head Ubuntu 24.04 AMD64
-runner with systemd and PostgreSQL 18. A dedicated non-login identity and
+I05 qualifies the durable service lifecycle on exact-head Ubuntu 24.04 AMD64
+and native ARM64 runners with systemd and PostgreSQL 18. A dedicated non-login
+identity and
 restricted database role served an authenticated loopback boundary; governed
 state survived upgrade, a failing release rolled back automatically, explicit
 rollback worked in both directions, and a private native backup restored into an
 empty database with runtime grants, projections, token authentication, and the
-governed default intact. All 16 lifecycle and credential gates passed. This does
-not claim long-duration uptime/SLA, native Linux ARM64, DEB/RPM distribution, or
-database migration rollback. See
+governed default intact. All 16 lifecycle and credential gates passed on both
+architectures. This does not claim long-duration uptime/SLA, DEB/RPM
+distribution, backup encryption, or database migration rollback. See
 [Durable Linux Service Lifecycle Qualification](docs/evidence/2026-07-22-durable-linux-service-lifecycle.md).
 
 Read the current [Capability And Evidence Matrix](docs/capability-evidence-matrix.md)

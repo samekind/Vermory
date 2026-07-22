@@ -173,12 +173,14 @@ candidate 接受/拒绝、记忆纠正和忘记。桌面与移动布局均连接
 authority 通过。确定性 provider 只隔离验证浏览器合同，不作为模型质量声明。
 详见[浏览器 Web Chat 生命周期实证](docs/evidence/2026-07-22-browser-webchat-lifecycle.md)。
 
-I05 在 exact-head Ubuntu 24.04 AMD64 runner 上完成 systemd 与 PostgreSQL 18
+I05 在 exact-head Ubuntu 24.04 AMD64 与原生 ARM64 runner 上完成 systemd 与
+PostgreSQL 18
 持久服务生命周期资格验证：专用不可登录服务身份和受限数据库角色只监听认证
 loopback 边界；升级保留治理状态，故障版本自动回滚，显式回滚可双向切换；私有
 原生备份恢复到空数据库后，runtime grant、projection、token 认证和 governed
-default 均恢复可用。16 个生命周期与凭据硬门全部通过。该证据不宣称长期
-uptime/SLA、原生 Linux ARM64、DEB/RPM 分发或数据库 migration rollback。详见
+default 均恢复可用。两个架构的 16 个生命周期与凭据硬门均全部通过。该证据不宣称
+长期
+uptime/SLA、DEB/RPM 分发、备份加密或数据库 migration rollback。详见
 [耐久 Linux 服务生命周期实证](docs/evidence/2026-07-22-durable-linux-service-lifecycle.md)。
 
 当前准确能力边界见[能力与证据矩阵](docs/capability-evidence-matrix.md)；
