@@ -271,7 +271,8 @@ SELECT
   ), false)
 	  AND has_sequence_privilege(current_user, 'public.observations_observation_seq_seq', 'USAGE')
 	  AND has_sequence_privilege(current_user, 'public.memory_projection_events_event_id_seq', 'USAGE')
-  AND has_function_privilege(current_user, 'vermory_auth.authenticate_token(text,bytea)', 'EXECUTE')
+	  AND has_function_privilege(current_user, 'vermory_auth.authenticate_token(text,bytea)', 'EXECUTE')
+	  AND has_function_privilege(current_user, 'vermory_auth.schema_version()', 'EXECUTE')
 FROM unnest($1::text[]) AS required(table_name)`, readWriteTables).Scan(&hasRequiredPrivileges); err != nil {
 		return fmt.Errorf("validate runtime required privileges: %w", err)
 	}
@@ -317,6 +318,7 @@ FROM unnest($1::text[]) AS required(table_name)`, readOnlyTables).Scan(&hasReadO
 	}
 	forbiddenTables := []string{
 		"vermory_auth.api_tokens",
+		"public.goose_db_version",
 		"public.projects", "public.sources", "public.source_versions", "public.claims",
 		"public.capsules", "public.capsule_claims", "public.packets", "public.audit_logs", "public.wcef_runs",
 		"public.memory_projection_prune_runs",

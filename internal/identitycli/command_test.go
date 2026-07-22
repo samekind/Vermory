@@ -69,7 +69,7 @@ func TestIdentityTokenIssuePrintsSecretOnceAndInspectDoesNot(t *testing.T) {
 
 func TestDatabaseCommandsAreRegisteredAndMigrateIsExplicit(t *testing.T) {
 	root := newTestRoot()
-	for _, path := range [][]string{{"identity", "token", "issue"}, {"identity", "token", "inspect"}, {"identity", "token", "revoke"}, {"database", "migrate"}, {"database", "grant-runtime"}, {"database", "rebuild-projections"}} {
+	for _, path := range [][]string{{"identity", "token", "issue"}, {"identity", "token", "inspect"}, {"identity", "token", "revoke"}, {"database", "compatibility"}, {"database", "migrate"}, {"database", "grant-runtime"}, {"database", "rebuild-projections"}} {
 		if findCommand(root, path...) == nil {
 			t.Fatalf("missing command %s", strings.Join(path, " "))
 		}
@@ -81,6 +81,25 @@ func TestDatabaseCommandsAreRegisteredAndMigrateIsExplicit(t *testing.T) {
 	output := executeCommand(t, "database", "migrate", "--database-url", databaseURL)
 	if !strings.Contains(output.String(), "migrated") {
 		t.Fatalf("unexpected migrate output: %s", output.String())
+	}
+}
+
+func TestDatabaseCompatibilityEmitsStableCurrentSchemaJSON(t *testing.T) {
+	databaseURL := resetIdentityCLIStore(t)
+	output := executeCommand(t, "database", "compatibility", "--database-url", databaseURL)
+	var report runtime.SchemaCompatibilityReport
+	if err := json.Unmarshal(output.Bytes(), &report); err != nil {
+		t.Fatal(err)
+	}
+	if report.Status != runtime.SchemaCompatibilityCompatible ||
+		report.SchemaVersion != runtime.MaximumSupportedSchemaVersion ||
+		report.MinimumSupportedSchema != runtime.MinimumSupportedSchemaVersion ||
+		report.MaximumSupportedSchema != runtime.MaximumSupportedSchemaVersion ||
+		report.MigrationRequired || !report.Compatible() {
+		t.Fatalf("unexpected compatibility output: %#v", report)
+	}
+	if strings.Contains(output.String(), databaseURL) || strings.Contains(output.String(), "database_url") {
+		t.Fatalf("compatibility output exposed database URL: %s", output.String())
 	}
 }
 

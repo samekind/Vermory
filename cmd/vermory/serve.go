@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"vermory/internal/authn"
+	"vermory/internal/brand"
 	"vermory/internal/runtime"
 	"vermory/internal/webchat"
 
@@ -55,16 +56,23 @@ func newServeCommand() *cobra.Command {
 			if err := options.Validate(); err != nil {
 				return err
 			}
-			llm, model, err := buildWebChatProvider(options.Provider)
-			if err != nil {
-				return err
-			}
 			store, err := runtime.OpenStoreWithOptions(command.Context(), options.DatabaseURL, runtime.StoreOptions{EnforceTenantContext: true})
 			if err != nil {
 				return fmt.Errorf("open authenticated runtime store")
 			}
 			defer store.Close()
+			compatibility, err := store.RuntimeSchemaCompatibility(command.Context(), brand.Revision)
+			if err != nil {
+				return err
+			}
+			if err := compatibility.ErrorIfIncompatible(); err != nil {
+				return err
+			}
 			if err := store.ValidateRuntimeRole(command.Context()); err != nil {
+				return err
+			}
+			llm, model, err := buildWebChatProvider(options.Provider)
+			if err != nil {
 				return err
 			}
 			retriever, err := buildRuntimeRetriever(store, options.Retrieval)

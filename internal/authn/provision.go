@@ -61,6 +61,7 @@ var runtimeGovernedMemoryUpdateColumns = []string{
 
 var forbiddenRuntimeTables = []string{
 	"vermory_auth.api_tokens",
+	"public.goose_db_version",
 	"public.projects",
 	"public.sources",
 	"public.source_versions",
@@ -140,6 +141,7 @@ WHERE r.rolname = $1
 		"GRANT USAGE, SELECT ON SEQUENCE public.observations_observation_seq_seq TO " + roleSQL,
 		"GRANT USAGE, SELECT ON SEQUENCE public.memory_projection_events_event_id_seq TO " + roleSQL,
 		"GRANT EXECUTE ON FUNCTION vermory_auth.authenticate_token(TEXT, BYTEA) TO " + roleSQL,
+		"GRANT EXECUTE ON FUNCTION vermory_auth.schema_version() TO " + roleSQL,
 		"REVOKE ALL PRIVILEGES ON TABLE " + strings.Join(forbiddenSQL, ", ") + " FROM " + roleSQL,
 	}
 	for _, statement := range statements {

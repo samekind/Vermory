@@ -69,7 +69,7 @@ VALUES ('chunked-migration-down', $1, 0, 'idle')`, ChunkedMeanRetrievalProfileID
 	if profileCount != 0 || cursorCount != 0 || productionCount != 1 {
 		t.Fatalf("chunked profile downgrade left dependencies or changed production: profile=%d cursor=%d production=%d", profileCount, cursorCount, productionCount)
 	}
-	if err := goose.UpToContext(ctx, db, "migrations", 23); err != nil {
+	if err := goose.UpToContext(ctx, db, "migrations", MaximumSupportedSchemaVersion); err != nil {
 		t.Fatal(err)
 	}
 }

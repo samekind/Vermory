@@ -155,6 +155,20 @@ SELECT has_table_privilege($1, 'public.memory_projection_retention', 'SELECT'),
 	if !canReadRetention || canMutateRetention || canUsePruneRuns {
 		t.Fatalf("runtime retention privileges read/mutate/prune=%v/%v/%v", canReadRetention, canMutateRetention, canUsePruneRuns)
 	}
+	var canInspectSchema, canReadMigrationTable, canMutateMigrationTable bool
+	if err := pool.QueryRow(ctx, `
+SELECT has_function_privilege($1, 'vermory_auth.schema_version()', 'EXECUTE'),
+       has_table_privilege($1, 'public.goose_db_version', 'SELECT'),
+       has_table_privilege($1, 'public.goose_db_version', 'INSERT,UPDATE,DELETE')`, roleName).Scan(
+		&canInspectSchema,
+		&canReadMigrationTable,
+		&canMutateMigrationTable,
+	); err != nil {
+		t.Fatal(err)
+	}
+	if !canInspectSchema || canReadMigrationTable || canMutateMigrationTable {
+		t.Fatalf("runtime schema privileges execute/read/mutate=%v/%v/%v", canInspectSchema, canReadMigrationTable, canMutateMigrationTable)
+	}
 
 	conn, err := pool.Acquire(ctx)
 	if err != nil {
@@ -175,7 +189,14 @@ SELECT count(*) FROM vermory_auth.authenticate_token($1, $2)`, "does-not-exist",
 	if err := conn.QueryRow(ctx, `SELECT count(*) FROM memory_projection_retention`).Scan(&lookupCount); err != nil {
 		t.Fatalf("runtime role cannot read tenant-filtered retention floor: %v", err)
 	}
-	for _, table := range []string{"vermory_auth.api_tokens", "projects", "sources", "claims", "capsules", "packets", "wcef_runs", "memory_projection_prune_runs"} {
+	var schemaVersion int64
+	if err := conn.QueryRow(ctx, `SELECT vermory_auth.schema_version()`).Scan(&schemaVersion); err != nil {
+		t.Fatalf("runtime role cannot inspect bounded schema version: %v", err)
+	}
+	if schemaVersion != runtime.MaximumSupportedSchemaVersion {
+		t.Fatalf("runtime schema version mismatch: got %d want %d", schemaVersion, runtime.MaximumSupportedSchemaVersion)
+	}
+	for _, table := range []string{"vermory_auth.api_tokens", "goose_db_version", "projects", "sources", "claims", "capsules", "packets", "wcef_runs", "memory_projection_prune_runs"} {
 		var ignored int
 		err := conn.QueryRow(ctx, "SELECT count(*) FROM "+table).Scan(&ignored)
 		if err == nil {

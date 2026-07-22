@@ -4,11 +4,15 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"net"
 	"os"
 	"strings"
 	"testing"
+	"time"
 
 	"vermory/internal/runtime"
+
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 func TestServeOptionsRequireRuntimeDatabaseAndTLSForNonLoopback(t *testing.T) {
@@ -142,5 +146,131 @@ func TestServeRejectsUnsafeDatabaseRoleBeforeListening(t *testing.T) {
 	}
 	if err != nil && strings.Contains(err.Error(), databaseURL) {
 		t.Fatalf("serve error exposed database URL: %v", err)
+	}
+}
+
+func TestServeRejectsFutureSchemaBeforeProviderConstructionOrListening(t *testing.T) {
+	databaseURL := os.Getenv("VERMORY_TEST_DATABASE_URL")
+	if databaseURL == "" {
+		t.Skip("VERMORY_TEST_DATABASE_URL is not set")
+	}
+	store, err := runtime.OpenStore(context.Background(), databaseURL)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := store.Migrate(context.Background()); err != nil {
+		store.Close()
+		t.Fatal(err)
+	}
+	store.Close()
+
+	adminPool, err := pgxpool.New(context.Background(), databaseURL)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(adminPool.Close)
+	futureVersion := runtime.MaximumSupportedSchemaVersion + 1
+	if _, err := adminPool.Exec(context.Background(), `DELETE FROM goose_db_version WHERE version_id = $1`, futureVersion); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := adminPool.Exec(context.Background(), `
+INSERT INTO goose_db_version (version_id, is_applied, tstamp)
+VALUES ($1, true, now())`, futureVersion); err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		_, _ = adminPool.Exec(context.Background(), `DELETE FROM goose_db_version WHERE version_id = $1`, futureVersion)
+	})
+
+	listenProbe, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	listenAddress := listenProbe.Addr().String()
+	if err := listenProbe.Close(); err != nil {
+		t.Fatal(err)
+	}
+
+	command := newServeCommand()
+	command.SetOut(&bytes.Buffer{})
+	command.SetErr(&bytes.Buffer{})
+	command.SetArgs([]string{"--database-url", databaseURL, "--listen", listenAddress, "--provider", "provider-must-not-be-constructed"})
+	err = command.Execute()
+	if !errors.Is(err, runtime.ErrIncompatibleSchema) {
+		t.Fatalf("serve did not reject future schema before provider construction: %v", err)
+	}
+	if strings.Contains(err.Error(), databaseURL) {
+		t.Fatalf("serve incompatibility exposed database URL: %v", err)
+	}
+
+	available, err := net.Listen("tcp", listenAddress)
+	if err != nil {
+		t.Fatalf("serve retained a listener after rejecting future schema: %v", err)
+	}
+	_ = available.Close()
+}
+
+func TestServePassesSchemaPreflightWithRestrictedRuntimeLogin(t *testing.T) {
+	databaseURL := os.Getenv("VERMORY_TEST_DATABASE_URL")
+	if databaseURL == "" {
+		t.Skip("VERMORY_TEST_DATABASE_URL is not set")
+	}
+	store, err := runtime.OpenStore(context.Background(), databaseURL)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := store.Migrate(context.Background()); err != nil {
+		store.Close()
+		t.Fatal(err)
+	}
+	store.Close()
+
+	pool, err := pgxpool.New(context.Background(), databaseURL)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(pool.Close)
+	runtimeURL := createConversationFormationWorkerRole(t, pool, databaseURL)
+
+	listenProbe, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	listenAddress := listenProbe.Addr().String()
+	if err := listenProbe.Close(); err != nil {
+		t.Fatal(err)
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	command := newServeCommand()
+	command.SetContext(ctx)
+	command.SetOut(&bytes.Buffer{})
+	command.SetErr(&bytes.Buffer{})
+	command.SetArgs([]string{"--database-url", runtimeURL, "--listen", listenAddress, "--provider", "mock"})
+	result := make(chan error, 1)
+	go func() { result <- command.Execute() }()
+
+	deadline := time.Now().Add(3 * time.Second)
+	for {
+		connection, dialErr := net.DialTimeout("tcp", listenAddress, 100*time.Millisecond)
+		if dialErr == nil {
+			_ = connection.Close()
+			break
+		}
+		if time.Now().After(deadline) {
+			cancel()
+			t.Fatalf("restricted serve never reached listening boundary: %v", dialErr)
+		}
+		time.Sleep(25 * time.Millisecond)
+	}
+	cancel()
+	select {
+	case err := <-result:
+		if err != nil {
+			t.Fatalf("restricted serve failed after schema preflight: %v", err)
+		}
+	case <-time.After(3 * time.Second):
+		t.Fatal("restricted serve did not stop after context cancellation")
 	}
 }

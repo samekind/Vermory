@@ -23,14 +23,17 @@ before selecting a non-loopback `VERMORY_LISTEN` value.
 
 ## Prepare PostgreSQL
 
-Keep the admin connection outside the service environment. Apply migrations
-and grant the serving boundary explicitly:
+Keep the admin connection outside the service environment. Inspect the database,
+apply migrations, grant the serving boundary, and inspect the restricted path
+explicitly:
 
 ```bash
+./vermory database compatibility --database-url "service=vermory_admin"
 ./vermory database migrate --database-url "service=vermory_admin"
 ./vermory database grant-runtime \
   --database-url "service=vermory_admin" \
   --role vermory_runtime
+./vermory database compatibility --database-url "service=vermory_runtime"
 ./vermory database rebuild-projections \
   --database-url "service=vermory_admin"
 ```
@@ -38,6 +41,9 @@ and grant the serving boundary explicitly:
 `service=vermory_admin` is a libpq service selected from an operator-controlled
 `PGSERVICEFILE`; its password can be supplied through a private `PGPASSFILE`.
 The running service must receive only its restricted runtime connection.
+`database compatibility` is read-only JSON. It exits nonzero with
+`migration_required` when an older schema needs the explicit migration above,
+and with `binary_too_old` when the selected binary cannot use a newer schema.
 
 ## Prepare the service environment
 
@@ -123,8 +129,12 @@ release does not pass the bounded probe, the installer restores the former
 `current` and `previous` pointers, restarts the former release, verifies it, and
 returns nonzero. The failed immutable release remains available for diagnosis.
 
-Binary pointer rollback does not reverse PostgreSQL migrations. A release with
-a non-backward-compatible migration requires a release-specific database plan.
+Before upgrading an existing database, create and verify a PostgreSQL backup,
+then run the compatibility, migration, grant, and restricted compatibility
+sequence above before restarting. Binary pointer rollback does not reverse
+PostgreSQL migrations. It is valid only when the database schema is inside the
+older binary's reported support interval. Otherwise restore the pre-migration
+backup or use a verified PITR restore point before starting the older binary.
 
 ## Explicit rollback
 

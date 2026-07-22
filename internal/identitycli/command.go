@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"vermory/internal/authn"
+	"vermory/internal/brand"
 	"vermory/internal/runtime"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -115,7 +116,38 @@ func NewIdentityCommand() *cobra.Command {
 func NewDatabaseCommand() *cobra.Command {
 	options := adminOptions{}
 	database := &cobra.Command{Use: "database", Short: "Manage the Vermory database boundary"}
-	database.PersistentFlags().StringVar(&options.databaseURL, "database-url", "", "admin PostgreSQL connection URL")
+	database.PersistentFlags().StringVar(&options.databaseURL, "database-url", "", "PostgreSQL connection URL; mutating commands require admin privileges")
+
+	compatibility := &cobra.Command{
+		Use:   "compatibility",
+		Short: "Inspect binary and database schema compatibility without changing state",
+		Args:  cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			report := runtime.NewSchemaCompatibilityPreflightReport(brand.Revision)
+			if strings.TrimSpace(options.databaseURL) == "" {
+				if err := writeJSON(cmd, report); err != nil {
+					return err
+				}
+				return errors.New("--database-url is required")
+			}
+			store, err := runtime.OpenStore(cmd.Context(), options.databaseURL)
+			if err != nil {
+				if writeErr := writeJSON(cmd, report); writeErr != nil {
+					return writeErr
+				}
+				return runtime.ErrSchemaCompatibilityPreflight
+			}
+			defer store.Close()
+			report, err = store.SchemaCompatibility(cmd.Context(), brand.Revision)
+			if writeErr := writeJSON(cmd, report); writeErr != nil {
+				return writeErr
+			}
+			if err != nil {
+				return err
+			}
+			return report.ErrorIfIncompatible()
+		},
+	}
 
 	migrate := &cobra.Command{
 		Use:   "migrate",
@@ -175,7 +207,7 @@ func NewDatabaseCommand() *cobra.Command {
 		},
 	}
 
-	database.AddCommand(migrate, grantRuntime, rebuildProjections)
+	database.AddCommand(compatibility, migrate, grantRuntime, rebuildProjections)
 	return database
 }
 
