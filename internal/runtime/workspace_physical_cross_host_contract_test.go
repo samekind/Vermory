@@ -201,6 +201,24 @@ func TestW34PhysicalCrossHostEvidencePreservesClientBoundary(t *testing.T) {
 			t.Fatalf("W34 public evidence contains forbidden material %q", forbidden)
 		}
 	}
+
+	capabilityMatrix, err := os.ReadFile(filepath.Join(root, "docs", "capability-evidence-matrix.md"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	matrix := strings.Join(strings.Fields(strings.ToLower(string(capabilityMatrix))), " ")
+	for _, required := range []string{
+		"physical cross-host continuity",
+		"w34 now qualifies the signed two-physical-host platform runtime",
+		"four grok generation gates remain externally blocked",
+	} {
+		if !strings.Contains(matrix, required) {
+			t.Fatalf("W34 capability matrix lost required boundary %q", required)
+		}
+	}
+	if strings.Contains(matrix, "or physical cross-host migration.") {
+		t.Fatal("W34 capability matrix still reports physical cross-host migration as unqualified")
+	}
 }
 
 func loadWorkspacePhysicalCrossHostCase(t *testing.T) workspacePhysicalCrossHostCase {
