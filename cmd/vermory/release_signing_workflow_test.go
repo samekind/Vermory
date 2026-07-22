@@ -19,7 +19,16 @@ func TestCIWorkflowKeepsOIDCOutOfTestJobAndSignsCompleteSnapshot(t *testing.T) {
 
 	signing := workflowSection(t, workflow, "  sign-snapshot:", "")
 	for _, required := range []string{
-		"needs: [test, linux-service-lifecycle, linux-service-lifecycle-arm64, linux-package-install, linux-repository-apt, linux-repository-dnf]",
+		"needs:",
+		"- test",
+		"- linux-service-lifecycle",
+		"- linux-service-lifecycle-arm64",
+		"- linux-package-install",
+		"- linux-repository-apt",
+		"- linux-repository-dnf",
+		"- linux-versioned-packages",
+		"- linux-repository-lifecycle-apt",
+		"- linux-repository-lifecycle-dnf",
 		"id-token: write",
 		"github.event.pull_request.head.repo.full_name == github.repository",
 		"SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}",
@@ -115,7 +124,7 @@ func TestCIWorkflowKeepsOIDCOutOfTestJobAndSignsCompleteSnapshot(t *testing.T) {
 		}
 	}
 
-	dnfRepository := workflowSection(t, workflow, "  linux-repository-dnf:", "\n  sign-snapshot:")
+	dnfRepository := workflowSection(t, workflow, "  linux-repository-dnf:", "\n  linux-versioned-packages:")
 	for _, required := range []string{
 		"needs: linux-package-install",
 		"fedora:43@sha256:762d73ba1c455232b0272c5d445a34f36c4b9f421cbc05ce8102552325b6a222",

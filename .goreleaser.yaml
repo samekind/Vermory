@@ -2,6 +2,9 @@ version: 2
 
 project_name: vermory
 
+snapshot:
+  version_template: '{{ envOrDefault "VERMORY_SNAPSHOT_VERSION" (printf "%s-SNAPSHOT-%s" .Version .ShortCommit) }}'
+
 builds:
   - id: vermory
     main: ./cmd/vermory

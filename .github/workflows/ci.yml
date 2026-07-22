@@ -511,8 +511,221 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
+  linux-versioned-packages:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            arch: amd64
+            machine: x86_64
+          - runner: ubuntu-24.04-arm
+            arch: arm64
+            machine: aarch64
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
+    env:
+      SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      I09_EXPECTED_MACHINE: ${{ matrix.machine }}
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 0
+          ref: ${{ env.SOURCE_SHA }}
+      - name: Verify versioned package source revision and architecture
+        run: |
+          test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
+          test "$(uname -m)" = "$I09_EXPECTED_MACHINE"
+      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
+        with:
+          go-version-file: go.mod
+          cache: true
+      - name: Install versioned package inspection tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends jq rpm
+      - name: Install GoReleaser
+        uses: goreleaser/goreleaser-action@f06c13b6b1a9625abc9e6e439d9c05a8f2190e94 # v7.2.3
+        with:
+          distribution: goreleaser
+          version: v2.17.0
+          install-only: true
+      - name: Build exact base and candidate qualification packages
+        run: >-
+          bash scripts/build-i09-versioned-packages.sh
+          "${{ matrix.arch }}"
+          "$SOURCE_SHA"
+          "$RUNNER_TEMP/i09-versioned-packages"
+      - name: Verify versioned package manifest
+        run: |
+          jq -e \
+            --arg source_sha "$SOURCE_SHA" \
+            --arg architecture "${{ matrix.arch }}" \
+            '.case_id == "I09-linux-repository-lifecycle" and .candidate_source_sha == $source_sha and .architecture == $architecture and (.packages.deb | length == 2) and (.packages.rpm | length == 2)' \
+            "$RUNNER_TEMP/i09-versioned-packages/package-set.json"
+          test -z "$(git status --porcelain)"
+      - name: Upload I09 versioned package set
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: vermory-i09-versioned-packages-${{ matrix.arch }}-${{ env.SOURCE_SHA }}
+          path: ${{ runner.temp }}/i09-versioned-packages
+          if-no-files-found: error
+          retention-days: 7
+
+  linux-repository-lifecycle-apt:
+    needs: linux-versioned-packages
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            arch: amd64
+            machine: x86_64
+          - runner: ubuntu-24.04-arm
+            arch: arm64
+            machine: aarch64
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 25
+    env:
+      SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      I09_EXPECTED_MACHINE: ${{ matrix.machine }}
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 0
+          ref: ${{ env.SOURCE_SHA }}
+      - name: Verify APT lifecycle source revision and architecture
+        run: |
+          test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
+          test "$(uname -m)" = "$I09_EXPECTED_MACHINE"
+      - name: Install APT lifecycle qualification tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends apt-utils dpkg-dev gnupg jq
+      - name: Download exact I09 versioned package set
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: vermory-i09-versioned-packages-${{ matrix.arch }}-${{ env.SOURCE_SHA }}
+          path: ${{ runner.temp }}/i09-versioned-packages
+      - name: Build signed APT lifecycle repository snapshots
+        run: >-
+          bash scripts/build-i09-lifecycle-repository.sh
+          "$RUNNER_TEMP/i09-versioned-packages"
+          apt
+          "${{ matrix.arch }}"
+          "$SOURCE_SHA"
+          "$RUNNER_TEMP/i09-repository"
+      - name: Run native APT upgrade and rollback lifecycle
+        run: |
+          sudo --preserve-env=SOURCE_SHA,I09_EXPECTED_MACHINE -- \
+            env "PATH=$PATH" \
+              deploy/linux/run-i09-repository-lifecycle-acceptance.sh \
+                "$RUNNER_TEMP/i09-repository" \
+                apt \
+                "${{ matrix.arch }}" \
+                "$RUNNER_TEMP/i09-evidence"
+          jq -e \
+            --arg source_sha "$SOURCE_SHA" \
+            --arg architecture "${{ matrix.arch }}" \
+            '.sources.candidate == $source_sha and .repository.kind == "apt" and .repository.architecture == $architecture and .repository.native == true and .repository.metadata_signature_enforced == true and (.hard_gates | length == 26) and (.hard_gates | to_entries | all(.value == true))' \
+            "$RUNNER_TEMP/i09-evidence/report.json"
+      - name: Upload normalized I09 APT lifecycle evidence
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: vermory-i09-linux-repository-lifecycle-apt-${{ matrix.arch }}-${{ env.SOURCE_SHA }}
+          path: ${{ runner.temp }}/i09-evidence
+          if-no-files-found: error
+          retention-days: 7
+
+  linux-repository-lifecycle-dnf:
+    needs: linux-versioned-packages
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            arch: amd64
+            machine: x86_64
+          - runner: ubuntu-24.04-arm
+            arch: arm64
+            machine: aarch64
+    runs-on: ${{ matrix.runner }}
+    container:
+      image: fedora:43@sha256:762d73ba1c455232b0272c5d445a34f36c4b9f421cbc05ce8102552325b6a222
+      options: --user 0
+    timeout-minutes: 25
+    env:
+      SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      I09_EXPECTED_MACHINE: ${{ matrix.machine }}
+    steps:
+      - name: Install Fedora checkout and lifecycle qualification tools
+        run: >-
+          dnf install --assumeyes
+          createrepo_c
+          bzip2
+          findutils
+          git
+          gnupg2
+          gzip
+          jq
+          rpm
+          shadow-utils
+          systemd
+          tar
+          xz
+          zstd
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 0
+          ref: ${{ env.SOURCE_SHA }}
+      - name: Verify DNF lifecycle source revision and architecture
+        run: |
+          test "$(git -c safe.directory="$GITHUB_WORKSPACE" rev-parse HEAD)" = "$SOURCE_SHA"
+          test "$(uname -m)" = "$I09_EXPECTED_MACHINE"
+      - name: Download exact I09 versioned package set
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: vermory-i09-versioned-packages-${{ matrix.arch }}-${{ env.SOURCE_SHA }}
+          path: ${{ runner.temp }}/i09-versioned-packages
+      - name: Build signed DNF lifecycle repository snapshots
+        run: >-
+          bash scripts/build-i09-lifecycle-repository.sh
+          "$RUNNER_TEMP/i09-versioned-packages"
+          dnf
+          "${{ matrix.arch }}"
+          "$SOURCE_SHA"
+          "$RUNNER_TEMP/i09-repository"
+      - name: Run native DNF upgrade and rollback lifecycle
+        run: |
+          deploy/linux/run-i09-repository-lifecycle-acceptance.sh \
+            "$RUNNER_TEMP/i09-repository" \
+            dnf \
+            "${{ matrix.arch }}" \
+            "$RUNNER_TEMP/i09-evidence"
+          jq -e \
+            --arg source_sha "$SOURCE_SHA" \
+            --arg architecture "${{ matrix.arch }}" \
+            '.sources.candidate == $source_sha and .repository.kind == "dnf" and .repository.architecture == $architecture and .repository.native == true and .repository.metadata_signature_enforced == true and (.hard_gates | length == 26) and (.hard_gates | to_entries | all(.value == true)) and .qualification_boundaries.rpm_payload_signature == false' \
+            "$RUNNER_TEMP/i09-evidence/report.json"
+      - name: Upload normalized I09 DNF lifecycle evidence
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: vermory-i09-linux-repository-lifecycle-dnf-${{ matrix.arch }}-${{ env.SOURCE_SHA }}
+          path: ${{ runner.temp }}/i09-evidence
+          if-no-files-found: error
+          retention-days: 7
+
   sign-snapshot:
-    needs: [test, linux-service-lifecycle, linux-service-lifecycle-arm64, linux-package-install, linux-repository-apt, linux-repository-dnf]
+    needs:
+      - test
+      - linux-service-lifecycle
+      - linux-service-lifecycle-arm64
+      - linux-package-install
+      - linux-repository-apt
+      - linux-repository-dnf
+      - linux-versioned-packages
+      - linux-repository-lifecycle-apt
+      - linux-repository-lifecycle-dnf
     if: >-
       github.event_name == 'push' ||
       github.event.pull_request.head.repo.full_name == github.repository
