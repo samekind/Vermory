@@ -19,7 +19,7 @@ func TestCIWorkflowKeepsOIDCOutOfTestJobAndSignsCompleteSnapshot(t *testing.T) {
 
 	signing := workflowSection(t, workflow, "  sign-snapshot:", "")
 	for _, required := range []string{
-		"needs: [test, linux-service-lifecycle, linux-service-lifecycle-arm64, linux-package-install]",
+		"needs: [test, linux-service-lifecycle, linux-service-lifecycle-arm64, linux-package-install, linux-repository-apt, linux-repository-dnf]",
 		"id-token: write",
 		"github.event.pull_request.head.repo.full_name == github.repository",
 		"SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}",
@@ -30,6 +30,8 @@ func TestCIWorkflowKeepsOIDCOutOfTestJobAndSignsCompleteSnapshot(t *testing.T) {
 		"actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093",
 		"pattern: vermory-i06-linux-package-*-${{ env.SOURCE_SHA }}",
 		"scripts/assemble-qualified-packages.sh",
+		"pattern: vermory-i08-linux-repository-*-${{ env.SOURCE_SHA }}",
+		"scripts/assemble-qualified-repositories.sh",
 		"scripts/release-manifest.sh create dist",
 		"cosign sign-blob",
 		"cosign verify-blob",
@@ -79,7 +81,7 @@ func TestCIWorkflowKeepsOIDCOutOfTestJobAndSignsCompleteSnapshot(t *testing.T) {
 		}
 	}
 
-	packageInstall := workflowSection(t, workflow, "  linux-package-install:", "\n  sign-snapshot:")
+	packageInstall := workflowSection(t, workflow, "  linux-package-install:", "\n  linux-repository-apt:")
 	for _, required := range []string{
 		"runs-on: ${{ matrix.runner }}",
 		"format: deb",
@@ -94,6 +96,39 @@ func TestCIWorkflowKeepsOIDCOutOfTestJobAndSignsCompleteSnapshot(t *testing.T) {
 	} {
 		if !strings.Contains(packageInstall, required) {
 			t.Fatalf("linux-package-install is missing %q", required)
+		}
+	}
+
+	aptRepository := workflowSection(t, workflow, "  linux-repository-apt:", "\n  linux-repository-dnf:")
+	for _, required := range []string{
+		"needs: linux-package-install",
+		"runner: ubuntu-latest",
+		"runner: ubuntu-24.04-arm",
+		"name: vermory-i06-linux-package-deb-${{ matrix.arch }}-${{ env.SOURCE_SHA }}",
+		"scripts/build-linux-repository.sh",
+		"deploy/linux/run-i08-repository-acceptance.sh",
+		"vermory-i08-linux-repository-apt-${{ matrix.arch }}-${{ env.SOURCE_SHA }}",
+		"(.hard_gates | length == 18)",
+	} {
+		if !strings.Contains(aptRepository, required) {
+			t.Fatalf("linux-repository-apt is missing %q", required)
+		}
+	}
+
+	dnfRepository := workflowSection(t, workflow, "  linux-repository-dnf:", "\n  sign-snapshot:")
+	for _, required := range []string{
+		"needs: linux-package-install",
+		"fedora:43@sha256:762d73ba1c455232b0272c5d445a34f36c4b9f421cbc05ce8102552325b6a222",
+		"runner: ubuntu-latest",
+		"runner: ubuntu-24.04-arm",
+		"name: vermory-i06-linux-package-rpm-${{ matrix.arch }}-${{ env.SOURCE_SHA }}",
+		"scripts/build-linux-repository.sh",
+		"deploy/linux/run-i08-repository-acceptance.sh",
+		"vermory-i08-linux-repository-dnf-${{ matrix.arch }}-${{ env.SOURCE_SHA }}",
+		"(.hard_gates | length == 18)",
+	} {
+		if !strings.Contains(dnfRepository, required) {
+			t.Fatalf("linux-repository-dnf is missing %q", required)
 		}
 	}
 

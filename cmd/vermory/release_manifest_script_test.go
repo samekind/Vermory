@@ -65,6 +65,18 @@ func TestReleaseManifestScriptRejectsMissingOrModifiedPayload(t *testing.T) {
 	})
 }
 
+func TestReleaseManifestScriptRejectsPartialRepositoryQualificationSet(t *testing.T) {
+	dist := writeReleaseManifestPayloads(t)
+	if err := os.WriteFile(
+		filepath.Join(dist, "vermory-repository-apt-amd64-"+qualifiedRepositorySource+".tar.gz"),
+		[]byte("partial repository set\n"),
+		0o600,
+	); err != nil {
+		t.Fatal(err)
+	}
+	runReleaseManifestScript(t, "create", dist, false)
+}
+
 func writeReleaseManifestPayloads(t *testing.T) string {
 	t.Helper()
 	dist := t.TempDir()

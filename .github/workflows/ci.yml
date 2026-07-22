@@ -367,8 +367,149 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
+  linux-repository-apt:
+    needs: linux-package-install
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            arch: amd64
+            machine: x86_64
+          - runner: ubuntu-24.04-arm
+            arch: arm64
+            machine: aarch64
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 20
+    env:
+      SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      I08_EXPECTED_MACHINE: ${{ matrix.machine }}
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 0
+          ref: ${{ env.SOURCE_SHA }}
+      - name: Verify APT repository source revision and architecture
+        run: |
+          test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
+          test "$(uname -m)" = "$I08_EXPECTED_MACHINE"
+      - name: Install APT repository qualification tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends apt-utils dpkg-dev gnupg jq
+      - name: Download exact I06-qualified DEB
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: vermory-i06-linux-package-deb-${{ matrix.arch }}-${{ env.SOURCE_SHA }}
+          path: ${{ runner.temp }}/i06-evidence
+      - name: Build signed APT repository from accepted package bytes
+        run: >-
+          bash scripts/build-linux-repository.sh
+          "$RUNNER_TEMP/i06-evidence"
+          apt
+          "${{ matrix.arch }}"
+          "$SOURCE_SHA"
+          "$RUNNER_TEMP/i08-repository"
+      - name: Run native APT repository acceptance
+        run: |
+          sudo --preserve-env=SOURCE_SHA,I08_EXPECTED_MACHINE -- \
+            env "PATH=$PATH" \
+              deploy/linux/run-i08-repository-acceptance.sh \
+                "$RUNNER_TEMP/i08-repository" \
+                apt \
+                "${{ matrix.arch }}" \
+                "$RUNNER_TEMP/i08-evidence"
+          jq -e \
+            --arg source_sha "$SOURCE_SHA" \
+            --arg architecture "${{ matrix.arch }}" \
+            '.source_sha == $source_sha and .repository.kind == "apt" and .repository.architecture == $architecture and .repository.native == true and .repository.package_manager == "apt" and .repository.transport == "file://" and .repository.metadata_signature_enforced == true and (.hard_gates | length == 18) and (.hard_gates | to_entries | all(.value == true))' \
+            "$RUNNER_TEMP/i08-evidence/report.json"
+      - name: Upload normalized I08 APT repository evidence
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: vermory-i08-linux-repository-apt-${{ matrix.arch }}-${{ env.SOURCE_SHA }}
+          path: ${{ runner.temp }}/i08-evidence
+          if-no-files-found: error
+          retention-days: 7
+
+  linux-repository-dnf:
+    needs: linux-package-install
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            arch: amd64
+            machine: x86_64
+          - runner: ubuntu-24.04-arm
+            arch: arm64
+            machine: aarch64
+    runs-on: ${{ matrix.runner }}
+    container:
+      image: fedora:43@sha256:762d73ba1c455232b0272c5d445a34f36c4b9f421cbc05ce8102552325b6a222
+      options: --user 0
+    timeout-minutes: 20
+    env:
+      SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      I08_EXPECTED_MACHINE: ${{ matrix.machine }}
+    steps:
+      - name: Install Fedora checkout and repository qualification tools
+        run: >-
+          dnf install --assumeyes
+          createrepo_c
+          dnf-plugins-core
+          findutils
+          git
+          gnupg2
+          gzip
+          jq
+          rpm
+          shadow-utils
+          systemd
+          tar
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 0
+          ref: ${{ env.SOURCE_SHA }}
+      - name: Verify DNF repository source revision and architecture
+        run: |
+          test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
+          test "$(uname -m)" = "$I08_EXPECTED_MACHINE"
+      - name: Download exact I06-qualified RPM
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: vermory-i06-linux-package-rpm-${{ matrix.arch }}-${{ env.SOURCE_SHA }}
+          path: ${{ runner.temp }}/i06-evidence
+      - name: Build signed DNF repository from accepted package bytes
+        run: >-
+          bash scripts/build-linux-repository.sh
+          "$RUNNER_TEMP/i06-evidence"
+          dnf
+          "${{ matrix.arch }}"
+          "$SOURCE_SHA"
+          "$RUNNER_TEMP/i08-repository"
+      - name: Run native DNF repository acceptance
+        run: |
+          deploy/linux/run-i08-repository-acceptance.sh \
+            "$RUNNER_TEMP/i08-repository" \
+            dnf \
+            "${{ matrix.arch }}" \
+            "$RUNNER_TEMP/i08-evidence"
+          jq -e \
+            --arg source_sha "$SOURCE_SHA" \
+            --arg architecture "${{ matrix.arch }}" \
+            '.source_sha == $source_sha and .repository.kind == "dnf" and .repository.architecture == $architecture and .repository.native == true and .repository.package_manager == "dnf" and .repository.transport == "file://" and .repository.metadata_signature_enforced == true and (.hard_gates | length == 18) and (.hard_gates | to_entries | all(.value == true)) and .qualification_boundaries.rpm_payload_signature == false' \
+            "$RUNNER_TEMP/i08-evidence/report.json"
+      - name: Upload normalized I08 DNF repository evidence
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: vermory-i08-linux-repository-dnf-${{ matrix.arch }}-${{ env.SOURCE_SHA }}
+          path: ${{ runner.temp }}/i08-evidence
+          if-no-files-found: error
+          retention-days: 7
+
   sign-snapshot:
-    needs: [test, linux-service-lifecycle, linux-service-lifecycle-arm64, linux-package-install]
+    needs: [test, linux-service-lifecycle, linux-service-lifecycle-arm64, linux-package-install, linux-repository-apt, linux-repository-dnf]
     if: >-
       github.event_name == 'push' ||
       github.event.pull_request.head.repo.full_name == github.repository
@@ -415,6 +556,17 @@ jobs:
         run: >-
           bash scripts/assemble-qualified-packages.sh
           "$RUNNER_TEMP/i06-qualified-packages"
+          dist
+          "$SOURCE_SHA"
+      - name: Download exact repositories qualified on native package managers
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          pattern: vermory-i08-linux-repository-*-${{ env.SOURCE_SHA }}
+          path: ${{ runner.temp }}/i08-qualified-repositories
+      - name: Assemble exact qualified repositories into the signed snapshot
+        run: >-
+          bash scripts/assemble-qualified-repositories.sh
+          "$RUNNER_TEMP/i08-qualified-repositories"
           dist
           "$SOURCE_SHA"
       - name: Pack OpenClaw release artifact
@@ -471,6 +623,7 @@ jobs:
             dist/*.tar.gz
             dist/*.deb
             dist/*.rpm
+            dist/vermory-repository-*.tar.gz
             dist/checksums.txt
             dist/*.tgz
             dist/vermory-hermes-*.sha256

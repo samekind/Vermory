@@ -15,7 +15,7 @@ dist="${2:-}"
 manifest="$dist/release-manifest.sha256"
 
 collect_payloads() {
-  local path
+  local path repository_count
   local -a go_archives deb_packages rpm_packages openclaw hermes hermes_sidecar
 
   shopt -s nullglob
@@ -30,6 +30,8 @@ collect_payloads() {
   [[ ${#go_archives[@]} -eq 4 ]] || return 1
   [[ ${#deb_packages[@]} -eq 2 ]] || return 1
   [[ ${#rpm_packages[@]} -eq 2 ]] || return 1
+  repository_count=$(find "$dist" -maxdepth 1 -type f -name 'vermory-repository-*.tar.gz' | wc -l | tr -d ' ')
+  [[ "$repository_count" == 0 || "$repository_count" == 4 ]] || return 1
   [[ ${#openclaw[@]} -eq 1 ]] || return 1
   [[ ${#hermes[@]} -eq 1 ]] || return 1
   [[ ${#hermes_sidecar[@]} -eq 1 ]] || return 1
@@ -37,7 +39,11 @@ collect_payloads() {
 
   for path in "${go_archives[@]}" "${deb_packages[@]}" "${rpm_packages[@]}" "$dist/checksums.txt" "${openclaw[@]}" "${hermes[@]}" "${hermes_sidecar[@]}"; do
     basename "$path"
-  done | LC_ALL=C sort
+  done
+  for path in "$dist"/vermory-repository-*.tar.gz; do
+    [[ -e "$path" ]] || continue
+    basename "$path"
+  done
 }
 
 hash_payloads() {
@@ -59,11 +65,12 @@ verify_hashes() {
   fi
 }
 
-expected="$(collect_payloads)" || {
+expected="$(collect_payloads | LC_ALL=C sort)" || {
   echo "release payload set is incomplete or ambiguous" >&2
   exit 1
 }
-[[ "$(printf '%s\n' "$expected" | wc -l | tr -d ' ')" == "12" ]]
+payload_count=$(printf '%s\n' "$expected" | wc -l | tr -d ' ')
+[[ "$payload_count" == "12" || "$payload_count" == "16" ]]
 
 case "$mode" in
   create)

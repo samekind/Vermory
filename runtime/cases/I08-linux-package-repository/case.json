@@ -1,0 +1,31 @@
+{
+  "version": "1",
+  "id": "I08-linux-package-repository",
+  "hard_gate_count": 18,
+  "hard_gates": [
+    "the repository is built for the exact pull-request head",
+    "the repository contains the exact package bytes accepted by I06",
+    "the repository kind matches the APT or DNF qualification leg",
+    "the package architecture matches the native runner architecture",
+    "the native package manager installs Vermory from a file repository",
+    "all unrelated package repositories are disabled during Vermory resolution",
+    "native repository metadata is present for the accepted package",
+    "repository metadata includes the accepted package SHA-256 digest",
+    "repository metadata has a valid signature from the bundled public key",
+    "the package manager enforces the repository metadata signature",
+    "the package manager downloads the exact accepted package bytes",
+    "the installed binary reports the exact source revision",
+    "repository installation does not enable or start the service",
+    "tampered repository metadata is rejected by the package manager",
+    "the repository bundle contains no private signing key material",
+    "the evidence declares the signing key as ephemeral qualification material",
+    "the exact repository bundle is bound to a SHA-256 digest",
+    "the normalized report contains no credential material"
+  ],
+  "qualification_boundaries": [
+    "no stable production repository signing key is qualified",
+    "no public or long-lived hosted repository is qualified",
+    "no cross-version upgrade, downgrade, rollback, or retention policy is qualified",
+    "RPM package payload signatures are not qualified; only DNF repository metadata signatures are enforced"
+  ]
+}
