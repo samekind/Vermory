@@ -94,6 +94,7 @@ created_role=0
 completed=0
 cleanup() {
   launchctl bootout "gui/$(id -u)" "$plist" >/dev/null 2>&1 || true
+  rm -f "$plist"
   if [[ $completed -eq 1 ]]; then
     if [[ $created_database -eq 1 ]]; then
       "$postgres_bin/dropdb" -h /tmp --if-exists "$database_name" >/dev/null 2>&1 || true

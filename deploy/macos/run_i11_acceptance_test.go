@@ -25,6 +25,7 @@ func TestI11AcceptanceRunnerMatchesFrozenContract(t *testing.T) {
 		"runtime_secret_matches",
 		"checksum_bound_credential_free_report",
 		"shasum -a 256 \"$report\"",
+		"rm -f \"$plist\"",
 	} {
 		if !strings.Contains(text, required) {
 			t.Fatalf("I11 runner omitted %q", required)
