@@ -42,11 +42,11 @@ BYTES=$(stat -c '%s' "$TEMP_DUMP")
 SCHEMA_VERSION=$(psql "service=$PG_SERVICE" -X -v ON_ERROR_STOP=1 -Atqc \
   "SELECT COALESCE(max(version_id) FILTER (WHERE is_applied), 0) FROM goose_db_version")
 SERVER_VERSION=$(psql "service=$PG_SERVICE" -X -v ON_ERROR_STOP=1 -Atqc "SHOW server_version_num")
-PG_DUMP_VERSION=$(pg_dump --version | awk '{print $NF}')
+PG_DUMP_VERSION=$(LC_ALL=C pg_dump --version | sed -nE 's/^pg_dump \(PostgreSQL\) ([0-9]+(\.[0-9]+)*)( .*)?$/\1/p')
 CREATED_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 [[ "$SCHEMA_VERSION" =~ ^[0-9]+$ ]] || fail "schema_version is not numeric"
 [[ "$SERVER_VERSION" =~ ^[0-9]+$ ]] || fail "PostgreSQL server version is not numeric"
-[[ "$PG_DUMP_VERSION" =~ ^[A-Za-z0-9._-]+$ ]] || fail "pg_dump version is invalid"
+[[ "$PG_DUMP_VERSION" =~ ^[0-9]+([.][0-9]+)*$ ]] || fail "pg_dump version is invalid"
 
 printf '%s  %s\n' "$DIGEST" "$(basename "$DUMP")" >"$TEMP_CHECKSUM"
 printf '{\n  "backup_id": "%s",\n  "bytes": %s,\n  "sha256": "%s",\n  "schema_version": %s,\n  "postgres_server_version_num": %s,\n  "pg_dump_version": "%s",\n  "created_at": "%s"\n}\n' \

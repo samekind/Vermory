@@ -75,6 +75,9 @@ func TestLinuxBackupUsesPrivateNativePostgreSQLArtifact(t *testing.T) {
 		"--no-acl",
 		"sha256sum",
 		"schema_version",
+		"LC_ALL=C pg_dump --version",
+		`^pg_dump \(PostgreSQL\)`,
+		`^[0-9]+([.][0-9]+)*$`,
 		"refusing to overwrite backup",
 	)
 	for _, forbidden := range []string{"postgresql://", "DATABASE_URL", "sudo "} {
