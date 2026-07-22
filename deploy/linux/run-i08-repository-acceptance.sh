@@ -58,6 +58,17 @@ hash_file() {
   sha256sum "$1" | awk '{print $1}'
 }
 
+read_primary_metadata() {
+  case "$1" in
+    *.gz) gzip -dc "$1" ;;
+    *.zst) zstd -dc "$1" ;;
+    *.xz) xz -dc "$1" ;;
+    *.bz2) bzip2 -dc "$1" ;;
+    *.xml) cat "$1" ;;
+    *) fail "unsupported DNF primary metadata compression" ;;
+  esac
+}
+
 manifest=$repository_root/repository.json
 repository=$repository_root/repository
 jq -e \
@@ -127,9 +138,10 @@ case "$repository_kind" in
     [[ $(rpm --query --package --queryformat '%{ARCH}' "$package") == "$package_architecture" ]] || fail "RPM architecture mismatch"
     gpgv --keyring "$public_key" "$signature" "$metadata" >/dev/null 2>&1 \
       || fail "DNF repository signature is invalid"
-    primary_metadata=$(find "$repository/repodata" -maxdepth 1 -type f -name '*-primary.xml.gz' -print -quit)
+    primary_metadata=$(find "$repository/repodata" -maxdepth 1 -type f \
+      \( -name '*-primary.xml' -o -name '*-primary.xml.*' \) -print -quit)
     [[ -n "$primary_metadata" ]] || fail "DNF primary metadata is missing"
-    gzip -dc "$primary_metadata" | grep -Fq "$package_sha256" \
+    read_primary_metadata "$primary_metadata" | grep -F "$package_sha256" >/dev/null \
       || fail "DNF metadata does not bind the accepted package digest"
     ;;
 esac

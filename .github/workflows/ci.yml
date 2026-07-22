@@ -457,6 +457,7 @@ jobs:
         run: >-
           dnf install --assumeyes
           createrepo_c
+          bzip2
           dnf-plugins-core
           findutils
           git
@@ -467,6 +468,8 @@ jobs:
           shadow-utils
           systemd
           tar
+          xz
+          zstd
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           fetch-depth: 0

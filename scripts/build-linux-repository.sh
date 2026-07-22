@@ -60,6 +60,17 @@ hash_file() {
   sha256sum "$1" | awk '{print $1}'
 }
 
+read_primary_metadata() {
+  case "$1" in
+    *.gz) gzip -dc "$1" ;;
+    *.zst) zstd -dc "$1" ;;
+    *.xz) xz -dc "$1" ;;
+    *.bz2) bzip2 -dc "$1" ;;
+    *.xml) cat "$1" ;;
+    *) fail "unsupported DNF primary metadata compression" ;;
+  esac
+}
+
 i06_report=$i06_evidence/report.json
 [[ -f "$i06_report" ]] || fail "I06 acceptance report is missing"
 jq -e \
@@ -160,9 +171,10 @@ case "$repository_kind" in
     mkdir -p "$repository/packages"
     install -m 0644 "$source_package" "$repository/$package_relative"
     createrepo_c --checksum sha256 --compress-type gz "$repository" >/dev/null
-    primary_metadata=$(find "$repository/repodata" -maxdepth 1 -type f -name '*-primary.xml.gz' -print -quit)
+    primary_metadata=$(find "$repository/repodata" -maxdepth 1 -type f \
+      \( -name '*-primary.xml' -o -name '*-primary.xml.*' \) -print -quit)
     [[ -n "$primary_metadata" ]] || fail "DNF primary metadata is missing"
-    gzip -dc "$primary_metadata" | grep -Fq "$package_sha256" \
+    read_primary_metadata "$primary_metadata" | grep -F "$package_sha256" >/dev/null \
       || fail "DNF metadata does not contain the accepted package digest"
     gpg --batch --yes --homedir "$key_home" --local-user "$key_fingerprint" \
       --armor --detach-sign \
