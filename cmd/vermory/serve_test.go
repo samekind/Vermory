@@ -81,6 +81,23 @@ func TestServeOptionsUseProtectedEnvironmentDefaults(t *testing.T) {
 	}
 
 	command := newServeCommand()
+	wantDefaults := map[string]string{
+		"database-url": "service=vermory-runtime",
+		"listen":       "127.0.0.1:9797",
+		"tls-cert":     "/etc/vermory/tls.crt",
+		"tls-key":      "/etc/vermory/tls.key",
+		"provider":     "external",
+		"model":        "server-model",
+		"base-url":     "https://provider.example/v1",
+		"api-key-env":  "VERMORY_PROVIDER_SECRET",
+		"grok-command": "/usr/local/bin/grok-wrapper",
+	}
+	for name, want := range wantDefaults {
+		got, err := command.Flags().GetString(name)
+		if err != nil || got != want {
+			t.Fatalf("--%s did not preserve environment default: got=%q want=%q err=%v", name, got, want, err)
+		}
+	}
 	if err := command.Flags().Set("listen", "127.0.0.1:9898"); err != nil {
 		t.Fatal(err)
 	}

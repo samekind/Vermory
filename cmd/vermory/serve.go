@@ -99,15 +99,15 @@ func newServeCommand() *cobra.Command {
 			return err
 		},
 	}
-	command.Flags().StringVar(&options.DatabaseURL, "database-url", "", "restricted runtime PostgreSQL connection URL")
-	command.Flags().StringVar(&options.Listen, "listen", "127.0.0.1:8788", "authenticated API listen address")
-	command.Flags().StringVar(&options.TLSCert, "tls-cert", "", "TLS certificate path")
-	command.Flags().StringVar(&options.TLSKey, "tls-key", "", "TLS private key path")
-	command.Flags().StringVar(&options.Provider.Name, "provider", "mock", "provider: external, mock, grok-cli, openai-compatible, siliconflow, or duojie")
-	command.Flags().StringVar(&options.Provider.Model, "model", "", "server-owned provider model")
-	command.Flags().StringVar(&options.Provider.BaseURL, "base-url", "", "direct provider base URL")
-	command.Flags().StringVar(&options.Provider.APIKeyEnv, "api-key-env", "", "environment variable containing provider API key")
-	command.Flags().StringVar(&options.Provider.GrokCommand, "grok-command", "", "authenticated Grok CLI command")
+	command.Flags().StringVar(&options.DatabaseURL, "database-url", options.DatabaseURL, "restricted runtime PostgreSQL connection URL")
+	command.Flags().StringVar(&options.Listen, "listen", options.Listen, "authenticated API listen address")
+	command.Flags().StringVar(&options.TLSCert, "tls-cert", options.TLSCert, "TLS certificate path")
+	command.Flags().StringVar(&options.TLSKey, "tls-key", options.TLSKey, "TLS private key path")
+	command.Flags().StringVar(&options.Provider.Name, "provider", options.Provider.Name, "provider: external, mock, grok-cli, openai-compatible, siliconflow, or duojie")
+	command.Flags().StringVar(&options.Provider.Model, "model", options.Provider.Model, "server-owned provider model")
+	command.Flags().StringVar(&options.Provider.BaseURL, "base-url", options.Provider.BaseURL, "direct provider base URL")
+	command.Flags().StringVar(&options.Provider.APIKeyEnv, "api-key-env", options.Provider.APIKeyEnv, "environment variable containing provider API key")
+	command.Flags().StringVar(&options.Provider.GrokCommand, "grok-command", options.Provider.GrokCommand, "authenticated Grok CLI command")
 	addSharedRetrievalFlags(command, &options.Retrieval)
 	return command
 }
