@@ -905,6 +905,46 @@ governance behavior. W35 is not a model-quality, multi-browser, Internet-scale
 SLA, or general identity-product claim. See
 [the W35 evidence](evidence/2026-07-23-authenticated-remote-webchat.md).
 
+## Native Linux Package Repository Qualification I08
+
+I08 extends the accepted I06 package bytes into native signed APT and DNF
+repository bundles without substituting a rebuilt package. Four protected CI
+legs cover APT/DNF on native AMD64/ARM64 machines, and a dependent OIDC job
+incorporates the exact accepted bundles into the complete release manifest.
+
+| Gate | Result |
+|---|---:|
+| exact pull-request head | `858e5afc05b8136fd81d46a88164f799f2925197` |
+| APT native legs | `2 / 2` pass |
+| DNF native legs | `2 / 2` pass |
+| hard gates per leg | `18 / 18` |
+| exact I06 package digest mismatches | `0` |
+| package-manager download digest mismatches | `0` |
+| installed source revision mismatches | `0` |
+| repository metadata signature enforcement | `4 / 4` pass |
+| tampered metadata accepted | `0` |
+| service auto-activation | `0` |
+| private signing keys in bundles | `0` |
+| signed snapshot repository entries | `4` |
+| complete release-manifest entries | `16` |
+| payload hash failures | `0` |
+| exact workflow identity and issuer | pass |
+| modified manifest accepted | `0` |
+| wrong workflow identity accepted | `0` |
+
+APT used `signed-by`; DNF used `repo_gpgcheck=1`. The DNF negative control
+used an independent repository identifier, isolated cache and persistence
+directories, forced refresh, and disabled unavailable-repository skipping, so
+the package manager itself had to reject the modified metadata. Six failed CI
+runs are retained as evidence of incorrect cache, metadata-format, DNF5 CLI,
+download-location, and tamper-probe assumptions.
+
+This qualification uses per-leg ephemeral CI signing keys and `file://`
+transport. It does not claim a stable production signing key, public hosted
+repository, mirrors, retention, cross-version upgrades or rollback, tagged
+publication, or RPM payload signatures. See
+[the I08 evidence](evidence/2026-07-23-linux-package-repository.md).
+
 
 ## Duojie Core Matrix Findings
 
