@@ -83,6 +83,8 @@ jobs:
           name: vermory-manual-snapshot-${{ github.run_id }}
           path: |
             dist/*.tar.gz
+            dist/*.deb
+            dist/*.rpm
             dist/checksums.txt
             dist/*.tgz
             dist/vermory-hermes-*.sha256
@@ -186,6 +188,8 @@ jobs:
           name: vermory-release-${{ github.run_id }}
           path: |
             dist/*.tar.gz
+            dist/*.deb
+            dist/*.rpm
             dist/checksums.txt
             dist/*.tgz
             dist/vermory-hermes-*.sha256

@@ -54,6 +54,46 @@ to this protected file. Do not put an admin database identity here. The unit
 loads this file without copying its values into `ExecStart` or command-line
 arguments.
 
+## DEB and RPM packages
+
+Vermory release snapshots and tagged releases include native DEB and RPM files
+for AMD64 and ARM64. Verify the selected package through the signed complete
+release manifest before installation, then use the host package manager:
+
+```bash
+sudo -- apt install ./vermory_0.1.0_linux_amd64.deb
+# or
+sudo -- dnf install ./vermory_0.1.0_linux_amd64.rpm
+```
+
+The package installs `/usr/bin/vermory`, a hardened
+`/usr/lib/systemd/system/vermory.service`, the `vermory` non-login service
+identity, Linux documentation, and a non-secret environment example at
+`/usr/share/vermory/vermory.env.example`. It deliberately does not create
+`/etc/vermory/vermory.env`, run migrations, enable the unit, start the service,
+or carry database credentials.
+
+Complete the database and environment steps above, then activate the service
+explicitly:
+
+```bash
+sudo -- install -d -o root -g root -m 0755 /etc/vermory
+sudo -- install -o root -g root -m 0600 \
+  /usr/share/vermory/vermory.env.example \
+  /etc/vermory/vermory.env
+sudo -- systemctl enable --now vermory.service
+```
+
+Replace every deployment-specific value before activation. Package upgrades do
+not migrate PostgreSQL or restart the service; perform the release-specific
+database compatibility check first and restart explicitly. Package removal
+stops a currently managed service and removes package-owned files while
+preserving `/etc/vermory` and the stable service identity.
+
+The repository currently produces signed package artifacts, not an APT or DNF
+repository. Repository metadata, repository signing, and retention remain a
+separate delivery boundary.
+
 ## Initial install and upgrade
 
 Verify the release archive against the signed Vermory release manifest first.

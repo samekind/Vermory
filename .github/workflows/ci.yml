@@ -290,8 +290,85 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
+  linux-package-install:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - format: deb
+            runner: ubuntu-latest
+            arch: amd64
+            machine: x86_64
+          - format: rpm
+            runner: ubuntu-latest
+            arch: amd64
+            machine: x86_64
+          - format: deb
+            runner: ubuntu-24.04-arm
+            arch: arm64
+            machine: aarch64
+          - format: rpm
+            runner: ubuntu-24.04-arm
+            arch: arm64
+            machine: aarch64
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 20
+    env:
+      SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      I06_EXPECTED_MACHINE: ${{ matrix.machine }}
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 0
+          ref: ${{ env.SOURCE_SHA }}
+      - name: Verify package source revision and architecture
+        run: |
+          test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
+          test "$(uname -m)" = "$I06_EXPECTED_MACHINE"
+      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
+        with:
+          go-version-file: go.mod
+          cache: true
+      - name: Install package acceptance tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends file jq
+      - name: Install RPM tooling
+        if: matrix.format == 'rpm'
+        run: sudo apt-get install --yes --no-install-recommends rpm
+      - name: Build native package snapshot
+        uses: goreleaser/goreleaser-action@f06c13b6b1a9625abc9e6e439d9c05a8f2190e94 # v7.2.3
+        with:
+          distribution: goreleaser
+          version: v2.17.0
+          args: release --snapshot --clean --skip=publish --config .goreleaser.yaml
+      - name: Run native package install and removal acceptance
+        run: |
+          sudo --preserve-env=SOURCE_SHA,I06_EXPECTED_MACHINE -- \
+            env "PATH=$PATH" \
+              deploy/linux/run-i06-package-acceptance.sh \
+                "$GITHUB_WORKSPACE" \
+                "$GITHUB_WORKSPACE/dist" \
+                "${{ matrix.format }}" \
+                "${{ matrix.arch }}" \
+                "$RUNNER_TEMP/i06-evidence"
+          test -z "$(git status --porcelain)"
+          jq -e \
+            --arg source_sha "$SOURCE_SHA" \
+            --arg format "${{ matrix.format }}" \
+            --arg architecture "${{ matrix.arch }}" \
+            '.source_sha == $source_sha and .package.format == $format and .package.architecture == $architecture and .package.native == true and (.hard_gates | length == 16) and (.hard_gates | to_entries | all(.value == true))' \
+            "$RUNNER_TEMP/i06-evidence/report.json"
+      - name: Upload normalized I06 package evidence
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: vermory-i06-linux-package-${{ matrix.format }}-${{ matrix.arch }}-${{ env.SOURCE_SHA }}
+          path: ${{ runner.temp }}/i06-evidence/report.json
+          if-no-files-found: error
+          retention-days: 7
+
   sign-snapshot:
-    needs: [test, linux-service-lifecycle, linux-service-lifecycle-arm64]
+    needs: [test, linux-service-lifecycle, linux-service-lifecycle-arm64, linux-package-install]
     if: >-
       github.event_name == 'push' ||
       github.event.pull_request.head.repo.full_name == github.repository
@@ -381,6 +458,8 @@ jobs:
           name: vermory-pr-snapshot-${{ env.SOURCE_SHA }}
           path: |
             dist/*.tar.gz
+            dist/*.deb
+            dist/*.rpm
             dist/checksums.txt
             dist/*.tgz
             dist/vermory-hermes-*.sha256

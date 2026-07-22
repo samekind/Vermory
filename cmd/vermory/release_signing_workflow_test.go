@@ -19,7 +19,7 @@ func TestCIWorkflowKeepsOIDCOutOfTestJobAndSignsCompleteSnapshot(t *testing.T) {
 
 	signing := workflowSection(t, workflow, "  sign-snapshot:", "")
 	for _, required := range []string{
-		"needs: [test, linux-service-lifecycle, linux-service-lifecycle-arm64]",
+		"needs: [test, linux-service-lifecycle, linux-service-lifecycle-arm64, linux-package-install]",
 		"id-token: write",
 		"github.event.pull_request.head.repo.full_name == github.repository",
 		"SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}",
@@ -59,7 +59,7 @@ func TestCIWorkflowKeepsOIDCOutOfTestJobAndSignsCompleteSnapshot(t *testing.T) {
 		}
 	}
 
-	armLifecycle := workflowSection(t, workflow, "  linux-service-lifecycle-arm64:", "\n  sign-snapshot:")
+	armLifecycle := workflowSection(t, workflow, "  linux-service-lifecycle-arm64:", "\n  linux-package-install:")
 	for _, required := range []string{
 		"runs-on: ubuntu-24.04-arm",
 		"SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}",
@@ -73,6 +73,23 @@ func TestCIWorkflowKeepsOIDCOutOfTestJobAndSignsCompleteSnapshot(t *testing.T) {
 	} {
 		if !strings.Contains(armLifecycle, required) {
 			t.Fatalf("linux-service-lifecycle-arm64 is missing %q", required)
+		}
+	}
+
+	packageInstall := workflowSection(t, workflow, "  linux-package-install:", "\n  sign-snapshot:")
+	for _, required := range []string{
+		"runs-on: ${{ matrix.runner }}",
+		"format: deb",
+		"format: rpm",
+		"runner: ubuntu-latest",
+		"runner: ubuntu-24.04-arm",
+		"arch: amd64",
+		"arch: arm64",
+		"deploy/linux/run-i06-package-acceptance.sh",
+		"vermory-i06-linux-package-${{ matrix.format }}-${{ matrix.arch }}-${{ env.SOURCE_SHA }}",
+	} {
+		if !strings.Contains(packageInstall, required) {
+			t.Fatalf("linux-package-install is missing %q", required)
 		}
 	}
 
@@ -103,6 +120,8 @@ func TestReleaseWorkflowSignsManualAndTaggedPayloadManifests(t *testing.T) {
 			"cosign verify-blob",
 			"release-manifest.sha256",
 			"release-manifest.sigstore.json",
+			"dist/*.deb",
+			"dist/*.rpm",
 		} {
 			if !strings.Contains(section, required) {
 				t.Fatalf("release %s job is missing %q", job.name, required)

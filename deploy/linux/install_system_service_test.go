@@ -1,11 +1,19 @@
 package linux_test
 
 import (
+	"encoding/json"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 )
+
+type nativePackageCase struct {
+	Version       string   `json:"version"`
+	ID            string   `json:"id"`
+	HardGateCount int      `json:"hard_gate_count"`
+	HardGates     []string `json:"hard_gates"`
+}
 
 func TestLinuxServiceUnitKeepsRuntimeSecretsOutOfArguments(t *testing.T) {
 	unit := readFile(t, "vermory.service")
@@ -170,6 +178,77 @@ func TestLinuxAcceptanceExercisesTheCompleteI05Boundary(t *testing.T) {
 	directoryMode := strings.Index(script, `chmod 0755 "$EVIDENCE_DIRECTORY"`)
 	if reportMode < 0 || credentialScan <= reportMode || directoryMode <= credentialScan {
 		t.Fatal("normalized evidence must remain root-confined until its credential scan passes")
+	}
+}
+
+func TestI06LinuxNativePackageCaseIsFrozen(t *testing.T) {
+	payload, err := os.ReadFile(filepath.Join("..", "..", "runtime", "cases", "I06-linux-native-packages", "case.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var manifest nativePackageCase
+	if err := json.Unmarshal(payload, &manifest); err != nil {
+		t.Fatal(err)
+	}
+	if manifest.Version != "1" || manifest.ID != "I06-linux-native-packages" ||
+		manifest.HardGateCount != 16 || len(manifest.HardGates) != manifest.HardGateCount {
+		t.Fatalf("unexpected I06 contract: %#v", manifest)
+	}
+	seen := make(map[string]struct{}, len(manifest.HardGates))
+	for _, gate := range manifest.HardGates {
+		if strings.TrimSpace(gate) == "" {
+			t.Fatal("I06 hard gate cannot be empty")
+		}
+		if _, exists := seen[gate]; exists {
+			t.Fatalf("I06 hard gate is duplicated: %q", gate)
+		}
+		seen[gate] = struct{}{}
+	}
+}
+
+func TestLinuxNativePackagesKeepInstallationNonActivating(t *testing.T) {
+	config := readFile(t, filepath.Join("..", "..", ".goreleaser.yaml"))
+	requireContains(t, config,
+		"nfpms:",
+		"id: vermory-linux-packages",
+		"package_name: vermory",
+		"- deb",
+		"- rpm",
+		"src: deploy/linux/package/vermory.service",
+		"dst: /usr/lib/systemd/system/vermory.service",
+		"src: deploy/linux/package/vermory.env.example",
+		"dst: /usr/share/vermory/vermory.env.example",
+		"preinstall: deploy/linux/package/preinstall.sh",
+		"postinstall: deploy/linux/package/postinstall.sh",
+		"preremove: deploy/linux/package/preremove-deb.sh",
+		"preremove: deploy/linux/package/preremove-rpm.sh",
+		"postremove: deploy/linux/package/postremove.sh",
+	)
+
+	unit := readFile(t, filepath.Join("package", "vermory.service"))
+	requireContains(t, unit,
+		"ConditionPathExists=/etc/vermory/vermory.env",
+		"User=vermory",
+		"Group=vermory",
+		"EnvironmentFile=/etc/vermory/vermory.env",
+		"ExecStart=/usr/bin/vermory serve",
+		"NoNewPrivileges=true",
+		"ProtectSystem=strict",
+	)
+
+	for _, name := range []string{"preinstall.sh", "postinstall.sh", "preremove-deb.sh", "preremove-rpm.sh", "postremove.sh"} {
+		script := readFile(t, filepath.Join("package", name))
+		for _, forbidden := range []string{"sudo ", "database migrate", "systemctl enable", "systemctl start", "systemctl restart"} {
+			if strings.Contains(script, forbidden) {
+				t.Fatalf("package script %s contains forbidden action %q", name, forbidden)
+			}
+		}
+	}
+
+	postinstall := readFile(t, filepath.Join("package", "postinstall.sh"))
+	requireContains(t, postinstall, "systemctl daemon-reload")
+	for _, name := range []string{"preremove-deb.sh", "preremove-rpm.sh"} {
+		requireContains(t, readFile(t, filepath.Join("package", name)), "systemctl disable --now vermory.service")
 	}
 }
 

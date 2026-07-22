@@ -17,8 +17,8 @@ func TestReleaseManifestScriptCreatesAndVerifiesCompletePayloadSet(t *testing.T)
 		t.Fatal(err)
 	}
 	lines := strings.Split(strings.TrimSpace(string(first)), "\n")
-	if len(lines) != 8 {
-		t.Fatalf("manifest entries=%d, want 8: %s", len(lines), first)
+	if len(lines) != 12 {
+		t.Fatalf("manifest entries=%d, want 12: %s", len(lines), first)
 	}
 	for index := 1; index < len(lines); index++ {
 		if lines[index-1][66:] > lines[index][66:] {
@@ -77,6 +77,10 @@ func writeReleaseManifestPayloads(t *testing.T) string {
 		"vermory_0.0.0_darwin_arm64.tar.gz",
 		"vermory_0.0.0_linux_amd64.tar.gz",
 		"vermory_0.0.0_linux_arm64.tar.gz",
+		"vermory_0.0.0_linux_amd64.deb",
+		"vermory_0.0.0_linux_arm64.deb",
+		"vermory_0.0.0_linux_amd64.rpm",
+		"vermory_0.0.0_linux_arm64.rpm",
 	}
 	for _, name := range files {
 		if err := os.WriteFile(filepath.Join(dist, name), []byte("fixture:"+name+"\n"), 0o600); err != nil {

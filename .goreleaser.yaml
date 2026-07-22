@@ -92,6 +92,68 @@ archives:
           mode: 0755
           mtime: "{{ .CommitDate }}"
 
+nfpms:
+  - id: vermory-linux-packages
+    ids:
+      - vermory
+    package_name: vermory
+    file_name_template: >-
+      {{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}
+    homepage: https://github.com/samekind/Vermory
+    description: PostgreSQL-authoritative memory and context continuity for AI clients.
+    maintainer: Vermory Maintainers <maintainers@samekind.dev>
+    vendor: samekind
+    license: Apache-2.0
+    section: utils
+    priority: optional
+    bindir: /usr/bin
+    mtime: "{{ .CommitDate }}"
+    formats:
+      - deb
+      - rpm
+    contents:
+      - src: deploy/linux/package/vermory.service
+        dst: /usr/lib/systemd/system/vermory.service
+        file_info:
+          mode: 0644
+          mtime: "{{ .CommitDate }}"
+      - src: deploy/linux/package/vermory.env.example
+        dst: /usr/share/vermory/vermory.env.example
+        file_info:
+          mode: 0644
+          mtime: "{{ .CommitDate }}"
+      - src: deploy/linux/README.md
+        dst: /usr/share/doc/vermory/README-linux.md
+        file_info:
+          mode: 0644
+          mtime: "{{ .CommitDate }}"
+      - src: LICENSE
+        dst: /usr/share/doc/vermory/LICENSE
+        file_info:
+          mode: 0644
+          mtime: "{{ .CommitDate }}"
+    overrides:
+      deb:
+        dependencies:
+          - bash
+          - passwd
+          - systemd
+        scripts:
+          preinstall: deploy/linux/package/preinstall.sh
+          postinstall: deploy/linux/package/postinstall.sh
+          preremove: deploy/linux/package/preremove-deb.sh
+          postremove: deploy/linux/package/postremove.sh
+      rpm:
+        dependencies:
+          - bash
+          - shadow-utils
+          - systemd
+        scripts:
+          preinstall: deploy/linux/package/preinstall.sh
+          postinstall: deploy/linux/package/postinstall.sh
+          preremove: deploy/linux/package/preremove-rpm.sh
+          postremove: deploy/linux/package/postremove.sh
+
 checksum:
   name_template: checksums.txt
   algorithm: sha256
