@@ -254,18 +254,21 @@ EOF
     tampered_config_directory=$work/tampered-repos
     mkdir -p "$tampered_config_directory"
     cat >"$tampered_config_directory/vermory.repo" <<EOF
-[vermory]
+[vermory-tampered]
 name=Vermory I08 Tampered
 baseurl=file://$tampered_repository
 enabled=1
 gpgcheck=0
 repo_gpgcheck=1
 gpgkey=file://$tampered_repository/$public_key_relative
+metadata_expire=0
+skip_if_unavailable=0
 EOF
     if dnf \
       --assumeyes \
+      --refresh \
       --disablerepo=\* \
-      --enablerepo=vermory \
+      --enablerepo=vermory-tampered \
       --setopt="reposdir=$tampered_config_directory" \
       --setopt="cachedir=$work/tampered-dnf-cache" \
       --setopt="persistdir=$work/tampered-dnf-persist" \

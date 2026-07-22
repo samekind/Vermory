@@ -126,6 +126,8 @@ func TestLinuxRepositoryScriptsRequireNativeSignedRepositorySemantics(t *testing
 		"file://",
 		"download vermory",
 		"tampered",
+		"skip_if_unavailable=0",
+		"--refresh",
 		"installed_revision_bound",
 		"private_signing_key_absent",
 	} {
