@@ -1,0 +1,130 @@
+{
+  "case_id": "W35-authenticated-remote-webchat",
+  "status": "accepted",
+  "hard_gate_count": 26,
+  "hard_gates_passed": 26,
+  "accepted_at": "2026-07-23",
+  "source": {
+    "revision": "7d0839d7f2935a933cab9477a82bdcae2d7252e8",
+    "version": "0.0.0-SNAPSHOT-7d0839d",
+    "build_date": "2026-07-22T18:01:28Z",
+    "go_version": "go1.25.7"
+  },
+  "protected_delivery": {
+    "run_id": 29944895981,
+    "run_status": "success",
+    "test_job_id": 89007674627,
+    "linux_service_arm64_job_id": 89007674663,
+    "linux_service_amd64_job_id": 89007674701,
+    "sign_snapshot_job_id": 89008605335,
+    "native_package_jobs_passed": 4,
+    "artifact_id": 8539846545,
+    "artifact_name": "vermory-pr-snapshot-7d0839d7f2935a933cab9477a82bdcae2d7252e8",
+    "artifact_digest": "sha256:3aea9b703d0a233b5119bf699a77b6168227c0f5d7e6804cdc01cb2beb919443",
+    "darwin_arm64_archive_sha256": "d78a70502df3922a892ae318e8a2c54e88cb4e204cecdf640d3bdbfa33de941f",
+    "darwin_arm64_binary_sha256": "83404b2a72316d6bebdf7410ba949b1fc82f3e8f1fdd35b82c5c63dbe003d31e",
+    "release_manifest_verified": true,
+    "checksums_verified": true,
+    "sigstore_identity_verified": true,
+    "sigstore_identity": "https://github.com/samekind/Vermory/.github/workflows/ci.yml@refs/pull/1/merge"
+  },
+  "runtime": {
+    "operating_system": "macOS",
+    "architecture": "arm64",
+    "service_scope": "unprivileged user LaunchAgent",
+    "backend_listener": "loopback only",
+    "provider": "deterministic mock provider",
+    "model_label": "w35-deployment-contract",
+    "postgresql": "18.3",
+    "schema_version": 24,
+    "real_model_claim": false
+  },
+  "browser": {
+    "browser": "Google Chrome 150",
+    "origin": "https://vermory.mcxin.top",
+    "secure_context": true,
+    "same_origin_https_requests": 20,
+    "successful_requests": 20,
+    "mixed_content": false,
+    "console_errors": 0,
+    "console_warnings": 0,
+    "horizontal_overflow": false,
+    "certificate_not_after": "2026-10-20T16:36:50Z"
+  },
+  "credential_boundary": {
+    "anonymous_shell_available": true,
+    "anonymous_protected_session_status": 401,
+    "url_contains_token_shape": false,
+    "dom_contains_token_shape": false,
+    "local_storage_contains_token_shape": false,
+    "session_storage_contains_token_shape": false,
+    "refresh_requires_reauthentication": true,
+    "browser_storage_is_tenant_scoped": true,
+    "raw_token_in_service_logs": false,
+    "raw_token_in_installed_public_files": false,
+    "raw_token_in_postgresql_content": false,
+    "raw_token_in_reverse_entrypoint_logs": false
+  },
+  "tenant_isolation": {
+    "same_channel_and_thread_anchor": true,
+    "bindings": 2,
+    "distinct_tenants": 2,
+    "distinct_continuities": 2,
+    "tenant_a_sees_own_marker": true,
+    "tenant_a_sees_tenant_b_marker": false,
+    "tenant_b_sees_tenant_a_marker": false,
+    "tenant_b_sees_own_marker": true,
+    "client_governance_controls_visible": 0,
+    "client_candidate_list_status": 403,
+    "client_global_default_mutation_status": 403,
+    "revoked_token_status": 401,
+    "active_token_status": 200
+  },
+  "governed_memory": {
+    "exact_marker": "EXACT-35-ECHO",
+    "fresh_recall_before_forget": true,
+    "current_memory_count_after_forget": 0,
+    "fresh_recall_after_forget": false,
+    "forget_database_tuple": "deleted|true|true|0|0|0",
+    "origin_transcript_retained": true,
+    "correction": {
+      "superseded_value": "EXACT-CORRECT-ALPHA",
+      "current_value": "EXACT-CORRECT-BETA",
+      "fresh_linked_turn_contains_current": true,
+      "fresh_linked_turn_contains_superseded": false,
+      "fresh_linked_turn_contains_governed_memory_section": true,
+      "source_transcript_pooled_into_linked_turn": false,
+      "current_memory_count_after_cleanup": 0,
+      "cleanup_database_tuple": "deleted|true|true|0|0|0"
+    }
+  },
+  "browser_revocation_retry": {
+    "database_rows_after_revoked_attempt": 0,
+    "replacement_authentication_succeeded": true,
+    "same_operation_id_reused": true,
+    "database_rows_after_retry": 1,
+    "distinct_operation_ids_after_retry": 1,
+    "pending_after_retry": null
+  },
+  "relay_failure": {
+    "public_status_while_down": 502,
+    "database_rows_while_down": 0,
+    "public_status_after_restore_and_retry": 200,
+    "database_rows_after_retry": 1,
+    "distinct_operation_ids_after_retry": 1
+  },
+  "restart": {
+    "public_root_status": 200,
+    "authenticated_session_status": 200,
+    "observation_count": 8,
+    "forgotten_memory_remained_deleted": true
+  },
+  "non_claims": [
+    "real-model quality",
+    "browser support beyond the accepted Chrome version",
+    "Internet-scale availability or service-level objectives",
+    "a general-purpose identity product",
+    "browser or relay authority over memory",
+    "source transcript erasure when governed memory is forgotten"
+  ]
+}

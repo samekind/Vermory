@@ -877,6 +877,34 @@ observation, or memory and cannot be replaced by another client. W34 therefore
 does not claim a complete Grok client pass. See
 [the W34 evidence](evidence/2026-07-22-physical-cross-host-workspace-continuity.md).
 
+## Authenticated Remote Web Chat W35
+
+W35 moved the Web Chat browser contract from loopback-only qualification to an
+authenticated public HTTPS deployment. Chrome reached an exact protected and
+OIDC-signed Darwin ARM64 release through a reverse entrypoint and private relay;
+the Vermory backend remained loopback-only and PostgreSQL 18.3 schema 24
+remained authoritative.
+
+| Gate | Result |
+|---|---|
+| protected source revision | `7d0839d7f2935a933cab9477a82bdcae2d7252e8` |
+| protected CI / signed snapshot | pass / pass |
+| remote Chrome and HTTPS | Chrome 150 / secure same-origin |
+| W35 hard gates | `26 / 26` pass |
+| same-anchor tenant isolation | `2` bindings / `2` tenants / `2` continuities |
+| client/operator authority | chat allowed / governance role-gated |
+| correction | fresh linked turn contains current value, not superseded value |
+| forgetting | `deleted|true|true|0|0|0` with source transcript retained |
+| revoked browser retry | `0` committed rows before replacement auth, then `1 / 1` idempotent row |
+| relay failure retry | `502 / 0` while down, then `200 / 1` after restore |
+| restart | transcript and deleted state preserved |
+| raw-token residue | zero across browser, logs, PostgreSQL, and public files |
+
+The deterministic provider isolates deployment, authentication, isolation, and
+governance behavior. W35 is not a model-quality, multi-browser, Internet-scale
+SLA, or general identity-product claim. See
+[the W35 evidence](evidence/2026-07-23-authenticated-remote-webchat.md).
+
 
 ## Duojie Core Matrix Findings
 

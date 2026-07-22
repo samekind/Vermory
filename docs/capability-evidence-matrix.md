@@ -1,6 +1,6 @@
 # Vermory Capability And Evidence Matrix
 
-Date: 2026-07-22
+Date: 2026-07-23
 
 This is the repository's authoritative map of what Vermory has actually
 qualified. It separates a frozen case contract from runtime execution, real
@@ -25,15 +25,15 @@ Status meanings are deliberately narrow:
   the case's acceptance boundary. The failure is retained and no pass is
   inferred.
 
-Frozen public reality cases: `21`.
+Frozen public reality cases: `22`.
 
 | Continuity line | Cases containing the line |
 |---|---:|
 | Workspace | 6 |
-| Conversation | 12 |
+| Conversation | 13 |
 | Global Defaults | 6 |
 | Bridge | 7 |
-| Security | 14 |
+| Security | 15 |
 
 A case may cover more than one line, so these counts intentionally overlap.
 
@@ -97,6 +97,7 @@ and the [rejected domestic reader run](evidence/2026-07-20-longmemeval-s-domesti
 | Runtime case | Status | Accepted boundary | Primary evidence | Explicit boundary |
 |---|---|---|---|---|
 | `W32-browser-webchat-lifecycle` | `runtime-qualified` | Real Chrome same-origin application passes thread isolation, refresh, unavailable-service retry, lost-response replay, candidate accept/reject, correction, forgetting, desktop, and mobile gates | [Browser Web Chat lifecycle](evidence/2026-07-22-browser-webchat-lifecycle.md) | Uses a deterministic provider to isolate the browser contract; it is not a real-model or public multi-user deployment claim. |
+| `W35-authenticated-remote-webchat` | `runtime-qualified` | Exact signed Darwin ARM64 runtime passes authenticated public HTTPS, loopback-only backend, multi-tenant same-anchor isolation, role gating, correction, forgetting, revocation, refresh recovery, restart, browser retry, relay failure, and credential-residue gates in Chrome | [Authenticated remote Web Chat](evidence/2026-07-23-authenticated-remote-webchat.md) | Uses a deterministic provider and one accepted Chrome version; it does not qualify model quality, Internet-scale SLA, or a general identity product. |
 
 ## Client Coverage
 
@@ -107,7 +108,7 @@ and the [rejected domestic reader run](evidence/2026-07-20-longmemeval-s-domesti
 | OpenClaw | Conversation continuity, formation/review, verified tool outcomes, correction, deletion, links, fail-open, and the B03 same-run Web Chat/Hermes bridge through the official Gateway HTTP agent path | Messaging channels and arbitrary session migration beyond the qualified cases |
 | Hermes | Explicit linked-session continuity, current-only recall, reversal, fail-open, and the B03 same-run Web Chat/OpenClaw bridge | Gateway and messaging modes beyond the qualified CLI sessions |
 | Cursor Agent | MCP discovery and zero-side-effect failure handling | The W04 generation, prepare, artifact, commit, and replay gates remain externally blocked |
-| Web Chat | Real HTTP and Chrome browser lifecycle with thread isolation, refresh, persisted retry, replay deduplication, candidate review, correction, deletion, responsive layout, and explicit three-client bridge delivery to Hermes/OpenClaw | Authenticated public multi-user browser deployment and browsers other than the qualified Chrome version |
+| Web Chat | Real HTTP and Chrome browser lifecycle with authenticated public HTTPS, loopback-only backend, multi-tenant same-anchor isolation, role gating, refresh, persisted retry, replay deduplication, revocation, restart, relay failure, candidate review, correction, deletion, responsive layout, and explicit three-client bridge delivery to Hermes/OpenClaw | Browsers other than the qualified Chrome version, Internet-scale availability/SLA, and a general-purpose identity product |
 
 ## Protected Delivery Rule
 
