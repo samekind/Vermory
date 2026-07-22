@@ -62,7 +62,19 @@ done < <(rg -o '\]\((evidence/[^)#]+\.md)\)' "$matrix" | sed -E 's/^.*\]\(([^)]+
 
 grep -Fq '| `B03-three-client-conversation-bridge` | `client-qualified` |' "$matrix"
 grep -Fq '| `W04-canonical-repository-cross-client` | `external-blocked` |' "$matrix"
-grep -Fq '| `I05-durable-linux-service-lifecycle` | `contract-only` |' "$matrix"
+grep -Fq '| `I05-durable-linux-service-lifecycle` | `runtime-qualified` |' "$matrix"
+i05_snapshot="docs/evidence/snapshots/2026-07-22-durable-linux-service-lifecycle.json"
+jq -e '
+  .github.repository == "samekind/Vermory" and
+  .github.run_id == 29916232568 and
+  .github.job_id == 88910623425 and
+  .github.head_sha == .report.source_sha and
+  .github.artifact_sha256 == .github.downloaded_zip_sha256 and
+  .report.case_id == "I05-durable-linux-service-lifecycle" and
+  .report.qualification == "github-hosted-ubuntu-systemd-amd64" and
+  (.report.hard_gates | length == 16) and
+  (.report.hard_gates | to_entries | all(.value == true))
+' "$i05_snapshot" >/dev/null
 grep -Fq '[Capability And Evidence Matrix](docs/capability-evidence-matrix.md)' README.md
 grep -Fq '[能力与证据矩阵](docs/capability-evidence-matrix.md)' README.zh-CN.md
 grep -Fq '[Capability And Evidence Matrix](docs/capability-evidence-matrix.md)' ARCHITECTURE.md
