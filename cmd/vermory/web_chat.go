@@ -57,7 +57,7 @@ func newWebChatCommand() *cobra.Command {
 	options := webChatOptions{Retrieval: defaultRetrievalRuntimeOptions()}
 	command := &cobra.Command{
 		Use:   "web-chat",
-		Short: "Run the local conversation continuity Web Chat API",
+		Short: "Run the local conversation continuity Web Chat application",
 		Args:  cobra.NoArgs,
 		RunE: func(command *cobra.Command, args []string) error {
 			if err := options.Validate(); err != nil {

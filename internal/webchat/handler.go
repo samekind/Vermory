@@ -34,6 +34,7 @@ func NewHandlerWithGovernance(service *runtime.ConversationService, defaults *ru
 
 func newHandler(service *runtime.ConversationService, defaults *runtime.GlobalDefaultsService, bridges *runtime.BridgeService) http.Handler {
 	handler := &Handler{service: service, defaults: defaults, bridges: bridges, mux: http.NewServeMux()}
+	handler.registerBrowserApp()
 	handler.mux.HandleFunc("POST /v1/chat/turn", handler.chatTurn)
 	handler.mux.HandleFunc("POST /v1/integrations/openclaw/turns/prepare", handler.prepareOpenClawTurn)
 	handler.mux.HandleFunc("POST /v1/integrations/openclaw/turns/complete", handler.completeOpenClawTurn)

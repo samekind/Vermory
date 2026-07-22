@@ -201,6 +201,15 @@ no `sudo`, system-wide Cosign install, private signing key, tag, or GitHub
 Release. `test` and `sign-snapshot` are strict required checks. See
 [Protected Artifact Signing Qualification](docs/evidence/2026-07-18-protected-artifact-signing.md).
 
+W32 qualifies the loopback Web Chat as a real Chrome application. It preserves
+threads across refresh, isolates unrelated conversations, persists an operation
+before sending, recovers both refused requests and lost successful responses
+without duplicate turns, and exposes candidate review, correction, and
+forgetting through the browser. Desktop and mobile layouts passed with a fresh
+PostgreSQL authority. The deterministic provider isolates the browser contract
+and is not a model-quality claim. See
+[Browser Web Chat Lifecycle Qualification](docs/evidence/2026-07-22-browser-webchat-lifecycle.md).
+
 Read the current [Capability And Evidence Matrix](docs/capability-evidence-matrix.md)
 for exact qualification boundaries. The
 [Experiment 0 report](docs/experiment-0-readout.md) is retained as the initial
@@ -243,6 +252,19 @@ Inspect the CLI:
 ```bash
 go run ./cmd/vermory --help
 ```
+
+Run the loopback Web Chat application and open `http://127.0.0.1:8787`:
+
+```bash
+go run ./cmd/vermory web-chat \
+  --database-url "$VERMORY_DATABASE_URL" \
+  --tenant-id local \
+  --listen 127.0.0.1:8787 \
+  --provider mock
+```
+
+The mock provider is useful for verifying the browser lifecycle. Select a
+direct provider explicitly when validating model behavior.
 
 Validate the frozen public cases:
 

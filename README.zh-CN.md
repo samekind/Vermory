@@ -166,6 +166,13 @@ sidecar 的完整 manifest；独立的 same-repository post-test job 使用 GitH
 长期私钥、tag 或 GitHub Release。`test` 和 `sign-snapshot` 都是 strict required
 checks。详见[受保护制品签名实证](docs/evidence/2026-07-18-protected-artifact-signing.md)。
 
+W32 把 loopback Web Chat 验证为真实 Chrome 应用：刷新后恢复同一 thread，
+不同 conversation 默认隔离；请求发出前先持久化 operation，服务拒绝连接和
+成功响应丢失两种故障都能用同一 operation 重试且不重复 turn；浏览器内可完成
+candidate 接受/拒绝、记忆纠正和忘记。桌面与移动布局均连接 fresh PostgreSQL
+authority 通过。确定性 provider 只隔离验证浏览器合同，不作为模型质量声明。
+详见[浏览器 Web Chat 生命周期实证](docs/evidence/2026-07-22-browser-webchat-lifecycle.md)。
+
 当前准确能力边界见[能力与证据矩阵](docs/capability-evidence-matrix.md)；
 [Experiment 0 读数](docs/experiment-0-readout.md)保留为最初的证据冻结基线。
 
@@ -186,6 +193,18 @@ go vet ./...
 ```bash
 go run ./cmd/vermory --help
 ```
+
+启动 loopback Web Chat，然后打开 `http://127.0.0.1:8787`：
+
+```bash
+go run ./cmd/vermory web-chat \
+  --database-url "$VERMORY_DATABASE_URL" \
+  --tenant-id local \
+  --listen 127.0.0.1:8787 \
+  --provider mock
+```
+
+mock provider 用于验证浏览器生命周期；验证模型行为时需显式选择直连 provider。
 
 对官方 LongMemEval-S cleaned artifact 运行不依赖 LLM provider 的全量检索
 资格：

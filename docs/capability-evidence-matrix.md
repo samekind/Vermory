@@ -1,6 +1,6 @@
 # Vermory Capability And Evidence Matrix
 
-Date: 2026-07-21
+Date: 2026-07-22
 
 This is the repository's authoritative map of what Vermory has actually
 qualified. It separates a frozen case contract from runtime execution, real
@@ -52,7 +52,7 @@ A case may cover more than one line, so these counts intentionally overlap.
 
 | Case | Status | Exact accepted boundary | External surface / model | Primary evidence | Explicit boundary |
 |---|---|---|---|---|---|
-| `C01-device-maintenance-continuity` | `client-qualified` | Corrected action and verified state survive restart; deleted or excluded details do not return | Grok Web Chat `grok-4.5`; direct DeepSeek-V4-Flash comparison | [Grok Web Chat runtime](evidence/2026-07-13-grok-webchat-runtime.md), [W27 comparison](evidence/2026-07-19-w27-real-utility-comparison.md) | Does not prove browser UI behavior; the accepted chat surface is the HTTP runtime plus external model client. |
+| `C01-device-maintenance-continuity` | `client-qualified` | Corrected action and verified state survive restart; deleted or excluded details do not return | Grok Web Chat `grok-4.5`; direct DeepSeek-V4-Flash comparison | [Grok Web Chat runtime](evidence/2026-07-13-grok-webchat-runtime.md), [W27 comparison](evidence/2026-07-19-w27-real-utility-comparison.md) | The original C01 run is the HTTP runtime plus external model client; W32 separately qualifies browser lifecycle without changing C01's model evidence. |
 | `C02-housing-viewing-validity` | `runtime-qualified` | Expired appointment is ineligible while durable housing constraints remain current | Deterministic W19 runtime; no exact external-client artifact claimed | [Memory eligibility and retention](evidence/2026-07-16-memory-eligibility-retention.md) | Expiry is not deletion and is not advertised as forgetting. |
 | `G01-language-default-local-override` | `client-qualified` | A local English instruction does not mutate the Chinese Global Default; correction and deletion propagate to Web Chat and MCP | Grok Web Chat and external MCP, `grok-4.5`; direct DeepSeek-V4-Flash comparison | [Grok Global Defaults runtime](evidence/2026-07-13-grok-global-defaults-runtime.md), [W27 comparison](evidence/2026-07-19-w27-real-utility-comparison.md) | Global Defaults remain explicit and thin; ordinary chat does not auto-grow personality settings. |
 | `S01-deletion-and-source-injection` | `client-qualified` | Deleted target fails exact and paraphrased probes while valid related guidance remains; source text cannot promote itself | Grok Web Chat `grok-4.5`; direct DeepSeek-V4-Flash comparison | [Grok Web Chat runtime](evidence/2026-07-13-grok-webchat-runtime.md), [W27 comparison](evidence/2026-07-19-w27-real-utility-comparison.md) | This is one governed deletion/injection case, not a universal proof against every prompt-injection technique. |
@@ -89,6 +89,12 @@ See [LongMemEval original sample](evidence/2026-07-14-longmemeval-original-sampl
 [full vector retrieval](evidence/2026-07-20-longmemeval-s-full-vector-retrieval.md),
 and the [rejected domestic reader run](evidence/2026-07-20-longmemeval-s-domestic-vector-reader-qa-rejected-v1.md).
 
+## Additional Surface Qualification
+
+| Runtime case | Status | Accepted boundary | Primary evidence | Explicit boundary |
+|---|---|---|---|---|
+| `W32-browser-webchat-lifecycle` | `runtime-qualified` | Real Chrome same-origin application passes thread isolation, refresh, unavailable-service retry, lost-response replay, candidate accept/reject, correction, forgetting, desktop, and mobile gates | [Browser Web Chat lifecycle](evidence/2026-07-22-browser-webchat-lifecycle.md) | Uses a deterministic provider to isolate the browser contract; it is not a real-model or public multi-user deployment claim. |
+
 ## Client Coverage
 
 | Client or surface | Current accepted scope | Not yet qualified |
@@ -98,7 +104,7 @@ and the [rejected domestic reader run](evidence/2026-07-20-longmemeval-s-domesti
 | OpenClaw | Conversation continuity, formation/review, verified tool outcomes, correction, deletion, links, fail-open | Exact B03 three-client replay on one shared run |
 | Hermes | Explicit linked-session continuity, current-only recall, reversal, fail-open | Exact B03 three-client replay on one shared run |
 | Cursor Agent | MCP discovery and zero-side-effect failure handling | The W04 generation, prepare, artifact, commit, and replay gates remain externally blocked |
-| Web Chat runtime | Real HTTP conversation lifecycle with restart, correction, deletion, and external model consumption | Browser-level UI and network lifecycle automation |
+| Web Chat | Real HTTP and Chrome browser lifecycle with thread isolation, refresh, persisted retry, replay deduplication, candidate review, correction, deletion, responsive layout, and separate external-model consumption evidence | Authenticated public multi-user browser deployment and browsers other than the qualified Chrome version |
 
 ## Protected Delivery Rule
 
@@ -116,17 +122,15 @@ The following remain explicit work, not hidden implementation details:
    the Mac mini when the cross-host route is available.
 2. Re-run W04 with Cursor only after the external account can generate; Codex,
    Hermes, or OpenClaw cannot substitute for that result.
-3. Qualify browser-level Web Chat behavior rather than only the HTTP handler
-   and external model process.
-4. Run the real worktree/adopt/rebind topology through an additional coding
+3. Run the real worktree/adopt/rebind topology through an additional coding
    client and extend it to mirrors, forks, and device migration. W31 qualifies
    actual local Git worktree, same-name repository, clone, physical move,
    namespace, tenant, adopt, rebind, replay, and reversal behavior without a
    model.
-5. Qualify a durable Linux service installation, upgrade, rollback, backup,
+4. Qualify a durable Linux service installation, upgrade, rollback, backup,
    and restore profile in addition to binary portability and database recovery.
-6. Add a genuine withheld external evaluation; public cases and internal blind
+5. Add a genuine withheld external evaluation; public cases and internal blind
    splits are not called sealed evidence.
-7. Complete blocked real-provider reader runs only when their original frozen
+6. Complete blocked real-provider reader runs only when their original frozen
    provider and account requirements are available; do not replace them with a
    different client or model and keep the same claim.
