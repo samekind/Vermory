@@ -203,6 +203,7 @@ jobs:
               deploy/linux/run-i05-acceptance.sh \
                 "$GITHUB_WORKSPACE" \
                 "$RUNNER_TEMP/i05-evidence"
+          test -z "$(git status --porcelain)"
           jq -e \
             --arg source_sha "$SOURCE_SHA" \
             '.source_sha == $source_sha and (.hard_gates | to_entries | all(.value == true))' \

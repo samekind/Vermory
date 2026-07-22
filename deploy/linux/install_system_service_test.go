@@ -135,6 +135,7 @@ func TestLinuxAcceptanceExercisesTheCompleteI05Boundary(t *testing.T) {
 	script := readFile(t, "run-i05-acceptance.sh")
 	requireContains(t, script,
 		"SOURCE_SHA",
+		"-buildvcs=false",
 		"build_release i05-v1",
 		"build_release i05-v2",
 		"build_failing_release i05-failing",
@@ -149,6 +150,9 @@ func TestLinuxAcceptanceExercisesTheCompleteI05Boundary(t *testing.T) {
 	)
 	if strings.Contains(script, "sudo ") {
 		t.Fatal("acceptance script must execute inside one externally established root boundary")
+	}
+	if strings.Contains(script, `git -C "$REPOSITORY_ROOT"`) {
+		t.Fatal("root acceptance must not refresh the repository index")
 	}
 }
 

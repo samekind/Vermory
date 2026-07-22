@@ -39,8 +39,12 @@ TARGET_TABLES=$(psql "service=$TARGET_PG_SERVICE" -X -v ON_ERROR_STOP=1 -Atqc \
 [[ "$TARGET_TABLES" == 0 ]] || fail "target database is not empty"
 
 ROLE_STATE=$(psql "service=$TARGET_PG_SERVICE" -X -v ON_ERROR_STOP=1 -At \
-  --set=runtime_role="$RUNTIME_ROLE" -c \
-  "SELECT rolcanlogin::int || ':' || rolsuper::int || ':' || rolbypassrls::int FROM pg_roles WHERE rolname = :'runtime_role'")
+  --set=runtime_role="$RUNTIME_ROLE" <<'SQL'
+SELECT rolcanlogin::int || ':' || rolsuper::int || ':' || rolbypassrls::int
+FROM pg_roles
+WHERE rolname = :'runtime_role';
+SQL
+)
 [[ "$ROLE_STATE" == "1:0:0" ]] || fail "runtime role must already exist as LOGIN NOSUPERUSER NOBYPASSRLS"
 
 pg_restore --exit-on-error --no-owner --no-acl --dbname "service=$TARGET_PG_SERVICE" "$BACKUP"

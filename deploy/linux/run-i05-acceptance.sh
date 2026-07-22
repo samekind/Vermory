@@ -23,7 +23,6 @@ fi
 
 REPOSITORY_ROOT=$(cd "$1" && pwd)
 EVIDENCE_DIRECTORY=$2
-[[ "$(git -C "$REPOSITORY_ROOT" rev-parse HEAD)" == "$SOURCE_SHA" ]] || fail "repository is not at SOURCE_SHA"
 
 SERVICE_NAME=vermory-i05.service
 SERVICE_USER=vermory-i05
@@ -107,7 +106,7 @@ build_release() {
   install -d -m 0755 "$release_dir"
   (
     cd "$REPOSITORY_ROOT"
-    CGO_ENABLED=0 go build -trimpath \
+    CGO_ENABLED=0 go build -buildvcs=false -trimpath \
       -ldflags "-s -w -X vermory/internal/brand.Version=$release_id -X vermory/internal/brand.Revision=$SOURCE_SHA" \
       -o "$release_dir/vermory" ./cmd/vermory
   )
@@ -204,9 +203,14 @@ assert_restricted_role() {
   local admin_service=$1
   local role=$2
   local state
+  [[ "$role" =~ ^[A-Za-z_][A-Za-z0-9_-]{0,62}$ ]] || fail "runtime role is invalid"
   state=$(psql "service=$admin_service" -X -v ON_ERROR_STOP=1 -At \
-    --set=runtime_role="$role" -c \
-    "SELECT rolcanlogin::int || ':' || rolsuper::int || ':' || rolbypassrls::int FROM pg_roles WHERE rolname = :'runtime_role'")
+    --set=runtime_role="$role" <<'SQL'
+SELECT rolcanlogin::int || ':' || rolsuper::int || ':' || rolbypassrls::int
+FROM pg_roles
+WHERE rolname = :'runtime_role';
+SQL
+  )
   [[ "$state" == "1:0:0" ]] || fail "runtime role $role is not restricted"
 }
 
