@@ -60,7 +60,7 @@ while IFS= read -r relative_path; do
   }
 done < <(rg -o '\]\((evidence/[^)#]+\.md)\)' "$matrix" | sed -E 's/^.*\]\(([^)]+)\)$/\1/' | sort -u)
 
-grep -Fq '| `B03-three-client-conversation-bridge` | `contract-only` |' "$matrix"
+grep -Fq '| `B03-three-client-conversation-bridge` | `client-qualified` |' "$matrix"
 grep -Fq '| `W04-canonical-repository-cross-client` | `external-blocked` |' "$matrix"
 grep -Fq '[Capability And Evidence Matrix](docs/capability-evidence-matrix.md)' README.md
 grep -Fq '[能力与证据矩阵](docs/capability-evidence-matrix.md)' README.zh-CN.md

@@ -61,7 +61,7 @@ A case may cover more than one line, so these counts intentionally overlap.
 | `F01-conversation-formation-loop` | `client-qualified` | User observations form reviewable candidates; accept, reject, correction, temporary-instruction abstention, deletion, replay, and isolation pass | OpenClaw with Grok `grok-4.5`; direct SiliconFlow DeepSeek-V4-Flash formation | [Conversation formation loop](evidence/2026-07-18-conversation-formation-loop.md) | Model output remains proposed until explicit governance; one rejected model-quality result is retained. |
 | `F02-automatic-conversation-review` | `client-qualified` | Completed turns schedule bounded review; operator actions govern activation, correction, rejection, and forgetting; cross-client isolation holds | OpenClaw/Grok accepted path and Hermes isolation control | [Automatic conversation review](evidence/2026-07-18-automatic-conversation-review.md) | The worker does not grant clients authority to activate their own memories. |
 | `F03-verified-tool-outcome-formation` | `client-qualified` | Only successful allowed tool outcomes become reviewable; denied, failed, and forged outcomes do not; forgetting removes shared-evidence recall | Real OpenClaw tool trajectory with real-model post-delete proof | [Verified tool outcome formation](evidence/2026-07-18-verified-tool-outcome-formation.md) | An assistant claim is not treated as verified tool evidence. |
-| `B03-three-client-conversation-bridge` | `contract-only` | Web Chat memory is linked to pre-existing Hermes and OpenClaw continuities, raw history stays out, replay is idempotent, and reversal stops fresh delivery | Deterministic HTTP/PostgreSQL provider with honest test model labels | [Three-client bridge contract](evidence/2026-07-21-three-client-conversation-bridge-contract.md) | This is not an accepted same-run real Web Chat + Hermes + OpenClaw trajectory. Existing individual client qualifications do not fill that gap. |
+| `B03-three-client-conversation-bridge` | `client-qualified` | One real Chrome Web Chat source is linked to exact official Hermes and OpenClaw Gateway continuities; only the governed bundle is delivered, replay is idempotent, unrelated sessions stay empty, and reversal stops fresh delivery while retaining source and client history | Chrome 150, Hermes `v0.18.2`, OpenClaw `2026.6.11`, Codex CLI `0.144.3` / `gpt-5.6-terra` through a temporary loopback relay | [Three-client bridge contract](evidence/2026-07-21-three-client-conversation-bridge-contract.md), [Three-client real-client run](evidence/2026-07-22-three-client-conversation-bridge-real-clients.md) | Qualifies the frozen same-run trajectory, not automatic cross-client merging, transcript deletion, a production relay, every client channel, or model ranking. |
 
 ## Security, Operations, And Delivery
 
@@ -101,10 +101,10 @@ and the [rejected domestic reader run](evidence/2026-07-20-longmemeval-s-domesti
 |---|---|---|
 | Codex | Workspace MCP consumption, trusted workspace attachment, artifact creation, proposed write-back, replay | Arbitrary clone/worktree adoption and every coding workflow |
 | Grok CLI | Web Chat provider, workspace MCP consumer, Global Defaults, bridge and retrieval trajectories | Current account refresh is unavailable for new runs; old evidence remains valid but is not silently refreshed |
-| OpenClaw | Conversation continuity, formation/review, verified tool outcomes, correction, deletion, links, fail-open | Exact B03 three-client replay on one shared run |
-| Hermes | Explicit linked-session continuity, current-only recall, reversal, fail-open | Exact B03 three-client replay on one shared run |
+| OpenClaw | Conversation continuity, formation/review, verified tool outcomes, correction, deletion, links, fail-open, and the B03 same-run Web Chat/Hermes bridge through the official Gateway HTTP agent path | Messaging channels and arbitrary session migration beyond the qualified cases |
+| Hermes | Explicit linked-session continuity, current-only recall, reversal, fail-open, and the B03 same-run Web Chat/OpenClaw bridge | Gateway and messaging modes beyond the qualified CLI sessions |
 | Cursor Agent | MCP discovery and zero-side-effect failure handling | The W04 generation, prepare, artifact, commit, and replay gates remain externally blocked |
-| Web Chat | Real HTTP and Chrome browser lifecycle with thread isolation, refresh, persisted retry, replay deduplication, candidate review, correction, deletion, responsive layout, and separate external-model consumption evidence | Authenticated public multi-user browser deployment and browsers other than the qualified Chrome version |
+| Web Chat | Real HTTP and Chrome browser lifecycle with thread isolation, refresh, persisted retry, replay deduplication, candidate review, correction, deletion, responsive layout, and explicit three-client bridge delivery to Hermes/OpenClaw | Authenticated public multi-user browser deployment and browsers other than the qualified Chrome version |
 
 ## Protected Delivery Rule
 
@@ -118,19 +118,17 @@ manually copied static status. A green CI badge alone does not upgrade a
 
 The following remain explicit work, not hidden implementation details:
 
-1. Execute B03 as one real shared Web Chat, Hermes, and OpenClaw trajectory on
-   the Mac mini when the cross-host route is available.
-2. Re-run W04 with Cursor only after the external account can generate; Codex,
+1. Re-run W04 with Cursor only after the external account can generate; Codex,
    Hermes, or OpenClaw cannot substitute for that result.
-3. Run the real worktree/adopt/rebind topology through an additional coding
+2. Run the real worktree/adopt/rebind topology through an additional coding
    client and extend it to mirrors, forks, and device migration. W31 qualifies
    actual local Git worktree, same-name repository, clone, physical move,
    namespace, tenant, adopt, rebind, replay, and reversal behavior without a
    model.
-4. Qualify a durable Linux service installation, upgrade, rollback, backup,
+3. Qualify a durable Linux service installation, upgrade, rollback, backup,
    and restore profile in addition to binary portability and database recovery.
-5. Add a genuine withheld external evaluation; public cases and internal blind
+4. Add a genuine withheld external evaluation; public cases and internal blind
    splits are not called sealed evidence.
-6. Complete blocked real-provider reader runs only when their original frozen
+5. Complete blocked real-provider reader runs only when their original frozen
    provider and account requirements are available; do not replace them with a
    different client or model and keep the same claim.

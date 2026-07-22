@@ -26,6 +26,7 @@ required_files=(
   docs/capability-evidence-matrix.md
   docs/collaboration/repository-workflow.md
   scripts/capability-matrix-check.sh
+  scripts/b03-real-client-evidence-check.sh
 )
 
 for path in "${required_files[@]}"; do
@@ -43,6 +44,7 @@ grep -Fq 'sign-snapshot:' .github/workflows/ci.yml
 grep -Fq 'id-token: write' .github/workflows/ci.yml
 grep -Fq 'cursor-agent' docs/superpowers/specs/2026-07-11-vermory-reality-program.md
 bash scripts/capability-matrix-check.sh
+bash scripts/b03-real-client-evidence-check.sh
 
 if rg -n 'sk-[A-Za-z0-9]{12,}|BEGIN [A-Z ]*PRIVATE KEY|github_pat_[A-Za-z0-9_]+|gh[opusr]_[A-Za-z0-9]+' \
   AGENTS.md ARCHITECTURE.md CODE_OF_CONDUCT.md CONTRIBUTING.md DEVELOPMENT.md \
