@@ -179,9 +179,17 @@ PostgreSQL 18
 loopback 边界；升级保留治理状态，故障版本自动回滚，显式回滚可双向切换；私有
 原生备份恢复到空数据库后，runtime grant、projection、token 认证和 governed
 default 均恢复可用。两个架构的 16 个生命周期与凭据硬门均全部通过。该证据不宣称
-长期
-uptime/SLA、DEB/RPM 分发、备份加密或数据库 migration rollback。详见
+长期 uptime/SLA、备份加密或数据库 migration rollback。详见
 [耐久 Linux 服务生命周期实证](docs/evidence/2026-07-22-durable-linux-service-lifecycle.md)。
+
+I06 完成原生 Linux package 边界资格验证。DEB 与 RPM 分别在原生 AMD64、ARM64
+runner 上真实安装和卸载；四个已安装二进制均绑定精确源码 revision 并匹配机器架构，
+16 个 package 硬门全部通过，安装过程不会激活服务、生成凭据或执行数据库 migration。
+随后，四个经过安装验收的 package 原始字节被直接纳入 12 项 GitHub OIDC 签名 PR
+snapshot，签名包哈希逐一等于原生验收报告。该证据验证的是签名 package artifact，
+不宣称 APT/DNF 仓库、tagged release 发布、特定发行版 DNF 升级、长期 uptime/SLA
+或数据库 migration rollback。详见
+[原生 Linux Package 实证](docs/evidence/2026-07-22-linux-native-packages.md)。
 
 当前准确能力边界见[能力与证据矩阵](docs/capability-evidence-matrix.md)；
 [Experiment 0 读数](docs/experiment-0-readout.md)保留为最初的证据冻结基线。
@@ -338,7 +346,7 @@ reverse 后直接检查新 delivery、无关 continuity 隔离、Vermory 不可�
 [Hermes 接入指南](integrations/hermes/README.md)与
 [Hermes 真实客户端连续性实证](docs/evidence/2026-07-18-hermes-real-client.md)。
 
-authenticated 部署、token 生命周期、runtime role 授权、TLS 规则、RLS 验证、备份、恢复、投影重建与撤销边界见[身份授权与 PostgreSQL RLS 指南](docs/integrations/identity-authorization-rls.md)。[身份授权实证](docs/evidence/2026-07-14-identity-authorization-rls.md)包含确定性租户隔离硬门和真实 OpenClaw/Grok 认证回放；[PostgreSQL 运维恢复实证](docs/evidence/2026-07-14-postgresql-operations-recovery.md)记录原生 dump/restore、投影丢失与重建、数据库中断恢复；[PostgreSQL HA/PITR 实证](docs/evidence/2026-07-16-postgresql-ha-pitr.md)记录 streaming standby 提升、精确 LSN 恢复、历史状态隔离、投影重建和凭据再治理。[Linux 部署指南](deploy/linux/README.md)与[I05 实证](docs/evidence/2026-07-22-durable-linux-service-lifecycle.md)覆盖已验证的 systemd 安装、升级、回滚、备份和恢复边界。
+authenticated 部署、token 生命周期、runtime role 授权、TLS 规则、RLS 验证、备份、恢复、投影重建与撤销边界见[身份授权与 PostgreSQL RLS 指南](docs/integrations/identity-authorization-rls.md)。[身份授权实证](docs/evidence/2026-07-14-identity-authorization-rls.md)包含确定性租户隔离硬门和真实 OpenClaw/Grok 认证回放；[PostgreSQL 运维恢复实证](docs/evidence/2026-07-14-postgresql-operations-recovery.md)记录原生 dump/restore、投影丢失与重建、数据库中断恢复；[PostgreSQL HA/PITR 实证](docs/evidence/2026-07-16-postgresql-ha-pitr.md)记录 streaming standby 提升、精确 LSN 恢复、历史状态隔离、投影重建和凭据再治理。[Linux 部署指南](deploy/linux/README.md)、[I05 生命周期实证](docs/evidence/2026-07-22-durable-linux-service-lifecycle.md)与[I06 Package 实证](docs/evidence/2026-07-22-linux-native-packages.md)覆盖已验证的 systemd 和原生 package 边界。
 
 ## 开发原则
 

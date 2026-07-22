@@ -94,6 +94,39 @@ jq -e '
   (.report.hard_gates | length == 16) and
   (.report.hard_gates | to_entries | all(.value == true))
 ' "$i05_arm64_snapshot" >/dev/null
+grep -Fq '| `I06-linux-native-packages` | `runtime-qualified` |' "$matrix"
+i06_snapshot="docs/evidence/snapshots/2026-07-22-linux-native-packages.json"
+jq -e '
+  .source_head as $source_head |
+  .case_id == "I06-linux-native-packages" and
+  .status == "runtime-qualified" and
+  .github.repository == "samekind/Vermory" and
+  .github.run_id == 29923986517 and
+  .github.run_conclusion == "success" and
+  .github.sign_snapshot_job_id == 88937403534 and
+  (.package_legs | length == 4) and
+  (.package_legs | map(.report.package.format + "/" + .report.package.architecture) | sort == ["deb/amd64", "deb/arm64", "rpm/amd64", "rpm/arm64"]) and
+  (.package_legs | all(
+    .artifact_sha256 == .downloaded_zip_sha256 and
+    .signed_snapshot_hash_match == true and
+    .report.case_id == "I06-linux-native-packages" and
+    .report.source_sha == $source_head and
+    .report.package.native == true and
+    (.report.hard_gates | length == 16) and
+    (.report.hard_gates | to_entries | all(.value == true))
+  )) and
+  .signed_snapshot.artifact_id == 8531264312 and
+  .signed_snapshot.artifact_sha256 == .signed_snapshot.downloaded_zip_sha256 and
+  .signed_snapshot.manifest_entries == 12 and
+  .signed_snapshot.checksums_entries == 8 and
+  .signed_snapshot.all_payload_hashes_verified == true and
+  .signed_snapshot.all_accepted_package_hashes_match == true and
+  .signed_snapshot.sigstore.workflow_identity == "https://github.com/samekind/Vermory/.github/workflows/ci.yml@refs/pull/1/merge" and
+  .signed_snapshot.sigstore.positive_verification == "pass" and
+  .signed_snapshot.sigstore.modified_manifest_rejection == "pass" and
+  .signed_snapshot.sigstore.wrong_identity_rejection == "pass" and
+  (.retained_failures | map(.run_id) == [29922576223, 29922904137])
+' "$i06_snapshot" >/dev/null
 grep -Fq '[Capability And Evidence Matrix](docs/capability-evidence-matrix.md)' README.md
 grep -Fq '[能力与证据矩阵](docs/capability-evidence-matrix.md)' README.zh-CN.md
 grep -Fq '[Capability And Evidence Matrix](docs/capability-evidence-matrix.md)' ARCHITECTURE.md

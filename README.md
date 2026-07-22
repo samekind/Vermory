@@ -218,9 +218,20 @@ state survived upgrade, a failing release rolled back automatically, explicit
 rollback worked in both directions, and a private native backup restored into an
 empty database with runtime grants, projections, token authentication, and the
 governed default intact. All 16 lifecycle and credential gates passed on both
-architectures. This does not claim long-duration uptime/SLA, DEB/RPM
-distribution, backup encryption, or database migration rollback. See
+architectures. This does not claim long-duration uptime/SLA, backup encryption,
+or database migration rollback. See
 [Durable Linux Service Lifecycle Qualification](docs/evidence/2026-07-22-durable-linux-service-lifecycle.md).
+
+I06 qualifies the native Linux package boundary. DEB and RPM artifacts were
+installed and removed on native AMD64 and ARM64 runners; all four installed
+binaries matched the exact source revision and architecture, all 16 package
+gates passed, and installation neither activated the service nor created
+credentials or ran database migrations. The exact accepted package bytes were
+then incorporated into the 12-entry GitHub OIDC-signed pull-request snapshot,
+with every package hash matching its native acceptance report. This qualifies
+signed package artifacts, not an APT/DNF repository, tagged publication,
+distribution-specific DNF upgrades, uptime/SLA, or database migration rollback.
+See [Native Linux Package Qualification](docs/evidence/2026-07-22-linux-native-packages.md).
 
 Read the current [Capability And Evidence Matrix](docs/capability-evidence-matrix.md)
 for exact qualification boundaries. The
@@ -551,7 +562,7 @@ inspection, unrelated-continuity isolation, fail-open answer availability, and
 zero credential leakage. See the [Hermes integration guide](integrations/hermes/README.md)
 and [real-client qualification evidence](docs/evidence/2026-07-18-hermes-real-client.md).
 
-For authenticated deployment, token lifecycle, runtime-role provisioning, TLS rules, RLS verification, backup, restore, projection rebuild, and revocation, see [Identity, Authorization, And PostgreSQL RLS](docs/integrations/identity-authorization-rls.md). The [identity evidence](docs/evidence/2026-07-14-identity-authorization-rls.md) includes deterministic tenant-isolation gates and a real authenticated OpenClaw/Grok replay; the [operations recovery evidence](docs/evidence/2026-07-14-postgresql-operations-recovery.md) records native dump/restore, projection loss/rebuild, and database outage recovery; the [HA/PITR evidence](docs/evidence/2026-07-16-postgresql-ha-pitr.md) records streaming standby promotion, exact-LSN recovery, historical-state quarantine, projection rebuild, and credential re-governance. The [Linux deployment guide](deploy/linux/README.md) and [I05 evidence](docs/evidence/2026-07-22-durable-linux-service-lifecycle.md) cover the qualified systemd install, upgrade, rollback, backup, and restore boundary.
+For authenticated deployment, token lifecycle, runtime-role provisioning, TLS rules, RLS verification, backup, restore, projection rebuild, and revocation, see [Identity, Authorization, And PostgreSQL RLS](docs/integrations/identity-authorization-rls.md). The [identity evidence](docs/evidence/2026-07-14-identity-authorization-rls.md) includes deterministic tenant-isolation gates and a real authenticated OpenClaw/Grok replay; the [operations recovery evidence](docs/evidence/2026-07-14-postgresql-operations-recovery.md) records native dump/restore, projection loss/rebuild, and database outage recovery; the [HA/PITR evidence](docs/evidence/2026-07-16-postgresql-ha-pitr.md) records streaming standby promotion, exact-LSN recovery, historical-state quarantine, projection rebuild, and credential re-governance. The [Linux deployment guide](deploy/linux/README.md), [I05 lifecycle evidence](docs/evidence/2026-07-22-durable-linux-service-lifecycle.md), and [I06 package evidence](docs/evidence/2026-07-22-linux-native-packages.md) cover the qualified systemd and native package boundaries.
 
 ## Repository Layout
 

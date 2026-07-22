@@ -94,6 +94,11 @@ The repository currently produces signed package artifacts, not an APT or DNF
 repository. Repository metadata, repository signing, and retention remain a
 separate delivery boundary.
 
+The exact DEB/RPM artifacts accepted on native AMD64/ARM64 runners and then
+included byte-for-byte in a signed pull-request snapshot are recorded in the
+[I06 native package evidence](../../docs/evidence/2026-07-22-linux-native-packages.md).
+That qualification does not extend to a package repository or tagged release.
+
 ## Initial install and upgrade
 
 Verify the release archive against the signed Vermory release manifest first.

@@ -71,7 +71,8 @@ A case may cover more than one line, so these counts intentionally overlap.
 | `I02-postgresql-operations-recovery` | `runtime-qualified` | Migration replay, dump/restore, projection rebuild, runtime-role restoration, and bounded outage recovery pass | PostgreSQL 18 and Linux runtime; model use is not required | [PostgreSQL operations and recovery](evidence/2026-07-14-postgresql-operations-recovery.md), [Linux portability](evidence/2026-07-14-linux-runtime-portability.md) | Does not define a universal HA topology or service SLO. |
 | `I03-postgresql-ha-pitr` | `runtime-qualified` | Streaming standby promotion and exact-LSN PITR restore the expected authoritative state without reviving later deletion/revocation changes | PostgreSQL 18; authenticated Web Chat recovery probe; no model-quality claim | [PostgreSQL HA and PITR](evidence/2026-07-16-postgresql-ha-pitr.md) | One measured local topology is qualified, not every distributed deployment. |
 | `I04-protected-artifact-signing` | `runtime-qualified` | Untrusted test job builds complete payload manifest; separate OIDC job signs it; identity, issuer, tamper, and cross-host verification pass | GitHub Actions, Cosign, ARM64 Mac mini; model use is not applicable | [Protected artifact signing](evidence/2026-07-18-protected-artifact-signing.md) | The signed subject is the release manifest, not a claim that every runtime trajectory was replayed on that exact head. |
-| `I05-durable-linux-service-lifecycle` | `runtime-qualified` | Exact-head install, authenticated startup, upgrade, automatic and explicit rollback, private backup, digest/non-empty-target rejection, empty-target restore, runtime-role recovery, projection rebuild, restored authentication/default access, and credential scans passed on both native architectures | GitHub-hosted Ubuntu 24.04 AMD64 and ARM64, systemd, PostgreSQL 18; model use is not applicable | [Durable Linux lifecycle qualification](evidence/2026-07-22-durable-linux-service-lifecycle.md) | The ephemeral runners do not qualify long-duration uptime/SLA, DEB/RPM repositories, backup encryption, or PostgreSQL migration rollback. |
+| `I05-durable-linux-service-lifecycle` | `runtime-qualified` | Exact-head install, authenticated startup, upgrade, automatic and explicit rollback, private backup, digest/non-empty-target rejection, empty-target restore, runtime-role recovery, projection rebuild, restored authentication/default access, and credential scans passed on both native architectures | GitHub-hosted Ubuntu 24.04 AMD64 and ARM64, systemd, PostgreSQL 18; model use is not applicable | [Durable Linux lifecycle qualification](evidence/2026-07-22-durable-linux-service-lifecycle.md) | The ephemeral runners do not qualify long-duration uptime/SLA, APT/DNF repository distribution, backup encryption, or PostgreSQL migration rollback. |
+| `I06-linux-native-packages` | `runtime-qualified` | Exact-head DEB and RPM packages install and remove on native AMD64/ARM64 runners; binary revision, service identity, non-activation, operator-state preservation, and 16 hard gates pass; the exact accepted bytes enter the OIDC-signed 12-entry snapshot | GitHub-hosted Ubuntu `x86_64` and Ubuntu 24.04 `aarch64`, dpkg/rpm, GoReleaser, GitHub Actions, Cosign; model use is not applicable | [Native Linux package qualification](evidence/2026-07-22-linux-native-packages.md) | Qualifies signed package artifacts, not APT/DNF repository metadata or signing, tagged publication, distribution-specific DNF upgrades, uptime/SLA, or database migration rollback. |
 
 ## Public Benchmark And Comparison Evidence
 
@@ -109,9 +110,9 @@ and the [rejected domestic reader run](evidence/2026-07-20-longmemeval-s-domesti
 
 ## Protected Delivery Rule
 
-Every publishable pull-request head must pass the protected `test`,
-`linux-service-lifecycle`, `linux-service-lifecycle-arm64`, and `sign-snapshot`
-jobs. The exact live head, run,
+Every publishable pull-request head must pass `test`, both native
+`linux-service-lifecycle` jobs, all four `linux-package-install` matrix legs,
+and the dependent protected `sign-snapshot` job. The exact live head, run,
 jobs, and signed artifact belong
 in GitHub's protected check record and PR evidence comment rather than a
 manually copied static status. A green CI badge alone does not upgrade a
@@ -129,9 +130,10 @@ The following remain explicit work, not hidden implementation details:
    bare mirror, mirror/fork checkout, multiple-remote, and cross-namespace
    migration behavior. Both runs qualify tenant isolation, explicit governance,
    replay, and reversal without substituting for another client or host.
-3. Extend I05 beyond its qualified ephemeral Ubuntu AMD64 and ARM64 runners to
-   long-duration uptime/SLA evidence, DEB/RPM repositories, and an explicit
-   database-migration rollback policy.
+3. Extend I05/I06 beyond their qualified ephemeral Ubuntu AMD64 and ARM64
+   runners to long-duration uptime/SLA evidence, APT/DNF repository metadata,
+   signing and retention, distribution-specific upgrade behavior, and an
+   explicit database-migration rollback policy.
 4. Add a genuine withheld external evaluation; public cases and internal blind
    splits are not called sealed evidence.
 5. Complete blocked real-provider reader runs only when their original frozen
