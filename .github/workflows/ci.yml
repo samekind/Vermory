@@ -363,7 +363,7 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: vermory-i06-linux-package-${{ matrix.format }}-${{ matrix.arch }}-${{ env.SOURCE_SHA }}
-          path: ${{ runner.temp }}/i06-evidence/report.json
+          path: ${{ runner.temp }}/i06-evidence
           if-no-files-found: error
           retention-days: 7
 
@@ -406,6 +406,17 @@ jobs:
           distribution: goreleaser
           version: v2.17.0
           args: release --snapshot --clean --skip=publish --config .goreleaser.yaml
+      - name: Download exact packages qualified on native runners
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          pattern: vermory-i06-linux-package-*-${{ env.SOURCE_SHA }}
+          path: ${{ runner.temp }}/i06-qualified-packages
+      - name: Assemble exact qualified packages into the signed snapshot
+        run: >-
+          bash scripts/assemble-qualified-packages.sh
+          "$RUNNER_TEMP/i06-qualified-packages"
+          dist
+          "$SOURCE_SHA"
       - name: Pack OpenClaw release artifact
         run: pnpm -C integrations/openclaw pack --pack-destination ../../dist
       - name: Pack Hermes release artifact

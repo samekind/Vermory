@@ -158,6 +158,7 @@ jq -n \
 if grep -E -i '(postgresql://|api[_-]?key|password|private key|sk-[a-z0-9])' "$EVIDENCE_DIRECTORY/report.json"; then
   fail "normalized report contains credential material"
 fi
+install -m 0644 "$PACKAGE" "$EVIDENCE_DIRECTORY/$(basename "$PACKAGE")"
 chmod 0644 "$EVIDENCE_DIRECTORY/report.json"
 chmod 0755 "$EVIDENCE_DIRECTORY"
 

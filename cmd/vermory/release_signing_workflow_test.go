@@ -27,6 +27,9 @@ func TestCIWorkflowKeepsOIDCOutOfTestJobAndSignsCompleteSnapshot(t *testing.T) {
 		"Verify snapshot source revision",
 		`test "$(git rev-parse HEAD)" = "$SOURCE_SHA"`,
 		"name: vermory-pr-snapshot-${{ env.SOURCE_SHA }}",
+		"actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093",
+		"pattern: vermory-i06-linux-package-*-${{ env.SOURCE_SHA }}",
+		"scripts/assemble-qualified-packages.sh",
 		"scripts/release-manifest.sh create dist",
 		"cosign sign-blob",
 		"cosign verify-blob",
@@ -87,6 +90,7 @@ func TestCIWorkflowKeepsOIDCOutOfTestJobAndSignsCompleteSnapshot(t *testing.T) {
 		"arch: arm64",
 		"deploy/linux/run-i06-package-acceptance.sh",
 		"vermory-i06-linux-package-${{ matrix.format }}-${{ matrix.arch }}-${{ env.SOURCE_SHA }}",
+		"path: ${{ runner.temp }}/i06-evidence",
 	} {
 		if !strings.Contains(packageInstall, required) {
 			t.Fatalf("linux-package-install is missing %q", required)

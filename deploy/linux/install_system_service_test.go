@@ -253,6 +253,10 @@ func TestLinuxNativePackagesKeepInstallationNonActivating(t *testing.T) {
 
 	postinstall := readFile(t, filepath.Join("package", "postinstall.sh"))
 	requireContains(t, postinstall, "systemctl daemon-reload")
+	acceptance := readFile(t, "run-i06-package-acceptance.sh")
+	requireContains(t, acceptance,
+		`install -m 0644 "$PACKAGE" "$EVIDENCE_DIRECTORY/$(basename "$PACKAGE")"`,
+	)
 	for _, name := range []string{"preremove-deb.sh", "preremove-rpm.sh"} {
 		requireContains(t, readFile(t, filepath.Join("package", name)), "systemctl disable --now vermory.service")
 	}
