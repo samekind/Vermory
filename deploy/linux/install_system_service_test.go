@@ -138,6 +138,9 @@ func TestLinuxAcceptanceExercisesTheCompleteI05Boundary(t *testing.T) {
 	script := readFile(t, "run-i05-acceptance.sh")
 	requireContains(t, script,
 		"SOURCE_SHA",
+		"I05_QUALIFICATION",
+		"I05_EXPECTED_MACHINE",
+		"uname -m",
 		"-buildvcs=false",
 		"build_release i05-v1",
 		"build_release i05-v2",
@@ -153,6 +156,9 @@ func TestLinuxAcceptanceExercisesTheCompleteI05Boundary(t *testing.T) {
 		`chmod 0644 "$EVIDENCE_DIRECTORY/report.json"`,
 		`chmod 0755 "$EVIDENCE_DIRECTORY"`,
 	)
+	if strings.Contains(script, `qualification: "github-hosted-ubuntu-systemd-amd64"`) {
+		t.Fatal("acceptance report must use the runner-qualified architecture instead of a hard-coded AMD64 label")
+	}
 	if strings.Contains(script, "sudo ") {
 		t.Fatal("acceptance script must execute inside one externally established root boundary")
 	}

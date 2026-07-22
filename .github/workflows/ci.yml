@@ -156,6 +156,8 @@ jobs:
     env:
       SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
       POSTGRES_PASSWORD: i05-ci-postgres
+      I05_QUALIFICATION: github-hosted-ubuntu-systemd-amd64
+      I05_EXPECTED_MACHINE: x86_64
     services:
       postgres:
         image: pgvector/pgvector:pg18@sha256:12a379b47ad65289572ea0756efc11b7c241a6662833e8af7038cd3b73d647e0
@@ -176,7 +178,9 @@ jobs:
           fetch-depth: 0
           ref: ${{ env.SOURCE_SHA }}
       - name: Verify lifecycle source revision
-        run: test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
+        run: |
+          test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
+          test "$(uname -m)" = "$I05_EXPECTED_MACHINE"
       - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
         with:
           go-version-file: go.mod
@@ -195,7 +199,7 @@ jobs:
           echo "/usr/lib/postgresql/18/bin" >> "$GITHUB_PATH"
       - name: Run exact-head systemd and PostgreSQL lifecycle
         run: |
-          sudo --preserve-env=SOURCE_SHA,POSTGRES_PASSWORD -- \
+          sudo --preserve-env=SOURCE_SHA,POSTGRES_PASSWORD,I05_QUALIFICATION,I05_EXPECTED_MACHINE -- \
             env \
               "PATH=$PATH:/usr/lib/postgresql/18/bin" \
               "GOCACHE=$RUNNER_TEMP/i05-go-build" \
@@ -206,18 +210,88 @@ jobs:
           test -z "$(git status --porcelain)"
           jq -e \
             --arg source_sha "$SOURCE_SHA" \
-            '.source_sha == $source_sha and (.hard_gates | to_entries | all(.value == true))' \
+            '.source_sha == $source_sha and .qualification == "github-hosted-ubuntu-systemd-amd64" and .runtime.machine == "x86_64" and .runtime.goarch == "amd64" and .runtime.native == true and (.hard_gates | to_entries | all(.value == true))' \
             "$RUNNER_TEMP/i05-evidence/report.json"
       - name: Upload normalized I05 evidence
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: vermory-i05-linux-service-${{ env.SOURCE_SHA }}
+          name: vermory-i05-linux-service-amd64-${{ env.SOURCE_SHA }}
+          path: ${{ runner.temp }}/i05-evidence/report.json
+          if-no-files-found: error
+          retention-days: 7
+
+  linux-service-lifecycle-arm64:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 30
+    env:
+      SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      POSTGRES_PASSWORD: i05-ci-postgres
+      I05_QUALIFICATION: github-hosted-ubuntu-systemd-arm64
+      I05_EXPECTED_MACHINE: aarch64
+    services:
+      postgres:
+        image: pgvector/pgvector:pg18@sha256:12a379b47ad65289572ea0756efc11b7c241a6662833e8af7038cd3b73d647e0
+        env:
+          POSTGRES_DB: postgres
+          POSTGRES_PASSWORD: i05-ci-postgres
+          POSTGRES_USER: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 0
+          ref: ${{ env.SOURCE_SHA }}
+      - name: Verify native ARM64 lifecycle source and architecture
+        run: |
+          test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
+          test "$(uname -m)" = "$I05_EXPECTED_MACHINE"
+      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
+        with:
+          go-version-file: go.mod
+          cache: true
+      - name: Install PostgreSQL 18 client tools
+        run: |
+          sudo install -d -m 0755 /usr/share/postgresql-common/pgdg
+          curl --fail --silent --show-error \
+            https://www.postgresql.org/media/keys/ACCC4CF8.asc \
+            | sudo tee /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc >/dev/null
+          . /etc/os-release
+          echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt ${VERSION_CODENAME}-pgdg main" \
+            | sudo tee /etc/apt/sources.list.d/pgdg.list >/dev/null
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends jq postgresql-client-18
+          echo "/usr/lib/postgresql/18/bin" >> "$GITHUB_PATH"
+      - name: Run exact-head native ARM64 systemd and PostgreSQL lifecycle
+        run: |
+          sudo --preserve-env=SOURCE_SHA,POSTGRES_PASSWORD,I05_QUALIFICATION,I05_EXPECTED_MACHINE -- \
+            env \
+              "PATH=$PATH:/usr/lib/postgresql/18/bin" \
+              "GOCACHE=$RUNNER_TEMP/i05-go-build" \
+              "GOMODCACHE=$RUNNER_TEMP/i05-go-mod" \
+              deploy/linux/run-i05-acceptance.sh \
+                "$GITHUB_WORKSPACE" \
+                "$RUNNER_TEMP/i05-evidence"
+          test -z "$(git status --porcelain)"
+          jq -e \
+            --arg source_sha "$SOURCE_SHA" \
+            '.source_sha == $source_sha and .qualification == "github-hosted-ubuntu-systemd-arm64" and .runtime.machine == "aarch64" and .runtime.goarch == "arm64" and .runtime.native == true and (.hard_gates | to_entries | all(.value == true))' \
+            "$RUNNER_TEMP/i05-evidence/report.json"
+      - name: Upload normalized native ARM64 I05 evidence
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: vermory-i05-linux-service-arm64-${{ env.SOURCE_SHA }}
           path: ${{ runner.temp }}/i05-evidence/report.json
           if-no-files-found: error
           retention-days: 7
 
   sign-snapshot:
-    needs: [test, linux-service-lifecycle]
+    needs: [test, linux-service-lifecycle, linux-service-lifecycle-arm64]
     if: >-
       github.event_name == 'push' ||
       github.event.pull_request.head.repo.full_name == github.repository

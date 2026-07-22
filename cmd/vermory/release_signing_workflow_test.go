@@ -19,7 +19,7 @@ func TestCIWorkflowKeepsOIDCOutOfTestJobAndSignsCompleteSnapshot(t *testing.T) {
 
 	signing := workflowSection(t, workflow, "  sign-snapshot:", "")
 	for _, required := range []string{
-		"needs: [test, linux-service-lifecycle]",
+		"needs: [test, linux-service-lifecycle, linux-service-lifecycle-arm64]",
 		"id-token: write",
 		"github.event.pull_request.head.repo.full_name == github.repository",
 		"SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}",
@@ -41,16 +41,38 @@ func TestCIWorkflowKeepsOIDCOutOfTestJobAndSignsCompleteSnapshot(t *testing.T) {
 		}
 	}
 
-	lifecycle := workflowSection(t, workflow, "  linux-service-lifecycle:", "\n  sign-snapshot:")
+	lifecycle := workflowSection(t, workflow, "  linux-service-lifecycle:", "\n  linux-service-lifecycle-arm64:")
 	for _, required := range []string{
+		"runs-on: ubuntu-latest",
 		"SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}",
+		"I05_QUALIFICATION: github-hosted-ubuntu-systemd-amd64",
+		"I05_EXPECTED_MACHINE: x86_64",
 		"ref: ${{ env.SOURCE_SHA }}",
 		"Verify lifecycle source revision",
 		"deploy/linux/run-i05-acceptance.sh",
-		"vermory-i05-linux-service-${{ env.SOURCE_SHA }}",
+		`.qualification == "github-hosted-ubuntu-systemd-amd64"`,
+		`.runtime.machine == "x86_64"`,
+		"vermory-i05-linux-service-amd64-${{ env.SOURCE_SHA }}",
 	} {
 		if !strings.Contains(lifecycle, required) {
 			t.Fatalf("linux-service-lifecycle is missing %q", required)
+		}
+	}
+
+	armLifecycle := workflowSection(t, workflow, "  linux-service-lifecycle-arm64:", "\n  sign-snapshot:")
+	for _, required := range []string{
+		"runs-on: ubuntu-24.04-arm",
+		"SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}",
+		"I05_QUALIFICATION: github-hosted-ubuntu-systemd-arm64",
+		"I05_EXPECTED_MACHINE: aarch64",
+		"ref: ${{ env.SOURCE_SHA }}",
+		"Verify native ARM64 lifecycle source and architecture",
+		`test "$(uname -m)" = "$I05_EXPECTED_MACHINE"`,
+		"deploy/linux/run-i05-acceptance.sh",
+		"vermory-i05-linux-service-arm64-${{ env.SOURCE_SHA }}",
+	} {
+		if !strings.Contains(armLifecycle, required) {
+			t.Fatalf("linux-service-lifecycle-arm64 is missing %q", required)
 		}
 	}
 

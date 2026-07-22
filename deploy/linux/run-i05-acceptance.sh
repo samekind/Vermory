@@ -20,6 +20,27 @@ fi
 [[ -n "${SOURCE_SHA:-}" ]] || fail "SOURCE_SHA is required"
 [[ "$SOURCE_SHA" =~ ^[a-f0-9]{40}$ ]] || fail "SOURCE_SHA is invalid"
 [[ -n "${POSTGRES_PASSWORD:-}" ]] || fail "POSTGRES_PASSWORD is required"
+[[ -n "${I05_QUALIFICATION:-}" ]] || fail "I05_QUALIFICATION is required"
+[[ -n "${I05_EXPECTED_MACHINE:-}" ]] || fail "I05_EXPECTED_MACHINE is required"
+
+case "$I05_QUALIFICATION:$I05_EXPECTED_MACHINE" in
+  github-hosted-ubuntu-systemd-amd64:x86_64)
+    I05_EXPECTED_GOARCH=amd64
+    ;;
+  github-hosted-ubuntu-systemd-arm64:aarch64)
+    I05_EXPECTED_GOARCH=arm64
+    ;;
+  *)
+    fail "unsupported qualification and machine pair"
+    ;;
+esac
+
+I05_ACTUAL_MACHINE=$(uname -m)
+I05_GOARCH=$(go env GOARCH)
+I05_GOHOSTARCH=$(go env GOHOSTARCH)
+[[ "$I05_ACTUAL_MACHINE" == "$I05_EXPECTED_MACHINE" ]] || fail "machine architecture is $I05_ACTUAL_MACHINE, want $I05_EXPECTED_MACHINE"
+[[ "$I05_GOARCH" == "$I05_EXPECTED_GOARCH" ]] || fail "Go target architecture is $I05_GOARCH, want $I05_EXPECTED_GOARCH"
+[[ "$I05_GOHOSTARCH" == "$I05_EXPECTED_GOARCH" ]] || fail "Go host architecture is $I05_GOHOSTARCH, want $I05_EXPECTED_GOARCH"
 
 REPOSITORY_ROOT=$(cd "$1" && pwd)
 EVIDENCE_DIRECTORY=$2
@@ -346,6 +367,9 @@ UNIT_PROPERTIES=$(systemctl show "$SERVICE_NAME" \
 
 jq -n \
   --arg source_sha "$SOURCE_SHA" \
+  --arg qualification "$I05_QUALIFICATION" \
+  --arg machine "$I05_ACTUAL_MACHINE" \
+  --arg goarch "$I05_GOARCH" \
   --arg service "$SERVICE_NAME" \
   --arg service_user "$SERVICE_USER" \
   --arg v1_binary_sha256 "$V1_BINARY_SHA256" \
@@ -360,7 +384,8 @@ jq -n \
     version: 1,
     case_id: "I05-durable-linux-service-lifecycle",
     source_sha: $source_sha,
-    qualification: "github-hosted-ubuntu-systemd-amd64",
+    qualification: $qualification,
+    runtime: {machine: $machine, goarch: $goarch, native: true},
     service: {name: $service, user: $service_user, listen: "127.0.0.1:18788", unauthenticated_status: 401, properties: $unit_properties},
     releases: {
       initial: {id: "i05-v1", binary_sha256: $v1_binary_sha256},
@@ -390,7 +415,7 @@ jq -n \
     },
     limitations: [
       "The GitHub-hosted Ubuntu runner is ephemeral and does not prove long-duration uptime or an SLA.",
-      "This run qualifies Linux AMD64 systemd, not native Linux ARM64 or distribution packages.",
+      "This report qualifies only the recorded native architecture, not other architectures or distribution packages.",
       "PostgreSQL custom format is not encrypted by the dump format.",
       "Binary pointer rollback does not reverse PostgreSQL migrations."
     ]
