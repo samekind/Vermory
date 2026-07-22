@@ -68,7 +68,11 @@ func newWebChatCommand() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			store, err := runtime.OpenStore(command.Context(), options.DatabaseURL)
+			store, err := runtime.OpenStoreWithOptions(
+				command.Context(),
+				options.DatabaseURL,
+				runtime.StoreOptions{EnforceTenantContext: true},
+			)
 			if err != nil {
 				return fmt.Errorf("open Web Chat runtime store")
 			}

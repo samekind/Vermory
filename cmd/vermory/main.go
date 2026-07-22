@@ -144,7 +144,11 @@ func newRootCommand() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			store, err := runtime.OpenStore(cmd.Context(), mcpDatabaseURL)
+			store, err := runtime.OpenStoreWithOptions(
+				cmd.Context(),
+				mcpDatabaseURL,
+				runtime.StoreOptions{EnforceTenantContext: true},
+			)
 			if err != nil {
 				return fmt.Errorf("open MCP runtime store")
 			}
