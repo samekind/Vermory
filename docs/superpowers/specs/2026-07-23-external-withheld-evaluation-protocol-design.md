@@ -146,5 +146,5 @@ external run.
   verify-only command for external attestations; it exposes no signer.
 - [x] Public documentation states the sandbox and evidence boundary without
   claiming that an external run already occurred.
-- [ ] Repository policy, full Go tests, workflow lint, and release configuration
+- [x] Repository policy, full Go tests, workflow lint, and release configuration
   checks pass before the change is published.

@@ -96,6 +96,34 @@ jq -e '
 ' "$i05_arm64_snapshot" >/dev/null
 grep -Fq '| `I06-linux-native-packages` | `runtime-qualified` |' "$matrix"
 grep -Fq '| `I10-external-withheld-evaluation-protocol` | `protocol-qualified` |' "$matrix"
+i10_snapshot="docs/evidence/snapshots/2026-07-23-external-withheld-evaluation-protocol.json"
+jq -e '
+  .case_id == "I10-external-withheld-evaluation-protocol" and
+  .status == "protocol-qualified" and
+  .source_head == "bb3c919efbd298f47f61fb781d6e6924480a44a4" and
+  .public_case.reality_validation_cases == 22 and
+  .public_case.reality_validation_pass == true and
+  .github.repository == "samekind/Vermory" and
+  .github.run_id == 29962727959 and
+  .github.run_conclusion == "success" and
+  .github.test_job_id == 89067294746 and
+  .github.sign_snapshot_job_id == 89068059759 and
+  .signed_snapshot.artifact_id == 8546725792 and
+  .signed_snapshot.artifact_zip_sha256 == "7c42b067ec2776d0a45f31d9ae11d947634464ceffb35f10b519fdc672ed7b5f" and
+  .signed_snapshot.github_artifact_digest == "sha256:7c42b067ec2776d0a45f31d9ae11d947634464ceffb35f10b519fdc672ed7b5f" and
+  .signed_snapshot.release_manifest_entries == 16 and
+  .signed_snapshot.all_payload_hashes_verified == true and
+  .signed_snapshot.positive_verification == "pass" and
+  .signed_snapshot.modified_manifest_rejection == "pass" and
+  .signed_snapshot.wrong_workflow_identity_rejection == "pass" and
+  .signed_snapshot.darwin_arm64_runtime_revision == .source_head and
+  (.protocol_hard_gates | to_entries | all(.value == true)) and
+  .claim_boundary.external_run_recorded == false and
+  .claim_boundary.sealed_qualified == false and
+  .claim_boundary.private_cases_in_repository == false and
+  .claim_boundary.expected_answers_in_repository == false and
+  .claim_boundary.evaluator_private_key_in_repository == false
+' "$i10_snapshot" >/dev/null
 i06_snapshot="docs/evidence/snapshots/2026-07-22-linux-native-packages.json"
 jq -e '
   .source_head as $source_head |
