@@ -115,8 +115,9 @@ and the [rejected domestic reader run](evidence/2026-07-20-longmemeval-s-domesti
 
 Every publishable pull-request head must pass `test`, both native
 `linux-service-lifecycle` jobs, all four `linux-package-install` matrix legs,
-and the dependent protected `sign-snapshot` job. The exact live head, run,
-jobs, and signed artifact belong
+all four `linux-repository-apt` and `linux-repository-dnf` matrix legs, and the
+dependent protected `sign-snapshot` job. The exact live head, run, jobs, and
+signed artifact belong
 in GitHub's protected check record and PR evidence comment rather than a
 manually copied static status. A green CI badge alone does not upgrade a
 `contract-only` or `external-blocked` case to `client-qualified`.
@@ -135,11 +136,12 @@ The following remain explicit work, not hidden implementation details:
    attachment, explicit rebind, tenant isolation, replay, and reversal, but its
    four Grok generation gates remain externally blocked and cannot be replaced
    by the independent SDK trajectory.
-3. Extend I05/I06 beyond their qualified ephemeral Ubuntu AMD64 and ARM64
-   runners to long-duration uptime/SLA evidence, APT/DNF repository metadata,
-   signing and retention, and distribution-specific upgrade behavior. I07 now
-   qualifies the deterministic schema-24 compatibility and backup/PITR rollback
-   boundary; it does not promise a universal automatic down migration.
+3. Extend I05/I06/I08 beyond qualified ephemeral AMD64 and ARM64 runners and
+   `file://` repository bundles to long-duration uptime/SLA evidence, a stable
+   production repository signing-key lifecycle, public hosted repositories,
+   mirrors, retention, and distribution-specific upgrade behavior. I07
+   qualifies the deterministic schema-24 compatibility and backup/PITR
+   rollback boundary; it does not promise a universal automatic down migration.
 4. Add a genuine withheld external evaluation; public cases and internal blind
    splits are not called sealed evidence.
 5. Complete blocked real-provider reader runs only when their original frozen

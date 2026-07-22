@@ -233,6 +233,18 @@ signed package artifacts, not an APT/DNF repository, tagged publication,
 distribution-specific DNF upgrades, uptime/SLA, or database migration rollback.
 See [Native Linux Package Qualification](docs/evidence/2026-07-22-linux-native-packages.md).
 
+I08 qualifies the next repository boundary without weakening I06's exact-byte
+contract. Signed APT and DNF repository bundles for AMD64 and ARM64 contain the
+same package bytes accepted by the native I06 jobs. Native package managers
+installed Vermory from `file://`, enforced repository metadata signatures,
+rejected modified metadata, preserved service non-activation, and passed all
+18 hard gates on all four legs. The exact four bundles entered the verified
+16-entry GitHub OIDC-signed snapshot. This qualifies ephemeral CI repository
+signing and portable repository bundles, not a stable production signing key,
+public hosting, mirrors, retention, cross-version upgrades or rollback, tagged
+publication, or RPM payload signatures. See
+[Native Linux Package Repository Qualification](docs/evidence/2026-07-23-linux-package-repository.md).
+
 Read the current [Capability And Evidence Matrix](docs/capability-evidence-matrix.md)
 for exact qualification boundaries. The
 [Experiment 0 report](docs/experiment-0-readout.md) is retained as the initial
