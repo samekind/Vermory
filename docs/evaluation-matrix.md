@@ -848,6 +848,35 @@ observations, zero proposed memories, and no artifact.
 The failed attempts are retained rather than replaced by another client. See
 [the W25 evidence](evidence/2026-07-19-cursor-agent-real-client-attempt.md).
 
+## Physical Cross-Host Workspace Continuity W34
+
+W34 moved one existing workspace continuity from a real external-volume clone
+on the operator workstation to an independent clone on the Mac mini. Both
+clones used the same `samekind/Vermory` remote and exact commit, but that Git
+identity did not authorize continuity until an explicit rebind.
+
+| Gate | Result |
+|---|---|
+| exact protected release head | `ceafea623791beeeb1f2a10e70f3f45a0bae494c` |
+| protected CI and OIDC snapshot | pass |
+| physical hosts / real clones | `2 / 2` |
+| unbound target | `needs_confirmation`, zero side effects |
+| explicit rebind and replay | pass |
+| continuity ID preserved | pass |
+| target/other-tenant isolation | pass |
+| MCP protocol / tools | `2025-06-18` / exactly `2` |
+| SDK artifact / proposed writeback / replay | pass |
+| exact reversal | pass |
+| Grok MCP doctor | pass |
+| Grok generation | external blocked by expired authentication |
+| W34 hard gates | `28 / 32` pass, `4` external blocked, `0` platform failures |
+
+The SDK trajectory proves the physical runtime and PostgreSQL contract but is
+not attributed to Grok. The Grok attempt produced no artifact, delivery,
+observation, or memory and cannot be replaced by another client. W34 therefore
+does not claim a complete Grok client pass. See
+[the W34 evidence](evidence/2026-07-22-physical-cross-host-workspace-continuity.md).
+
 
 ## Duojie Core Matrix Findings
 

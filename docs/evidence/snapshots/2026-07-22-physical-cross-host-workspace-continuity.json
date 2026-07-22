@@ -1,0 +1,250 @@
+{
+  "evidence_version": 1,
+  "case_id": "W34-physical-cross-host-workspace-continuity",
+  "reality_case_id": "W05-trusted-workspace-attachment",
+  "status": "physical-runtime-qualified-grok-generation-external-blocked",
+  "evidence_level": "public",
+  "executed_at": "2026-07-23T00:20:24+08:00",
+  "source_head": "ceafea623791beeeb1f2a10e70f3f45a0bae494c",
+  "contract": {
+    "case_sha256": "ed8de0a2a04e6ab58e68be9b6abb05b38da7b68fe9e198d2eb9d830e6d3f555d",
+    "spec_sha256": "d3d12b94e576e81eb20429b5f2719e4085979e505d6fe36207a89f3a839586c8",
+    "hard_gate_count": 32
+  },
+  "protected_ci": {
+    "repository": "samekind/Vermory",
+    "pull_request": 1,
+    "draft": true,
+    "run_id": 29934847722,
+    "run_url": "https://github.com/samekind/Vermory/actions/runs/29934847722",
+    "conclusion": "success",
+    "jobs": {
+      "test": 88973645778,
+      "linux_service_amd64": 88973645579,
+      "linux_service_arm64": 88973645465,
+      "deb_amd64": 88973645539,
+      "rpm_amd64": 88973645507,
+      "deb_arm64": 88973645641,
+      "rpm_arm64": 88973645585,
+      "sign_snapshot": 88974697163
+    }
+  },
+  "signed_snapshot": {
+    "artifact_id": 8535789948,
+    "artifact_name": "vermory-pr-snapshot-ceafea623791beeeb1f2a10e70f3f45a0bae494c",
+    "artifact_bytes": 44253308,
+    "artifact_api_digest": "sha256:9bce20e9653c972a6617cf6917f91dd4826c2582f6e651ef530555e82e0b2b37",
+    "independent_zip_sha256": "9bce20e9653c972a6617cf6917f91dd4826c2582f6e651ef530555e82e0b2b37",
+    "manifest_entries": 12,
+    "checksums_entries": 8,
+    "manifest_sha256": "070499c3841b5fb52535683941f9faf2cefafb22e638ac8d151ff4467cd683c4",
+    "checksums_sha256": "6c8669a4848a59728f2389b8efc944a3c98cd64e2489807886349ce805f537df",
+    "sigstore_bundle_sha256": "ddb08105192357b98ac5653115cd52412178d615a4bf879ebf528d8ee6aba62b",
+    "cosign_version": "v3.0.6",
+    "cosign_sha256": "5fadd012ae6381a6a29ff86a7d39aa873878852f1073fc90b15995961ecfb084",
+    "workflow_identity": "https://github.com/samekind/Vermory/.github/workflows/ci.yml@refs/pull/1/merge",
+    "oidc_issuer": "https://token.actions.githubusercontent.com",
+    "tlog_entry_index": "2218560113",
+    "inclusion_proof_index": "2096655851",
+    "positive_verification": "pass",
+    "modified_manifest_rejection": "pass",
+    "wrong_identity_rejection": "pass",
+    "darwin_arm64_binary_sha256": "48947a5cd587ea1d4724fce098f68c7dbff5b238f5f5a6b68b6bd40a3a8bbdcf",
+    "darwin_arm64_revision": "ceafea623791beeeb1f2a10e70f3f45a0bae494c"
+  },
+  "hosts": {
+    "source": {
+      "label": "operator-workstation",
+      "storage": "external-volume",
+      "root_sha256": "55a6ef35fd0fb88b247aef475806fcf7c1bc7783ba0b7cbdf75b9ac5e02fbc12",
+      "namespace": "w34-workstation-source",
+      "git_remote": "https://github.com/samekind/Vermory.git",
+      "git_commit": "ceafea623791beeeb1f2a10e70f3f45a0bae494c",
+      "git_bare": false,
+      "git_common_fingerprint": "bff31503527966862e1a5b7598e8432f7bf65205ae8f56c6d425ea19f8eaad44",
+      "attachment_fingerprint": "46318d678c2424740c0f677f7fbd92e67a0e3c073f63210b27a05922512825d5"
+    },
+    "target": {
+      "label": "macmini-runtime",
+      "storage": "isolated-w34-root",
+      "root_sha256": "822bebb572c0dd5b58dca1816cc7354710d138efeb844ad04554fc1de34601e0",
+      "namespace": "w34-macmini-target",
+      "git_remote": "https://github.com/samekind/Vermory.git",
+      "git_commit": "ceafea623791beeeb1f2a10e70f3f45a0bae494c",
+      "git_bare": false,
+      "git_common_fingerprint": "c0aeee3a8b6961e171fca223c17d58672d914298320e1212fd54fd8bd6dbc319",
+      "attachment_fingerprint": "eb3b36fdb875ed14d8dcbf284bd7969658ae964cdfa8df294f83d494a3d19b7c"
+    }
+  },
+  "database": {
+    "server": "PostgreSQL 18.3",
+    "schema_version": 24,
+    "runtime_role": "vermory_w34_runtime_ceafea6",
+    "runtime_current_user_matches_session_user": true,
+    "runtime_schema_function": 24,
+    "credential_retained_in_snapshot": false
+  },
+  "authority": {
+    "tenant_id": "w34-physical-cross-host",
+    "other_tenant_id": "w34-physical-cross-host-other",
+    "continuity_id": "306f5c58-3dc2-4b76-9c2e-9897700a38d3",
+    "other_continuity_id": "db1f4a84-e859-40c1-bbd2-bea88345d42e",
+    "current_fact": "continuation_marker=w34-current",
+    "other_tenant_fact": "continuation_marker=w34-other-tenant-only"
+  },
+  "pre_rebind": {
+    "source_status": "resolved",
+    "target_status": "needs_confirmation",
+    "target_delivery_id_empty": true,
+    "target_context_empty": true,
+    "before_counts": {"deliveries": 0, "observations": 1, "memories": 1},
+    "after_counts": {"deliveries": 0, "observations": 1, "memories": 1}
+  },
+  "rebind": {
+    "bridge_id": "264a7288-7f9a-410c-ab60-d56b54257ab3",
+    "operation_id": "w34-ceafea6-rebind-device-migration",
+    "status_before_reversal": "active",
+    "continuity_preserved": true,
+    "source_binding_after_rebind": "retired",
+    "target_binding_after_rebind": "confirmed",
+    "other_tenant_binding_after_rebind": "confirmed",
+    "exact_replay": true,
+    "replay_bridge_id_equal": true
+  },
+  "mcp": {
+    "protocol": "2025-06-18",
+    "tools": ["commit_observation", "prepare_context"],
+    "tool_schema_sha256": "9c0ac55ce9efd60979707c6269d1ae84dd15e22837d440887763b93d6cff27ec",
+    "model_visible_authority_fields": 0,
+    "grok_doctor_healthy": true,
+    "grok_doctor_server_count": 1
+  },
+  "runtime_probe": {
+    "client": "independent-go-mcp-sdk",
+    "target_status": "resolved",
+    "target_context_current_fact": true,
+    "target_context_other_fact": false,
+    "other_tenant_status": "resolved",
+    "other_context_other_fact": true,
+    "other_context_current_fact": false,
+    "artifact_sha256": "ede4f57a80f003593489ed55de503804ff17f65bc1c5ca671ee6b468c20bc21b",
+    "artifact_content_exact": true,
+    "delivery_id": "236cda8d-e046-4dba-809d-ce5c420d68fb",
+    "observation_id": "a1692de6-f4b7-476c-9564-6fab3921b361",
+    "memory_id": "3f80707c-1af7-450f-8ce7-9afbd1cc660d",
+    "memory_status": "proposed",
+    "first_replayed": false,
+    "exact_replay": true,
+    "proposed_projection_rows": 0,
+    "target_delivery_count": 1,
+    "other_tenant_delivery_count": 1
+  },
+  "grok_attempt": {
+    "client": "grok-cli",
+    "version": "0.2.101 (5bc4b5dfadcf)",
+    "fresh_isolated_state": true,
+    "prompt_contained_fact_value": false,
+    "status": "external_blocked",
+    "failure_class": "authentication_expired",
+    "error": "Not signed in; device-code login required",
+    "prepare_calls": 0,
+    "commit_calls": 0,
+    "deliveries": 0,
+    "observations": 0,
+    "artifacts": 0
+  },
+  "reversal": {
+    "operation_id": "w34-ceafea6-reverse-device-migration",
+    "bridge_status": "reversed",
+    "source_binding": "confirmed",
+    "target_binding": "retired",
+    "other_tenant_target_binding": "confirmed",
+    "source_status": "resolved",
+    "source_delivery_created": true,
+    "source_context_current_fact": true,
+    "target_status": "needs_confirmation",
+    "target_delivery_id_empty": true,
+    "target_context_empty": true,
+    "target_delivery_rows": 0,
+    "current_memory_status": "active",
+    "runtime_probe_memory_status": "proposed",
+    "other_tenant_memory_status": "active"
+  },
+  "hard_gate_summary": {
+    "passed": 28,
+    "external_blocked": 4,
+    "platform_failed": 0,
+    "qualified_32_of_32": false
+  },
+  "hard_gates": [
+    {"id": 1, "status": "pass", "gate": "two distinct physical hosts"},
+    {"id": 2, "status": "pass", "gate": "two real non-bare clones at the exact commit"},
+    {"id": 3, "status": "pass", "gate": "distinct roots namespaces and attachment fingerprints"},
+    {"id": 4, "status": "pass", "gate": "shared Git identity did not auto-merge continuity"},
+    {"id": 5, "status": "pass", "gate": "exact checksum-verified signed release binary"},
+    {"id": 6, "status": "pass", "gate": "source resolved before migration"},
+    {"id": 7, "status": "pass", "gate": "unbound target returned needs_confirmation"},
+    {"id": 8, "status": "pass", "gate": "unbound target created no delivery"},
+    {"id": 9, "status": "pass", "gate": "unbound target created no observation or memory"},
+    {"id": 10, "status": "pass", "gate": "other tenant received only its current fact"},
+    {"id": 11, "status": "pass", "gate": "explicit operator rebind command"},
+    {"id": 12, "status": "pass", "gate": "rebind preserved continuity id"},
+    {"id": 13, "status": "pass", "gate": "rebind retired source binding"},
+    {"id": 14, "status": "pass", "gate": "rebind confirmed target binding"},
+    {"id": 15, "status": "pass", "gate": "rebound target received current fact", "client": "independent-go-mcp-sdk"},
+    {"id": 16, "status": "pass", "gate": "rebound target excluded other tenant fact", "client": "independent-go-mcp-sdk"},
+    {"id": 17, "status": "pass", "gate": "other tenant remained isolated"},
+    {"id": 18, "status": "pass", "gate": "active auditable bridge operation"},
+    {"id": 19, "status": "pass", "gate": "rebind replay was idempotent"},
+    {"id": 20, "status": "pass", "gate": "Grok MCP doctor negotiated protocol 2025-06-18"},
+    {"id": 21, "status": "pass", "gate": "Grok MCP exposed exactly two normal-flow tools"},
+    {"id": 22, "status": "pass", "gate": "tool schema exposed no governance authority"},
+    {"id": 23, "status": "external_blocked", "gate": "fresh authenticated Grok called prepare_context"},
+    {"id": 24, "status": "external_blocked", "gate": "Grok received current context without forbidden fact"},
+    {"id": 25, "status": "external_blocked", "gate": "Grok wrote deterministic target artifact"},
+    {"id": 26, "status": "pass", "gate": "artifact content and SHA-256 matched", "client": "independent-go-mcp-sdk"},
+    {"id": 27, "status": "external_blocked", "gate": "Grok called commit_observation with delivery id"},
+    {"id": 28, "status": "pass", "gate": "client writeback remained proposed", "client": "independent-go-mcp-sdk"},
+    {"id": 29, "status": "pass", "gate": "exact writeback replay returned the same observation", "client": "independent-go-mcp-sdk"},
+    {"id": 30, "status": "pass", "gate": "PostgreSQL ledger and tenant isolation agreed"},
+    {"id": 31, "status": "pass", "gate": "reversal restored exact bindings and preserved memory"},
+    {"id": 32, "status": "pass", "gate": "source resolved and target abstained after reversal"}
+  ],
+  "retained_failures": [
+    {
+      "stage": "real-grok-generation",
+      "classification": "external_client_authentication",
+      "result": "Not signed in; no MCP call or authoritative side effect"
+    },
+    {
+      "stage": "remote-go-test",
+      "classification": "transport_and_dependency_download",
+      "result": "long SSH command disconnected; checksum-identical Darwin ARM64 test binary passed on the Mac mini"
+    },
+    {
+      "stage": "remote-cosign-download",
+      "classification": "upstream_download_stall",
+      "result": "stalled process terminated; official checksum-verified binary downloaded to external volume and used independently"
+    }
+  ],
+  "privacy": {
+    "sudo_used": false,
+    "newapi_used": false,
+    "provider_key_retained": false,
+    "database_password_retained": false,
+    "raw_auth_material_retained": false,
+    "personal_home_path_retained": false
+  },
+  "claim_boundary": {
+    "qualified": "signed physical cross-host workspace rebind runtime, tenant isolation, MCP behavior, proposed-only writeback, replay, and reversal",
+    "not_qualified": [
+      "Grok generation or complete 32-of-32 W34 trajectory",
+      "Cursor generation",
+      "automatic clone identity merging",
+      "uncommitted workspace state transfer",
+      "PostgreSQL cross-host replication or high availability",
+      "long-duration network reliability",
+      "the complete Vermory platform"
+    ]
+  }
+}
