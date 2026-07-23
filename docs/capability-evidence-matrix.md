@@ -139,15 +139,15 @@ The following remain explicit work, not hidden implementation details:
 2. Extend the accepted client topology beyond the exact cases already run.
    W31 qualifies actual local Git worktree, same-name repository, clone, and
    physical move behavior; W33 adds bare mirror, mirror/fork checkout,
-   multiple-remote, and cross-namespace migration behavior. W34 qualifies
+   multiple-remote, and cross-namespace migration behavior. W34 now qualifies
    the signed two-physical-host Grok client trajectory with conservative
    attachment, explicit rebind, current-only context, artifact creation,
    proposed write-back, exact replay, tenant isolation, and reversal at
    `32 / 32`. W37 adds root/nested attachment, replay, repository isolation,
    namespace abstention, and tenant isolation for six exact public repositories
-   at `18 / 18`. The paid `grok-build` route, repositories beyond the frozen
-   corpus, other Git implementations, and long-duration network behavior remain
-   outside the qualified boundary.
+   at `18 / 18`. The paid `grok-build` route remains outside the qualified
+   boundary. Repositories beyond the frozen corpus, other Git implementations,
+   and long-duration network behavior also remain outside the qualified boundary.
 3. Extend I05/I06/I08/I09 beyond qualified ephemeral AMD64 and ARM64 runners
    and `file://` repository bundles to long-duration uptime/SLA evidence, a
    stable production repository signing-key lifecycle, public hosted
