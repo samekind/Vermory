@@ -173,6 +173,16 @@ candidate 接受/拒绝、记忆纠正和忘记。桌面与移动布局均连接
 authority 通过。确定性 provider 只隔离验证浏览器合同，不作为模型质量声明。
 详见[浏览器 Web Chat 生命周期实证](docs/evidence/2026-07-22-browser-webchat-lifecycle.md)。
 
+W38 在真实 Chrome 中通过官方 OpenClaw 2026.6.11 Control UI 和无宿主记忆的
+真实 Grok CLI 完成治理连续性资格验证。新的宿主 transcript 能召回已接受的预约，
+无关 session 只得到 `UNKNOWN`；纠正后 Saturday 被 Sunday 替代，执行
+`/vermory forget` 后，精确和同义问题都无法恢复被删除事实。浏览器刷新、Vermory
+与 OpenClaw 重启、终态 operation 重放、PostgreSQL 权威状态、投影残留、凭据清理
+和 28 个冻结硬门全部通过。WebChat 实际观察到的 provider route 是
+`grok-4.5-build-free`；这是客户端兼容性证据，不是模型排名，也不代表所有
+OpenClaw channel。详见
+[官方 OpenClaw WebChat 治理连续性实证](docs/evidence/2026-07-23-official-openclaw-webchat.md)。
+
 I05 在 exact-head Ubuntu 24.04 AMD64 与原生 ARM64 runner 上完成 systemd 与
 PostgreSQL 18
 持久服务生命周期资格验证：专用不可登录服务身份和受限数据库角色只监听认证

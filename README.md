@@ -220,6 +220,17 @@ a claim that every repository or Git implementation is supported, and it does
 not make remote URLs or shared history automatic merge authority. See
 [Real Repository Corpus Qualification](docs/evidence/2026-07-23-real-repository-corpus.md).
 
+W38 qualifies governed conversation continuity through the official OpenClaw
+2026.6.11 Control UI in real Chrome with a stateless real Grok CLI backend.
+Fresh host transcripts recalled an accepted appointment, an unrelated session
+received `UNKNOWN`, correction replaced Saturday with Sunday, and exact plus
+paraphrased probes recovered none of the fact after `/vermory forget`. Browser
+reload, Vermory/OpenClaw restart, terminal operation replay, PostgreSQL
+authority, projection residue, credential cleanup, and all 28 frozen gates
+passed. The observed WebChat provider route was `grok-4.5-build-free`; this is
+client compatibility evidence, not a model ranking or an all-channel OpenClaw
+claim. See [Official OpenClaw WebChat Qualification](docs/evidence/2026-07-23-official-openclaw-webchat.md).
+
 I05 qualifies the durable service lifecycle on exact-head Ubuntu 24.04 AMD64
 and native ARM64 runners with systemd and PostgreSQL 18. A dedicated non-login
 identity and

@@ -1003,6 +1003,38 @@ payload signature. See
 [the I09 evidence](evidence/2026-07-23-linux-repository-lifecycle.md).
 
 
+## Official OpenClaw WebChat W38
+
+W38 validates the user-facing governed-memory lifecycle through the official
+OpenClaw 2026.6.11 Control UI instead of an internal handler or synthetic chat
+page. Real Chrome sent Gateway WebSocket turns to a stateless real Grok CLI;
+the maintained Vermory plugin formed one appointment candidate, required
+explicit `/vermory accept`, isolated an unrelated session, applied an explicit
+correction, and removed current recall through `/vermory forget`.
+
+| Gate | Result |
+|---|---:|
+| frozen hard gates | `28 / 28` pass |
+| WebChat requested / observed model | `grok-4.5` / `grok-4.5-build-free` |
+| real WebChat / formation calls | `6 / 1` |
+| appointment / temporary candidates | `1 / 0` |
+| fresh accepted recall | Saturday 10:00 + front-desk instruction |
+| unrelated session | `UNKNOWN` |
+| fresh corrected recall | Sunday 14:00 + front-desk instruction |
+| exact deletion probe | `UNKNOWN` |
+| paraphrased deletion fact recovery | false |
+| active / superseded / deleted memories | `0 / 1 / 1` |
+| lexical / vector residue | `0 / 0` |
+| completed operation replay | `replayed=true`, semantic counts unchanged |
+| final clean browser console | `0` errors, `0` warnings |
+
+The deliberate service outage produced expected WebSocket refusal and reconnect
+messages, after which Chrome automatically recovered the active transcript.
+Those expected messages and all earlier failed attempts remain in evidence;
+the final clean reload is the zero-console gate. W38 is client/runtime
+compatibility evidence, not a provider comparison or an automatic-governance
+claim. See [the W38 evidence](evidence/2026-07-23-official-openclaw-webchat.md).
+
 ## Duojie Core Matrix Findings
 
 Tested models:

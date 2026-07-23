@@ -1,0 +1,283 @@
+{
+  "evidence_version": 1,
+  "case_id": "W38-official-openclaw-webchat",
+  "status": "runtime-qualified",
+  "accepted_at": "2026-07-23",
+  "implementation_revision": "6811b117292484872e0e3c89379edbf664efaa06",
+  "case_sha256": "4cc844975c0be930bb3029e9336c62bfa5a7577271ee3389606f83ee1654116a",
+  "implementation_binary_sha256": "e5146e8c61e8920ea6e7c865fa61daac8b4c5bc8159ff1dbc4a2249a9c1b6b66",
+  "authoritative_report_sha256": "9fc02f1bab766f384166ed333b410f6590f823599d47b6f679421e2a6e365fda",
+  "raw_inventory_sha256": "4777bcfd52c847f00f7f3f89618232cc488bac58cd9f447754c37be7c3ece6fd",
+  "raw_evidence_file_count": 49,
+  "surface": "real_chrome_official_openclaw_control_ui_gateway_websocket",
+  "runtime": {
+    "openclaw_version": "2026.6.11",
+    "grok_cli_version": "0.2.111",
+    "postgres_version": "18.4",
+    "schema_version": 25,
+    "official_plugin_loaded": true,
+    "provider_session_mode": "none",
+    "external_volume_only": true,
+    "system_go_cache_bytes": 0,
+    "privileged_commands_used": false,
+    "private_newapi_used": false
+  },
+  "model": {
+    "requested_webchat_model": "grok-4.5",
+    "observed_webchat_provider_model": "grok-4.5-build-free",
+    "real_webchat_calls": 6,
+    "real_formation_calls": 1,
+    "formation_requested_model": "grok-4.5",
+    "formation_actual_route_reported": false,
+    "ranking_claim": false
+  },
+  "scenario": {
+    "candidate_count": 1,
+    "temporary_lunch_candidate_count": 0,
+    "accepted_through_official_ui": true,
+    "first_fresh_recall": "Saturday at 10:00; the technician must contact the front desk before arriving.",
+    "unrelated_session_answer": "UNKNOWN",
+    "corrected_through_official_ui": true,
+    "second_fresh_recall": "Sunday at 14:00; the technician must contact the front desk before arriving.",
+    "stale_value_presented_as_current": false,
+    "forgotten_through_official_ui": true,
+    "exact_deleted_probe_answer": "UNKNOWN",
+    "paraphrased_deleted_probe_recovered_fact": false,
+    "canonical_session_key_preserved": true,
+    "backing_session_changes_after_reset": 4,
+    "browser_reload_preserved_transcript": true,
+    "service_restart_preserved_transcript": true,
+    "completed_operation_prepare_replayed": true,
+    "replay_semantic_counts_unchanged": true
+  },
+  "authority": {
+    "continuities_total": 3,
+    "conversation_continuities": 2,
+    "global_default_continuities": 1,
+    "conversation_turns": 6,
+    "observations": 16,
+    "deliveries": 6,
+    "formation_schedules": 2,
+    "active_memories": 0,
+    "superseded_memories": 1,
+    "deleted_memories": 1,
+    "lexical_rows": 0,
+    "vector_1536_rows": 0,
+    "vector_2560_rows": 0,
+    "latest_two_deliveries_contain_old_markers": false
+  },
+  "browser": {
+    "intentional_restart_connection_errors": 6,
+    "intentional_restart_connection_warnings": 6,
+    "automatic_reconnect": true,
+    "final_clean_reload_errors": 0,
+    "final_clean_reload_warnings": 0,
+    "unexpected_console_messages": 0
+  },
+  "hard_gate_count": 28,
+  "hard_gates": [
+    {
+      "number": 1,
+      "description": "a fresh PostgreSQL cluster migrates from schema zero to the exact supported schema before the run",
+      "status": "passed"
+    },
+    {
+      "number": 2,
+      "description": "Vermory, PostgreSQL, OpenClaw state, Grok state, caches, transcripts, and raw evidence remain on the external volume",
+      "status": "passed"
+    },
+    {
+      "number": 3,
+      "description": "the accepted run uses no privileged command and no private NewAPI gateway",
+      "status": "passed"
+    },
+    {
+      "number": 4,
+      "description": "OpenClaw 2026.6.11 loads the maintained Vermory plugin through the official plugin runtime",
+      "status": "passed"
+    },
+    {
+      "number": 5,
+      "description": "runtime inspection reports the Vermory command and the before_prompt_build and agent_end hooks",
+      "status": "passed"
+    },
+    {
+      "number": 6,
+      "description": "the Grok CLI backend is stateless, disables ambient memory and web search, and performs a real model call",
+      "status": "passed"
+    },
+    {
+      "number": 7,
+      "description": "a real Chrome page loads the official OpenClaw Control UI served by the Gateway",
+      "status": "passed"
+    },
+    {
+      "number": 8,
+      "description": "the browser authenticates to the Gateway and uses its WebSocket chat surface",
+      "status": "passed"
+    },
+    {
+      "number": 9,
+      "description": "the initial browser message is submitted through chat.send and recovered through chat.history",
+      "status": "passed"
+    },
+    {
+      "number": 10,
+      "description": "one completed initial agent run creates exactly one durable Vermory user observation, assistant observation, delivery, and formation schedule",
+      "status": "passed"
+    },
+    {
+      "number": 11,
+      "description": "model output remains an observation and no memory becomes active without explicit governance",
+      "status": "passed"
+    },
+    {
+      "number": 12,
+      "description": "a real formation call proposes the durable appointment fact while temporary lunch chatter remains ungoverned",
+      "status": "passed"
+    },
+    {
+      "number": 13,
+      "description": "the official WebChat /vermory command displays reviewable candidates without exposing authority identifiers or credentials",
+      "status": "passed"
+    },
+    {
+      "number": 14,
+      "description": "accepting the selected candidate through the official WebChat command creates one active governed memory",
+      "status": "passed"
+    },
+    {
+      "number": 15,
+      "description": "resetting the OpenClaw transcript changes its backing session id while retaining the canonical session key",
+      "status": "passed"
+    },
+    {
+      "number": 16,
+      "description": "a recall question in the reset transcript receives the active appointment fact through Vermory context",
+      "status": "passed"
+    },
+    {
+      "number": 17,
+      "description": "the reset OpenClaw transcript contains no pre-reset user or assistant message that could independently supply the recalled fact",
+      "status": "passed"
+    },
+    {
+      "number": 18,
+      "description": "an unrelated OpenClaw session receives none of the appointment fact before or after governance actions",
+      "status": "passed"
+    },
+    {
+      "number": 19,
+      "description": "correcting the appointment through the official WebChat command supersedes the old memory and creates one current replacement",
+      "status": "passed"
+    },
+    {
+      "number": 20,
+      "description": "a second reset transcript recalls Sunday at 14:00 and does not present Saturday at 10:00 as current",
+      "status": "passed"
+    },
+    {
+      "number": 21,
+      "description": "forgetting the current appointment through the official WebChat command makes the memory deleted",
+      "status": "passed"
+    },
+    {
+      "number": 22,
+      "description": "after a third transcript reset neither exact nor paraphrased recall can recover the deleted appointment fact",
+      "status": "passed"
+    },
+    {
+      "number": 23,
+      "description": "deleted and superseded appointment content is absent from current delivery, lexical projection, and vector projection",
+      "status": "passed"
+    },
+    {
+      "number": 24,
+      "description": "refresh reconnects the official Control UI and recovers only the active OpenClaw transcript for the selected session",
+      "status": "passed"
+    },
+    {
+      "number": 25,
+      "description": "restarting Vermory and the OpenClaw Gateway preserves the canonical continuity and governed lifecycle outcome",
+      "status": "passed"
+    },
+    {
+      "number": 26,
+      "description": "replayed browser or plugin operations do not duplicate observations, deliveries, candidates, or memories",
+      "status": "passed"
+    },
+    {
+      "number": 27,
+      "description": "the final browser run has no unexpected console error, credential exposure, mixed authority, or cross-session content",
+      "status": "passed"
+    },
+    {
+      "number": 28,
+      "description": "the public snapshot is credential-free, path-normalized, checksum-bound, and preserves every observed failed attempt separately",
+      "status": "passed"
+    }
+  ],
+  "retained_failures": [
+    {
+      "attempt": "attempt1",
+      "result": "rejected",
+      "reason": "the Grok runtime installer was invoked directly before executable handling was corrected"
+    },
+    {
+      "attempt": "attempt2",
+      "result": "rejected",
+      "reason": "the Homebrew Grok launcher failed strict code-signature validation"
+    },
+    {
+      "attempt": "attempt3",
+      "result": "rejected",
+      "reason": "the copied Grok Node shim omitted its platform package and OpenClaw runtime inspection had changed shape"
+    },
+    {
+      "attempt": "attempt4",
+      "result": "precursor-only",
+      "reason": "the trajectory completed while the harness was still changing and therefore was not accepted as the exact final run"
+    },
+    {
+      "attempt": "formation-first-invocation",
+      "result": "retained-failure",
+      "reason": "a duplicate verbatim flag made the first formation invocation invalid"
+    },
+    {
+      "attempt": "precursor-initial-answer",
+      "result": "retained-failure",
+      "reason": "the first precursor model answer contained an irrelevant alphanumeric string"
+    },
+    {
+      "attempt": "new-session-first-send",
+      "result": "retained-failure",
+      "reason": "the initial automated fill did not dispatch the input event and created no turn"
+    },
+    {
+      "attempt": "screenshot-export",
+      "result": "retained-tool-limit",
+      "reason": "the browser tool could not write its screenshot to the canonical external evidence location"
+    },
+    {
+      "attempt": "exact-paraphrased-deletion-probe",
+      "result": "accepted-nonleak",
+      "reason": "the model did not follow the requested fixed wording but recovered none of the deleted fact"
+    }
+  ],
+  "evidence_integrity": {
+    "failed_attempts_retained": true,
+    "known_secret_matches_in_raw_evidence": 0,
+    "temporary_runtime_credentials_removed": true,
+    "public_paths_normalized": true,
+    "checksum_bound": true
+  },
+  "claim_boundary": {
+    "model_ranking": false,
+    "all_openclaw_releases": false,
+    "all_browsers": false,
+    "all_openclaw_channels": false,
+    "automatic_governance": false,
+    "perfect_formation_quality": false,
+    "transcript_erasure_on_forget": false
+  }
+}
