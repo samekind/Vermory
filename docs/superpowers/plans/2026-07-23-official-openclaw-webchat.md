@@ -10,4 +10,4 @@
 - [x] Refresh and restart the real clients and services, then verify idempotency and PostgreSQL authority/projection residue.
 - [x] Preserve raw failed and accepted attempts on the external volume; publish a normalized snapshot and bounded evidence report.
 - [x] Run focused and complete repository gates with all caches and temporary artifacts on the external volume.
-- [ ] Push the exact delivery head and wait for all protected checks, including `sign-snapshot`, without merging the review-required PR.
+- [x] Push the exact delivery head and wait for all protected checks, including `sign-snapshot`, without merging the review-required PR.
