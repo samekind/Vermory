@@ -8,5 +8,5 @@
 - [x] Fence leased OpenClaw tool results and integrate prepare, checkpoint, restart replay, completion, and failure.
 - [x] Run focused Go, race, vet, OpenClaw, Hermes, reset, dump/restore, and Reality validation.
 - [x] Execute the authenticated W36 runtime trajectory with process restart and retained stale-write failures.
-- [ ] Commit normalized evidence, update the capability matrix, and preserve failed runs.
-- [ ] Push the exact revision and require the complete protected verification chain.
+- [x] Commit normalized evidence, update the capability matrix, and preserve failed runs.
+- [x] Push the exact revision and require the complete protected verification chain.

@@ -206,7 +206,7 @@ Names, payloads, streaming behavior, and transport remain versioned rather than 
 
 ### H-017: Durable fenced client operations
 
-- Status: `testing`
+- Status: `supported`
 - Candidate: a long-running client operation remains the existing conversation turn plus a PostgreSQL-authoritative leased attempt, monotonically increasing fencing generation, and one bounded latest checkpoint. It is not a second workflow or memory authority.
 - Reason: H-014 qualifies bounded prepare/complete turns but does not protect multi-hour tool loops, process restart, timeout reclaim, cancellation, or late writes from an obsolete client attempt.
 - Frozen experiment: W36 exercises exact prepare replay, checkpoint replay and drift, process restart, expired-lease reclaim, stale-attempt rejection, concurrent cancel/complete, cross-tenant and cross-continuity isolation, and legacy bounded-turn compatibility. The OpenClaw integration uses the leased protocol while Hermes remains a bounded control.
@@ -233,8 +233,12 @@ identities.
 
 This is runtime evidence, not model-quality evidence. No LLM ranking,
 embedding-quality, Hermes long-running, offline synchronization, or generic
-workflow-scheduler claim is inferred. The status remains `testing` until the
-same pushed revision completes the protected PR checks.
+workflow-scheduler claim is inferred. Protected PR run `29990451694` passed
+all required checks on delivery head
+`4f275bab77da0d34f154ce0bf2479cd82965c608`, so H-017 is supported for this
+scoped lifecycle contract. Reopen it for offline multi-device synchronization,
+distributed execution ownership, checkpoint history, or clients that cannot
+retain an operation ID.
 
 ## 3. Decision Records
 

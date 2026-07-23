@@ -16,8 +16,10 @@ The report binds the run to frozen case SHA
 `553126cd1af677018c68d79d13145203c4a64c3b329f3fbdecef32197b3efe21`, exact
 implementation revision `bc0eb0e90bba0d9f0013f38cd12f788d979ad1cd`,
 authoritative PostgreSQL counts, native dump SHA-256, and all 28 hard gates.
-The exact-commit run qualifies the W36 runtime contract. H-017 remains
-`testing` until the same pushed revision completes the protected PR checks.
+The exact-commit run qualifies the W36 runtime contract. Protected PR run
+`29990451694` passed all required checks on delivery head
+`4f275bab77da0d34f154ce0bf2479cd82965c608`; H-017 is therefore `supported`
+for this scoped lifecycle contract.
 
 ## Qualified Contract
 
