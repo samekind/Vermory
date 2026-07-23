@@ -217,3 +217,36 @@ func TestW35AuthenticatedRemoteBrowserContractManifestRemainsFrozen(t *testing.T
 		t.Fatalf("unexpected W35 non-claim count: %d", len(manifest.NonClaims))
 	}
 }
+
+func TestW38OfficialOpenClawWebChatContractManifestRemainsFrozen(t *testing.T) {
+	payload, err := os.ReadFile("../../runtime/cases/W38-official-openclaw-webchat/case.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	var manifest struct {
+		Version              int      `json:"version"`
+		ID                   string   `json:"id"`
+		Surface              string   `json:"surface"`
+		OpenClawVersion      string   `json:"openclaw_version"`
+		ConversationProvider string   `json:"conversation_provider"`
+		HardGateCount        int      `json:"hard_gate_count"`
+		HardGates            []string `json:"hard_gates"`
+		NonClaims            []string `json:"non_claims"`
+	}
+	if err := json.Unmarshal(payload, &manifest); err != nil {
+		t.Fatal(err)
+	}
+	if manifest.Version != 1 || manifest.ID != "W38-official-openclaw-webchat" ||
+		manifest.Surface != "real_chrome_official_openclaw_control_ui_gateway_websocket" {
+		t.Fatalf("unexpected W38 identity: %#v", manifest)
+	}
+	if manifest.OpenClawVersion != "2026.6.11" || manifest.ConversationProvider != "real_grok_cli_stateless" {
+		t.Fatalf("unexpected W38 client boundary: %#v", manifest)
+	}
+	if manifest.HardGateCount != 28 || len(manifest.HardGates) != manifest.HardGateCount {
+		t.Fatalf("unexpected W38 hard gates: count=%d gates=%d", manifest.HardGateCount, len(manifest.HardGates))
+	}
+	if len(manifest.NonClaims) != 6 {
+		t.Fatalf("unexpected W38 non-claim count: %d", len(manifest.NonClaims))
+	}
+}
