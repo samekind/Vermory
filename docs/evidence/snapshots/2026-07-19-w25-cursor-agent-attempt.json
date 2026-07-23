@@ -54,6 +54,17 @@
     "active_agent_memories": 0
   },
   "preserved_attempts": 7,
+  "latest_reprobe": {
+    "date": "2026-07-23",
+    "branch_revision": "d7dd71d6c99bea57dd67d5f1df51ac019c6f0612",
+    "client_version": "2026.07.13-7fe37d2",
+    "requested_model": "gpt-5.3-codex",
+    "workspace_storage": "external_volume",
+    "generation_exit": 1,
+    "failure_class": "client_account_blocked",
+    "mcp_started": false,
+    "vermory_side_effects": 0
+  },
   "evidence": {
     "retained_files": 85,
     "checksum_entries_verified": 85,

@@ -183,3 +183,16 @@ The probe created no workspace artifact and made no Vermory authority change.
 No login identity, session identifier, or raw account output is retained in
 committed evidence. W25 therefore remains blocked by the external Cursor
 account rather than by the W26 attachment contract.
+
+## 2026-07-23 External-Volume Re-probe
+
+After W34 delivery, Cursor Agent `2026.07.13-7fe37d2` still reported a logged-in
+account and listed `gpt-5.3-codex`. A fresh minimal generation request used an
+empty workspace and temporary directory on the external volume. The client
+initialized the requested model, then exited `1` with the same unpaid-invoice
+account error before MCP startup, database access, tool execution, or artifact
+creation.
+
+The re-probe intentionally did not allocate a W25 PostgreSQL run because the
+generation prerequisite failed first. It does not change W25's status and does
+not substitute another Cursor model or client for the frozen target.
