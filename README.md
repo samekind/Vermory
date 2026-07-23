@@ -257,6 +257,18 @@ hosting, retention, unattended updates, database migration rollback, tagged
 publication, or RPM payload signatures. See
 [Cross-Version Linux Repository Lifecycle Qualification](docs/evidence/2026-07-23-linux-repository-lifecycle.md).
 
+I11 qualifies an authenticated macOS user-service lifecycle on the ARM64 Mac
+mini. An OIDC-signed exact-revision candidate passed version and read-only
+database compatibility preflight, unprivileged loopback LaunchAgent startup,
+incompatible candidate and rollback rejection, upgrade, restart, explicit
+rollback, failed-activation automatic restoration, governed-state preservation,
+credential scans, and residue-free cleanup. All 20 hard gates passed. OpenClaw
+and Hermes backend probes remained usable after the lifecycle, but this run does
+not claim model quality or new real-client qualification. It also does not claim
+database down migration, arbitrary historical rollback, zero downtime,
+long-duration SLA, notarization, public exposure, or system-wide installation.
+See [macOS Authenticated Service Lifecycle Qualification](docs/evidence/2026-07-23-macos-authenticated-service-lifecycle.md).
+
 Read the current [Capability And Evidence Matrix](docs/capability-evidence-matrix.md)
 for exact qualification boundaries. The
 [Experiment 0 report](docs/experiment-0-readout.md) is retained as the initial

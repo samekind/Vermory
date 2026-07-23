@@ -7,6 +7,6 @@
 - [x] Add explicit compatible rollback with health verification.
 - [x] Run focused macOS tests and ShellCheck validation.
 - [x] Add a reproducible real-host I11 acceptance runner and contract test.
-- [ ] Execute the complete isolated trajectory on the Mac mini.
-- [ ] Commit normalized evidence and capability-matrix status.
-- [ ] Run the full protected verification chain and push the exact head.
+- [x] Execute the complete isolated trajectory on the Mac mini.
+- [x] Commit normalized evidence and capability-matrix status.
+- [x] Run the full protected verification chain and push the exact head.

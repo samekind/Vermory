@@ -208,6 +208,15 @@ DEB/RPM package 在原生 AMD64/ARM64 APT/DNF 上依次完成 base 安装、普�
 tagged release 或 RPM payload 签名。详见
 [跨版本 Linux 仓库生命周期实证](docs/evidence/2026-07-23-linux-repository-lifecycle.md)。
 
+I11 在 ARM64 Mac mini 上完成认证 macOS 用户级服务生命周期资格验证。OIDC 签名
+且绑定精确 revision 的候选版本依次通过版本与只读数据库兼容性预检、非特权
+loopback LaunchAgent 启动、不兼容候选与回滚拒绝、升级、重启、显式回滚、故障
+激活自动恢复、治理状态保持、凭据扫描和零残片清理，20 个硬门全部通过。OpenClaw
+与 Hermes backend probe 在生命周期后仍可用，但这不构成新的模型质量或真实客户端
+资格声明。该证据也不宣称数据库 down migration、任意历史版本回滚、零停机、长期
+SLA、notarization、公共暴露或系统级安装。详见
+[macOS 认证服务生命周期实证](docs/evidence/2026-07-23-macos-authenticated-service-lifecycle.md)。
+
 当前准确能力边界见[能力与证据矩阵](docs/capability-evidence-matrix.md)；
 [Experiment 0 读数](docs/experiment-0-readout.md)保留为最初的证据冻结基线。
 
