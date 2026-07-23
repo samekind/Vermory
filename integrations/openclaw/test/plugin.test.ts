@@ -375,6 +375,129 @@ describe("Vermory OpenClaw plugin", () => {
     });
   });
 
+	it("runs a fenced tool loop through leased prepare, tool evidence, checkpoint, and completion", async () => {
+		const requests: Array<{ path: string; body: Record<string, unknown> }> = [];
+		const fetchMock = vi.fn(async (input: unknown, init: RequestInit) => {
+			const path = new URL(String(input)).pathname;
+			const body = JSON.parse(String(init.body)) as Record<string, unknown>;
+			requests.push({ path, body });
+			if (path === "/v1/client-operations/prepare") {
+				return jsonResponse(prepareReceipt(String(body.operation_id), "current governed context"));
+			}
+			if (path.endsWith("/tool-results")) {
+				return jsonResponse({
+					turn_id: "22222222-2222-2222-2222-222222222222",
+					observation_id: "33333333-3333-3333-3333-333333333333",
+					tool_name: body.tool_name,
+					replayed: false,
+				});
+			}
+			if (path === "/v1/client-operations/checkpoint") {
+				return jsonResponse({
+					...prepareReceipt(String(body.operation_id), ""),
+					checkpoint_sequence: body.sequence,
+					checkpoint: body.checkpoint,
+				});
+			}
+			return jsonResponse(completedReceipt(String(body.operation_id)));
+		});
+		vi.stubGlobal("fetch", fetchMock);
+		const harness = registerPlugin({ toolAllowlist: ["release.verify"] });
+
+		await harness.beforePrompt(
+			{ prompt: "Continue the release repair.", messages: [] },
+			{ sessionKey: "agent:main:leased", runId: "leased-tool-loop" },
+		);
+		await harness.afterToolCall(
+			{
+				toolName: "release.verify",
+				params: { hidden: "must-not-persist" },
+				runId: "leased-tool-loop",
+				toolCallId: "call-verify",
+				result: "Verification passed.",
+			},
+			{
+				sessionKey: "agent:main:leased",
+				runId: "leased-tool-loop",
+				toolName: "release.verify",
+				toolCallId: "call-verify",
+			},
+		);
+		await harness.agentEnd(
+			{ success: true, messages: [{ role: "assistant", content: "Release repair completed." }] },
+			{ sessionKey: "agent:main:leased", runId: "leased-tool-loop", modelId: "runtime-model" },
+		);
+
+		expect(requests.map((request) => request.path)).toEqual([
+			"/v1/client-operations/prepare",
+			"/v1/integrations/openclaw/turns/tool-results",
+			"/v1/client-operations/checkpoint",
+			"/v1/client-operations/complete",
+		]);
+		expect(requests[1]?.body).toMatchObject({
+			attempt_id: "11111111-1111-1111-1111-111111111111",
+			lease_generation: 1,
+		});
+		expect(requests[2]?.body).toMatchObject({
+			sequence: 1,
+			checkpoint: { phase: "tool_completed", tool_name: "release.verify", tool_call_id: "call-verify" },
+		});
+		expect(requests[3]?.body).toMatchObject({
+			attempt_id: "11111111-1111-1111-1111-111111111111",
+			lease_generation: 1,
+			answer: "Release repair completed.",
+		});
+		expect(JSON.stringify(requests)).not.toContain("must-not-persist");
+	});
+
+	it("reconstructs leased attempt metadata by repeating prepare after plugin restart", async () => {
+		const requests: Array<{ path: string; body: Record<string, unknown> }> = [];
+		const fetchMock = vi.fn(async (input: unknown, init: RequestInit) => {
+			const path = new URL(String(input)).pathname;
+			const body = JSON.parse(String(init.body)) as Record<string, unknown>;
+			requests.push({ path, body });
+			if (path === "/v1/client-operations/prepare") {
+				return jsonResponse({
+					...prepareReceipt(String(body.operation_id), "restart-safe context"),
+					replayed: requests.filter((request) => request.path === path).length > 1,
+					checkpoint_sequence: 3,
+					checkpoint: { phase: "resume", completed_steps: 3 },
+				});
+			}
+			return jsonResponse({
+				...completedReceipt(String(body.operation_id)),
+				checkpoint_sequence: 3,
+				checkpoint: { phase: "resume", completed_steps: 3 },
+			});
+		});
+		vi.stubGlobal("fetch", fetchMock);
+
+		const beforeRestart = registerPlugin();
+		await beforeRestart.beforePrompt(
+			{ prompt: "Continue after restart.", messages: [] },
+			{ sessionKey: "agent:main:restart", runId: "restart-run" },
+		);
+		const afterRestart = registerPlugin();
+		await afterRestart.beforePrompt(
+			{ prompt: "Continue after restart.", messages: [] },
+			{ sessionKey: "agent:main:restart", runId: "restart-run" },
+		);
+		await afterRestart.agentEnd(
+			{ success: true, messages: [{ role: "assistant", content: "Recovered completion." }] },
+			{ sessionKey: "agent:main:restart", runId: "restart-run", modelId: "runtime-model" },
+		);
+
+		expect(requests.map((request) => request.path)).toEqual([
+			"/v1/client-operations/prepare",
+			"/v1/client-operations/prepare",
+			"/v1/client-operations/complete",
+		]);
+		expect(requests[2]?.body).toMatchObject({
+			attempt_id: "11111111-1111-1111-1111-111111111111",
+			lease_generation: 1,
+		});
+	});
+
   it("uses model metadata from the visible assistant message when hook context omits it", async () => {
     const fetchMock = vi.fn(async (_input: unknown, init: RequestInit) => {
       const body = JSON.parse(String(init.body));
@@ -543,9 +666,15 @@ function prepareReceipt(operationId: string, context: string) {
     turn_id: "turn-1",
     operation_id: operationId,
     status: "in_progress",
+	protocol: "leased_v1",
     continuity_id: "continuity-1",
     delivery_id: "delivery-1",
     user_observation_id: "observation-user-1",
+	attempt_id: "11111111-1111-1111-1111-111111111111",
+	lease_generation: 1,
+	lease_expires_at: "2026-07-23T01:00:00Z",
+	checkpoint_sequence: 0,
+	checkpoint: {},
     replayed: false,
     context,
   };

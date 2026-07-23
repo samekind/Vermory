@@ -204,6 +204,37 @@ Names, payloads, streaming behavior, and transport remain versioned rather than 
 - Falsifier: the preflight leaks migration metadata or credentials, expands runtime authority, performs a hidden migration, permits an unsupported schema to listen, or blocks a declared-compatible schema.
 - Decision gate: passed for the exact schema-24 profile on protected head `45dbdee`. Binary-only rollback remains conditional on the older binary's support interval; incompatible schema rollback uses PostgreSQL backup or PITR rather than an assumed automatic down migration. Reopen for a widened support interval, zero-downtime upgrades, arbitrary schema rollback, or another database topology.
 
+### H-017: Durable fenced client operations
+
+- Status: `testing`
+- Candidate: a long-running client operation remains the existing conversation turn plus a PostgreSQL-authoritative leased attempt, monotonically increasing fencing generation, and one bounded latest checkpoint. It is not a second workflow or memory authority.
+- Reason: H-014 qualifies bounded prepare/complete turns but does not protect multi-hour tool loops, process restart, timeout reclaim, cancellation, or late writes from an obsolete client attempt.
+- Frozen experiment: W36 exercises exact prepare replay, checkpoint replay and drift, process restart, expired-lease reclaim, stale-attempt rejection, concurrent cancel/complete, cross-tenant and cross-continuity isolation, and legacy bounded-turn compatibility. The OpenClaw integration uses the leased protocol while Hermes remains a bounded control.
+- Required invariant: checkpoints and heartbeats are operation progress only. They cannot create observations, formation work, governed memories, search projections, Global Defaults, or bridges.
+- Required invariant: expiry alone does not grant authority to another attempt. Reclaim under a locked PostgreSQL row increments the generation; every mutation from an older generation is then rejected.
+- Required invariant: only an exact completion by the current fenced attempt may create the assistant observation and enqueue conversation formation. Failure and cancellation are terminal without semantic write-back.
+- Evidence needed: deterministic store and HTTP races, real process restart, one real client lifecycle, PostgreSQL restart, retained late-write failures, and full release/database compatibility validation.
+- Falsifier: the protocol loses or duplicates semantic effects after restart; a stale attempt can mutate a reclaimed operation; checkpoint content reaches memory or model context; cancellation races can still produce an assistant observation; or the additional lease state is unnecessary for the accepted client lifecycle.
+- Decision gate: after W36 passes on the exact schema and protected release head. Reopen for offline multi-device synchronization, distributed execution ownership, checkpoint history, or clients that cannot retain an operation id.
+
+This hypothesis intentionally does not introduce a generic task scheduler, durable arbitrary tool state, or automatic truth promotion.
+
+### H-017 W36 qualification update (2026-07-23)
+
+The external-disk W36 runtime trajectory passed all 28 frozen hard gates on a
+fresh PostgreSQL 18.4 cluster. The run used the actual compiled OpenClaw
+plugin hooks, two Vermory and PostgreSQL restart cycles, an expired-lease
+reclaim, retained stale-write failures, a concurrent cancel/complete race,
+cross-tenant and cross-continuity probes, Hermes bounded complete/fail
+controls, and a native `pg_dump`/`pg_restore` cycle. The restored bearer token
+authenticated and the restored terminal receipts retained their original
+identities.
+
+This is runtime evidence, not model-quality evidence. No LLM ranking,
+embedding-quality, Hermes long-running, offline synchronization, or generic
+workflow-scheduler claim is inferred. The status remains `testing` until the
+same case is rerun against the protected exact commit head after delivery.
+
 ## 3. Decision Records
 
 When a hypothesis changes status, record:

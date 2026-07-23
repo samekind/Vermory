@@ -144,6 +144,118 @@ describe("VermoryClient", () => {
     ]);
   });
 
+	it("posts and validates the leased operation lifecycle", async () => {
+		const requests: Array<{ path: string; body: Record<string, unknown> }> = [];
+		await withServer(async (request, response) => {
+			const body = JSON.parse(await readRequest(request)) as Record<string, unknown>;
+			const path = request.url ?? "";
+			requests.push({ path, body });
+			if (path.endsWith("/prepare")) {
+				writeJSON(response, leasedReceipt(String(body.operation_id), "governed context"));
+				return;
+			}
+			if (path.endsWith("/checkpoint")) {
+				writeJSON(response, {
+					...leasedReceipt(String(body.operation_id), ""),
+					checkpoint_sequence: body.sequence,
+					checkpoint: body.checkpoint,
+				});
+				return;
+			}
+			writeJSON(response, {
+				...leasedReceipt(String(body.operation_id), ""),
+				status: "completed",
+				lease_expires_at: undefined,
+				assistant_observation_id: "22222222-2222-2222-2222-222222222222",
+				answer: body.answer,
+				model: body.model,
+			});
+		}, async (baseUrl) => {
+			const client = new VermoryClient({ baseUrl, timeoutMs: 1000 });
+			const prepared = await client.prepareLeased({
+				operationId: "openclaw:leased-client",
+				sessionKey: "agent:main:leased-client",
+				message: "Continue the tool loop.",
+			});
+			const checkpoint = await client.checkpointLeased({
+				operationId: prepared.operationId,
+				sessionKey: "agent:main:leased-client",
+				attemptId: prepared.attemptId,
+				leaseGeneration: prepared.leaseGeneration,
+				sequence: 1,
+				checkpoint: { phase: "tool_completed" },
+			});
+			expect(checkpoint.checkpointSequence).toBe(1);
+			await client.completeLeased({
+				operationId: prepared.operationId,
+				sessionKey: "agent:main:leased-client",
+				attemptId: prepared.attemptId,
+				leaseGeneration: prepared.leaseGeneration,
+				answer: "Completed.",
+				model: "openclaw/test",
+			});
+		});
+
+		expect(requests).toEqual([
+			{
+				path: "/v1/client-operations/prepare",
+				body: {
+					operation_id: "openclaw:leased-client",
+					channel: "openclaw",
+					thread_id: "agent:main:leased-client",
+					message: "Continue the tool loop.",
+				},
+			},
+			{
+				path: "/v1/client-operations/checkpoint",
+				body: {
+					operation_id: "openclaw:leased-client",
+					channel: "openclaw",
+					thread_id: "agent:main:leased-client",
+					attempt_id: "11111111-1111-1111-1111-111111111111",
+					lease_generation: 1,
+					sequence: 1,
+					checkpoint: { phase: "tool_completed" },
+				},
+			},
+			{
+				path: "/v1/client-operations/complete",
+				body: {
+					operation_id: "openclaw:leased-client",
+					channel: "openclaw",
+					thread_id: "agent:main:leased-client",
+					attempt_id: "11111111-1111-1111-1111-111111111111",
+					lease_generation: 1,
+					answer: "Completed.",
+					model: "openclaw/test",
+				},
+			},
+		]);
+	});
+
+	it("accepts a terminal leased receipt when prepare is replayed after completion", async () => {
+		await withServer(async (_request, response) => {
+			writeJSON(response, {
+				...leasedReceipt("openclaw:leased-terminal-replay", ""),
+				status: "completed",
+				lease_expires_at: undefined,
+				assistant_observation_id: "22222222-2222-2222-2222-222222222222",
+				answer: "Already completed.",
+				model: "openclaw/test",
+				replayed: true,
+			});
+		}, async (baseUrl) => {
+			const client = new VermoryClient({ baseUrl, timeoutMs: 1000 });
+			const receipt = await client.prepareLeased({
+				operationId: "openclaw:leased-terminal-replay",
+				sessionKey: "agent:main:leased-terminal-replay",
+				message: "Same request.",
+			});
+			expect(receipt.status).toBe("completed");
+			expect(receipt.replayed).toBe(true);
+		});
+	});
+
   it("posts an exact bounded tool-result request and validates its receipt", async () => {
 	await withServer(async (request, response) => {
 		expect(request.method).toBe("POST");
@@ -410,6 +522,25 @@ function prepareReceipt(operationId: string, context: string) {
     replayed: false,
     context,
   };
+}
+
+function leasedReceipt(operationId: string, context: string) {
+	return {
+		turn_id: "turn-1",
+		operation_id: operationId,
+		status: "in_progress",
+		protocol: "leased_v1",
+		continuity_id: "continuity-1",
+		delivery_id: "delivery-1",
+		user_observation_id: "observation-user-1",
+		attempt_id: "11111111-1111-1111-1111-111111111111",
+		lease_generation: 1,
+		lease_expires_at: "2026-07-23T01:00:00Z",
+		checkpoint_sequence: 0,
+		checkpoint: {},
+		replayed: false,
+		context,
+	};
 }
 
 function completedReceipt(operationId: string) {

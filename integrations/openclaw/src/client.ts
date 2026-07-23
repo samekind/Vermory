@@ -1,6 +1,6 @@
 const MAX_RESPONSE_BYTES = 256 * 1024;
 
-type TurnStatus = "in_progress" | "completed" | "failed";
+type TurnStatus = "in_progress" | "completed" | "failed" | "cancelled";
 
 export interface ClientConfig {
   baseUrl: string;
@@ -32,6 +32,28 @@ export interface ToolResultRequest extends TurnIdentityInput {
 	toolName: string;
 	toolCallId: string;
 	content: string;
+	attemptId?: string;
+	leaseGeneration?: number;
+}
+
+export interface LeasedTurnIdentityInput extends TurnIdentityInput {
+	attemptId: string;
+	leaseGeneration: number;
+}
+
+export interface CheckpointOperationRequest extends LeasedTurnIdentityInput {
+	sequence: number;
+	checkpoint: Record<string, unknown>;
+}
+
+export interface CompleteLeasedOperationRequest extends LeasedTurnIdentityInput {
+	answer: string;
+	model: string;
+}
+
+export interface FailLeasedOperationRequest extends LeasedTurnIdentityInput {
+	failureCode: string;
+	failureMessage: string;
 }
 
 export interface ToolResultReceipt {
@@ -57,6 +79,16 @@ export interface TurnReceipt {
 
 export interface PreparedTurnReceipt extends TurnReceipt {
   context?: string;
+}
+
+export interface LeasedOperationReceipt extends TurnReceipt {
+	protocol: "leased_v1";
+	attemptId: string;
+	leaseGeneration: number;
+	leaseExpiresAt?: string;
+	checkpointSequence: number;
+	checkpoint: Record<string, unknown>;
+	context?: string;
 }
 
 export interface ReviewCandidate {
@@ -125,6 +157,46 @@ export class VermoryClient {
     return parseReceipt(body, "fail", request.operationId, false);
   }
 
+	async prepareLeased(request: PreparedTurnRequest): Promise<LeasedOperationReceipt> {
+		return this.prepareOrReclaimLeased("prepare", request);
+	}
+
+	async reclaimLeased(request: PreparedTurnRequest): Promise<LeasedOperationReceipt> {
+		return this.prepareOrReclaimLeased("reclaim", request);
+	}
+
+	async heartbeatLeased(request: LeasedTurnIdentityInput): Promise<LeasedOperationReceipt> {
+		const body = await this.clientOperationRequest("heartbeat", request, {});
+		return parseLeasedOperationReceipt(body, "heartbeat", request.operationId, "in_progress");
+	}
+
+	async checkpointLeased(request: CheckpointOperationRequest): Promise<LeasedOperationReceipt> {
+		if (!Number.isSafeInteger(request.sequence) || request.sequence <= 0) {
+			throw new Error("Vermory checkpoint sequence is invalid");
+		}
+		const body = await this.clientOperationRequest("checkpoint", request, {
+			sequence: request.sequence,
+			checkpoint: request.checkpoint,
+		});
+		return parseLeasedOperationReceipt(body, "checkpoint", request.operationId, "in_progress");
+	}
+
+	async completeLeased(request: CompleteLeasedOperationRequest): Promise<LeasedOperationReceipt> {
+		const body = await this.clientOperationRequest("complete", request, {
+			answer: requireValue(request.answer, "answer"),
+			model: requireValue(request.model, "model"),
+		});
+		return parseLeasedOperationReceipt(body, "complete", request.operationId, "completed");
+	}
+
+	async failLeased(request: FailLeasedOperationRequest): Promise<LeasedOperationReceipt> {
+		const body = await this.clientOperationRequest("fail", request, {
+			failure_code: requireValue(request.failureCode, "failure code"),
+			failure_message: request.failureMessage.trim(),
+		});
+		return parseLeasedOperationReceipt(body, "fail", request.operationId, "failed");
+	}
+
 	async recordToolResult(request: ToolResultRequest): Promise<ToolResultReceipt> {
 		const toolName = requireValue(request.toolName, "tool name");
 		const body = await this.request("POST", "/v1/integrations/openclaw/turns/tool-results", {
@@ -134,6 +206,8 @@ export class VermoryClient {
 			tool_name: toolName,
 			tool_call_id: requireValue(request.toolCallId, "tool call ID"),
 			content: requireValue(request.content, "tool result content"),
+			...(request.attemptId === undefined ? {} : { attempt_id: requireValue(request.attemptId, "attempt ID") }),
+			...(request.leaseGeneration === undefined ? {} : { lease_generation: requireLeaseGeneration(request.leaseGeneration) }),
 		}, "tool result");
 		return parseToolResultReceipt(body, toolName);
 	}
@@ -193,6 +267,32 @@ export class VermoryClient {
   private async post(phase: "prepare" | "complete" | "fail", body: unknown): Promise<unknown> {
 	return this.request("POST", `/v1/integrations/openclaw/turns/${phase}`, body, phase);
   }
+
+	private async prepareOrReclaimLeased(phase: "prepare" | "reclaim", request: PreparedTurnRequest): Promise<LeasedOperationReceipt> {
+		const operationId = requireValue(request.operationId, "operation ID");
+		const body = await this.request("POST", `/v1/client-operations/${phase}`, {
+			operation_id: operationId,
+			channel: "openclaw",
+			thread_id: requireValue(request.sessionKey, "session key"),
+			message: requireValue(request.message, "message"),
+		}, `leased ${phase}`);
+		return parseLeasedOperationReceipt(body, phase, operationId, undefined, true);
+	}
+
+	private async clientOperationRequest(
+		phase: "heartbeat" | "checkpoint" | "complete" | "fail",
+		request: LeasedTurnIdentityInput,
+		extra: Record<string, unknown>,
+	): Promise<unknown> {
+		return this.request("POST", `/v1/client-operations/${phase}`, {
+			operation_id: requireValue(request.operationId, "operation ID"),
+			channel: "openclaw",
+			thread_id: requireValue(request.sessionKey, "session key"),
+			attempt_id: requireValue(request.attemptId, "attempt ID"),
+			lease_generation: requireLeaseGeneration(request.leaseGeneration),
+			...extra,
+		}, `leased ${phase}`);
+	}
 
   private async request(method: "GET" | "POST", path: string, body: unknown | undefined, phase: string): Promise<unknown> {
     const controller = new AbortController();
@@ -324,6 +424,13 @@ function requireValue(value: string, label: string): string {
 	return normalized;
 }
 
+function requireLeaseGeneration(value: number): number {
+	if (!Number.isSafeInteger(value) || value <= 0) {
+		throw new Error("Vermory lease generation is invalid");
+	}
+	return value;
+}
+
 function isUUID(value: unknown): value is string {
 	return typeof value === "string" && /^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(value);
 }
@@ -450,6 +557,61 @@ function parseReceipt(
     };
   }
   return receipt;
+}
+
+function parseLeasedOperationReceipt(
+	value: unknown,
+	phase: string,
+	operationId: string,
+	expectedStatus?: TurnStatus,
+	includeContext = false,
+): LeasedOperationReceipt {
+	const actualStatus = isRecord(value) && isTurnStatus(value.status) ? value.status : undefined;
+	if (!isRecord(value) || actualStatus === undefined || (expectedStatus !== undefined && actualStatus !== expectedStatus) ||
+		value.operation_id !== operationId ||
+		value.protocol !== "leased_v1" || typeof value.turn_id !== "string" || value.turn_id === "" ||
+		typeof value.continuity_id !== "string" || value.continuity_id === "" ||
+		typeof value.delivery_id !== "string" || value.delivery_id === "" ||
+		typeof value.user_observation_id !== "string" || value.user_observation_id === "" ||
+		!isUUID(value.attempt_id) || !Number.isSafeInteger(value.lease_generation) || Number(value.lease_generation) <= 0 ||
+		typeof value.replayed !== "boolean" || !Number.isSafeInteger(value.checkpoint_sequence) || Number(value.checkpoint_sequence) < 0 ||
+		(value.checkpoint !== undefined && !isRecord(value.checkpoint)) ||
+		(includeContext && value.context !== undefined && typeof value.context !== "string") ||
+		(actualStatus === "in_progress" && (typeof value.lease_expires_at !== "string" || Number.isNaN(Date.parse(value.lease_expires_at))))) {
+		throw new Error(`Vermory leased ${phase} returned an invalid receipt`);
+	}
+	if (actualStatus === "completed" &&
+		(typeof value.assistant_observation_id !== "string" || value.assistant_observation_id === "" ||
+		 typeof value.answer !== "string" || typeof value.model !== "string")) {
+		throw new Error(`Vermory leased ${phase} returned an invalid receipt`);
+	}
+	if (actualStatus === "failed" && (typeof value.failure_code !== "string" || value.failure_code === "")) {
+		throw new Error(`Vermory leased ${phase} returned an invalid receipt`);
+	}
+	return {
+		turnId: value.turn_id,
+		operationId: value.operation_id,
+		status: actualStatus,
+		protocol: "leased_v1",
+		continuityId: value.continuity_id,
+		deliveryId: value.delivery_id,
+		userObservationId: value.user_observation_id,
+		attemptId: value.attempt_id,
+		leaseGeneration: Number(value.lease_generation),
+		...(typeof value.lease_expires_at === "string" ? { leaseExpiresAt: value.lease_expires_at } : {}),
+		checkpointSequence: Number(value.checkpoint_sequence),
+		checkpoint: isRecord(value.checkpoint) ? value.checkpoint : {},
+		replayed: value.replayed,
+		...(typeof value.context === "string" ? { context: value.context } : {}),
+		...(typeof value.assistant_observation_id === "string" ? { assistantObservationId: value.assistant_observation_id } : {}),
+		...(typeof value.answer === "string" ? { answer: value.answer } : {}),
+		...(typeof value.model === "string" ? { model: value.model } : {}),
+		...(typeof value.failure_code === "string" ? { failureCode: value.failure_code } : {}),
+	};
+}
+
+function isTurnStatus(value: unknown): value is TurnStatus {
+	return value === "in_progress" || value === "completed" || value === "failed" || value === "cancelled";
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

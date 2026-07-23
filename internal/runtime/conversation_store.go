@@ -573,6 +573,7 @@ RETURNING id::text, operation_id, status, continuity_id::text, user_observation_
 	if err := tx.Commit(ctx); err != nil {
 		return ChatTurnReceipt{}, fmt.Errorf("commit conversation turn: %w", err)
 	}
+	receipt.Protocol = ClientOperationBoundedV1
 	return receipt, nil
 }
 
@@ -667,13 +668,16 @@ func (s *Store) CompleteConversationTurn(ctx context.Context, tenantID, turnID, 
 	}
 	defer tx.Rollback(ctx)
 
-	var operationID, continuityID, status, userObservationID string
+	var operationID, continuityID, status, protocol, userObservationID string
 	if err := tx.QueryRow(ctx, `
-SELECT operation_id, continuity_id::text, status, user_observation_id::text
+SELECT operation_id, continuity_id::text, status, operation_protocol, user_observation_id::text
 FROM conversation_turns
 WHERE id = $1::uuid AND tenant_id = $2
-FOR UPDATE`, turnID, tenantID).Scan(&operationID, &continuityID, &status, &userObservationID); err != nil {
+FOR UPDATE`, turnID, tenantID).Scan(&operationID, &continuityID, &status, &protocol, &userObservationID); err != nil {
 		return ChatTurnReceipt{}, fmt.Errorf("lock conversation turn: %w", err)
+	}
+	if ClientOperationProtocol(protocol) != ClientOperationBoundedV1 {
+		return ChatTurnReceipt{}, fmt.Errorf("leased conversation operation requires fenced completion")
 	}
 	if ChatTurnStatus(status) != ChatTurnInProgress {
 		receipt, found, err := lookupConversationTurnTx(ctx, tx, tenantID, operationID)
@@ -746,19 +750,22 @@ func (s *Store) FailConversationTurn(ctx context.Context, tenantID, turnID, fail
 	}
 	defer tx.Rollback(ctx)
 
-	var operationID string
+	var operationID, protocol string
 	if err := tx.QueryRow(ctx, `
 UPDATE conversation_turns
 SET status = 'failed', failure_code = $1, failure_message = $2, updated_at = now()
-WHERE id = $3::uuid AND tenant_id = $4 AND status = 'in_progress'
-RETURNING operation_id`, failureCode, failureMessage, turnID, tenantID).Scan(&operationID); err != nil {
+WHERE id = $3::uuid AND tenant_id = $4 AND status = 'in_progress' AND operation_protocol = 'bounded_v1'
+RETURNING operation_id, operation_protocol`, failureCode, failureMessage, turnID, tenantID).Scan(&operationID, &protocol); err != nil {
 		if !errors.Is(err, pgx.ErrNoRows) {
 			return ChatTurnReceipt{}, fmt.Errorf("fail conversation turn: %w", err)
 		}
 		if err := tx.QueryRow(ctx, `
-SELECT operation_id FROM conversation_turns WHERE id = $1::uuid AND tenant_id = $2`, turnID, tenantID).Scan(&operationID); err != nil {
+SELECT operation_id, operation_protocol FROM conversation_turns WHERE id = $1::uuid AND tenant_id = $2`, turnID, tenantID).Scan(&operationID, &protocol); err != nil {
 			return ChatTurnReceipt{}, fmt.Errorf("lookup existing failed conversation turn: %w", err)
 		}
+	}
+	if ClientOperationProtocol(protocol) != ClientOperationBoundedV1 {
+		return ChatTurnReceipt{}, fmt.Errorf("leased conversation operation requires fenced failure")
 	}
 	receipt, found, err := lookupConversationTurnTx(ctx, tx, tenantID, operationID)
 	if err != nil {
@@ -774,17 +781,60 @@ SELECT operation_id FROM conversation_turns WHERE id = $1::uuid AND tenant_id = 
 }
 
 func lookupConversationTurnTx(ctx context.Context, tx pgx.Tx, tenantID, operationID string) (ChatTurnReceipt, bool, error) {
-	var receipt ChatTurnReceipt
-	err := tx.QueryRow(ctx, `
-SELECT id::text, operation_id, status, continuity_id::text,
+	receipt, err := scanConversationTurn(tx.QueryRow(ctx, `
+SELECT id::text, operation_id, status, operation_protocol, continuity_id::text,
        COALESCE(delivery_id::text, ''), user_observation_id::text,
        COALESCE(assistant_observation_id::text, ''), answer, provider_model, failure_code,
-       failure_message, request_fingerprint, answer_fingerprint
+       failure_message, cancellation_code, cancellation_message,
+       COALESCE(attempt_id::text, ''), lease_generation, lease_expires_at,
+       last_heartbeat_at, checkpoint_sequence, checkpoint_payload,
+       checkpoint_fingerprint, checkpoint_updated_at,
+       request_fingerprint, answer_fingerprint
 FROM conversation_turns
-WHERE tenant_id = $1 AND operation_id = $2`, tenantID, operationID).Scan(
+WHERE tenant_id = $1 AND operation_id = $2`, tenantID, operationID))
+	if errors.Is(err, pgx.ErrNoRows) {
+		return ChatTurnReceipt{}, false, nil
+	}
+	if err != nil {
+		return ChatTurnReceipt{}, false, fmt.Errorf("lookup conversation turn: %w", err)
+	}
+	return receipt, true, nil
+}
+
+func lookupConversationTurnForUpdateTx(ctx context.Context, tx pgx.Tx, tenantID, operationID string) (ChatTurnReceipt, bool, error) {
+	receipt, err := scanConversationTurn(tx.QueryRow(ctx, `
+SELECT id::text, operation_id, status, operation_protocol, continuity_id::text,
+       COALESCE(delivery_id::text, ''), user_observation_id::text,
+       COALESCE(assistant_observation_id::text, ''), answer, provider_model, failure_code,
+       failure_message, cancellation_code, cancellation_message,
+       COALESCE(attempt_id::text, ''), lease_generation, lease_expires_at,
+       last_heartbeat_at, checkpoint_sequence, checkpoint_payload,
+       checkpoint_fingerprint, checkpoint_updated_at,
+       request_fingerprint, answer_fingerprint
+FROM conversation_turns
+WHERE tenant_id = $1 AND operation_id = $2
+FOR UPDATE`, tenantID, operationID))
+	if errors.Is(err, pgx.ErrNoRows) {
+		return ChatTurnReceipt{}, false, nil
+	}
+	if err != nil {
+		return ChatTurnReceipt{}, false, fmt.Errorf("lock conversation turn: %w", err)
+	}
+	return receipt, true, nil
+}
+
+type conversationTurnRow interface {
+	Scan(dest ...any) error
+}
+
+func scanConversationTurn(row conversationTurnRow) (ChatTurnReceipt, error) {
+	var receipt ChatTurnReceipt
+	var checkpoint []byte
+	err := row.Scan(
 		&receipt.ID,
 		&receipt.OperationID,
 		&receipt.Status,
+		&receipt.Protocol,
 		&receipt.ContinuityID,
 		&receipt.DeliveryID,
 		&receipt.UserObservationID,
@@ -793,16 +843,26 @@ WHERE tenant_id = $1 AND operation_id = $2`, tenantID, operationID).Scan(
 		&receipt.Model,
 		&receipt.FailureCode,
 		&receipt.FailureMessage,
+		&receipt.CancellationCode,
+		&receipt.CancellationMessage,
+		&receipt.AttemptID,
+		&receipt.LeaseGeneration,
+		&receipt.LeaseExpiresAt,
+		&receipt.LastHeartbeatAt,
+		&receipt.CheckpointSequence,
+		&checkpoint,
+		&receipt.CheckpointFingerprint,
+		&receipt.CheckpointUpdatedAt,
 		&receipt.RequestFingerprint,
 		&receipt.AnswerFingerprint,
 	)
-	if errors.Is(err, pgx.ErrNoRows) {
-		return ChatTurnReceipt{}, false, nil
-	}
 	if err != nil {
-		return ChatTurnReceipt{}, false, fmt.Errorf("lookup conversation turn: %w", err)
+		return ChatTurnReceipt{}, err
 	}
-	return receipt, true, nil
+	if receipt.CheckpointSequence > 0 {
+		receipt.Checkpoint = checkpoint
+	}
+	return receipt, nil
 }
 
 func conversationContentFingerprint(content string) string {

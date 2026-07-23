@@ -1,6 +1,6 @@
 import { definePluginEntry } from "openclaw/plugin-sdk/plugin-entry";
 
-import { VermoryClient } from "./client.js";
+import { VermoryClient, type LeasedOperationReceipt } from "./client.js";
 import { normalizePluginConfig } from "./config.js";
 import { VermoryGovernanceCommand } from "./governance.js";
 import { resolveTurnIdentity } from "./identity.js";
@@ -22,6 +22,7 @@ const plugin: ReturnType<typeof definePluginEntry> = definePluginEntry({
       ...config,
       apiToken: process.env.VERMORY_API_TOKEN,
     });
+	const leasedOperations = new Map<string, LeasedOperationReceipt>();
 	const operatorToken = process.env.VERMORY_OPERATOR_API_TOKEN?.trim();
 	const governance = new VermoryGovernanceCommand(operatorToken
 		? new VermoryClient({ ...config, apiToken: operatorToken })
@@ -54,10 +55,15 @@ const plugin: ReturnType<typeof definePluginEntry> = definePluginEntry({
         }
 
         try {
-          const prepared = await client.prepare({
+          const prepared = await client.prepareLeased({
             ...identity,
             message: event.prompt,
           });
+		  if (prepared.status !== "in_progress") {
+			leasedOperations.delete(identity.operationId);
+			return undefined;
+		  }
+		  leasedOperations.set(identity.operationId, prepared);
           const semanticContext = prepared.context?.trim();
           if (!semanticContext) {
             return undefined;
@@ -99,14 +105,32 @@ const plugin: ReturnType<typeof definePluginEntry> = definePluginEntry({
 		  return;
 		}
 		try {
+		  const operationId = `openclaw:${eventRunID}`;
+		  const leased = leasedOperations.get(operationId);
 		  await client.recordToolResult({
-			operationId: `openclaw:${eventRunID}`,
+			operationId,
 			sessionKey,
 			runId: eventRunID,
 			toolName: eventToolName,
 			toolCallId: eventToolCallID,
 			content,
+			...(leased ? { attemptId: leased.attemptId, leaseGeneration: leased.leaseGeneration } : {}),
 		  });
+		  if (leased) {
+			const checkpoint = await client.checkpointLeased({
+			  operationId,
+			  sessionKey,
+			  attemptId: leased.attemptId,
+			  leaseGeneration: leased.leaseGeneration,
+			  sequence: leased.checkpointSequence + 1,
+			  checkpoint: {
+				phase: "tool_completed",
+				tool_name: eventToolName,
+				tool_call_id: eventToolCallID,
+			  },
+			});
+			leasedOperations.set(operationId, checkpoint);
+		  }
 		} catch {
 		  api.logger.warn("Vermory tool result persistence failed; OpenClaw tool execution remains available.");
 		}
@@ -128,29 +152,63 @@ const plugin: ReturnType<typeof definePluginEntry> = definePluginEntry({
         }
 
         try {
+		  const leased = leasedOperations.get(identity.operationId);
           const output = extractLatestAssistantOutput(event.messages);
           if (!event.success) {
-            await client.fail({
-              ...identity,
-              failureCode: "openclaw_agent_error",
-              failureMessage: "OpenClaw agent run failed before a completed visible answer.",
-            });
+			if (leased) {
+			  await client.failLeased({
+				...identity,
+				attemptId: leased.attemptId,
+				leaseGeneration: leased.leaseGeneration,
+				failureCode: "openclaw_agent_error",
+				failureMessage: "OpenClaw agent run failed before a completed visible answer.",
+			  });
+			} else {
+			  await client.fail({
+				...identity,
+				failureCode: "openclaw_agent_error",
+				failureMessage: "OpenClaw agent run failed before a completed visible answer.",
+			  });
+			}
+			leasedOperations.delete(identity.operationId);
             return;
           }
           if (!output) {
-            await client.fail({
-              ...identity,
-              failureCode: "openclaw_empty_output",
-              failureMessage: "OpenClaw agent run completed without a visible assistant answer.",
-            });
+			if (leased) {
+			  await client.failLeased({
+				...identity,
+				attemptId: leased.attemptId,
+				leaseGeneration: leased.leaseGeneration,
+				failureCode: "openclaw_empty_output",
+				failureMessage: "OpenClaw agent run completed without a visible assistant answer.",
+			  });
+			} else {
+			  await client.fail({
+				...identity,
+				failureCode: "openclaw_empty_output",
+				failureMessage: "OpenClaw agent run completed without a visible assistant answer.",
+			  });
+			}
+			leasedOperations.delete(identity.operationId);
             return;
           }
 
-          await client.complete({
-            ...identity,
-            answer: output.text,
-            model: resolveModelLabel(context, output.model),
-          });
+		  if (leased) {
+			await client.completeLeased({
+			  ...identity,
+			  attemptId: leased.attemptId,
+			  leaseGeneration: leased.leaseGeneration,
+			  answer: output.text,
+			  model: resolveModelLabel(context, output.model),
+			});
+		  } else {
+			await client.complete({
+			  ...identity,
+			  answer: output.text,
+			  model: resolveModelLabel(context, output.model),
+			});
+		  }
+		  leasedOperations.delete(identity.operationId);
         } catch {
           api.logger.warn(
             "Vermory completion persistence failed; OpenClaw result remains available but was not confirmed as persisted.",

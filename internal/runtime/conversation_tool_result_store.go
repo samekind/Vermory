@@ -26,12 +26,14 @@ func (s *Store) RecordConversationToolResult(
 	}
 	defer tx.Rollback(ctx)
 
-	var continuityID, operationID, status string
+	var continuityID, operationID, status, protocol, attemptID string
+	var leaseGeneration int64
 	if err := tx.QueryRow(ctx, `
-SELECT continuity_id::text, operation_id, status
+SELECT continuity_id::text, operation_id, status, operation_protocol,
+       COALESCE(attempt_id::text, ''), lease_generation
 FROM conversation_turns
 WHERE tenant_id = $1 AND id = $2::uuid
-FOR UPDATE`, tenantID, turn.ID).Scan(&continuityID, &operationID, &status); err != nil {
+FOR UPDATE`, tenantID, turn.ID).Scan(&continuityID, &operationID, &status, &protocol, &attemptID, &leaseGeneration); err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return ConversationToolResultReceipt{}, fmt.Errorf("conversation turn does not exist")
 		}
@@ -39,6 +41,16 @@ FOR UPDATE`, tenantID, turn.ID).Scan(&continuityID, &operationID, &status); err 
 	}
 	if continuityID != turn.ContinuityID || operationID != request.OperationID {
 		return ConversationToolResultReceipt{}, fmt.Errorf("operation_id is already bound to another conversation turn")
+	}
+	if ClientOperationProtocol(protocol) == ClientOperationLeasedV1 {
+		if request.AttemptID == "" || request.LeaseGeneration <= 0 {
+			return ConversationToolResultReceipt{}, fmt.Errorf("leased conversation operation requires fenced tool result")
+		}
+		if request.AttemptID != attemptID || request.LeaseGeneration != leaseGeneration {
+			return ConversationToolResultReceipt{}, fmt.Errorf("stale leased conversation attempt")
+		}
+	} else if request.AttemptID != "" || request.LeaseGeneration != 0 {
+		return ConversationToolResultReceipt{}, fmt.Errorf("bounded conversation turn does not accept leased tool fencing")
 	}
 
 	contentSHA := contentSHA256(request.Content)

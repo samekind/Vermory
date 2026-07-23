@@ -48,8 +48,12 @@ func TestSchemaCompatibilityDistinguishesRealOldAndFutureDatabaseStates(t *testi
 	if oldErr != nil || oldReport.Status != SchemaCompatibilityMigrationRequired || oldReport.SchemaVersion != MinimumSupportedSchemaVersion-1 {
 		t.Fatalf("old schema compatibility mismatch: report=%#v err=%v", oldReport, oldErr)
 	}
-	if _, err := store.RuntimeSchemaCompatibility(ctx, "compatibility-test"); err == nil {
-		t.Fatal("restricted runtime compatibility unexpectedly accepted a pre-boundary schema")
+	runtimeOldReport, err := store.RuntimeSchemaCompatibility(ctx, "compatibility-test")
+	if err != nil || runtimeOldReport.Status != SchemaCompatibilityMigrationRequired || runtimeOldReport.SchemaVersion != MinimumSupportedSchemaVersion-1 {
+		t.Fatalf("restricted old schema compatibility mismatch: report=%#v err=%v", runtimeOldReport, err)
+	}
+	if err := runtimeOldReport.ErrorIfIncompatible(); err == nil {
+		t.Fatal("restricted runtime compatibility accepted an old schema")
 	}
 	if err := goose.UpToContext(ctx, db, "migrations", MaximumSupportedSchemaVersion); err != nil {
 		t.Fatal(err)

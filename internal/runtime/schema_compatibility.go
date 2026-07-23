@@ -7,8 +7,8 @@ import (
 )
 
 const (
-	MinimumSupportedSchemaVersion int64 = 24
-	MaximumSupportedSchemaVersion int64 = 24
+	MinimumSupportedSchemaVersion int64 = 25
+	MaximumSupportedSchemaVersion int64 = 25
 )
 
 type SchemaCompatibilityStatus string

@@ -1,0 +1,53 @@
+{
+  "evidence_version": 1,
+  "case_id": "W36-long-running-client-operation",
+  "status": "runtime-qualified",
+  "source_revision": "worktree-b8fc0b380f597c7e",
+  "run_id": "w36-worktree-dumprestore-attempt5",
+  "report_path": "/Volumes/JSData/.cache/vermory/w36/runs/w36-worktree-dumprestore-attempt5/report.json",
+  "protocol": "leased_v1",
+  "runtime": {
+    "postgres": "18.4",
+    "provider": "mock",
+    "openclaw_plugin_hooks": true,
+    "hermes_bounded_control": true,
+    "service_restarts": 2,
+    "postgres_restarts": 2,
+    "sudo_used": false,
+    "newapi_used": false,
+    "local_home_state_used": false
+  },
+  "hard_gates": {
+    "passed": 28,
+    "total": 28
+  },
+  "authoritative_counts": {
+    "leased_turns": 6,
+    "completed_turns": 4,
+    "failed_turns": 3,
+    "cancelled_turns": 1,
+    "assistant_observations": 4,
+    "tool_result_observations": 3,
+    "formation_schedules": 4,
+    "race_assistant_observations": 1,
+    "race_formation_schedules": 1
+  },
+  "native_dump_restore": {
+    "passed": true,
+    "bytes": 174668,
+    "sha256": "b33d1ae0285285592100654e5384ff77213544b7844dc8d220ca1e3d7e474922",
+    "restored_token_authenticated": true
+  },
+  "evidence_integrity": {
+    "credentials_persisted": false,
+    "temporary_cluster_removed": true,
+    "failed_runs_retained": true
+  },
+  "claim_boundary": {
+    "model_quality_qualified": false,
+    "hermes_long_running_recovery_qualified": false,
+    "generic_workflow_scheduler_qualified": false,
+    "offline_multi_device_conflict_qualified": false,
+    "distributed_execution_ownership_qualified": false
+  }
+}

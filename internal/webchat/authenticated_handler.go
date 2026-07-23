@@ -121,6 +121,13 @@ func authenticatedRouteAccess(method, path string) routeAccess {
 		"POST /v1/integrations/hermes/turns/prepare":        {},
 		"POST /v1/integrations/hermes/turns/complete":       {},
 		"POST /v1/integrations/hermes/turns/fail":           {},
+		"POST /v1/client-operations/prepare":                {},
+		"POST /v1/client-operations/reclaim":                {},
+		"POST /v1/client-operations/heartbeat":              {},
+		"POST /v1/client-operations/checkpoint":             {},
+		"POST /v1/client-operations/complete":               {},
+		"POST /v1/client-operations/fail":                   {},
+		"POST /v1/client-operations/cancel":                 {},
 	}
 	operatorRoutes := map[string]struct{}{
 		"POST /v1/memories/confirm":           {},

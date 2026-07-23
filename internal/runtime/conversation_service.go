@@ -91,6 +91,9 @@ func (s *ConversationService) CompleteExternalTurn(ctx context.Context, request 
 	if turn.ContinuityID != resolution.ContinuityID {
 		return ChatTurnReceipt{}, fmt.Errorf("operation_id is already bound to another conversation turn")
 	}
+	if turn.Protocol == ClientOperationLeasedV1 {
+		return ChatTurnReceipt{}, fmt.Errorf("leased conversation operation requires fenced completion")
+	}
 	switch turn.Status {
 	case ChatTurnCompleted:
 		if turn.AnswerFingerprint != conversationContentFingerprint(request.Answer) || turn.Model != request.Model {
@@ -127,6 +130,9 @@ func (s *ConversationService) FailExternalTurn(ctx context.Context, request Fail
 	}
 	if turn.ContinuityID != resolution.ContinuityID {
 		return ChatTurnReceipt{}, fmt.Errorf("operation_id is already bound to another conversation turn")
+	}
+	if turn.Protocol == ClientOperationLeasedV1 {
+		return ChatTurnReceipt{}, fmt.Errorf("leased conversation operation requires fenced failure")
 	}
 	switch turn.Status {
 	case ChatTurnFailed:
@@ -346,21 +352,41 @@ func (s *ConversationService) prepareConversationTurn(ctx context.Context, reque
 	if err != nil {
 		return PreparedConversationTurn{}, err
 	}
+	return s.finishPreparedConversationTurn(ctx, resolution, turn, request, includeRecent, s.failTurn)
+}
+
+type conversationTurnFailure func(context.Context, ChatTurnReceipt, string, error) (ChatTurnReceipt, error)
+
+func (s *ConversationService) finishPreparedConversationTurn(
+	ctx context.Context,
+	resolution ConversationResolution,
+	turn ChatTurnReceipt,
+	request ChatTurnRequest,
+	includeRecent bool,
+	fail conversationTurnFailure,
+) (PreparedConversationTurn, error) {
 	if turn.Status != ChatTurnInProgress {
 		return PreparedConversationTurn{ChatTurnReceipt: turn}, nil
+	}
+	if turn.DeliveryID != "" {
+		delivery, err := s.store.LookupDelivery(ctx, s.tenantID, turn.DeliveryID)
+		if err != nil {
+			return failPreparedConversationTurn(ctx, turn, "delivery_replay_error", err, fail)
+		}
+		return PreparedConversationTurn{ChatTurnReceipt: turn, Context: delivery.Context}, nil
 	}
 
 	snapshot, err := s.store.CurrentEligibilitySnapshot(ctx, s.tenantID)
 	if err != nil {
-		return s.failPreparedTurn(ctx, turn, "eligibility_clock_error", err)
+		return failPreparedConversationTurn(ctx, turn, "eligibility_clock_error", err, fail)
 	}
 	defaultsContinuityID, err := s.store.EnsureGlobalDefaultsContinuity(ctx, s.tenantID)
 	if err != nil {
-		return s.failPreparedTurn(ctx, turn, "global_defaults_retrieval_error", err)
+		return failPreparedConversationTurn(ctx, turn, "global_defaults_retrieval_error", err, fail)
 	}
 	defaults, err := s.store.ListEligibleGlobalDefaultsAt(ctx, s.tenantID, defaultsContinuityID, snapshot.AsOf)
 	if err != nil {
-		return s.failPreparedTurn(ctx, turn, "global_defaults_retrieval_error", err)
+		return failPreparedConversationTurn(ctx, turn, "global_defaults_retrieval_error", err, fail)
 	}
 	var memories []Memory
 	if s.config.Retriever == nil {
@@ -370,7 +396,7 @@ func (s *ConversationService) prepareConversationTurn(ctx context.Context, reque
 	} else {
 		continuityIDs, scopeErr := s.store.ResolveLinkedConversationContinuityIDs(ctx, s.tenantID, resolution.ContinuityID)
 		if scopeErr != nil {
-			return s.failPreparedTurn(ctx, turn, "memory_retrieval_error", scopeErr)
+			return failPreparedConversationTurn(ctx, turn, "memory_retrieval_error", scopeErr, fail)
 		}
 		var result RetrievalResult
 		result, err = s.config.Retriever.Retrieve(ctx, RetrievalRequest{
@@ -384,7 +410,7 @@ func (s *ConversationService) prepareConversationTurn(ctx context.Context, reque
 		memories = result.Memories
 	}
 	if err != nil {
-		return s.failPreparedTurn(ctx, turn, "memory_retrieval_error", err)
+		return failPreparedConversationTurn(ctx, turn, "memory_retrieval_error", err, fail)
 	}
 	var recent []ConversationObservation
 	if includeRecent {
@@ -392,7 +418,7 @@ func (s *ConversationService) prepareConversationTurn(ctx context.Context, reque
 			ctx, s.tenantID, resolution.ContinuityID, turn.UserObservationID, s.config.RecentLimit, snapshot.AsOf,
 		)
 		if err != nil {
-			return s.failPreparedTurn(ctx, turn, "history_retrieval_error", err)
+			return failPreparedConversationTurn(ctx, turn, "history_retrieval_error", err, fail)
 		}
 	}
 	contextPacket := BuildConversationContext(defaults, memories, recent)
@@ -406,22 +432,32 @@ func (s *ConversationService) prepareConversationTurn(ctx context.Context, reque
 		snapshot.AsOf,
 	)
 	if err != nil {
-		return s.failPreparedTurn(ctx, turn, "delivery_error", err)
+		return failPreparedConversationTurn(ctx, turn, "delivery_error", err, fail)
 	}
 	attached, err := s.store.AttachConversationTurnDelivery(ctx, s.tenantID, turn.ID, delivery.DeliveryID)
 	if err != nil {
-		return s.failPreparedTurn(ctx, turn, "delivery_attachment_error", err)
+		return failPreparedConversationTurn(ctx, turn, "delivery_attachment_error", err, fail)
 	}
 	attached.Replayed = turn.Replayed || delivery.Replayed || attached.Replayed
 	return PreparedConversationTurn{ChatTurnReceipt: attached, Context: delivery.Context}, nil
 }
 
-func (s *ConversationService) failPreparedTurn(ctx context.Context, turn ChatTurnReceipt, code string, cause error) (PreparedConversationTurn, error) {
-	failed, err := s.failTurn(ctx, turn, code, cause)
+func failPreparedConversationTurn(
+	ctx context.Context,
+	turn ChatTurnReceipt,
+	code string,
+	cause error,
+	fail conversationTurnFailure,
+) (PreparedConversationTurn, error) {
+	failed, err := fail(ctx, turn, code, cause)
 	if err != nil {
 		return PreparedConversationTurn{}, err
 	}
 	return PreparedConversationTurn{ChatTurnReceipt: failed}, nil
+}
+
+func (s *ConversationService) failPreparedTurn(ctx context.Context, turn ChatTurnReceipt, code string, cause error) (PreparedConversationTurn, error) {
+	return failPreparedConversationTurn(ctx, turn, code, cause, s.failTurn)
 }
 
 func (s *ConversationService) failTurn(ctx context.Context, turn ChatTurnReceipt, code string, cause error) (ChatTurnReceipt, error) {

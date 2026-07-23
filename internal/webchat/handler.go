@@ -43,6 +43,13 @@ func newHandler(service *runtime.ConversationService, defaults *runtime.GlobalDe
 	handler.mux.HandleFunc("POST /v1/integrations/hermes/turns/prepare", handler.prepareHermesTurn)
 	handler.mux.HandleFunc("POST /v1/integrations/hermes/turns/complete", handler.completeHermesTurn)
 	handler.mux.HandleFunc("POST /v1/integrations/hermes/turns/fail", handler.failHermesTurn)
+	handler.mux.HandleFunc("POST /v1/client-operations/prepare", handler.prepareClientOperation)
+	handler.mux.HandleFunc("POST /v1/client-operations/reclaim", handler.reclaimClientOperation)
+	handler.mux.HandleFunc("POST /v1/client-operations/heartbeat", handler.heartbeatClientOperation)
+	handler.mux.HandleFunc("POST /v1/client-operations/checkpoint", handler.checkpointClientOperation)
+	handler.mux.HandleFunc("POST /v1/client-operations/complete", handler.completeClientOperation)
+	handler.mux.HandleFunc("POST /v1/client-operations/fail", handler.failClientOperation)
+	handler.mux.HandleFunc("POST /v1/client-operations/cancel", handler.cancelClientOperation)
 	handler.mux.HandleFunc("POST /v1/memories/confirm", handler.confirmMemory)
 	handler.mux.HandleFunc("GET /v1/memories/candidates", handler.listMemoryCandidates)
 	handler.mux.HandleFunc("POST /v1/memories/candidates/accept", handler.acceptMemoryCandidate)
@@ -103,10 +110,47 @@ type failOpenClawTurnInput struct {
 
 type recordOpenClawToolResultInput struct {
 	openClawTurnInput
-	RunID      string `json:"run_id"`
-	ToolName   string `json:"tool_name"`
-	ToolCallID string `json:"tool_call_id"`
-	Content    string `json:"content"`
+	RunID           string `json:"run_id"`
+	ToolName        string `json:"tool_name"`
+	ToolCallID      string `json:"tool_call_id"`
+	Content         string `json:"content"`
+	AttemptID       string `json:"attempt_id"`
+	LeaseGeneration int64  `json:"lease_generation"`
+}
+
+type clientOperationMutationInput struct {
+	conversationInput
+	AttemptID       string `json:"attempt_id"`
+	LeaseGeneration int64  `json:"lease_generation"`
+}
+
+type prepareClientOperationInput struct {
+	conversationInput
+	Message string `json:"message"`
+}
+
+type checkpointClientOperationInput struct {
+	clientOperationMutationInput
+	Sequence   int64           `json:"sequence"`
+	Checkpoint json.RawMessage `json:"checkpoint"`
+}
+
+type completeClientOperationInput struct {
+	clientOperationMutationInput
+	Answer string `json:"answer"`
+	Model  string `json:"model"`
+}
+
+type failClientOperationInput struct {
+	clientOperationMutationInput
+	FailureCode    string `json:"failure_code"`
+	FailureMessage string `json:"failure_message"`
+}
+
+type cancelClientOperationInput struct {
+	clientOperationMutationInput
+	CancellationCode    string `json:"cancellation_code"`
+	CancellationMessage string `json:"cancellation_message"`
 }
 
 type confirmMemoryInput struct {
@@ -274,12 +318,14 @@ func (h *Handler) recordOpenClawToolResult(response http.ResponseWriter, request
 		return
 	}
 	receipt, err := h.service.RecordToolResult(request.Context(), runtime.RecordConversationToolResultRequest{
-		OperationID: input.OperationID,
-		Anchor:      runtime.ConversationAnchor{Channel: "openclaw", ThreadID: input.SessionKey},
-		RunID:       input.RunID,
-		ToolName:    input.ToolName,
-		ToolCallID:  input.ToolCallID,
-		Content:     input.Content,
+		OperationID:     input.OperationID,
+		Anchor:          runtime.ConversationAnchor{Channel: "openclaw", ThreadID: input.SessionKey},
+		RunID:           input.RunID,
+		ToolName:        input.ToolName,
+		ToolCallID:      input.ToolCallID,
+		Content:         input.Content,
+		AttemptID:       input.AttemptID,
+		LeaseGeneration: input.LeaseGeneration,
 	})
 	if err != nil {
 		writeServiceError(response, err)
@@ -308,6 +354,132 @@ func (h *Handler) failExternalTurn(response http.ResponseWriter, request *http.R
 		return
 	}
 	writeJSON(response, http.StatusOK, receipt)
+}
+
+func (h *Handler) prepareClientOperation(response http.ResponseWriter, request *http.Request) {
+	h.prepareOrReclaimClientOperation(response, request, false)
+}
+
+func (h *Handler) reclaimClientOperation(response http.ResponseWriter, request *http.Request) {
+	h.prepareOrReclaimClientOperation(response, request, true)
+}
+
+func (h *Handler) prepareOrReclaimClientOperation(response http.ResponseWriter, request *http.Request, reclaim bool) {
+	var input prepareClientOperationInput
+	if !decodeRequestJSON(response, request, &input) {
+		return
+	}
+	operation := runtime.LeasedConversationOperationRequest{
+		OperationID: input.OperationID,
+		Anchor:      runtime.ConversationAnchor{Channel: input.Channel, ThreadID: input.ThreadID},
+		Message:     input.Message,
+	}
+	var (
+		receipt runtime.PreparedConversationTurn
+		err     error
+	)
+	if reclaim {
+		receipt, err = h.service.ReclaimLeasedOperation(request.Context(), operation)
+	} else {
+		receipt, err = h.service.PrepareLeasedOperation(request.Context(), operation)
+	}
+	if err != nil {
+		writeServiceError(response, err)
+		return
+	}
+	writeJSON(response, http.StatusOK, receipt)
+}
+
+func (h *Handler) heartbeatClientOperation(response http.ResponseWriter, request *http.Request) {
+	var input clientOperationMutationInput
+	if !decodeRequestJSON(response, request, &input) {
+		return
+	}
+	receipt, err := h.service.HeartbeatLeasedOperation(request.Context(), runtime.HeartbeatLeasedConversationOperationRequest{
+		LeasedConversationOperationMutation: clientOperationMutation(input),
+	})
+	if err != nil {
+		writeServiceError(response, err)
+		return
+	}
+	writeJSON(response, http.StatusOK, receipt)
+}
+
+func (h *Handler) checkpointClientOperation(response http.ResponseWriter, request *http.Request) {
+	var input checkpointClientOperationInput
+	if !decodeRequestJSON(response, request, &input) {
+		return
+	}
+	receipt, err := h.service.CheckpointLeasedOperation(request.Context(), runtime.CheckpointLeasedConversationOperationRequest{
+		LeasedConversationOperationMutation: clientOperationMutation(input.clientOperationMutationInput),
+		Sequence:                            input.Sequence,
+		Checkpoint:                          input.Checkpoint,
+	})
+	if err != nil {
+		writeServiceError(response, err)
+		return
+	}
+	writeJSON(response, http.StatusOK, receipt)
+}
+
+func (h *Handler) completeClientOperation(response http.ResponseWriter, request *http.Request) {
+	var input completeClientOperationInput
+	if !decodeRequestJSON(response, request, &input) {
+		return
+	}
+	receipt, err := h.service.CompleteLeasedOperation(request.Context(), runtime.CompleteLeasedConversationOperationRequest{
+		LeasedConversationOperationMutation: clientOperationMutation(input.clientOperationMutationInput),
+		Answer:                              input.Answer,
+		Model:                               input.Model,
+	})
+	if err != nil {
+		writeServiceError(response, err)
+		return
+	}
+	writeJSON(response, http.StatusOK, receipt)
+}
+
+func (h *Handler) failClientOperation(response http.ResponseWriter, request *http.Request) {
+	var input failClientOperationInput
+	if !decodeRequestJSON(response, request, &input) {
+		return
+	}
+	receipt, err := h.service.FailLeasedOperation(request.Context(), runtime.FailLeasedConversationOperationRequest{
+		LeasedConversationOperationMutation: clientOperationMutation(input.clientOperationMutationInput),
+		FailureCode:                         input.FailureCode,
+		FailureMessage:                      input.FailureMessage,
+	})
+	if err != nil {
+		writeServiceError(response, err)
+		return
+	}
+	writeJSON(response, http.StatusOK, receipt)
+}
+
+func (h *Handler) cancelClientOperation(response http.ResponseWriter, request *http.Request) {
+	var input cancelClientOperationInput
+	if !decodeRequestJSON(response, request, &input) {
+		return
+	}
+	receipt, err := h.service.CancelLeasedOperation(request.Context(), runtime.CancelLeasedConversationOperationRequest{
+		LeasedConversationOperationMutation: clientOperationMutation(input.clientOperationMutationInput),
+		CancellationCode:                    input.CancellationCode,
+		CancellationMessage:                 input.CancellationMessage,
+	})
+	if err != nil {
+		writeServiceError(response, err)
+		return
+	}
+	writeJSON(response, http.StatusOK, receipt)
+}
+
+func clientOperationMutation(input clientOperationMutationInput) runtime.LeasedConversationOperationMutation {
+	return runtime.LeasedConversationOperationMutation{
+		OperationID:     input.OperationID,
+		Anchor:          runtime.ConversationAnchor{Channel: input.Channel, ThreadID: input.ThreadID},
+		AttemptID:       input.AttemptID,
+		LeaseGeneration: input.LeaseGeneration,
+	}
 }
 
 func (h *Handler) confirmMemory(response http.ResponseWriter, request *http.Request) {
@@ -677,11 +849,29 @@ func writeServiceError(response http.ResponseWriter, err error) {
 	switch {
 	case strings.Contains(message, "does not exist"):
 		writeError(response, http.StatusNotFound, "not_found", "resource does not exist")
+	case isConflictError(message):
+		writeError(response, http.StatusConflict, "operation_conflict", message)
 	case isSafeClientError(message):
 		writeError(response, http.StatusBadRequest, "invalid_request", message)
 	default:
 		writeError(response, http.StatusInternalServerError, "internal_error", "request could not be completed")
 	}
+}
+
+func isConflictError(message string) bool {
+	for _, fragment := range []string{
+		"stale leased conversation attempt",
+		"has a live lease",
+		"conversation operation is already",
+		"requires fenced",
+		"is not leased",
+		"checkpoint sequence",
+	} {
+		if strings.Contains(message, fragment) {
+			return true
+		}
+	}
+	return false
 }
 
 func isSafeClientError(message string) bool {
@@ -708,6 +898,10 @@ func isSafeClientError(message string) bool {
 		"too many tool results",
 		"total content is too long",
 		"does not match the prepared operation",
+		"must be positive",
+		"must be a JSON object",
+		"contains trailing JSON",
+		"checkpoint is too large",
 	} {
 		if strings.Contains(message, fragment) {
 			return true
