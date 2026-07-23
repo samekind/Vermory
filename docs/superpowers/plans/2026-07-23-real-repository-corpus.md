@@ -6,4 +6,4 @@
 - [x] Run the exact corpus against a fresh external-volume PostgreSQL database.
 - [x] Record normalized evidence, retained preparation failures, source checksums, and explicit claim boundaries.
 - [ ] Run focused and complete repository gates with every cache and temporary artifact on the external volume.
-- [ ] Push the exact delivery head and wait for all protected checks, including `sign-snapshot`.
+- [x] Push the exact delivery head and wait for all protected checks, including `sign-snapshot`.
