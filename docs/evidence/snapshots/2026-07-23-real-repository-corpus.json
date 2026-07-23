@@ -1,0 +1,97 @@
+{
+  "evidence_version": 1,
+  "case_id": "W37-real-repository-corpus",
+  "reality_case_id": "W05-trusted-workspace-attachment",
+  "status": "runtime-qualified",
+  "source_revision": "ee4d30596e47acaa5b4a10965c4a22f47084b72a",
+  "run_id": "w37-20260723T124111Z",
+  "source_authorization": "public_https_read_only",
+  "runtime": {
+    "host_class": "darwin_arm64_workstation",
+    "git": "2.55.0",
+    "postgres": "18.4",
+    "go": "1.26.5",
+    "schema_start": 0,
+    "schema_end": 25,
+    "external_volume_state": true,
+    "sudo_used": false,
+    "newapi_used": false,
+    "model_used": false,
+    "embedding_used": false
+  },
+  "corpus": [
+    {
+      "id": "golang-example",
+      "url": "https://github.com/golang/example.git",
+      "revision": "7f05d217867b2af52b0a28c6d1c91df97e1b5b39"
+    },
+    {
+      "id": "rust-mdbook",
+      "url": "https://github.com/rust-lang/mdBook.git",
+      "revision": "4f8c9460977e18974b37bb9a2292219bfa317632"
+    },
+    {
+      "id": "python-django",
+      "url": "https://github.com/django/django.git",
+      "revision": "21b3a4c4c528ca827adda14b6c4cf045afba6d4f"
+    },
+    {
+      "id": "node-pnpm",
+      "url": "https://github.com/pnpm/pnpm.git",
+      "revision": "50ed6f5070fa5b159f4cfd56e6de8ffddeae4d3e"
+    },
+    {
+      "id": "memory-mem0",
+      "url": "https://github.com/mem0ai/mem0.git",
+      "revision": "ca2abca2b884e038d3e525070e79d3057ef2012c"
+    },
+    {
+      "id": "agent-openclaw",
+      "url": "https://github.com/openclaw/openclaw.git",
+      "revision": "9ca500db98574d1d0e87bdc412293d5196f2a8d8"
+    }
+  ],
+  "probes": {
+    "repository_roots": 6,
+    "nested_directories": 6,
+    "canonical_root_failures": 0,
+    "git_common_collisions": 0,
+    "attachment_round_trip_failures": 0
+  },
+  "hard_gates": {
+    "passed": 18,
+    "total": 18
+  },
+  "authoritative_counts": {
+    "target_continuities": 6,
+    "target_distinct_continuities": 6,
+    "target_confirmed_bindings": 6,
+    "target_active_memories": 6,
+    "target_deliveries": 7,
+    "replay_operation_duplicate_rows": 0,
+    "missing_expected_markers": 0,
+    "cross_repository_marker_hits": 0,
+    "alternate_namespace_deliveries": 0,
+    "other_tenant_continuities": 1,
+    "other_tenant_active_memories": 1,
+    "other_tenant_deliveries": 1,
+    "other_tenant_target_marker_hits": 0,
+    "target_other_tenant_marker_hits": 0
+  },
+  "evidence_integrity": {
+    "case_sha256": "b9fe96bebf62d6f379d54f69e53e740c87ccc252dd1c6056fca9c4660a34c2f6",
+    "design_sha256": "121992825d583b9fa41d4b43b034cce6d6b6aaaeac4c08a48be33a655bf87b21",
+    "runner_sha256": "7f204ee2fbf524470b113c37bd11c55a89de6a3f19d1415d65441aac90be925d",
+    "raw_test_sha256": "301c6b50e7688ddc0e10ab263cd0f8d02a19c31e3481bc120ff69962fe9935ae",
+    "ledger_sha256": "79abddabf8881f70567a763f25081189e147a573133b58680a3a841ae8a7e242",
+    "privacy_hits": 0,
+    "preparation_failures_retained": 1
+  },
+  "claim_boundary": {
+    "arbitrary_repository_qualified": false,
+    "coding_client_qualified": false,
+    "model_quality_qualified": false,
+    "automatic_repository_merge_qualified": false,
+    "long_duration_network_qualified": false
+  }
+}

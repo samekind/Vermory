@@ -210,6 +210,16 @@ PostgreSQL authority. The deterministic provider isolates the browser contract
 and is not a model-quality claim. See
 [Browser Web Chat Lifecycle Qualification](docs/evidence/2026-07-22-browser-webchat-lifecycle.md).
 
+W37 qualifies trusted workspace attachment against six exact public
+repositories spanning Go, Rust, Python, Node.js, a memory-platform monorepo,
+and an agent-platform monorepo. Repository-root and real nested-directory
+probes, bounded attachment round-trip, six isolated PostgreSQL continuities,
+exact prepare replay, alternate-namespace abstention, and cross-tenant
+isolation passed all 18 gates. This is evidence for those exact checkouts, not
+a claim that every repository or Git implementation is supported, and it does
+not make remote URLs or shared history automatic merge authority. See
+[Real Repository Corpus Qualification](docs/evidence/2026-07-23-real-repository-corpus.md).
+
 I05 qualifies the durable service lifecycle on exact-head Ubuntu 24.04 AMD64
 and native ARM64 runners with systemd and PostgreSQL 18. A dedicated non-login
 identity and
