@@ -1,0 +1,43 @@
+{
+  "version": "1",
+  "id": "I09-linux-repository-lifecycle",
+  "base_source_sha": "858e5afc05b8136fd81d46a88164f799f2925197",
+  "base_qualification_version": "0.0.1-i09.1",
+  "candidate_qualification_version": "0.0.2-i09.1",
+  "hard_gate_count": 26,
+  "hard_gates": [
+    "the candidate package is built from the exact pull-request head",
+    "the base package is built from the frozen accepted base source revision",
+    "base and candidate package versions are explicit qualification-only semantic versions",
+    "the candidate version is newer than the base version according to the native package manager",
+    "the package architecture matches the native runner architecture",
+    "the base repository snapshot contains only the base package version",
+    "the full repository snapshot retains the base package and adds the candidate package",
+    "both repository snapshots are signed by the same ephemeral qualification key",
+    "the native package manager enforces repository metadata signatures for both snapshots",
+    "all unrelated package repositories are disabled during Vermory resolution",
+    "the base version installs through the native package manager",
+    "the installed base binary reports the frozen base source revision",
+    "base installation does not enable or start the service",
+    "operator configuration is created after base installation",
+    "a normal package-manager upgrade selects the candidate version",
+    "the upgraded binary reports the exact candidate source revision",
+    "upgrade preserves operator configuration and the service identity",
+    "a normal update operation does not implicitly downgrade the candidate",
+    "an explicit package-manager rollback selects the retained base version",
+    "the rolled-back binary reports the frozen base source revision",
+    "rollback preserves operator configuration and the service identity",
+    "a second normal upgrade returns to the candidate version",
+    "final package removal preserves operator configuration and the service identity",
+    "the service remains disabled and inactive throughout the complete lifecycle",
+    "the repository lifecycle bundle contains no private signing key material",
+    "the normalized report and lifecycle bundle are SHA-256 bound and contain no credential material"
+  ],
+  "qualification_boundaries": [
+    "qualification-only versions are not release tags or public version promises",
+    "no stable production repository signing key or public hosted repository is qualified",
+    "no database schema migration, downgrade, or rollback is performed by package operations",
+    "RPM package payload signatures are not qualified; DNF repository metadata signatures are enforced",
+    "no unattended operating-system upgrade policy or long-duration repository retention SLA is qualified"
+  ]
+}

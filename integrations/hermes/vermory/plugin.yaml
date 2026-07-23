@@ -1,0 +1,4 @@
+name: vermory
+version: 0.1.0
+description: Governed cross-session continuity backed by a local Vermory service.
+dependencies: []

@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
 	"net/http"
 	"net/url"
@@ -19,15 +18,17 @@ const (
 )
 
 type Config struct {
-	BaseURL string
-	APIKey  string
-	Client  *http.Client
+	BaseURL         string
+	APIKey          string
+	Client          *http.Client
+	DisableThinking bool
 }
 
 type OpenAICompatible struct {
-	baseURL string
-	apiKey  string
-	client  *http.Client
+	baseURL         string
+	apiKey          string
+	client          *http.Client
+	disableThinking bool
 }
 
 func NewOpenAICompatible(config Config) *OpenAICompatible {
@@ -36,9 +37,10 @@ func NewOpenAICompatible(config Config) *OpenAICompatible {
 		client = &http.Client{Timeout: 90 * time.Second}
 	}
 	return &OpenAICompatible{
-		baseURL: strings.TrimRight(strings.TrimSpace(config.BaseURL), "/"),
-		apiKey:  strings.TrimSpace(config.APIKey),
-		client:  client,
+		baseURL:         strings.TrimRight(strings.TrimSpace(config.BaseURL), "/"),
+		apiKey:          strings.TrimSpace(config.APIKey),
+		client:          client,
+		disableThinking: config.DisableThinking,
 	}
 }
 
@@ -53,11 +55,17 @@ func (p *OpenAICompatible) Generate(ctx context.Context, req GenerateRequest) (G
 		return GenerateResponse{}, errors.New("provider: model is required")
 	}
 
-	body, err := json.Marshal(openAICompatibleRequest{
-		Model:     req.Model,
-		Messages:  buildMessages(req),
-		MaxTokens: req.MaxTokens,
-	})
+	request := openAICompatibleRequest{
+		Model:       req.Model,
+		Messages:    buildMessages(req),
+		MaxTokens:   req.MaxTokens,
+		Temperature: req.Temperature,
+	}
+	if p.disableThinking {
+		enabled := false
+		request.EnableThinking = &enabled
+	}
+	body, err := json.Marshal(request)
 	if err != nil {
 		return GenerateResponse{}, err
 	}
@@ -84,6 +92,7 @@ func (p *OpenAICompatible) Generate(ctx context.Context, req GenerateRequest) (G
 		Output:      sanitizeModelOutput(output),
 		RawArtifact: raw,
 		Model:       model,
+		Usage:       decoded.Usage.normalized(),
 	}, nil
 }
 
@@ -112,7 +121,11 @@ func (p *OpenAICompatible) doChatCompletion(ctx context.Context, body []byte) ([
 			return raw, nil
 		}
 
-		lastErr = fmt.Errorf("provider: chat completions returned %s: %s", resp.Status, trimForError(raw))
+		lastErr = &HTTPStatusError{
+			StatusCode: resp.StatusCode,
+			Status:     resp.Status,
+			Body:       trimForError(raw),
+		}
 		if !shouldRetryStatus(resp.StatusCode) || attempt == maxBusyRetries-1 {
 			return nil, lastErr
 		}
@@ -124,9 +137,11 @@ func (p *OpenAICompatible) doChatCompletion(ctx context.Context, body []byte) ([
 }
 
 type openAICompatibleRequest struct {
-	Model     string                `json:"model"`
-	Messages  []openAICompatibleMsg `json:"messages"`
-	MaxTokens int                   `json:"max_tokens,omitempty"`
+	Model          string                `json:"model"`
+	Messages       []openAICompatibleMsg `json:"messages"`
+	MaxTokens      int                   `json:"max_tokens,omitempty"`
+	Temperature    *float64              `json:"temperature,omitempty"`
+	EnableThinking *bool                 `json:"enable_thinking,omitempty"`
 }
 
 type openAICompatibleMsg struct {
@@ -144,10 +159,20 @@ func buildMessages(req GenerateRequest) []openAICompatibleMsg {
 }
 
 func buildUserPrompt(req GenerateRequest) string {
-	if strings.TrimSpace(req.ContextPacket) == "" {
+	contextPacket := strings.TrimSpace(req.ContextPacket)
+	jsonSchema := strings.TrimSpace(req.JSONSchema)
+	if contextPacket == "" && jsonSchema == "" {
 		return req.Prompt
 	}
-	return "Context packet:\n" + req.ContextPacket + "\n\nTask:\n" + req.Prompt
+	sections := make([]string, 0, 3)
+	if contextPacket != "" {
+		sections = append(sections, "Context packet:\n"+req.ContextPacket)
+	}
+	sections = append(sections, "Task:\n"+req.Prompt)
+	if jsonSchema != "" {
+		sections = append(sections, "Required JSON schema:\n"+jsonSchema)
+	}
+	return strings.Join(sections, "\n\n")
 }
 
 func chatCompletionsURL(baseURL string) string {
@@ -170,6 +195,32 @@ type openAICompatibleResponse struct {
 			ReasoningContent string          `json:"reasoning_content"`
 		} `json:"message"`
 	} `json:"choices"`
+	Usage *openAICompatibleUsage `json:"usage"`
+}
+
+type openAICompatibleUsage struct {
+	PromptTokens     int `json:"prompt_tokens"`
+	CompletionTokens int `json:"completion_tokens"`
+	TotalTokens      int `json:"total_tokens"`
+	PromptDetails    struct {
+		CachedTokens int `json:"cached_tokens"`
+	} `json:"prompt_tokens_details"`
+	CompletionDetails struct {
+		ReasoningTokens int `json:"reasoning_tokens"`
+	} `json:"completion_tokens_details"`
+}
+
+func (usage *openAICompatibleUsage) normalized() *TokenUsage {
+	if usage == nil {
+		return nil
+	}
+	return &TokenUsage{
+		InputTokens:       usage.PromptTokens,
+		CachedInputTokens: usage.PromptDetails.CachedTokens,
+		OutputTokens:      usage.CompletionTokens,
+		ReasoningTokens:   usage.CompletionDetails.ReasoningTokens,
+		TotalTokens:       usage.TotalTokens,
+	}
 }
 
 func (r openAICompatibleResponse) FirstContent() string {

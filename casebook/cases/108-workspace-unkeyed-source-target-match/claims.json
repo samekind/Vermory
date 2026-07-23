@@ -1,0 +1,14 @@
+[
+  {
+    "type": "decision",
+    "content": "Production releases now use GitHub Actions OIDC keyless signing."
+  },
+  {
+    "type": "constraint",
+    "content": "The deployment API timeout is 800 ms."
+  },
+  {
+    "type": "constraint",
+    "content": "Production releases publish a signed SLSA provenance statement."
+  }
+]

@@ -1,0 +1,13 @@
+[
+  {
+    "id": "workspace-source-revision-current-release-check",
+    "prompt": "Create `release-source-check.md` from the current governed workspace context. Record the current release verification command and the API timeout. Do not reuse superseded release instructions.",
+    "must_include": [
+      "pnpm exec release:verify --mode locked",
+      "800 ms"
+    ],
+    "must_not_include": [
+      "npm run release:verify -- --legacy"
+    ]
+  }
+]

@@ -1,0 +1,82 @@
+{
+  "version": 1,
+  "id": "F02-automatic-conversation-review",
+  "title": "Completed client turns schedule reviewable memory without automatic activation",
+  "evidence_level": "public",
+  "continuity_lines": ["conversation", "global_defaults", "security"],
+  "pressures": ["automatic_formation_schedule", "worker_retry", "client_fail_open", "review_inbox", "explicit_candidate_governance", "correction", "rejection", "deletion", "cross_client_isolation", "role_separation", "idempotent_replay"],
+  "sources": [
+    {
+      "id": "f02-transcript",
+      "kind": "authorized_transcript_excerpt",
+      "fixture_path": "fixtures/review-transcript.md",
+      "original_ref": "authorized-synthetic-case:thesis-submission",
+      "original_revision": "2026-07-18",
+      "sha256": "af35829301e7906e8a553e23e704a22d57c20ac08424216f07655f4b5661d248",
+      "authorized": true,
+      "anonymization": "All people, filenames, offices, sessions, deadlines, and identifiers are synthetic."
+    },
+    {
+      "id": "f02-governance",
+      "kind": "authorized_governance_trajectory",
+      "fixture_path": "fixtures/review-governance.md",
+      "original_ref": "vermory-design:automatic-conversation-review-f02",
+      "original_revision": "2026-07-18",
+      "sha256": "e81284f84bf5810041266b8f7881b7e4170f12c77e8b14f32c7fc13b901b7559",
+      "authorized": true,
+      "anonymization": "The complete governance trajectory is synthetic and public."
+    }
+  ],
+  "anchors": [
+    {
+      "kind": "openclaw_session_key",
+      "value": "agent:main:auto-review-thesis-a",
+      "ambiguous": false
+    },
+    {
+      "kind": "hermes_session_id",
+      "value": "auto-review-hermes-b",
+      "ambiguous": false
+    }
+  ],
+  "expectations": {
+    "current_facts": [
+      "The current thesis upload bundle is thesis-defense-v7.zip.",
+      "Only explicitly accepted candidates become current memory.",
+      "The final forgotten deadline is unavailable as current memory."
+    ],
+    "forbidden_facts": [
+      "The faculty office B-412 is active memory after rejection.",
+      "The current deadline is Tuesday at 18:00.",
+      "The forgotten Wednesday at 12:00 deadline is delivered.",
+      "A completed turn blocks on formation provider availability.",
+      "A replay creates another schedule or provider call.",
+      "A client token can list or govern candidates.",
+      "The Hermes session candidate appears in the OpenClaw review inbox.",
+      "Assistant output is formation evidence.",
+      "A model activates or rejects its own candidate.",
+      "Ordinary conversation creates a Global Default."
+    ],
+    "allowed_unknowns": [
+      "Whether a later release adds another review UI in addition to OpenClaw and HTTP.",
+      "Whether another supported provider forms different reviewable wording that still cites the exact source."
+    ],
+    "expected_action": "Schedule bounded user-observation formation after completed turns, keep provider work asynchronous and retryable, require explicit review in the exact continuity, and remove forgotten content from covered Vermory surfaces."
+  },
+  "task": {
+    "prompt": "Continue the thesis-submission matter through automatic formation, explicit OpenClaw review, correction, rejection, forgetting, worker restart, and a separate Hermes isolation control.",
+    "artifact_checks": [
+      "turn completion and replay produce one durable requested sequence",
+      "worker failure does not advance the processed sequence",
+      "review inbox shows exact source evidence without provider internals",
+      "fresh delivery contains the accepted bundle and no rejected or forgotten fact",
+      "Hermes raw observations and pending candidates remain isolated"
+    ],
+    "deterministic_checks": [
+      "contains:thesis-defense-v7.zip",
+      "not_contains:B-412",
+      "not_contains:Tuesday at 18:00",
+      "not_contains:Wednesday at 12:00"
+    ]
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "id": "W32-browser-webchat-lifecycle",
+  "title": "Browser Web Chat continuity, retry, governance, and deletion",
+  "surface": "real_chrome_same_origin_web_chat",
+  "provider_boundary": "deterministic_provider_for_browser_contract",
+  "hard_gate_count": 20,
+  "hard_gates": [
+    "the root route serves a usable same-origin Web Chat application",
+    "a user can create and switch isolated conversation threads",
+    "a sent message reaches the conversation runtime and renders one assistant answer",
+    "refresh restores the selected thread and server-owned transcript",
+    "the operation identifier is persisted before the network request starts",
+    "retry after an uncertain response reuses the original operation identifier",
+    "replay renders no duplicate user or assistant turn",
+    "an offline send shows an explicit recoverable failure",
+    "an offline send creates no phantom assistant answer",
+    "network restoration allows the failed request to be retried",
+    "reviewable memory candidates are visible without exposing authority identifiers",
+    "a candidate can be accepted or rejected from the browser",
+    "current governed memory is visible for the selected thread",
+    "current memory can be corrected from the browser",
+    "current memory can be forgotten from the browser",
+    "forgotten memory is absent from a fresh turn and refreshed memory view",
+    "asynchronous send completion and failure update only the originating thread",
+    "an out-of-order inspection response cannot replace the active thread transcript or memory",
+    "desktop and mobile layouts keep the active composer visible without page-level overflow",
+    "same-origin assets use restrictive browser headers and the final clean reload has no console errors or warnings"
+  ],
+  "non_claims": [
+    "the deterministic browser run is not a real-model quality qualification",
+    "browser local storage is not memory authority",
+    "this case does not qualify a publicly exposed multi-user Web Chat deployment"
+  ]
+}

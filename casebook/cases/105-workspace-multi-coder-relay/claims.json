@@ -9,11 +9,10 @@
   },
   {
     "type": "constraint",
-    "content": "Gemini CLI is used only for SQL explanation and should not edit source files in this relay."
+    "content": "Grok is used only for SQL explanation and should not edit source files in this relay."
   },
   {
     "type": "constraint",
     "content": "The backend contract is frozen for this sprint and API names should not change."
   }
 ]
-

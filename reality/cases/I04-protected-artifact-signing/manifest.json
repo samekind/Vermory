@@ -1,0 +1,96 @@
+{
+  "version": 1,
+  "id": "I04-protected-artifact-signing",
+  "title": "Protected release payload manifest with GitHub OIDC keyless signing",
+  "evidence_level": "public",
+  "continuity_lines": ["security"],
+  "pressures": [
+    "complete_release_payload_manifest",
+    "keyless_signing",
+    "github_oidc_identity",
+    "untrusted_fork_isolation",
+    "transparency_log_bundle",
+    "modified_manifest_rejection",
+    "wrong_identity_rejection",
+    "cross_host_verification",
+    "no_long_lived_signing_key"
+  ],
+  "sources": [
+    {
+      "id": "i04-signing-contract",
+      "kind": "authorized_release_signing_contract",
+      "fixture_path": "fixtures/signing-contract.md",
+      "original_ref": "vermory-design:i04-protected-artifact-signing",
+      "original_revision": "2026-07-18",
+      "sha256": "4ecab38541b3191f2db8efbce7aa4d82f9493a4e4e579ce99a7a341597703111",
+      "authorized": true,
+      "anonymization": "The case contains only public repository, workflow, artifact-class, and synthetic failure-control information; private keys, OIDC tokens, credentials, private paths, and user data are excluded."
+    }
+  ],
+  "anchors": [
+    {
+      "kind": "github_workflow_identity",
+      "value": "https://github.com/jstar0/Vermory/.github/workflows/ci.yml@current-protected-ref",
+      "ambiguous": false
+    },
+    {
+      "kind": "release_revision",
+      "value": "vermory-i04-source-head",
+      "ambiguous": false
+    },
+    {
+      "kind": "protected_artifact",
+      "value": "vermory-pr-snapshot-current-synthetic-merge",
+      "ambiguous": false
+    }
+  ],
+  "expectations": {
+    "current_facts": [
+      "One deterministic release manifest covers all eight uploaded release payload files.",
+      "A GitHub OIDC keyless Sigstore bundle authenticates the exact release manifest bytes without a long-lived private key.",
+      "Verification requires the exact GitHub workflow identity and token.actions.githubusercontent.com issuer.",
+      "The signing job runs only after protected tests and does not grant OIDC permission to the ordinary untrusted-code test job.",
+      "The signed synthetic merge is independently bound to the exact source head through GitHub commit-parent evidence.",
+      "A modified manifest and a wrong workflow identity both fail verification."
+    ],
+    "forbidden_facts": [
+      "The existing Go-only checksums.txt covers OpenClaw and Hermes release payloads.",
+      "A checksum without a valid identity-bound signature is accepted as signed delivery.",
+      "A repository, workflow, or Mac mini stores a long-lived plaintext signing private key.",
+      "Untrusted fork pull-request code receives the Vermory signing job's OIDC authority.",
+      "A valid signature from another workflow or repository is accepted for Vermory.",
+      "The GitHub transport ZIP is described as the signed subject.",
+      "A signed pull-request snapshot is described as a published or final Vermory release.",
+      "Artifact signing is treated as external sealed benchmark evidence."
+    ],
+    "allowed_unknowns": [
+      "Which later macOS notarization and package-manager distribution channels will be adopted.",
+      "Whether final tagged releases will additionally publish SLSA provenance through GitHub artifact attestations.",
+      "Which container-image signing contract will be used if Vermory later publishes images."
+    ],
+    "expected_action": "Create a complete deterministic release manifest, sign it only in a post-test trusted GitHub OIDC job, verify exact identity and issuer with positive and negative controls, and independently validate the signed protected artifact on the Mac mini."
+  },
+  "task": {
+    "prompt": "Qualify one protected Vermory snapshot whose complete release payload manifest is signed by the exact GitHub Actions workflow identity and independently verified after cross-host delivery.",
+    "artifact_checks": [
+      "release manifest contains exactly eight sorted payload records and every hash passes",
+      "Sigstore bundle contains no private key or OIDC token and verifies the exact manifest bytes",
+      "GitHub workflow identity, issuer, synthetic merge, and source-head parent are recorded",
+      "Mac mini evidence contains positive verification plus modified-manifest and wrong-identity rejection",
+      "no tag or GitHub Release is created by the protected pull-request qualification"
+    ],
+    "deterministic_checks": [
+      "payload_manifest:exactly_eight_sorted_records",
+      "payload_manifest:all_hashes_verify",
+      "oidc_scope:test_job_has_no_id_token_write",
+      "oidc_scope:trusted_post_test_sign_job_only",
+      "sigstore:exact_identity_and_issuer_verify",
+      "sigstore:modified_manifest_rejected",
+      "sigstore:wrong_identity_rejected",
+      "github_merge:second_parent_equals_source_head",
+      "cross_host:mac_mini_verification_passes",
+      "privacy:no_private_key_token_or_credential",
+      "publication:no_tag_or_release_created"
+    ]
+  }
+}

@@ -91,9 +91,24 @@ func BuildExperiment0(options Experiment0Options) Experiment0Report {
 	sortCoverage(report.ContinuityCoverage)
 	sortCoverage(report.PressureCoverage)
 	report.HypothesisSignals["H-003"] = existingCases(caseIDs, "W01-synapseloom-continuity", "S01-deletion-and-source-injection")
-	report.HypothesisSignals["H-005"] = existingCases(caseIDs, "W01-synapseloom-continuity", "C01-device-maintenance-continuity", "S01-deletion-and-source-injection")
-	report.HypothesisSignals["H-007"] = existingCases(caseIDs, "G01-language-default-local-override", "S01-deletion-and-source-injection")
-	report.HypothesisSignals["H-008"] = existingCases(caseIDs, "C01-device-maintenance-continuity", "S01-deletion-and-source-injection")
+	report.HypothesisSignals["H-005"] = existingCases(caseIDs, "W01-synapseloom-continuity", "C01-device-maintenance-continuity", "F03-verified-tool-outcome-formation", "S01-deletion-and-source-injection")
+	report.HypothesisSignals["H-007"] = existingCases(
+		caseIDs,
+		"G01-language-default-local-override",
+		"S01-deletion-and-source-injection",
+		"C02-housing-viewing-validity",
+		"W03-workspace-workaround-validity",
+	)
+	report.HypothesisSignals["H-008"] = existingCases(caseIDs, "C01-device-maintenance-continuity", "F03-verified-tool-outcome-formation", "S01-deletion-and-source-injection")
+	report.HypothesisSignals["H-013"] = existingCases(caseIDs, "I01-authenticated-multitenant-rls")
+	report.HypothesisSignals["H-014"] = existingCases(caseIDs, "I02-postgresql-operations-recovery", "I03-postgresql-ha-pitr")
+	report.HypothesisSignals["bridge_seed"] = existingCases(
+		caseIDs,
+		"B01-conversation-workspace-promotion",
+		"B02-linked-conversations-workspace-rebind",
+		"B03-three-client-conversation-bridge",
+	)
+	report.HypothesisSignals["hermes_client_seed"] = existingCases(caseIDs, "H01-hermes-linked-sessions")
 
 	if options.SealedAttestation != nil {
 		report.SealedStatus = "attested"
@@ -101,11 +116,10 @@ func BuildExperiment0(options Experiment0Options) Experiment0Report {
 	}
 
 	report.Limitations = []string{
-		"The first four cases are a seed batch; target discovery coverage remains incomplete and is not an automatic pass or fail threshold.",
+		"The public cases are an expanding seed batch; target discovery coverage remains incomplete and is not an automatic pass or fail threshold.",
 		"Experiment 0 freezes evidence only; it does not execute a production memory implementation or a real client integration.",
 		"The new reality cases have not yet run against no-context, full-history, summary, vector-RAG, mem0, and Vermory conditions.",
 		"Legacy ContextMesh scenarios and the MemOS three-client round packs remain inspired cases or translated proxies rather than real executed trajectories.",
-		"Bridge continuity has no dedicated first-batch case yet.",
 	}
 	if report.EvidenceLevels[string(EvidenceWithheldLocal)] == 0 {
 		report.Limitations = append(report.Limitations, "No withheld_local holdout is included in this readout.")

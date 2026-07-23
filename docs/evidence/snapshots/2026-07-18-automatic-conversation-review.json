@@ -1,0 +1,128 @@
+{
+  "version": 1,
+  "date": "2026-07-18",
+  "run_id": "w22-f02-20260718-b6c6154",
+  "case_id": "F02-automatic-conversation-review",
+  "fixture_lock_sha256": "e5f5762885b2372742412f7f9499f49de08c7a854d59dae4babb4875a79c8231",
+  "implementation_revision": "6038cece6c9c949e5006de1f0145c11b431f2899",
+  "schema_version": 20,
+  "hard_gates": {
+    "passed": 23,
+    "failed": 0
+  },
+  "clients": {
+    "openclaw": {
+      "version": "2026.6.11",
+      "revision": "e085fa1",
+      "conversation_model": "grok-cli/grok-4.5",
+      "direct_commands": [
+        "memories",
+        "accept",
+        "reject",
+        "correct",
+        "forget"
+      ],
+      "model_tools": 0
+    },
+    "hermes": {
+      "version": "0.18.2",
+      "revision": "0f102fa4dc04b7dfdab048169aaaa640d09d7523",
+      "conversation_provider": "siliconflow-direct",
+      "conversation_model": "deepseek-ai/DeepSeek-V4-Flash",
+      "model_tools": 0
+    }
+  },
+  "formation": {
+    "provider": "grok-cli",
+    "model": "grok-4.5",
+    "mac_mini_newapi": false,
+    "initial_candidates": 3,
+    "correction_candidates": 1,
+    "hermes_candidates": 1,
+    "first_hermes_attempt": "abstained"
+  },
+  "governance": {
+    "accepted_initial": 2,
+    "rejected_initial": 1,
+    "accepted_updates": 1,
+    "forgotten": 1,
+    "client_candidate_list_http_status": 403
+  },
+  "current_result": {
+    "active_openclaw_memory_keys": [
+      "thesis-defense-upload-bundle"
+    ],
+    "final_openclaw_answer": "thesis-defense-v7.zip",
+    "forbidden_in_final_answer": [
+      "Wednesday",
+      "Tuesday",
+      "B-412",
+      "C-204"
+    ],
+    "cross_client_candidate_leakage": 0
+  },
+  "resilience": {
+    "worker_down_chat_completed": true,
+    "pending_before_restart": true,
+    "processed_after_restart": true,
+    "completion_replayed": true,
+    "duplicate_formation_runs": 0
+  },
+  "database": {
+    "restricted_runtime_role": true,
+    "row_security": true,
+    "schedule_rls": true,
+    "formation_run_rls": true,
+    "formation_item_rls": true,
+    "governed_memory_rls": true
+  },
+  "artifacts": {
+    "vermory_binary_sha256": "2a33536c73d2ea8da6500badb76a7471043514d733fe560611ecd8d179c9968f",
+    "openclaw_package_sha256": "26f1d729999f3fb16eb3626bea1864a065ba8867e84510bc66c89ea39dbc0ca0",
+    "evidence_manifest_sha256": "9acaae45d041fb8ed4f4755a79a3edaf0719bddb60e4e8d32a3c99b52c6508f1"
+  },
+  "privacy": {
+    "credential_hits": 0,
+    "sudo_used": false,
+    "provider_credentials_persisted": false
+  },
+  "protected_delivery": {
+    "failed_run": {
+      "run_id": 29618465089,
+      "job_id": 88008485535,
+      "reason": "normalized_fixtures_not_refrozen"
+    },
+    "source_head": "3e1f7b9c9a0e6eb5de902db96ec0c28218f54bcb",
+    "run_id": 29618745068,
+    "job_id": 88009318831,
+    "conclusion": "success",
+    "artifact": {
+      "id": 8421515213,
+      "name": "vermory-pr-snapshot-53f16117762ab05cf26f56f33524b102604f5637",
+      "bytes": 21753983,
+      "sha256": "6b4600fa4c7b5c59d94fd2f73f9f84f5e030c9e99bd554291ef0f3b854cf2772"
+    },
+    "synthetic_merge": {
+      "revision": "53f16117762ab05cf26f56f33524b102604f5637",
+      "verified": true,
+      "reason": "valid",
+      "second_parent": "3e1f7b9c9a0e6eb5de902db96ec0c28218f54bcb"
+    },
+    "packages": {
+      "go_archives": 4,
+      "go_archive_files_each": 4,
+      "linux_static_archives": 2,
+      "darwin_arm64_execution": true,
+      "openclaw_sha256": "dc3f2489b3a3260739d0675d75c238c25dbdf83cb2b35e75e72baa063f220c63",
+      "openclaw_entries": 14,
+      "hermes_sha256": "c06b4112161c07be1dc4e2f8b858e28801a5c7345a315fefbb57c92313d9c7b9",
+      "hermes_files": 6,
+      "hermes_sidecar": true,
+      "privacy_hits": 0
+    },
+    "mac_mini_manifest": {
+      "entries": 43,
+      "sha256": "9146537930fc97894fe342c5fd20ada7ac4118eb26a5442bd794cf91ba588e92"
+    }
+  }
+}

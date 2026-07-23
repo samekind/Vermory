@@ -81,3 +81,23 @@ func TestScoreOutputWithoutForbiddenChecksDefaultsGroundednessProxy(t *testing.T
 		t.Fatalf("expected target fitness to stay conservative at 0.5, got %f", score.TargetFitness)
 	}
 }
+
+func TestScoreOutputAcceptsDeclaredAlternativeFactPhrasings(t *testing.T) {
+	task := Task{
+		ID: "conversation-fact-aliases",
+		MustIncludeAny: [][]string{
+			{"Seattle", "西雅图"},
+			{"one-bedroom", "一居"},
+			{"pet-friendly", "能养", "可养", "宠物友好"},
+		},
+	}
+
+	score := ScoreOutput(task, "当前主线是西雅图租房：一居优先，且房源必须可养中型犬。")
+
+	if score.MustIncludeHitRate != 1 {
+		t.Fatalf("expected declared fact aliases to satisfy all requirements, got %#v", score)
+	}
+	if len(score.MissingIncludes) != 0 {
+		t.Fatalf("expected no missing requirements, got %#v", score.MissingIncludes)
+	}
+}

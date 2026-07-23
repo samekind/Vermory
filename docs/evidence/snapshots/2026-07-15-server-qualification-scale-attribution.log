@@ -1,0 +1,25 @@
+=== RUN   TestServerQualificationScaleProfile
+2026/07/15 19:08:14 OK   00001_initial.sql (13.77ms)
+2026/07/15 19:08:14 OK   00002_workspace_runtime.sql (12.32ms)
+2026/07/15 19:08:14 OK   00003_governed_memory_origin.sql (620.5µs)
+2026/07/15 19:08:14 OK   00004_conversation_continuity.sql (4.29ms)
+2026/07/15 19:08:14 OK   00005_conversation_turns.sql (2.07ms)
+2026/07/15 19:08:14 OK   00006_global_defaults.sql (1.43ms)
+2026/07/15 19:08:14 OK   00007_durable_bridges.sql (6.26ms)
+2026/07/15 19:08:14 OK   00008_conversation_turn_fingerprints.sql (1.18ms)
+2026/07/15 19:08:14 OK   00009_identity_authorization_rls.sql (14.62ms)
+2026/07/15 19:08:14 OK   00010_source_conflict_candidates.sql (1.01ms)
+2026/07/15 19:08:14 OK   00011_source_match_decisions.sql (2.99ms)
+2026/07/15 19:08:14 OK   00012_source_match_continuity_fks.sql (2.79ms)
+2026/07/15 19:08:14 OK   00013_source_document_formation.sql (5.67ms)
+2026/07/15 19:08:14 OK   00014_production_retrieval_runtime.sql (16.14ms)
+2026/07/15 19:08:14 OK   00015_retrieval_profile_migration.sql (3.04ms)
+2026/07/15 19:08:14 goose: successfully migrated database to version: 15
+    server_scale_profile_test.go:207: W12 authority seed complete: records=100000 duration=6.551549208s
+    server_scale_profile_test.go:216: W12 governed history complete: revisions=450000 events=1000000 duration=1m38.19337475s
+    server_scale_profile_test.go:229: W12 lexical rebuild complete: rows=100000 duration=6.109955458s
+    server_scale_profile_test.go:246: W12 vector snapshot complete: vectors=100000 duration=5m37.62550625s
+    server_scale_profile_test.go:384: server qualification evidence={"active_after_delete":99000,"active_before_delete":100000,"authority_seed_ms":6551,"competing_worker_results":{"already_running":10,"processed":1000},"database_size_bytes":2709165759,"degraded_queries":405,"delete_and_query_ms":19086,"effective_vector_queries":145,"governed_memories":550000,"history_generation_ms":98193,"lexical_rebuild_ms":6109,"lexical_rows_before_delete":100000,"other_degraded_queries":0,"profile":"server-qualification-v1","projection_events_before_tail":1000000,"projection_events_final":1001000,"projection_lag_fallbacks":405,"query_clients":50,"query_p50_ms":13,"query_p95_ms":212,"query_p99_ms":253,"query_samples":1000,"real_provider_requests":2,"requested_vector_queries":550,"snapshot_embedding_requests":100000,"superseded_memories":450000,"tail_catchup_ms":18257,"vector_rows_before_delete":100000,"vector_snapshot_ms":337625}
+--- PASS: TestServerQualificationScaleProfile (472.11s)
+PASS
+ok  	vermory/internal/runtime	472.415s

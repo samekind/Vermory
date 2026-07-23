@@ -1,0 +1,2650 @@
+{
+  "run_id": "w10-profile-comparison-20260715-v1",
+  "request_fingerprint": "93b7728f663643b46f2c52ad452b1772deb8c2a9ef2a4b85025329e7ec0d71d2",
+  "corpus_sha256": "6a615f06a0598556b566e10bb089d506282990cceaedf91c8188ae6bbbe40f37",
+  "implementation_revision": "45cc9f0a",
+  "schema_version": 15,
+  "authority_fingerprint": "54943f32ff1978df2d9435db6c4e14b039d281ba74fe97e5ed63b5e799e1f43c",
+  "started_at": "2026-07-15T07:36:11.382549Z",
+  "duration": 21983356000,
+  "profiles": [
+    {
+      "profile_id": "siliconflow-bge-m3-1024-v1",
+      "model": "BAAI/bge-m3",
+      "dimensions": 1024,
+      "lifecycle_status": "active",
+      "embedding_request_count": 96,
+      "projection_build_duration": 3399347459,
+      "projection_vector_count": 30,
+      "projection_lag": 0,
+      "queries": [
+        {
+          "query_id": "w10-coder-command-paraphrase",
+          "cohorts": [
+            "semantic_paraphrase",
+            "mixed_language",
+            "technical_command"
+          ],
+          "duration": 113720167,
+          "results": [
+            {
+              "memory_id": "9e1cfcf8-3d19-4787-88da-7b407c84eddc",
+              "record_id": "w10-coder-command",
+              "content": "For the Atlas service release, run just pnpm exec verify:release --profile production.",
+              "score": 0,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "7e652808-9d1d-4867-a0b7-a72bbc2181d2",
+              "record_id": "w10-coder-window",
+              "content": "The Atlas release window ends on 2026-09-18.",
+              "score": 0,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "396960bb-e17a-4781-b035-6541db96926f",
+              "record_id": "w10-coder-region",
+              "content": "Atlas production traffic is deployed in ap-southeast-1.",
+              "score": 0,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "f9fa6c4d-4ec0-4773-8489-09bd8c570225",
+              "record_id": "w10-coder-flag",
+              "content": "The active request router flag is atlas_router_v4.",
+              "score": 0,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "da28e573-af8f-4365-8f8f-a4e021036346",
+              "record_id": "w10-coder-approvals",
+              "content": "A production rollback needs approval from one release owner and one on-call engineer.",
+              "score": 0,
+              "vector_rank": 5,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "w10-coder-error-chinese",
+          "cohorts": [
+            "chinese_semantic",
+            "error_code"
+          ],
+          "duration": 131575750,
+          "results": [
+            {
+              "memory_id": "ae26d66a-23c2-4474-90f2-33d1021e2a67",
+              "record_id": "w10-coder-error",
+              "content": "DEPLOY_409 means the release lock is held by another deployment worker.",
+              "score": 0,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "da28e573-af8f-4365-8f8f-a4e021036346",
+              "record_id": "w10-coder-approvals",
+              "content": "A production rollback needs approval from one release owner and one on-call engineer.",
+              "score": 0,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "9e1cfcf8-3d19-4787-88da-7b407c84eddc",
+              "record_id": "w10-coder-command",
+              "content": "For the Atlas service release, run just pnpm exec verify:release --profile production.",
+              "score": 0,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "f9fa6c4d-4ec0-4773-8489-09bd8c570225",
+              "record_id": "w10-coder-flag",
+              "content": "The active request router flag is atlas_router_v4.",
+              "score": 0,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "396960bb-e17a-4781-b035-6541db96926f",
+              "record_id": "w10-coder-region",
+              "content": "Atlas production traffic is deployed in ap-southeast-1.",
+              "score": 0,
+              "vector_rank": 5,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "w10-coder-flag-exact",
+          "cohorts": [
+            "exact_identifier",
+            "feature_flag"
+          ],
+          "duration": 148397917,
+          "results": [
+            {
+              "memory_id": "f9fa6c4d-4ec0-4773-8489-09bd8c570225",
+              "record_id": "w10-coder-flag",
+              "content": "The active request router flag is atlas_router_v4.",
+              "score": 0,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "396960bb-e17a-4781-b035-6541db96926f",
+              "record_id": "w10-coder-region",
+              "content": "Atlas production traffic is deployed in ap-southeast-1.",
+              "score": 0,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "9e1cfcf8-3d19-4787-88da-7b407c84eddc",
+              "record_id": "w10-coder-command",
+              "content": "For the Atlas service release, run just pnpm exec verify:release --profile production.",
+              "score": 0,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "w10-coder-release-multi",
+          "cohorts": [
+            "multi_fact",
+            "date",
+            "numeric_constraint"
+          ],
+          "duration": 123115000,
+          "results": [
+            {
+              "memory_id": "da28e573-af8f-4365-8f8f-a4e021036346",
+              "record_id": "w10-coder-approvals",
+              "content": "A production rollback needs approval from one release owner and one on-call engineer.",
+              "score": 0,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "7e652808-9d1d-4867-a0b7-a72bbc2181d2",
+              "record_id": "w10-coder-window",
+              "content": "The Atlas release window ends on 2026-09-18.",
+              "score": 0,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "9e1cfcf8-3d19-4787-88da-7b407c84eddc",
+              "record_id": "w10-coder-command",
+              "content": "For the Atlas service release, run just pnpm exec verify:release --profile production.",
+              "score": 0,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "396960bb-e17a-4781-b035-6541db96926f",
+              "record_id": "w10-coder-region",
+              "content": "Atlas production traffic is deployed in ap-southeast-1.",
+              "score": 0,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "ae26d66a-23c2-4474-90f2-33d1021e2a67",
+              "record_id": "w10-coder-error",
+              "content": "DEPLOY_409 means the release lock is held by another deployment worker.",
+              "score": 0,
+              "vector_rank": 5,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "f9fa6c4d-4ec0-4773-8489-09bd8c570225",
+              "record_id": "w10-coder-flag",
+              "content": "The active request router flag is atlas_router_v4.",
+              "score": 0,
+              "vector_rank": 6,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 0.9674679834891693,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "w10-cross-tenant-code",
+          "cohorts": [
+            "continuity_isolation",
+            "error_code",
+            "mixed_language"
+          ],
+          "duration": 119297792,
+          "results": [
+            {
+              "memory_id": "ae26d66a-23c2-4474-90f2-33d1021e2a67",
+              "record_id": "w10-coder-error",
+              "content": "DEPLOY_409 means the release lock is held by another deployment worker.",
+              "score": 0,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "9e1cfcf8-3d19-4787-88da-7b407c84eddc",
+              "record_id": "w10-coder-command",
+              "content": "For the Atlas service release, run just pnpm exec verify:release --profile production.",
+              "score": 0,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "da28e573-af8f-4365-8f8f-a4e021036346",
+              "record_id": "w10-coder-approvals",
+              "content": "A production rollback needs approval from one release owner and one on-call engineer.",
+              "score": 0,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "f9fa6c4d-4ec0-4773-8489-09bd8c570225",
+              "record_id": "w10-coder-flag",
+              "content": "The active request router flag is atlas_router_v4.",
+              "score": 0,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "396960bb-e17a-4781-b035-6541db96926f",
+              "record_id": "w10-coder-region",
+              "content": "Atlas production traffic is deployed in ap-southeast-1.",
+              "score": 0,
+              "vector_rank": 5,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "w10-cross-tenant-release",
+          "cohorts": [
+            "continuity_isolation",
+            "multi_fact",
+            "technical_command"
+          ],
+          "duration": 110190125,
+          "results": [
+            {
+              "memory_id": "9e1cfcf8-3d19-4787-88da-7b407c84eddc",
+              "record_id": "w10-coder-command",
+              "content": "For the Atlas service release, run just pnpm exec verify:release --profile production.",
+              "score": 0,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "7e652808-9d1d-4867-a0b7-a72bbc2181d2",
+              "record_id": "w10-coder-window",
+              "content": "The Atlas release window ends on 2026-09-18.",
+              "score": 0,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "396960bb-e17a-4781-b035-6541db96926f",
+              "record_id": "w10-coder-region",
+              "content": "Atlas production traffic is deployed in ap-southeast-1.",
+              "score": 0,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "f9fa6c4d-4ec0-4773-8489-09bd8c570225",
+              "record_id": "w10-coder-flag",
+              "content": "The active request router flag is atlas_router_v4.",
+              "score": 0,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "da28e573-af8f-4365-8f8f-a4e021036346",
+              "record_id": "w10-coder-approvals",
+              "content": "A production rollback needs approval from one release owner and one on-call engineer.",
+              "score": 0,
+              "vector_rank": 5,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "ae26d66a-23c2-4474-90f2-33d1021e2a67",
+              "record_id": "w10-coder-error",
+              "content": "DEPLOY_409 means the release lock is held by another deployment worker.",
+              "score": 0,
+              "vector_rank": 6,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 0.9197207891481877,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "w10-home-appointment",
+          "cohorts": [
+            "multi_fact",
+            "date",
+            "numeric_constraint"
+          ],
+          "duration": 103227208,
+          "results": [
+            {
+              "memory_id": "3c141039-6567-4ec2-b58a-55b84d63d57f",
+              "record_id": "w10-home-water",
+              "content": "The apartment water meter appointment is scheduled for Saturday morning.",
+              "score": 0,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "e89be6d8-b434-4166-8947-2f1c69265776",
+              "record_id": "w10-home-cost",
+              "content": "The maintenance visit budget is capped at CNY 480.",
+              "score": 0,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "ebfe67ee-12b4-4b14-beb6-88b23fb0402a",
+              "record_id": "w10-home-filter",
+              "content": "Replace the air purifier filter when the indicator stays red for more than 10 minutes.",
+              "score": 0,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "2f81c9c4-5624-4f44-b9b6-45e50cad4b0e",
+              "record_id": "w10-home-model",
+              "content": "The current air purifier model is AC-4100.",
+              "score": 0,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "72467487-0131-4411-bd43-795e3ce31b6d",
+              "record_id": "w10-home-reset",
+              "content": "Do not factory-reset the purifier until its Wi-Fi schedule has been exported.",
+              "score": 0,
+              "vector_rank": 5,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "w10-home-error-exact",
+          "cohorts": [
+            "exact_identifier",
+            "error_code"
+          ],
+          "duration": 116896208,
+          "results": [
+            {
+              "memory_id": "83fc9835-64c0-4125-8915-03065cded7f2",
+              "record_id": "w10-home-code",
+              "content": "E-AIR-17 means the purifier fan sensor did not report a stable reading.",
+              "score": 0,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "2f81c9c4-5624-4f44-b9b6-45e50cad4b0e",
+              "record_id": "w10-home-model",
+              "content": "The current air purifier model is AC-4100.",
+              "score": 0,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "ebfe67ee-12b4-4b14-beb6-88b23fb0402a",
+              "record_id": "w10-home-filter",
+              "content": "Replace the air purifier filter when the indicator stays red for more than 10 minutes.",
+              "score": 0,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "72467487-0131-4411-bd43-795e3ce31b6d",
+              "record_id": "w10-home-reset",
+              "content": "Do not factory-reset the purifier until its Wi-Fi schedule has been exported.",
+              "score": 0,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "w10-home-filter-semantic",
+          "cohorts": [
+            "chinese_semantic",
+            "semantic_paraphrase",
+            "duration"
+          ],
+          "duration": 111227375,
+          "results": [
+            {
+              "memory_id": "ebfe67ee-12b4-4b14-beb6-88b23fb0402a",
+              "record_id": "w10-home-filter",
+              "content": "Replace the air purifier filter when the indicator stays red for more than 10 minutes.",
+              "score": 0,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "72467487-0131-4411-bd43-795e3ce31b6d",
+              "record_id": "w10-home-reset",
+              "content": "Do not factory-reset the purifier until its Wi-Fi schedule has been exported.",
+              "score": 0,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "2f81c9c4-5624-4f44-b9b6-45e50cad4b0e",
+              "record_id": "w10-home-model",
+              "content": "The current air purifier model is AC-4100.",
+              "score": 0,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "83fc9835-64c0-4125-8915-03065cded7f2",
+              "record_id": "w10-home-code",
+              "content": "E-AIR-17 means the purifier fan sensor did not report a stable reading.",
+              "score": 0,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "3c141039-6567-4ec2-b58a-55b84d63d57f",
+              "record_id": "w10-home-water",
+              "content": "The apartment water meter appointment is scheduled for Saturday morning.",
+              "score": 0,
+              "vector_rank": 5,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "w10-home-safe-reset",
+          "cohorts": [
+            "multi_fact",
+            "semantic_paraphrase"
+          ],
+          "duration": 103388125,
+          "results": [
+            {
+              "memory_id": "72467487-0131-4411-bd43-795e3ce31b6d",
+              "record_id": "w10-home-reset",
+              "content": "Do not factory-reset the purifier until its Wi-Fi schedule has been exported.",
+              "score": 0,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "2f81c9c4-5624-4f44-b9b6-45e50cad4b0e",
+              "record_id": "w10-home-model",
+              "content": "The current air purifier model is AC-4100.",
+              "score": 0,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "ebfe67ee-12b4-4b14-beb6-88b23fb0402a",
+              "record_id": "w10-home-filter",
+              "content": "Replace the air purifier filter when the indicator stays red for more than 10 minutes.",
+              "score": 0,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "83fc9835-64c0-4125-8915-03065cded7f2",
+              "record_id": "w10-home-code",
+              "content": "E-AIR-17 means the purifier fan sensor did not report a stable reading.",
+              "score": 0,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "3c141039-6567-4ec2-b58a-55b84d63d57f",
+              "record_id": "w10-home-water",
+              "content": "The apartment water meter appointment is scheduled for Saturday morning.",
+              "score": 0,
+              "vector_rank": 5,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "w10-shopping-budget",
+          "cohorts": [
+            "chinese_semantic",
+            "numeric_constraint"
+          ],
+          "duration": 114830167,
+          "results": [
+            {
+              "memory_id": "23b83aa7-0c31-4349-bb7b-120ef1c97902",
+              "record_id": "w10-shopping-budget",
+              "content": "The household replacement budget this month is CNY 1200.",
+              "score": 0,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "501a098d-0cb8-4b5d-9191-bd6dc6c8ec13",
+              "record_id": "w10-shopping-date",
+              "content": "Place the order before 2026-08-22 so the parts arrive before the inspection.",
+              "score": 0,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "79f4fc40-550e-4973-b193-101e2ea0f08a",
+              "record_id": "w10-shopping-delivery",
+              "content": "Deliver the replacement parts to the Qingdao home address after 18:30.",
+              "score": 0,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "b9cc0d48-1439-459d-82f8-72bc38654744",
+              "record_id": "w10-shopping-size",
+              "content": "The replacement filter must be the 4100-series compatible size, not the 3200-series size.",
+              "score": 0,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "w10-shopping-delivery",
+          "cohorts": [
+            "mixed_language",
+            "semantic_paraphrase"
+          ],
+          "duration": 105148500,
+          "results": [
+            {
+              "memory_id": "79f4fc40-550e-4973-b193-101e2ea0f08a",
+              "record_id": "w10-shopping-delivery",
+              "content": "Deliver the replacement parts to the Qingdao home address after 18:30.",
+              "score": 0,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "501a098d-0cb8-4b5d-9191-bd6dc6c8ec13",
+              "record_id": "w10-shopping-date",
+              "content": "Place the order before 2026-08-22 so the parts arrive before the inspection.",
+              "score": 0,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "fcb562e0-1d6e-4748-b12b-b23a39b7e626",
+              "record_id": "w10-shopping-return",
+              "content": "Keep the receipt until the installation test passes for 48 hours.",
+              "score": 0,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "721ce680-c0d1-4dce-9b40-b32a4c4ddea3",
+              "record_id": "w10-shopping-contact",
+              "content": "Ask the installer to message the household chat rather than calling during the meeting.",
+              "score": 0,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "b9cc0d48-1439-459d-82f8-72bc38654744",
+              "record_id": "w10-shopping-size",
+              "content": "The replacement filter must be the 4100-series compatible size, not the 3200-series size.",
+              "score": 0,
+              "vector_rank": 5,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "w10-shopping-filter-size",
+          "cohorts": [
+            "multi_fact",
+            "numeric_constraint",
+            "semantic_paraphrase"
+          ],
+          "duration": 105759333,
+          "results": [
+            {
+              "memory_id": "b9cc0d48-1439-459d-82f8-72bc38654744",
+              "record_id": "w10-shopping-size",
+              "content": "The replacement filter must be the 4100-series compatible size, not the 3200-series size.",
+              "score": 0,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "501a098d-0cb8-4b5d-9191-bd6dc6c8ec13",
+              "record_id": "w10-shopping-date",
+              "content": "Place the order before 2026-08-22 so the parts arrive before the inspection.",
+              "score": 0,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "721ce680-c0d1-4dce-9b40-b32a4c4ddea3",
+              "record_id": "w10-shopping-contact",
+              "content": "Ask the installer to message the household chat rather than calling during the meeting.",
+              "score": 0,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "fcb562e0-1d6e-4748-b12b-b23a39b7e626",
+              "record_id": "w10-shopping-return",
+              "content": "Keep the receipt until the installation test passes for 48 hours.",
+              "score": 0,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "79f4fc40-550e-4973-b193-101e2ea0f08a",
+              "record_id": "w10-shopping-delivery",
+              "content": "Deliver the replacement parts to the Qingdao home address after 18:30.",
+              "score": 0,
+              "vector_rank": 5,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "w10-shopping-order-date",
+          "cohorts": [
+            "date",
+            "chinese_semantic"
+          ],
+          "duration": 110134083,
+          "results": [
+            {
+              "memory_id": "501a098d-0cb8-4b5d-9191-bd6dc6c8ec13",
+              "record_id": "w10-shopping-date",
+              "content": "Place the order before 2026-08-22 so the parts arrive before the inspection.",
+              "score": 0,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "79f4fc40-550e-4973-b193-101e2ea0f08a",
+              "record_id": "w10-shopping-delivery",
+              "content": "Deliver the replacement parts to the Qingdao home address after 18:30.",
+              "score": 0,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "fcb562e0-1d6e-4748-b12b-b23a39b7e626",
+              "record_id": "w10-shopping-return",
+              "content": "Keep the receipt until the installation test passes for 48 hours.",
+              "score": 0,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "721ce680-c0d1-4dce-9b40-b32a4c4ddea3",
+              "record_id": "w10-shopping-contact",
+              "content": "Ask the installer to message the household chat rather than calling during the meeting.",
+              "score": 0,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "w10-thesis-claim-multi",
+          "cohorts": [
+            "multi_fact",
+            "mixed_language",
+            "chinese_semantic"
+          ],
+          "duration": 103722292,
+          "results": [
+            {
+              "memory_id": "acab25a3-0f96-4e4c-b364-408b00228858",
+              "record_id": "w10-thesis-language",
+              "content": "The final thesis body is written in Chinese, while code identifiers remain in English.",
+              "score": 0,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "2050e50f-d62c-43f0-abb0-df67c1a55afb",
+              "record_id": "w10-thesis-topic",
+              "content": "The thesis studies retrieval quality for long-running software maintenance conversations.",
+              "score": 0,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "75b2104d-98d5-43f2-a1cc-abc0a6d6b692",
+              "record_id": "w10-thesis-deadline",
+              "content": "The methods chapter must be submitted by 2026-10-06.",
+              "score": 0,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "f21f80c2-26c0-4d8b-ae0e-26904e9c150e",
+              "record_id": "w10-thesis-citation",
+              "content": "Every benchmark claim must cite a reproducible artifact and its execution revision.",
+              "score": 0,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "9abdcb57-d6cc-4ca8-b542-5253f8922cef",
+              "record_id": "w10-thesis-method",
+              "content": "The primary method compares governed context against no-history and plain lexical baselines.",
+              "score": 0,
+              "vector_rank": 5,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "d7dc36f9-7c1f-4c1b-9fef-1596533eb59a",
+              "record_id": "w10-thesis-dataset",
+              "content": "The current evaluation dataset is stored at research/data/continuity-v2.jsonl.",
+              "score": 0,
+              "vector_rank": 6,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 0.9674679834891693,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "w10-thesis-dataset-path",
+          "cohorts": [
+            "path",
+            "exact_identifier"
+          ],
+          "duration": 169750292,
+          "results": [
+            {
+              "memory_id": "d7dc36f9-7c1f-4c1b-9fef-1596533eb59a",
+              "record_id": "w10-thesis-dataset",
+              "content": "The current evaluation dataset is stored at research/data/continuity-v2.jsonl.",
+              "score": 0,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "2050e50f-d62c-43f0-abb0-df67c1a55afb",
+              "record_id": "w10-thesis-topic",
+              "content": "The thesis studies retrieval quality for long-running software maintenance conversations.",
+              "score": 0,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "f21f80c2-26c0-4d8b-ae0e-26904e9c150e",
+              "record_id": "w10-thesis-citation",
+              "content": "Every benchmark claim must cite a reproducible artifact and its execution revision.",
+              "score": 0,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "9abdcb57-d6cc-4ca8-b542-5253f8922cef",
+              "record_id": "w10-thesis-method",
+              "content": "The primary method compares governed context against no-history and plain lexical baselines.",
+              "score": 0,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "w10-thesis-deadline",
+          "cohorts": [
+            "date",
+            "semantic_paraphrase"
+          ],
+          "duration": 105787833,
+          "results": [
+            {
+              "memory_id": "75b2104d-98d5-43f2-a1cc-abc0a6d6b692",
+              "record_id": "w10-thesis-deadline",
+              "content": "The methods chapter must be submitted by 2026-10-06.",
+              "score": 0,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "acab25a3-0f96-4e4c-b364-408b00228858",
+              "record_id": "w10-thesis-language",
+              "content": "The final thesis body is written in Chinese, while code identifiers remain in English.",
+              "score": 0,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "2050e50f-d62c-43f0-abb0-df67c1a55afb",
+              "record_id": "w10-thesis-topic",
+              "content": "The thesis studies retrieval quality for long-running software maintenance conversations.",
+              "score": 0,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "d7dc36f9-7c1f-4c1b-9fef-1596533eb59a",
+              "record_id": "w10-thesis-dataset",
+              "content": "The current evaluation dataset is stored at research/data/continuity-v2.jsonl.",
+              "score": 0,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "w10-thesis-method-chinese",
+          "cohorts": [
+            "chinese_semantic",
+            "semantic_paraphrase"
+          ],
+          "duration": 103102500,
+          "results": [
+            {
+              "memory_id": "9abdcb57-d6cc-4ca8-b542-5253f8922cef",
+              "record_id": "w10-thesis-method",
+              "content": "The primary method compares governed context against no-history and plain lexical baselines.",
+              "score": 0,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "f21f80c2-26c0-4d8b-ae0e-26904e9c150e",
+              "record_id": "w10-thesis-citation",
+              "content": "Every benchmark claim must cite a reproducible artifact and its execution revision.",
+              "score": 0,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "2050e50f-d62c-43f0-abb0-df67c1a55afb",
+              "record_id": "w10-thesis-topic",
+              "content": "The thesis studies retrieval quality for long-running software maintenance conversations.",
+              "score": 0,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "75b2104d-98d5-43f2-a1cc-abc0a6d6b692",
+              "record_id": "w10-thesis-deadline",
+              "content": "The methods chapter must be submitted by 2026-10-06.",
+              "score": 0,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "acab25a3-0f96-4e4c-b364-408b00228858",
+              "record_id": "w10-thesis-language",
+              "content": "The final thesis body is written in Chinese, while code identifiers remain in English.",
+              "score": 0,
+              "vector_rank": 5,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        }
+      ],
+      "metrics": {
+        "query_count": 18,
+        "hit_at_1": 1,
+        "recall_at_k": 1,
+        "mrr": 1,
+        "ndcg_at_k": 0.9919253753403624,
+        "forbidden_count": 0,
+        "ineligible_count": 0,
+        "search_p50": 110190125,
+        "search_p95": 148397917
+      },
+      "cohorts": {
+        "chinese_semantic": {
+          "query_count": 6,
+          "hit_at_1": 1,
+          "recall_at_k": 1,
+          "mrr": 1,
+          "ndcg_at_k": 0.9945779972481948,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 110134083,
+          "search_p95": 114830167
+        },
+        "continuity_isolation": {
+          "query_count": 2,
+          "hit_at_1": 1,
+          "recall_at_k": 1,
+          "mrr": 1,
+          "ndcg_at_k": 0.9598603945740938,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 110190125,
+          "search_p95": 110190125
+        },
+        "date": {
+          "query_count": 4,
+          "hit_at_1": 1,
+          "recall_at_k": 1,
+          "mrr": 1,
+          "ndcg_at_k": 0.9918669958722923,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 105787833,
+          "search_p95": 110134083
+        },
+        "duration": {
+          "query_count": 1,
+          "hit_at_1": 1,
+          "recall_at_k": 1,
+          "mrr": 1,
+          "ndcg_at_k": 1,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 111227375,
+          "search_p95": 111227375
+        },
+        "error_code": {
+          "query_count": 3,
+          "hit_at_1": 1,
+          "recall_at_k": 1,
+          "mrr": 1,
+          "ndcg_at_k": 1,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 119297792,
+          "search_p95": 119297792
+        },
+        "exact_identifier": {
+          "query_count": 3,
+          "hit_at_1": 1,
+          "recall_at_k": 1,
+          "mrr": 1,
+          "ndcg_at_k": 1,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 148397917,
+          "search_p95": 148397917
+        },
+        "feature_flag": {
+          "query_count": 1,
+          "hit_at_1": 1,
+          "recall_at_k": 1,
+          "mrr": 1,
+          "ndcg_at_k": 1,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 148397917,
+          "search_p95": 148397917
+        },
+        "mixed_language": {
+          "query_count": 4,
+          "hit_at_1": 1,
+          "recall_at_k": 1,
+          "mrr": 1,
+          "ndcg_at_k": 0.9918669958722923,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 105148500,
+          "search_p95": 113720167
+        },
+        "multi_fact": {
+          "query_count": 6,
+          "hit_at_1": 1,
+          "recall_at_k": 1,
+          "mrr": 1,
+          "ndcg_at_k": 0.9757761260210877,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 103722292,
+          "search_p95": 110190125
+        },
+        "numeric_constraint": {
+          "query_count": 4,
+          "hit_at_1": 1,
+          "recall_at_k": 1,
+          "mrr": 1,
+          "ndcg_at_k": 0.9918669958722923,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 105759333,
+          "search_p95": 114830167
+        },
+        "path": {
+          "query_count": 1,
+          "hit_at_1": 1,
+          "recall_at_k": 1,
+          "mrr": 1,
+          "ndcg_at_k": 1,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 169750292,
+          "search_p95": 169750292
+        },
+        "semantic_paraphrase": {
+          "query_count": 7,
+          "hit_at_1": 1,
+          "recall_at_k": 1,
+          "mrr": 1,
+          "ndcg_at_k": 1,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 105759333,
+          "search_p95": 111227375
+        },
+        "technical_command": {
+          "query_count": 2,
+          "hit_at_1": 1,
+          "recall_at_k": 1,
+          "mrr": 1,
+          "ndcg_at_k": 0.9598603945740938,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 110190125,
+          "search_p95": 110190125
+        }
+      },
+      "hard_gates": {
+        "pass": true,
+        "forbidden_count": 0,
+        "ineligible_count": 0,
+        "degraded_count": 0
+      },
+      "projection_rebuild_equivalent": true
+    },
+    {
+      "profile_id": "siliconflow-bge-large-zh-1024-v2",
+      "model": "BAAI/bge-large-zh-v1.5",
+      "dimensions": 1024,
+      "lifecycle_status": "candidate",
+      "embedding_request_count": 96,
+      "projection_build_duration": 3514512750,
+      "projection_vector_count": 30,
+      "projection_lag": 0,
+      "queries": [
+        {
+          "query_id": "w10-coder-command-paraphrase",
+          "cohorts": [
+            "semantic_paraphrase",
+            "mixed_language",
+            "technical_command"
+          ],
+          "duration": 106333083,
+          "results": [
+            {
+              "memory_id": "9e1cfcf8-3d19-4787-88da-7b407c84eddc",
+              "record_id": "w10-coder-command",
+              "content": "For the Atlas service release, run just pnpm exec verify:release --profile production.",
+              "score": 0,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "f9fa6c4d-4ec0-4773-8489-09bd8c570225",
+              "record_id": "w10-coder-flag",
+              "content": "The active request router flag is atlas_router_v4.",
+              "score": 0,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "da28e573-af8f-4365-8f8f-a4e021036346",
+              "record_id": "w10-coder-approvals",
+              "content": "A production rollback needs approval from one release owner and one on-call engineer.",
+              "score": 0,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "396960bb-e17a-4781-b035-6541db96926f",
+              "record_id": "w10-coder-region",
+              "content": "Atlas production traffic is deployed in ap-southeast-1.",
+              "score": 0,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "ae26d66a-23c2-4474-90f2-33d1021e2a67",
+              "record_id": "w10-coder-error",
+              "content": "DEPLOY_409 means the release lock is held by another deployment worker.",
+              "score": 0,
+              "vector_rank": 5,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "w10-coder-error-chinese",
+          "cohorts": [
+            "chinese_semantic",
+            "error_code"
+          ],
+          "duration": 305172833,
+          "results": [
+            {
+              "memory_id": "ae26d66a-23c2-4474-90f2-33d1021e2a67",
+              "record_id": "w10-coder-error",
+              "content": "DEPLOY_409 means the release lock is held by another deployment worker.",
+              "score": 0,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "da28e573-af8f-4365-8f8f-a4e021036346",
+              "record_id": "w10-coder-approvals",
+              "content": "A production rollback needs approval from one release owner and one on-call engineer.",
+              "score": 0,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "9e1cfcf8-3d19-4787-88da-7b407c84eddc",
+              "record_id": "w10-coder-command",
+              "content": "For the Atlas service release, run just pnpm exec verify:release --profile production.",
+              "score": 0,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "f9fa6c4d-4ec0-4773-8489-09bd8c570225",
+              "record_id": "w10-coder-flag",
+              "content": "The active request router flag is atlas_router_v4.",
+              "score": 0,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "7e652808-9d1d-4867-a0b7-a72bbc2181d2",
+              "record_id": "w10-coder-window",
+              "content": "The Atlas release window ends on 2026-09-18.",
+              "score": 0,
+              "vector_rank": 5,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "w10-coder-flag-exact",
+          "cohorts": [
+            "exact_identifier",
+            "feature_flag"
+          ],
+          "duration": 112156834,
+          "results": [
+            {
+              "memory_id": "f9fa6c4d-4ec0-4773-8489-09bd8c570225",
+              "record_id": "w10-coder-flag",
+              "content": "The active request router flag is atlas_router_v4.",
+              "score": 0,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "9e1cfcf8-3d19-4787-88da-7b407c84eddc",
+              "record_id": "w10-coder-command",
+              "content": "For the Atlas service release, run just pnpm exec verify:release --profile production.",
+              "score": 0,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "7e652808-9d1d-4867-a0b7-a72bbc2181d2",
+              "record_id": "w10-coder-window",
+              "content": "The Atlas release window ends on 2026-09-18.",
+              "score": 0,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "w10-coder-release-multi",
+          "cohorts": [
+            "multi_fact",
+            "date",
+            "numeric_constraint"
+          ],
+          "duration": 102006916,
+          "results": [
+            {
+              "memory_id": "da28e573-af8f-4365-8f8f-a4e021036346",
+              "record_id": "w10-coder-approvals",
+              "content": "A production rollback needs approval from one release owner and one on-call engineer.",
+              "score": 0,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "9e1cfcf8-3d19-4787-88da-7b407c84eddc",
+              "record_id": "w10-coder-command",
+              "content": "For the Atlas service release, run just pnpm exec verify:release --profile production.",
+              "score": 0,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "7e652808-9d1d-4867-a0b7-a72bbc2181d2",
+              "record_id": "w10-coder-window",
+              "content": "The Atlas release window ends on 2026-09-18.",
+              "score": 0,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "ae26d66a-23c2-4474-90f2-33d1021e2a67",
+              "record_id": "w10-coder-error",
+              "content": "DEPLOY_409 means the release lock is held by another deployment worker.",
+              "score": 0,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "f9fa6c4d-4ec0-4773-8489-09bd8c570225",
+              "record_id": "w10-coder-flag",
+              "content": "The active request router flag is atlas_router_v4.",
+              "score": 0,
+              "vector_rank": 5,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "396960bb-e17a-4781-b035-6541db96926f",
+              "record_id": "w10-coder-region",
+              "content": "Atlas production traffic is deployed in ap-southeast-1.",
+              "score": 0,
+              "vector_rank": 6,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 0.8710785440003371,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "w10-cross-tenant-code",
+          "cohorts": [
+            "continuity_isolation",
+            "error_code",
+            "mixed_language"
+          ],
+          "duration": 105270334,
+          "results": [
+            {
+              "memory_id": "ae26d66a-23c2-4474-90f2-33d1021e2a67",
+              "record_id": "w10-coder-error",
+              "content": "DEPLOY_409 means the release lock is held by another deployment worker.",
+              "score": 0,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "9e1cfcf8-3d19-4787-88da-7b407c84eddc",
+              "record_id": "w10-coder-command",
+              "content": "For the Atlas service release, run just pnpm exec verify:release --profile production.",
+              "score": 0,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "f9fa6c4d-4ec0-4773-8489-09bd8c570225",
+              "record_id": "w10-coder-flag",
+              "content": "The active request router flag is atlas_router_v4.",
+              "score": 0,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "da28e573-af8f-4365-8f8f-a4e021036346",
+              "record_id": "w10-coder-approvals",
+              "content": "A production rollback needs approval from one release owner and one on-call engineer.",
+              "score": 0,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "7e652808-9d1d-4867-a0b7-a72bbc2181d2",
+              "record_id": "w10-coder-window",
+              "content": "The Atlas release window ends on 2026-09-18.",
+              "score": 0,
+              "vector_rank": 5,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "w10-cross-tenant-release",
+          "cohorts": [
+            "continuity_isolation",
+            "multi_fact",
+            "technical_command"
+          ],
+          "duration": 103994875,
+          "results": [
+            {
+              "memory_id": "9e1cfcf8-3d19-4787-88da-7b407c84eddc",
+              "record_id": "w10-coder-command",
+              "content": "For the Atlas service release, run just pnpm exec verify:release --profile production.",
+              "score": 0,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "396960bb-e17a-4781-b035-6541db96926f",
+              "record_id": "w10-coder-region",
+              "content": "Atlas production traffic is deployed in ap-southeast-1.",
+              "score": 0,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "7e652808-9d1d-4867-a0b7-a72bbc2181d2",
+              "record_id": "w10-coder-window",
+              "content": "The Atlas release window ends on 2026-09-18.",
+              "score": 0,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "f9fa6c4d-4ec0-4773-8489-09bd8c570225",
+              "record_id": "w10-coder-flag",
+              "content": "The active request router flag is atlas_router_v4.",
+              "score": 0,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "da28e573-af8f-4365-8f8f-a4e021036346",
+              "record_id": "w10-coder-approvals",
+              "content": "A production rollback needs approval from one release owner and one on-call engineer.",
+              "score": 0,
+              "vector_rank": 5,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "ae26d66a-23c2-4474-90f2-33d1021e2a67",
+              "record_id": "w10-coder-error",
+              "content": "DEPLOY_409 means the release lock is held by another deployment worker.",
+              "score": 0,
+              "vector_rank": 6,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "w10-home-appointment",
+          "cohorts": [
+            "multi_fact",
+            "date",
+            "numeric_constraint"
+          ],
+          "duration": 104275458,
+          "results": [
+            {
+              "memory_id": "3c141039-6567-4ec2-b58a-55b84d63d57f",
+              "record_id": "w10-home-water",
+              "content": "The apartment water meter appointment is scheduled for Saturday morning.",
+              "score": 0,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "e89be6d8-b434-4166-8947-2f1c69265776",
+              "record_id": "w10-home-cost",
+              "content": "The maintenance visit budget is capped at CNY 480.",
+              "score": 0,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "ebfe67ee-12b4-4b14-beb6-88b23fb0402a",
+              "record_id": "w10-home-filter",
+              "content": "Replace the air purifier filter when the indicator stays red for more than 10 minutes.",
+              "score": 0,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "2f81c9c4-5624-4f44-b9b6-45e50cad4b0e",
+              "record_id": "w10-home-model",
+              "content": "The current air purifier model is AC-4100.",
+              "score": 0,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "83fc9835-64c0-4125-8915-03065cded7f2",
+              "record_id": "w10-home-code",
+              "content": "E-AIR-17 means the purifier fan sensor did not report a stable reading.",
+              "score": 0,
+              "vector_rank": 5,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "w10-home-error-exact",
+          "cohorts": [
+            "exact_identifier",
+            "error_code"
+          ],
+          "duration": 117479791,
+          "results": [
+            {
+              "memory_id": "83fc9835-64c0-4125-8915-03065cded7f2",
+              "record_id": "w10-home-code",
+              "content": "E-AIR-17 means the purifier fan sensor did not report a stable reading.",
+              "score": 0,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "2f81c9c4-5624-4f44-b9b6-45e50cad4b0e",
+              "record_id": "w10-home-model",
+              "content": "The current air purifier model is AC-4100.",
+              "score": 0,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "ebfe67ee-12b4-4b14-beb6-88b23fb0402a",
+              "record_id": "w10-home-filter",
+              "content": "Replace the air purifier filter when the indicator stays red for more than 10 minutes.",
+              "score": 0,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "72467487-0131-4411-bd43-795e3ce31b6d",
+              "record_id": "w10-home-reset",
+              "content": "Do not factory-reset the purifier until its Wi-Fi schedule has been exported.",
+              "score": 0,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "w10-home-filter-semantic",
+          "cohorts": [
+            "chinese_semantic",
+            "semantic_paraphrase",
+            "duration"
+          ],
+          "duration": 111247167,
+          "results": [
+            {
+              "memory_id": "ebfe67ee-12b4-4b14-beb6-88b23fb0402a",
+              "record_id": "w10-home-filter",
+              "content": "Replace the air purifier filter when the indicator stays red for more than 10 minutes.",
+              "score": 0,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "2f81c9c4-5624-4f44-b9b6-45e50cad4b0e",
+              "record_id": "w10-home-model",
+              "content": "The current air purifier model is AC-4100.",
+              "score": 0,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "72467487-0131-4411-bd43-795e3ce31b6d",
+              "record_id": "w10-home-reset",
+              "content": "Do not factory-reset the purifier until its Wi-Fi schedule has been exported.",
+              "score": 0,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "3c141039-6567-4ec2-b58a-55b84d63d57f",
+              "record_id": "w10-home-water",
+              "content": "The apartment water meter appointment is scheduled for Saturday morning.",
+              "score": 0,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "83fc9835-64c0-4125-8915-03065cded7f2",
+              "record_id": "w10-home-code",
+              "content": "E-AIR-17 means the purifier fan sensor did not report a stable reading.",
+              "score": 0,
+              "vector_rank": 5,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "w10-home-safe-reset",
+          "cohorts": [
+            "multi_fact",
+            "semantic_paraphrase"
+          ],
+          "duration": 211614166,
+          "results": [
+            {
+              "memory_id": "72467487-0131-4411-bd43-795e3ce31b6d",
+              "record_id": "w10-home-reset",
+              "content": "Do not factory-reset the purifier until its Wi-Fi schedule has been exported.",
+              "score": 0,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "2f81c9c4-5624-4f44-b9b6-45e50cad4b0e",
+              "record_id": "w10-home-model",
+              "content": "The current air purifier model is AC-4100.",
+              "score": 0,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "ebfe67ee-12b4-4b14-beb6-88b23fb0402a",
+              "record_id": "w10-home-filter",
+              "content": "Replace the air purifier filter when the indicator stays red for more than 10 minutes.",
+              "score": 0,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "3c141039-6567-4ec2-b58a-55b84d63d57f",
+              "record_id": "w10-home-water",
+              "content": "The apartment water meter appointment is scheduled for Saturday morning.",
+              "score": 0,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "e89be6d8-b434-4166-8947-2f1c69265776",
+              "record_id": "w10-home-cost",
+              "content": "The maintenance visit budget is capped at CNY 480.",
+              "score": 0,
+              "vector_rank": 5,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "w10-shopping-budget",
+          "cohorts": [
+            "chinese_semantic",
+            "numeric_constraint"
+          ],
+          "duration": 102603250,
+          "results": [
+            {
+              "memory_id": "23b83aa7-0c31-4349-bb7b-120ef1c97902",
+              "record_id": "w10-shopping-budget",
+              "content": "The household replacement budget this month is CNY 1200.",
+              "score": 0,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "b9cc0d48-1439-459d-82f8-72bc38654744",
+              "record_id": "w10-shopping-size",
+              "content": "The replacement filter must be the 4100-series compatible size, not the 3200-series size.",
+              "score": 0,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "501a098d-0cb8-4b5d-9191-bd6dc6c8ec13",
+              "record_id": "w10-shopping-date",
+              "content": "Place the order before 2026-08-22 so the parts arrive before the inspection.",
+              "score": 0,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "79f4fc40-550e-4973-b193-101e2ea0f08a",
+              "record_id": "w10-shopping-delivery",
+              "content": "Deliver the replacement parts to the Qingdao home address after 18:30.",
+              "score": 0,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "w10-shopping-delivery",
+          "cohorts": [
+            "mixed_language",
+            "semantic_paraphrase"
+          ],
+          "duration": 115147459,
+          "results": [
+            {
+              "memory_id": "501a098d-0cb8-4b5d-9191-bd6dc6c8ec13",
+              "record_id": "w10-shopping-date",
+              "content": "Place the order before 2026-08-22 so the parts arrive before the inspection.",
+              "score": 0,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "79f4fc40-550e-4973-b193-101e2ea0f08a",
+              "record_id": "w10-shopping-delivery",
+              "content": "Deliver the replacement parts to the Qingdao home address after 18:30.",
+              "score": 0,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "fcb562e0-1d6e-4748-b12b-b23a39b7e626",
+              "record_id": "w10-shopping-return",
+              "content": "Keep the receipt until the installation test passes for 48 hours.",
+              "score": 0,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "23b83aa7-0c31-4349-bb7b-120ef1c97902",
+              "record_id": "w10-shopping-budget",
+              "content": "The household replacement budget this month is CNY 1200.",
+              "score": 0,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "b9cc0d48-1439-459d-82f8-72bc38654744",
+              "record_id": "w10-shopping-size",
+              "content": "The replacement filter must be the 4100-series compatible size, not the 3200-series size.",
+              "score": 0,
+              "vector_rank": 5,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 0,
+            "recall_at_k": 1,
+            "mrr": 0.5,
+            "ndcg_at_k": 0.6309297535714574,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "w10-shopping-filter-size",
+          "cohorts": [
+            "multi_fact",
+            "numeric_constraint",
+            "semantic_paraphrase"
+          ],
+          "duration": 109883334,
+          "results": [
+            {
+              "memory_id": "b9cc0d48-1439-459d-82f8-72bc38654744",
+              "record_id": "w10-shopping-size",
+              "content": "The replacement filter must be the 4100-series compatible size, not the 3200-series size.",
+              "score": 0,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "501a098d-0cb8-4b5d-9191-bd6dc6c8ec13",
+              "record_id": "w10-shopping-date",
+              "content": "Place the order before 2026-08-22 so the parts arrive before the inspection.",
+              "score": 0,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "fcb562e0-1d6e-4748-b12b-b23a39b7e626",
+              "record_id": "w10-shopping-return",
+              "content": "Keep the receipt until the installation test passes for 48 hours.",
+              "score": 0,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "721ce680-c0d1-4dce-9b40-b32a4c4ddea3",
+              "record_id": "w10-shopping-contact",
+              "content": "Ask the installer to message the household chat rather than calling during the meeting.",
+              "score": 0,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "79f4fc40-550e-4973-b193-101e2ea0f08a",
+              "record_id": "w10-shopping-delivery",
+              "content": "Deliver the replacement parts to the Qingdao home address after 18:30.",
+              "score": 0,
+              "vector_rank": 5,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "w10-shopping-order-date",
+          "cohorts": [
+            "date",
+            "chinese_semantic"
+          ],
+          "duration": 101128041,
+          "results": [
+            {
+              "memory_id": "501a098d-0cb8-4b5d-9191-bd6dc6c8ec13",
+              "record_id": "w10-shopping-date",
+              "content": "Place the order before 2026-08-22 so the parts arrive before the inspection.",
+              "score": 0,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "79f4fc40-550e-4973-b193-101e2ea0f08a",
+              "record_id": "w10-shopping-delivery",
+              "content": "Deliver the replacement parts to the Qingdao home address after 18:30.",
+              "score": 0,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "fcb562e0-1d6e-4748-b12b-b23a39b7e626",
+              "record_id": "w10-shopping-return",
+              "content": "Keep the receipt until the installation test passes for 48 hours.",
+              "score": 0,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "23b83aa7-0c31-4349-bb7b-120ef1c97902",
+              "record_id": "w10-shopping-budget",
+              "content": "The household replacement budget this month is CNY 1200.",
+              "score": 0,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 1,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "w10-thesis-claim-multi",
+          "cohorts": [
+            "multi_fact",
+            "mixed_language",
+            "chinese_semantic"
+          ],
+          "duration": 110716833,
+          "results": [
+            {
+              "memory_id": "2050e50f-d62c-43f0-abb0-df67c1a55afb",
+              "record_id": "w10-thesis-topic",
+              "content": "The thesis studies retrieval quality for long-running software maintenance conversations.",
+              "score": 0,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "acab25a3-0f96-4e4c-b364-408b00228858",
+              "record_id": "w10-thesis-language",
+              "content": "The final thesis body is written in Chinese, while code identifiers remain in English.",
+              "score": 0,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "75b2104d-98d5-43f2-a1cc-abc0a6d6b692",
+              "record_id": "w10-thesis-deadline",
+              "content": "The methods chapter must be submitted by 2026-10-06.",
+              "score": 0,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "9abdcb57-d6cc-4ca8-b542-5253f8922cef",
+              "record_id": "w10-thesis-method",
+              "content": "The primary method compares governed context against no-history and plain lexical baselines.",
+              "score": 0,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "f21f80c2-26c0-4d8b-ae0e-26904e9c150e",
+              "record_id": "w10-thesis-citation",
+              "content": "Every benchmark claim must cite a reproducible artifact and its execution revision.",
+              "score": 0,
+              "vector_rank": 5,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "d7dc36f9-7c1f-4c1b-9fef-1596533eb59a",
+              "record_id": "w10-thesis-dataset",
+              "content": "The current evaluation dataset is stored at research/data/continuity-v2.jsonl.",
+              "score": 0,
+              "vector_rank": 6,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 0.9469024295259745,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "w10-thesis-dataset-path",
+          "cohorts": [
+            "path",
+            "exact_identifier"
+          ],
+          "duration": 115453250,
+          "results": [
+            {
+              "memory_id": "d7dc36f9-7c1f-4c1b-9fef-1596533eb59a",
+              "record_id": "w10-thesis-dataset",
+              "content": "The current evaluation dataset is stored at research/data/continuity-v2.jsonl.",
+              "score": 0,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "2050e50f-d62c-43f0-abb0-df67c1a55afb",
+              "record_id": "w10-thesis-topic",
+              "content": "The thesis studies retrieval quality for long-running software maintenance conversations.",
+              "score": 0,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "9abdcb57-d6cc-4ca8-b542-5253f8922cef",
+              "record_id": "w10-thesis-method",
+              "content": "The primary method compares governed context against no-history and plain lexical baselines.",
+              "score": 0,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "acab25a3-0f96-4e4c-b364-408b00228858",
+              "record_id": "w10-thesis-language",
+              "content": "The final thesis body is written in Chinese, while code identifiers remain in English.",
+              "score": 0,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "w10-thesis-deadline",
+          "cohorts": [
+            "date",
+            "semantic_paraphrase"
+          ],
+          "duration": 113528625,
+          "results": [
+            {
+              "memory_id": "75b2104d-98d5-43f2-a1cc-abc0a6d6b692",
+              "record_id": "w10-thesis-deadline",
+              "content": "The methods chapter must be submitted by 2026-10-06.",
+              "score": 0,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "2050e50f-d62c-43f0-abb0-df67c1a55afb",
+              "record_id": "w10-thesis-topic",
+              "content": "The thesis studies retrieval quality for long-running software maintenance conversations.",
+              "score": 0,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "9abdcb57-d6cc-4ca8-b542-5253f8922cef",
+              "record_id": "w10-thesis-method",
+              "content": "The primary method compares governed context against no-history and plain lexical baselines.",
+              "score": 0,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "f21f80c2-26c0-4d8b-ae0e-26904e9c150e",
+              "record_id": "w10-thesis-citation",
+              "content": "Every benchmark claim must cite a reproducible artifact and its execution revision.",
+              "score": 0,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "w10-thesis-method-chinese",
+          "cohorts": [
+            "chinese_semantic",
+            "semantic_paraphrase"
+          ],
+          "duration": 112756958,
+          "results": [
+            {
+              "memory_id": "2050e50f-d62c-43f0-abb0-df67c1a55afb",
+              "record_id": "w10-thesis-topic",
+              "content": "The thesis studies retrieval quality for long-running software maintenance conversations.",
+              "score": 0,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "75b2104d-98d5-43f2-a1cc-abc0a6d6b692",
+              "record_id": "w10-thesis-deadline",
+              "content": "The methods chapter must be submitted by 2026-10-06.",
+              "score": 0,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "9abdcb57-d6cc-4ca8-b542-5253f8922cef",
+              "record_id": "w10-thesis-method",
+              "content": "The primary method compares governed context against no-history and plain lexical baselines.",
+              "score": 0,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "acab25a3-0f96-4e4c-b364-408b00228858",
+              "record_id": "w10-thesis-language",
+              "content": "The final thesis body is written in Chinese, while code identifiers remain in English.",
+              "score": 0,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "d7dc36f9-7c1f-4c1b-9fef-1596533eb59a",
+              "record_id": "w10-thesis-dataset",
+              "content": "The current evaluation dataset is stored at research/data/continuity-v2.jsonl.",
+              "score": 0,
+              "vector_rank": 5,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 0,
+            "recall_at_k": 1,
+            "mrr": 0.3333333333333333,
+            "ndcg_at_k": 0.5,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        }
+      ],
+      "metrics": {
+        "query_count": 18,
+        "hit_at_1": 0.8888888888888888,
+        "recall_at_k": 1,
+        "mrr": 0.9351851851851851,
+        "ndcg_at_k": 0.9416061515054316,
+        "forbidden_count": 1,
+        "ineligible_count": 0,
+        "search_p50": 110716833,
+        "search_p95": 211614166
+      },
+      "cohorts": {
+        "chinese_semantic": {
+          "query_count": 6,
+          "hit_at_1": 0.8333333333333334,
+          "recall_at_k": 1,
+          "mrr": 0.8888888888888888,
+          "ndcg_at_k": 0.9078170715876624,
+          "forbidden_count": 1,
+          "ineligible_count": 0,
+          "search_p50": 110716833,
+          "search_p95": 112756958
+        },
+        "continuity_isolation": {
+          "query_count": 2,
+          "hit_at_1": 1,
+          "recall_at_k": 1,
+          "mrr": 1,
+          "ndcg_at_k": 1,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 103994875,
+          "search_p95": 103994875
+        },
+        "date": {
+          "query_count": 4,
+          "hit_at_1": 1,
+          "recall_at_k": 1,
+          "mrr": 1,
+          "ndcg_at_k": 0.9677696360000843,
+          "forbidden_count": 1,
+          "ineligible_count": 0,
+          "search_p50": 102006916,
+          "search_p95": 104275458
+        },
+        "duration": {
+          "query_count": 1,
+          "hit_at_1": 1,
+          "recall_at_k": 1,
+          "mrr": 1,
+          "ndcg_at_k": 1,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 111247167,
+          "search_p95": 111247167
+        },
+        "error_code": {
+          "query_count": 3,
+          "hit_at_1": 1,
+          "recall_at_k": 1,
+          "mrr": 1,
+          "ndcg_at_k": 1,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 117479791,
+          "search_p95": 117479791
+        },
+        "exact_identifier": {
+          "query_count": 3,
+          "hit_at_1": 1,
+          "recall_at_k": 1,
+          "mrr": 1,
+          "ndcg_at_k": 1,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 115453250,
+          "search_p95": 115453250
+        },
+        "feature_flag": {
+          "query_count": 1,
+          "hit_at_1": 1,
+          "recall_at_k": 1,
+          "mrr": 1,
+          "ndcg_at_k": 1,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 112156834,
+          "search_p95": 112156834
+        },
+        "mixed_language": {
+          "query_count": 4,
+          "hit_at_1": 0.75,
+          "recall_at_k": 1,
+          "mrr": 0.875,
+          "ndcg_at_k": 0.894458045774358,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 106333083,
+          "search_p95": 110716833
+        },
+        "multi_fact": {
+          "query_count": 6,
+          "hit_at_1": 1,
+          "recall_at_k": 1,
+          "mrr": 1,
+          "ndcg_at_k": 0.9696634955877186,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 104275458,
+          "search_p95": 110716833
+        },
+        "numeric_constraint": {
+          "query_count": 4,
+          "hit_at_1": 1,
+          "recall_at_k": 1,
+          "mrr": 1,
+          "ndcg_at_k": 0.9677696360000843,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 102603250,
+          "search_p95": 104275458
+        },
+        "path": {
+          "query_count": 1,
+          "hit_at_1": 1,
+          "recall_at_k": 1,
+          "mrr": 1,
+          "ndcg_at_k": 1,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 115453250,
+          "search_p95": 115453250
+        },
+        "semantic_paraphrase": {
+          "query_count": 7,
+          "hit_at_1": 0.7142857142857143,
+          "recall_at_k": 1,
+          "mrr": 0.8333333333333333,
+          "ndcg_at_k": 0.8758471076530654,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 112756958,
+          "search_p95": 115147459
+        },
+        "technical_command": {
+          "query_count": 2,
+          "hit_at_1": 1,
+          "recall_at_k": 1,
+          "mrr": 1,
+          "ndcg_at_k": 1,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 103994875,
+          "search_p95": 103994875
+        }
+      },
+      "hard_gates": {
+        "pass": false,
+        "forbidden_count": 1,
+        "ineligible_count": 0,
+        "degraded_count": 0
+      },
+      "projection_rebuild_equivalent": true
+    }
+  ],
+  "promotion_policy": {
+    "max_recall_regression": 0,
+    "max_mrr_regression": 0.02,
+    "max_ndcg_regression": 0.02,
+    "max_p95_ratio": 1.25,
+    "max_p95_absolute_increase": 75000000,
+    "min_hit_at_1_gain": 0.02,
+    "min_mrr_gain": 0.02,
+    "min_p95_improvement_ratio": 0.15
+  },
+  "promotion_decision": {
+    "incumbent_profile_id": "siliconflow-bge-m3-1024-v1",
+    "candidate_profile_id": "siliconflow-bge-large-zh-1024-v2",
+    "promote": false,
+    "status": "keep_candidate",
+    "reason_codes": [
+      "hard_gate_failed",
+      "quality_regression"
+    ],
+    "hit_at_1_delta": -0.11111111111111116,
+    "recall_delta": 0,
+    "mrr_delta": -0.06481481481481488,
+    "ndcg_delta": -0.050319223834930815,
+    "p95_delta": 63216249
+  },
+  "hard_gates": {
+    "pass": false,
+    "profile_failure_count": 1,
+    "forbidden_count": 1,
+    "ineligible_count": 0,
+    "degraded_count": 0,
+    "projection_lag": 0
+  },
+  "qualification_status": "hard_gate_failed",
+  "non_claims": [
+    "not a model ranking",
+    "not a production default switch without the recorded decision",
+    "not a scale qualification",
+    "not a sealed result"
+  ]
+}

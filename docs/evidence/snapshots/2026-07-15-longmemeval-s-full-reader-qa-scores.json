@@ -1,0 +1,832 @@
+{
+  "conditions": {
+    "plain_token_overlap_k10": {
+      "total": 500,
+      "completed": 500,
+      "reader_failed": 0,
+      "judged": 500,
+      "judge_failed": 0,
+      "judge_invalid": 0,
+      "judge_not_run": 0,
+      "judge_correct": 379,
+      "exact_matches": 252,
+      "mean_token_f1": 0.5906,
+      "mean_answer_token_recall": 0.706,
+      "overall_judge_accuracy": 0.758,
+      "judged_accuracy": 0.758,
+      "task_averaged_judge_accuracy": 0.7668,
+      "abstention_expected": 30,
+      "abstention_correct": 29,
+      "abstention_accuracy": 0.9667,
+      "reader_latency": {
+        "count": 500,
+        "total_ms": 4470759,
+        "p50_ms": 7762,
+        "p95_ms": 15116,
+        "p99_ms": 20896,
+        "max_ms": 43822
+      },
+      "judge_latency": {
+        "count": 500,
+        "total_ms": 5589437,
+        "p50_ms": 6257,
+        "p95_ms": 33743,
+        "p99_ms": 59336,
+        "max_ms": 125502
+      },
+      "usage": {
+        "available_attempts": 500,
+        "missing_attempts": 0,
+        "input_tokens": 14124371,
+        "cached_input_tokens": 933631,
+        "output_tokens": 275978,
+        "reasoning_tokens": 0,
+        "total_tokens": 15333980
+      },
+      "judge_usage": {
+        "available_attempts": 500,
+        "missing_attempts": 1,
+        "input_tokens": 175630,
+        "cached_input_tokens": 540416,
+        "output_tokens": 82060,
+        "reasoning_tokens": 81560,
+        "total_tokens": 798106
+      }
+    },
+    "vermory_lexical_k10": {
+      "total": 500,
+      "completed": 500,
+      "reader_failed": 0,
+      "judged": 500,
+      "judge_failed": 0,
+      "judge_invalid": 0,
+      "judge_not_run": 0,
+      "judge_correct": 341,
+      "exact_matches": 226,
+      "mean_token_f1": 0.5328,
+      "mean_answer_token_recall": 0.6557,
+      "overall_judge_accuracy": 0.682,
+      "judged_accuracy": 0.682,
+      "task_averaged_judge_accuracy": 0.6952,
+      "abstention_expected": 30,
+      "abstention_correct": 29,
+      "abstention_accuracy": 0.9667,
+      "reader_latency": {
+        "count": 500,
+        "total_ms": 4519906,
+        "p50_ms": 7956,
+        "p95_ms": 15496,
+        "p99_ms": 19454,
+        "max_ms": 27101
+      },
+      "judge_latency": {
+        "count": 500,
+        "total_ms": 5772320,
+        "p50_ms": 6229,
+        "p95_ms": 39473,
+        "p99_ms": 60193,
+        "max_ms": 89219
+      },
+      "usage": {
+        "available_attempts": 500,
+        "missing_attempts": 0,
+        "input_tokens": 14766352,
+        "cached_input_tokens": 927048,
+        "output_tokens": 272094,
+        "reasoning_tokens": 0,
+        "total_tokens": 15965494
+      },
+      "judge_usage": {
+        "available_attempts": 501,
+        "missing_attempts": 0,
+        "input_tokens": 169135,
+        "cached_input_tokens": 549120,
+        "output_tokens": 79112,
+        "reasoning_tokens": 78609,
+        "total_tokens": 797367
+      }
+    }
+  },
+  "judge_deterministic_disagreements": 304,
+  "paired": {
+    "eligible": 500,
+    "both_correct": 310,
+    "plain_only_correct": 69,
+    "vermory_only_correct": 31,
+    "neither_correct": 90,
+    "incomplete": 0
+  },
+  "question_types": {
+    "knowledge-update": {
+      "plain_token_overlap_k10": {
+        "total": 78,
+        "completed": 78,
+        "reader_failed": 0,
+        "judged": 78,
+        "judge_failed": 0,
+        "judge_invalid": 0,
+        "judge_not_run": 0,
+        "judge_correct": 70,
+        "exact_matches": 57,
+        "mean_token_f1": 0.7827,
+        "mean_answer_token_recall": 0.8615,
+        "overall_judge_accuracy": 0.8974,
+        "judged_accuracy": 0.8974,
+        "task_averaged_judge_accuracy": 0,
+        "abstention_expected": 6,
+        "abstention_correct": 6,
+        "abstention_accuracy": 1,
+        "reader_latency": {
+          "count": 78,
+          "total_ms": 676608,
+          "p50_ms": 7853,
+          "p95_ms": 14395,
+          "p99_ms": 21761,
+          "max_ms": 21761
+        },
+        "judge_latency": {
+          "count": 78,
+          "total_ms": 756091,
+          "p50_ms": 6183,
+          "p95_ms": 29822,
+          "p99_ms": 43055,
+          "max_ms": 43055
+        },
+        "usage": {
+          "available_attempts": 78,
+          "missing_attempts": 0,
+          "input_tokens": 2212056,
+          "cached_input_tokens": 154870,
+          "output_tokens": 39779,
+          "reasoning_tokens": 0,
+          "total_tokens": 2406705
+        },
+        "judge_usage": {
+          "available_attempts": 78,
+          "missing_attempts": 0,
+          "input_tokens": 28850,
+          "cached_input_tokens": 78464,
+          "output_tokens": 12577,
+          "reasoning_tokens": 12499,
+          "total_tokens": 119891
+        }
+      },
+      "vermory_lexical_k10": {
+        "total": 78,
+        "completed": 78,
+        "reader_failed": 0,
+        "judged": 78,
+        "judge_failed": 0,
+        "judge_invalid": 0,
+        "judge_not_run": 0,
+        "judge_correct": 63,
+        "exact_matches": 55,
+        "mean_token_f1": 0.7585,
+        "mean_answer_token_recall": 0.8426,
+        "overall_judge_accuracy": 0.8077,
+        "judged_accuracy": 0.8077,
+        "task_averaged_judge_accuracy": 0,
+        "abstention_expected": 6,
+        "abstention_correct": 6,
+        "abstention_accuracy": 1,
+        "reader_latency": {
+          "count": 78,
+          "total_ms": 697138,
+          "p50_ms": 8646,
+          "p95_ms": 13205,
+          "p99_ms": 14033,
+          "max_ms": 14033
+        },
+        "judge_latency": {
+          "count": 78,
+          "total_ms": 787254,
+          "p50_ms": 6243,
+          "p95_ms": 33894,
+          "p99_ms": 53664,
+          "max_ms": 53664
+        },
+        "usage": {
+          "available_attempts": 78,
+          "missing_attempts": 0,
+          "input_tokens": 2270132,
+          "cached_input_tokens": 156424,
+          "output_tokens": 42499,
+          "reasoning_tokens": 0,
+          "total_tokens": 2469055
+        },
+        "judge_usage": {
+          "available_attempts": 78,
+          "missing_attempts": 0,
+          "input_tokens": 26946,
+          "cached_input_tokens": 80384,
+          "output_tokens": 13226,
+          "reasoning_tokens": 13148,
+          "total_tokens": 120556
+        }
+      }
+    },
+    "multi-session": {
+      "plain_token_overlap_k10": {
+        "total": 133,
+        "completed": 133,
+        "reader_failed": 0,
+        "judged": 133,
+        "judge_failed": 0,
+        "judge_invalid": 0,
+        "judge_not_run": 0,
+        "judge_correct": 90,
+        "exact_matches": 66,
+        "mean_token_f1": 0.547,
+        "mean_answer_token_recall": 0.6351,
+        "overall_judge_accuracy": 0.6767,
+        "judged_accuracy": 0.6767,
+        "task_averaged_judge_accuracy": 0,
+        "abstention_expected": 12,
+        "abstention_correct": 11,
+        "abstention_accuracy": 0.9167,
+        "reader_latency": {
+          "count": 133,
+          "total_ms": 1205630,
+          "p50_ms": 7916,
+          "p95_ms": 14718,
+          "p99_ms": 19806,
+          "max_ms": 33283
+        },
+        "judge_latency": {
+          "count": 133,
+          "total_ms": 1447976,
+          "p50_ms": 6390,
+          "p95_ms": 34479,
+          "p99_ms": 44514,
+          "max_ms": 59336
+        },
+        "usage": {
+          "available_attempts": 133,
+          "missing_attempts": 0,
+          "input_tokens": 3779585,
+          "cached_input_tokens": 250184,
+          "output_tokens": 74825,
+          "reasoning_tokens": 0,
+          "total_tokens": 4104594
+        },
+        "judge_usage": {
+          "available_attempts": 133,
+          "missing_attempts": 0,
+          "input_tokens": 36241,
+          "cached_input_tokens": 152192,
+          "output_tokens": 17562,
+          "reasoning_tokens": 17429,
+          "total_tokens": 205995
+        }
+      },
+      "vermory_lexical_k10": {
+        "total": 133,
+        "completed": 133,
+        "reader_failed": 0,
+        "judged": 133,
+        "judge_failed": 0,
+        "judge_invalid": 0,
+        "judge_not_run": 0,
+        "judge_correct": 77,
+        "exact_matches": 57,
+        "mean_token_f1": 0.4789,
+        "mean_answer_token_recall": 0.5712,
+        "overall_judge_accuracy": 0.5789,
+        "judged_accuracy": 0.5789,
+        "task_averaged_judge_accuracy": 0,
+        "abstention_expected": 12,
+        "abstention_correct": 11,
+        "abstention_accuracy": 0.9167,
+        "reader_latency": {
+          "count": 133,
+          "total_ms": 1242377,
+          "p50_ms": 8056,
+          "p95_ms": 16275,
+          "p99_ms": 21220,
+          "max_ms": 27101
+        },
+        "judge_latency": {
+          "count": 133,
+          "total_ms": 1447715,
+          "p50_ms": 6249,
+          "p95_ms": 30153,
+          "p99_ms": 54930,
+          "max_ms": 76745
+        },
+        "usage": {
+          "available_attempts": 133,
+          "missing_attempts": 0,
+          "input_tokens": 3917577,
+          "cached_input_tokens": 253469,
+          "output_tokens": 74389,
+          "reasoning_tokens": 0,
+          "total_tokens": 4245435
+        },
+        "judge_usage": {
+          "available_attempts": 133,
+          "missing_attempts": 0,
+          "input_tokens": 42908,
+          "cached_input_tokens": 145280,
+          "output_tokens": 17636,
+          "reasoning_tokens": 17503,
+          "total_tokens": 205824
+        }
+      }
+    },
+    "single-session-assistant": {
+      "plain_token_overlap_k10": {
+        "total": 56,
+        "completed": 56,
+        "reader_failed": 0,
+        "judged": 56,
+        "judge_failed": 0,
+        "judge_invalid": 0,
+        "judge_not_run": 0,
+        "judge_correct": 54,
+        "exact_matches": 35,
+        "mean_token_f1": 0.785,
+        "mean_answer_token_recall": 0.9211,
+        "overall_judge_accuracy": 0.9643,
+        "judged_accuracy": 0.9643,
+        "task_averaged_judge_accuracy": 0,
+        "abstention_expected": 0,
+        "abstention_correct": 0,
+        "abstention_accuracy": 0,
+        "reader_latency": {
+          "count": 56,
+          "total_ms": 398486,
+          "p50_ms": 6626,
+          "p95_ms": 10260,
+          "p99_ms": 12840,
+          "max_ms": 12840
+        },
+        "judge_latency": {
+          "count": 56,
+          "total_ms": 433982,
+          "p50_ms": 5471,
+          "p95_ms": 22723,
+          "p99_ms": 28660,
+          "max_ms": 28660
+        },
+        "usage": {
+          "available_attempts": 56,
+          "missing_attempts": 0,
+          "input_tokens": 1523803,
+          "cached_input_tokens": 112434,
+          "output_tokens": 11604,
+          "reasoning_tokens": 0,
+          "total_tokens": 1647841
+        },
+        "judge_usage": {
+          "available_attempts": 56,
+          "missing_attempts": 0,
+          "input_tokens": 7631,
+          "cached_input_tokens": 71424,
+          "output_tokens": 5715,
+          "reasoning_tokens": 5659,
+          "total_tokens": 84770
+        }
+      },
+      "vermory_lexical_k10": {
+        "total": 56,
+        "completed": 56,
+        "reader_failed": 0,
+        "judged": 56,
+        "judge_failed": 0,
+        "judge_invalid": 0,
+        "judge_not_run": 0,
+        "judge_correct": 42,
+        "exact_matches": 27,
+        "mean_token_f1": 0.6119,
+        "mean_answer_token_recall": 0.7362,
+        "overall_judge_accuracy": 0.75,
+        "judged_accuracy": 0.75,
+        "task_averaged_judge_accuracy": 0,
+        "abstention_expected": 0,
+        "abstention_correct": 0,
+        "abstention_accuracy": 0,
+        "reader_latency": {
+          "count": 56,
+          "total_ms": 403817,
+          "p50_ms": 6909,
+          "p95_ms": 9819,
+          "p99_ms": 11864,
+          "max_ms": 11864
+        },
+        "judge_latency": {
+          "count": 56,
+          "total_ms": 511486,
+          "p50_ms": 5527,
+          "p95_ms": 35956,
+          "p99_ms": 42025,
+          "max_ms": 42025
+        },
+        "usage": {
+          "available_attempts": 56,
+          "missing_attempts": 0,
+          "input_tokens": 1620994,
+          "cached_input_tokens": 112368,
+          "output_tokens": 13101,
+          "reasoning_tokens": 0,
+          "total_tokens": 1746463
+        },
+        "judge_usage": {
+          "available_attempts": 56,
+          "missing_attempts": 0,
+          "input_tokens": 8580,
+          "cached_input_tokens": 70400,
+          "output_tokens": 5552,
+          "reasoning_tokens": 5496,
+          "total_tokens": 84532
+        }
+      }
+    },
+    "single-session-preference": {
+      "plain_token_overlap_k10": {
+        "total": 30,
+        "completed": 30,
+        "reader_failed": 0,
+        "judged": 30,
+        "judge_failed": 0,
+        "judge_invalid": 0,
+        "judge_not_run": 0,
+        "judge_correct": 14,
+        "exact_matches": 0,
+        "mean_token_f1": 0.1454,
+        "mean_answer_token_recall": 0.2661,
+        "overall_judge_accuracy": 0.4667,
+        "judged_accuracy": 0.4667,
+        "task_averaged_judge_accuracy": 0,
+        "abstention_expected": 0,
+        "abstention_correct": 0,
+        "abstention_accuracy": 0,
+        "reader_latency": {
+          "count": 30,
+          "total_ms": 271105,
+          "p50_ms": 9127,
+          "p95_ms": 11342,
+          "p99_ms": 11993,
+          "max_ms": 11993
+        },
+        "judge_latency": {
+          "count": 30,
+          "total_ms": 323551,
+          "p50_ms": 8949,
+          "p95_ms": 22867,
+          "p99_ms": 22893,
+          "max_ms": 22893
+        },
+        "usage": {
+          "available_attempts": 30,
+          "missing_attempts": 0,
+          "input_tokens": 889201,
+          "cached_input_tokens": 58531,
+          "output_tokens": 16752,
+          "reasoning_tokens": 0,
+          "total_tokens": 964484
+        },
+        "judge_usage": {
+          "available_attempts": 30,
+          "missing_attempts": 0,
+          "input_tokens": 22021,
+          "cached_input_tokens": 26752,
+          "output_tokens": 14290,
+          "reasoning_tokens": 14260,
+          "total_tokens": 63063
+        }
+      },
+      "vermory_lexical_k10": {
+        "total": 30,
+        "completed": 30,
+        "reader_failed": 0,
+        "judged": 30,
+        "judge_failed": 0,
+        "judge_invalid": 0,
+        "judge_not_run": 0,
+        "judge_correct": 16,
+        "exact_matches": 0,
+        "mean_token_f1": 0.1487,
+        "mean_answer_token_recall": 0.2964,
+        "overall_judge_accuracy": 0.5333,
+        "judged_accuracy": 0.5333,
+        "task_averaged_judge_accuracy": 0,
+        "abstention_expected": 0,
+        "abstention_correct": 0,
+        "abstention_accuracy": 0,
+        "reader_latency": {
+          "count": 30,
+          "total_ms": 305675,
+          "p50_ms": 9936,
+          "p95_ms": 15702,
+          "p99_ms": 16713,
+          "max_ms": 16713
+        },
+        "judge_latency": {
+          "count": 30,
+          "total_ms": 335930,
+          "p50_ms": 6865,
+          "p95_ms": 35762,
+          "p99_ms": 45825,
+          "max_ms": 45825
+        },
+        "usage": {
+          "available_attempts": 30,
+          "missing_attempts": 0,
+          "input_tokens": 941178,
+          "cached_input_tokens": 56918,
+          "output_tokens": 18345,
+          "reasoning_tokens": 0,
+          "total_tokens": 1016441
+        },
+        "judge_usage": {
+          "available_attempts": 31,
+          "missing_attempts": 0,
+          "input_tokens": 22494,
+          "cached_input_tokens": 28928,
+          "output_tokens": 11938,
+          "reasoning_tokens": 11905,
+          "total_tokens": 63360
+        }
+      }
+    },
+    "single-session-user": {
+      "plain_token_overlap_k10": {
+        "total": 70,
+        "completed": 70,
+        "reader_failed": 0,
+        "judged": 70,
+        "judge_failed": 0,
+        "judge_invalid": 0,
+        "judge_not_run": 0,
+        "judge_correct": 68,
+        "exact_matches": 54,
+        "mean_token_f1": 0.8406,
+        "mean_answer_token_recall": 0.8967,
+        "overall_judge_accuracy": 0.9714,
+        "judged_accuracy": 0.9714,
+        "task_averaged_judge_accuracy": 0,
+        "abstention_expected": 6,
+        "abstention_correct": 6,
+        "abstention_accuracy": 1,
+        "reader_latency": {
+          "count": 70,
+          "total_ms": 495227,
+          "p50_ms": 6462,
+          "p95_ms": 10666,
+          "p99_ms": 15642,
+          "max_ms": 15642
+        },
+        "judge_latency": {
+          "count": 70,
+          "total_ms": 993450,
+          "p50_ms": 6531,
+          "p95_ms": 40785,
+          "p99_ms": 125502,
+          "max_ms": 125502
+        },
+        "usage": {
+          "available_attempts": 70,
+          "missing_attempts": 0,
+          "input_tokens": 1872790,
+          "cached_input_tokens": 92445,
+          "output_tokens": 13529,
+          "reasoning_tokens": 0,
+          "total_tokens": 1978764
+        },
+        "judge_usage": {
+          "available_attempts": 70,
+          "missing_attempts": 1,
+          "input_tokens": 42297,
+          "cached_input_tokens": 52864,
+          "output_tokens": 8910,
+          "reasoning_tokens": 8840,
+          "total_tokens": 104071
+        }
+      },
+      "vermory_lexical_k10": {
+        "total": 70,
+        "completed": 70,
+        "reader_failed": 0,
+        "judged": 70,
+        "judge_failed": 0,
+        "judge_invalid": 0,
+        "judge_not_run": 0,
+        "judge_correct": 63,
+        "exact_matches": 50,
+        "mean_token_f1": 0.7794,
+        "mean_answer_token_recall": 0.8453,
+        "overall_judge_accuracy": 0.9,
+        "judged_accuracy": 0.9,
+        "task_averaged_judge_accuracy": 0,
+        "abstention_expected": 6,
+        "abstention_correct": 6,
+        "abstention_accuracy": 1,
+        "reader_latency": {
+          "count": 70,
+          "total_ms": 511946,
+          "p50_ms": 6744,
+          "p95_ms": 10647,
+          "p99_ms": 15191,
+          "max_ms": 15191
+        },
+        "judge_latency": {
+          "count": 70,
+          "total_ms": 984906,
+          "p50_ms": 6449,
+          "p95_ms": 49415,
+          "p99_ms": 89219,
+          "max_ms": 89219
+        },
+        "usage": {
+          "available_attempts": 70,
+          "missing_attempts": 0,
+          "input_tokens": 2058596,
+          "cached_input_tokens": 81326,
+          "output_tokens": 14177,
+          "reasoning_tokens": 0,
+          "total_tokens": 2154099
+        },
+        "judge_usage": {
+          "available_attempts": 70,
+          "missing_attempts": 0,
+          "input_tokens": 32944,
+          "cached_input_tokens": 62080,
+          "output_tokens": 9135,
+          "reasoning_tokens": 9065,
+          "total_tokens": 104159
+        }
+      }
+    },
+    "temporal-reasoning": {
+      "plain_token_overlap_k10": {
+        "total": 133,
+        "completed": 133,
+        "reader_failed": 0,
+        "judged": 133,
+        "judge_failed": 0,
+        "judge_invalid": 0,
+        "judge_not_run": 0,
+        "judge_correct": 83,
+        "exact_matches": 40,
+        "mean_token_f1": 0.4087,
+        "mean_answer_token_recall": 0.5942,
+        "overall_judge_accuracy": 0.6241,
+        "judged_accuracy": 0.6241,
+        "task_averaged_judge_accuracy": 0,
+        "abstention_expected": 6,
+        "abstention_correct": 6,
+        "abstention_accuracy": 1,
+        "reader_latency": {
+          "count": 133,
+          "total_ms": 1423703,
+          "p50_ms": 9408,
+          "p95_ms": 18809,
+          "p99_ms": 21496,
+          "max_ms": 43822
+        },
+        "judge_latency": {
+          "count": 133,
+          "total_ms": 1634387,
+          "p50_ms": 6206,
+          "p95_ms": 39407,
+          "p99_ms": 69120,
+          "max_ms": 76938
+        },
+        "usage": {
+          "available_attempts": 133,
+          "missing_attempts": 0,
+          "input_tokens": 3846936,
+          "cached_input_tokens": 265167,
+          "output_tokens": 119489,
+          "reasoning_tokens": 0,
+          "total_tokens": 4231592
+        },
+        "judge_usage": {
+          "available_attempts": 133,
+          "missing_attempts": 0,
+          "input_tokens": 38590,
+          "cached_input_tokens": 158720,
+          "output_tokens": 23006,
+          "reasoning_tokens": 22873,
+          "total_tokens": 220316
+        }
+      },
+      "vermory_lexical_k10": {
+        "total": 133,
+        "completed": 133,
+        "reader_failed": 0,
+        "judged": 133,
+        "judge_failed": 0,
+        "judge_invalid": 0,
+        "judge_not_run": 0,
+        "judge_correct": 80,
+        "exact_matches": 37,
+        "mean_token_f1": 0.378,
+        "mean_answer_token_recall": 0.5779,
+        "overall_judge_accuracy": 0.6015,
+        "judged_accuracy": 0.6015,
+        "task_averaged_judge_accuracy": 0,
+        "abstention_expected": 6,
+        "abstention_correct": 6,
+        "abstention_accuracy": 1,
+        "reader_latency": {
+          "count": 133,
+          "total_ms": 1358953,
+          "p50_ms": 9214,
+          "p95_ms": 17969,
+          "p99_ms": 19454,
+          "max_ms": 19497
+        },
+        "judge_latency": {
+          "count": 133,
+          "total_ms": 1705029,
+          "p50_ms": 6211,
+          "p95_ms": 40816,
+          "p99_ms": 61677,
+          "max_ms": 82019
+        },
+        "usage": {
+          "available_attempts": 133,
+          "missing_attempts": 0,
+          "input_tokens": 3957875,
+          "cached_input_tokens": 266543,
+          "output_tokens": 109583,
+          "reasoning_tokens": 0,
+          "total_tokens": 4334001
+        },
+        "judge_usage": {
+          "available_attempts": 133,
+          "missing_attempts": 0,
+          "input_tokens": 35263,
+          "cached_input_tokens": 162048,
+          "output_tokens": 21625,
+          "reasoning_tokens": 21492,
+          "total_tokens": 218936
+        }
+      }
+    }
+  },
+  "retrieval_classes": {
+    "plain_token_overlap_k10": {
+      "abstention_unscored": {
+        "total": 30,
+        "judged": 30,
+        "correct": 29,
+        "accuracy": 0.9667
+      },
+      "all_evidence_retrieved": {
+        "total": 394,
+        "judged": 394,
+        "correct": 339,
+        "accuracy": 0.8604
+      },
+      "no_evidence_retrieved": {
+        "total": 24,
+        "judged": 24,
+        "correct": 0,
+        "accuracy": 0
+      },
+      "partial_evidence_retrieved": {
+        "total": 52,
+        "judged": 52,
+        "correct": 11,
+        "accuracy": 0.2115
+      }
+    },
+    "vermory_lexical_k10": {
+      "abstention_unscored": {
+        "total": 30,
+        "judged": 30,
+        "correct": 29,
+        "accuracy": 0.9667
+      },
+      "all_evidence_retrieved": {
+        "total": 345,
+        "judged": 345,
+        "correct": 292,
+        "accuracy": 0.8464
+      },
+      "no_evidence_retrieved": {
+        "total": 46,
+        "judged": 46,
+        "correct": 1,
+        "accuracy": 0.0217
+      },
+      "partial_evidence_retrieved": {
+        "total": 79,
+        "judged": 79,
+        "correct": 19,
+        "accuracy": 0.2405
+      }
+    }
+  },
+  "run_id": "longmemeval-s-full-reader-qa-grok-20260715-v3",
+  "source_summary": {
+    "record_count": 500,
+    "scored_record_count": 470,
+    "abstention_record_count": 30,
+    "session_count": 23867,
+    "turn_count": 246750,
+    "record_set_sha256": "f038965c54b03632f86a59104dd77848b66e3f80c08d5fbabdd3984d16457811"
+  }
+}

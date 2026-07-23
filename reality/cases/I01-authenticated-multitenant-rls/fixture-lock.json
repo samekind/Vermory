@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "case_id": "I01-authenticated-multitenant-rls",
+  "manifest_sha256": "4984ef0682eb34b004ce908fe038720c1740f52b79ae391e005d6951d16d40b2",
+  "events_sha256": "67928b8d8402989d1eb7fca5bedef698f14fb7a8489ca6f19c4ece10ba61bb08",
+  "files": [
+    {
+      "path": "fixtures/token-lifecycle.md",
+      "sha256": "62a91dd8680e21eb48457d377c92f3979e028ca33b7c3359ee3717e80dc87d8d",
+      "bytes": 946
+    },
+    {
+      "path": "fixtures/tenant-isolation.md",
+      "sha256": "f83cab3d1c392ac55bbf48bf0fc152bfa0745b7906a21e4b3eabee56fe30b6f1",
+      "bytes": 1151
+    }
+  ]
+}

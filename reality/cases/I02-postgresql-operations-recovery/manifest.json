@@ -1,0 +1,84 @@
+{
+  "version": 1,
+  "id": "I02-postgresql-operations-recovery",
+  "title": "PostgreSQL authoritative restore, projection rebuild, outage recovery, and Linux portability",
+  "evidence_level": "public",
+  "continuity_lines": ["security"],
+  "pressures": ["migration_replay", "backup_restore", "projection_rebuild", "runtime_role_reprovision", "database_outage", "linux_amd64", "linux_arm64"],
+  "sources": [
+    {
+      "id": "i02-recovery-contract",
+      "kind": "authorized_operations_recovery_trajectory",
+      "fixture_path": "fixtures/recovery-contract.md",
+      "original_ref": "vermory-design:i02-postgresql-operations-recovery",
+      "original_revision": "2026-07-14",
+      "sha256": "afab0d8770c49852232aff876307a3277a0deb38cde00c1216e11ea7d38209e2",
+      "authorized": true,
+      "anonymization": "Every database, role, tenant, continuity, memory, token metadata, fact, and runtime identifier is synthetic; credentials and private connection material are excluded."
+    }
+  ],
+  "anchors": [
+    {
+      "kind": "dedicated_database_scope",
+      "value": "vermory-ops-i02/source",
+      "ambiguous": false
+    },
+    {
+      "kind": "dedicated_database_scope",
+      "value": "vermory-ops-i02/target",
+      "ambiguous": false
+    },
+    {
+      "kind": "release_revision",
+      "value": "vermory-ops-i02/current-commit",
+      "ambiguous": false
+    }
+  ],
+  "expectations": {
+    "current_facts": [
+      "PostgreSQL is authoritative for governed continuity, identity metadata, lifecycle, delivery, and bridge state.",
+      "Native PostgreSQL dump and restore preserve authoritative state while runtime roles are re-provisioned separately.",
+      "Search projection state can be cleared and rebuilt from governed active memories.",
+      "A database outage cannot create a successful persistence receipt for an uncommitted write.",
+      "A running Vermory process can serve a new authenticated request after database availability returns.",
+      "The same revision produces separately checksummed Linux amd64 and arm64 ELF artifacts."
+    ],
+    "forbidden_facts": [
+      "A PostgreSQL custom-format dump is encrypted by the dump format.",
+      "Vermory stores or exports raw token secrets for backup recovery.",
+      "The authenticated server falls back to an admin database identity.",
+      "Deleted or superseded memory becomes active after projection rebuild.",
+      "A failed database write returns a successful persistence receipt.",
+      "An emulated architecture probe is reported as native hardware execution.",
+      "One dump and restore run proves high availability or point-in-time recovery."
+    ],
+    "allowed_unknowns": [
+      "Which production backup scheduler and encryption system an operator will choose.",
+      "Which native amd64 and arm64 Linux distributions will be included in a later release matrix.",
+      "Whether later deployments add streaming replication or point-in-time recovery."
+    ],
+    "expected_action": "Replay migrations, preserve and compare authoritative state through native restore, re-provision the restricted runtime identity, rebuild only disposable projections, fail closed during outage, recover on the next request, and execute both Linux release architectures with explicit runtime provenance."
+  },
+  "task": {
+    "prompt": "Restore a dedicated authenticated Vermory database into an empty target, re-provision its runtime role, rebuild search projections, repeat authorization and isolation probes, simulate a bounded database outage and recovery, and execute Linux amd64 and arm64 startup probes.",
+    "artifact_checks": [
+      "fixture and evidence contain no raw token, password, private connection string, or user database material",
+      "source and target authoritative fingerprints match while projection rows are compared only after rebuild",
+      "restore records native tool status, dump checksum, runtime role properties, RLS inventory, and token lifecycle outcomes",
+      "Linux evidence records artifact checksums, ELF architecture, runtime architecture, and emulation status"
+    ],
+    "deterministic_checks": [
+      "migration_replay:stable_current_version",
+      "backup_restore:authoritative_fingerprint_equal",
+      "runtime_role:restricted_and_reprovisioned",
+      "restored_token:active_accepts_revoked_rejects",
+      "projection_rebuild:active_equivalent_deleted_excluded",
+      "rls_filter_omission:isolated",
+      "cross_tenant_fk:rejected",
+      "database_outage:no_false_success_receipt",
+      "database_recovery:new_request_succeeds_without_restart",
+      "linux_amd64:elf_and_startup_pass",
+      "linux_arm64:elf_and_startup_pass"
+    ]
+  }
+}

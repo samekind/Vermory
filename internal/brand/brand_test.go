@@ -1,15 +1,16 @@
 package brand
 
-import "testing"
+import (
+	"runtime"
+	"testing"
+)
 
-func TestIdentity(t *testing.T) {
-	if Name != "Vermory" {
-		t.Fatalf("expected product name Vermory, got %q", Name)
+func TestVersionInfoUsesDevelopmentDefaults(t *testing.T) {
+	info := Info()
+	if info.Version != "dev" || info.Revision != "unknown" || info.BuildDate != "unknown" {
+		t.Fatalf("unexpected development metadata: %#v", info)
 	}
-	if Slug != "vermory" {
-		t.Fatalf("expected product slug vermory, got %q", Slug)
-	}
-	if Tagline != "Governed Memory for AI" {
-		t.Fatalf("unexpected tagline %q", Tagline)
+	if info.GoVersion != runtime.Version() {
+		t.Fatalf("unexpected Go version: got %q want %q", info.GoVersion, runtime.Version())
 	}
 }

@@ -1,0 +1,95 @@
+{
+  "id": "W09-production-retrieval-runtime",
+  "evidence_level": "public",
+  "profile": {
+    "id": "siliconflow-bge-m3-1024-v1",
+    "base_url": "https://api.siliconflow.cn/v1",
+    "model": "BAAI/bge-m3",
+    "dimensions": 1024
+  },
+  "workspace": {
+    "tenant_id": "w09-release-tenant",
+    "repo_root": "/fixtures/acme-release-control",
+    "semantic_query": "如果生产版本出问题，要几个人同意才能撤回？",
+    "semantic_expected": "生产回滚必须由两名值班维护者共同批准。",
+    "exact_query": "deploy/prod/release.yaml --canary-percent=10 REL-SIG-409 deepseek-ai/DeepSeek-V4-Flash",
+    "active_facts": [
+      {
+        "key": "release.rollback.approval",
+        "content": "生产回滚必须由两名值班维护者共同批准。"
+      },
+      {
+        "key": "release.manifest.path",
+        "content": "发布清单路径是 deploy/prod/release.yaml。"
+      },
+      {
+        "key": "release.canary.flag",
+        "content": "灰度发布必须使用 --canary-percent=10。"
+      },
+      {
+        "key": "release.signature.error",
+        "content": "签名校验失败码是 REL-SIG-409。"
+      },
+      {
+        "key": "release.notes.model",
+        "content": "发布说明生成使用模型 deepseek-ai/DeepSeek-V4-Flash。"
+      },
+      {
+        "key": "release.standard.approval",
+        "content": "常规生产发布只需一名发布经理批准。"
+      }
+    ],
+    "superseded": {
+      "key": "release.rollback.approval",
+      "content": "生产回滚必须由一名值班维护者批准。"
+    },
+    "deleted": {
+      "key": "release.legacy.token",
+      "content": "旧版紧急发布令牌是 RELEASE-OLD-7788。"
+    },
+    "proposed": "Agent 提议使用 --force 绕过生产回滚审批。",
+    "cross_workspace": {
+      "repo_root": "/fixtures/acme-incident-console",
+      "key": "incident.rollback.approval",
+      "content": "事故回滚只需一名 SRE 批准。"
+    },
+    "cross_tenant": {
+      "tenant_id": "w09-other-tenant",
+      "repo_root": "/fixtures/other-release-control",
+      "key": "release.rollback.approval",
+      "content": "生产回滚需要三名维护者批准。"
+    }
+  },
+  "conversation": {
+    "tenant_id": "w09-release-tenant",
+    "primary": {
+      "channel": "openclaw",
+      "thread_id": "agent:main:deployment-friday",
+      "fact": "数据库迁移窗口定在周五 22:30，必须先完成只读检查。"
+    },
+    "linked": {
+      "channel": "web_chat",
+      "thread_id": "deployment-friday-handoff",
+      "fact": "迁移完成后由值班负责人确认只读流量恢复。"
+    },
+    "unlinked": {
+      "channel": "web_chat",
+      "thread_id": "deployment-next-month",
+      "fact": "下个月的测试迁移窗口定在周一 09:00。"
+    },
+    "query": "这次数据库变更安排在什么时候，开始前必须做什么？",
+    "expected": "数据库迁移窗口定在周五 22:30，必须先完成只读检查。"
+  },
+  "hard_gates": {
+    "workspace_forbidden": [
+      "生产回滚必须由一名值班维护者批准。",
+      "旧版紧急发布令牌是 RELEASE-OLD-7788。",
+      "Agent 提议使用 --force 绕过生产回滚审批。",
+      "事故回滚只需一名 SRE 批准。",
+      "生产回滚需要三名维护者批准。"
+    ],
+    "conversation_forbidden": [
+      "下个月的测试迁移窗口定在周一 09:00。"
+    ]
+  }
+}

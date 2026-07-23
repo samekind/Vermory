@@ -1,0 +1,112 @@
+{
+  "version": 1,
+  "run_id": "active-backlog-dimension-20260716-v3",
+  "case_sha256": "ebab12a98f6b848f37296bb30e6c8261de3194341935cf2823d267bda9278e34",
+  "implementation_revision": "86fb8d0a25fefa4efe47a0b4618c139facafde16",
+  "request_fingerprint": "d62cca78b9099f6db2e31de925d3310dc52d12f52e0c95ee654c4a80f7237a5c",
+  "postgresql_version": "18.4",
+  "pgvector_version": "0.8.5",
+  "started_at": "2026-07-15T23:14:47.140297Z",
+  "completed_at": "2026-07-15T23:21:34.605803Z",
+  "environment": {
+    "os": "darwin arm64",
+    "cpu": "Apple M4 Pro",
+    "memory_gib": 48,
+    "schema_version": 16
+  },
+  "profiles": {
+    "incumbent_id": "siliconflow-bge-m3-1024-v1",
+    "incumbent_class": "vector_1024",
+    "incumbent_dimensions": 1024,
+    "incumbent_lifecycle": "active",
+    "candidate_id": "siliconflow-qwen3-embedding-4b-2560-v3",
+    "candidate_class": "halfvec_2560",
+    "candidate_dimensions": 2560,
+    "candidate_lifecycle": "candidate"
+  },
+  "counts": {
+    "initial_active": 20000,
+    "revisions": 2000,
+    "deleted": 500,
+    "new_facts": 500,
+    "tail_events": 5000,
+    "final_active": 20000,
+    "lexical_rows": 20000,
+    "incumbent_final_vectors": 20000,
+    "candidate_final_vectors": 20000
+  },
+  "snapshot": {
+    "incumbent_projected": 20000,
+    "candidate_scanned": 20000,
+    "candidate_projected": 20000,
+    "candidate_skipped_changed": 0,
+    "candidate_final_lag": 0
+  },
+  "workload": {
+    "query_clients": 16,
+    "query_samples": 320,
+    "writer_duration_ms": 2258,
+    "authority_completed_while_candidate_blocked": true
+  },
+  "restart": {
+    "failure_code": "postgres_restart_during_candidate_embedding",
+    "partial_rows": 0,
+    "interrupted_cursor_advance": 0,
+    "recovery_duration_ms": 13,
+    "same_pools_recovered": true
+  },
+  "queries": {
+    "successful": 320,
+    "bounded_database_failures": 1,
+    "cross_scope_results": 0,
+    "p50_ms": 12,
+    "p95_ms": 20,
+    "p99_ms": 30
+  },
+  "reset": {
+    "candidate_rows_after_reset": 0,
+    "incumbent_rows_unchanged": true,
+    "authority_unchanged": true,
+    "candidate_rebuilt": true
+  },
+  "provider": {
+    "base_url": "https://api.siliconflow.cn/v1",
+    "model": "Qwen/Qwen3-Embedding-4B",
+    "dimensions": 2560,
+    "requests": 2,
+    "duration_ms": 317,
+    "projection_response_sha256": "a5605dabd67ae93092dacf2095ff707608c4e8270f481d853f3ead07e3746996",
+    "query_response_sha256": "4d77c06da93c5daac4be59e0da7755113a5e42331d9480d9d50acb039d1c1b57"
+  },
+  "hard_gates": {
+    "authority_writes_provider_independent": true,
+    "candidate_reset_isolated": true,
+    "default_profile_unchanged": true,
+    "incumbent_served_during_backlog": true,
+    "ineligible_rows_absent": true,
+    "physical_classes_converged": true,
+    "real_provider_2560_dimensions": true,
+    "restart_committed_no_partial_vector": true,
+    "retrieval_audits_profile_scoped": true,
+    "same_pools_recovered": true,
+    "schema_classes_isolated": true,
+    "tail_event_count_exact": true
+  },
+  "failures": [
+    {
+      "phase": "candidate_restart",
+      "attempt": 1,
+      "code": "postgres_restart_during_candidate_embedding",
+      "message": "the dedicated PostgreSQL cluster was stopped after every candidate worker reached embedding",
+      "retried": true
+    }
+  ],
+  "non_claims": [
+    "not an embedding-model ranking",
+    "not an automatic profile promotion",
+    "not a long-duration retention result",
+    "not cross-host HA evidence",
+    "not an external sealed evaluation",
+    "not artifact signing or final release acceptance"
+  ]
+}

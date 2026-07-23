@@ -1,0 +1,79 @@
+{
+  "version": 1,
+  "case_id": "I04-protected-artifact-signing",
+  "evidence_level": "public",
+  "source_head": "e4bb83ba72989f6cd60d1af7ef61e50481c13b6a",
+  "base_head": "2fe75531c7d8e85b6d7fadf39e2b42dd70ebaac7",
+  "synthetic_merge": "efe3ad6d532a28b3efed10c00de1e300bdc947fa",
+  "github": {
+    "run_id": 29641606056,
+    "test_job_id": 88072944118,
+    "sign_snapshot_job_id": 88073327492,
+    "test_conclusion": "success",
+    "sign_snapshot_conclusion": "success",
+    "artifact_id": 8428840638,
+    "artifact_name": "vermory-pr-snapshot-efe3ad6d532a28b3efed10c00de1e300bdc947fa",
+    "artifact_bytes": 21813069,
+    "artifact_sha256": "f22fd6aff9c84e412762db86dfc6caaedb3fd7d87ab49757ff9bf40f7e9f674f"
+  },
+  "payload": {
+    "manifest_entries": 8,
+    "all_hashes_verified": true,
+    "go_archives": 4,
+    "openclaw_packages": 1,
+    "hermes_archives": 1,
+    "hermes_checksum_sidecars": 1,
+    "goreleaser_checksum_files": 1
+  },
+  "sigstore": {
+    "cosign_version": "v3.0.6",
+    "cosign_git_commit": "f1ad3ee952313be5d74a49d67ba0aa8d0d5e351f",
+    "cosign_darwin_arm64_sha256": "5fadd012ae6381a6a29ff86a7d39aa873878852f1073fc90b15995961ecfb084",
+    "bundle_media_type": "application/vnd.dev.sigstore.bundle.v0.3+json",
+    "workflow_identity": "https://github.com/jstar0/Vermory/.github/workflows/ci.yml@refs/pull/1/merge",
+    "oidc_issuer": "https://token.actions.githubusercontent.com",
+    "tlog_entries": 1,
+    "rekor_log_index": "2194452343",
+    "inclusion_promise": true,
+    "inclusion_proof": true,
+    "positive_verification": "pass",
+    "modified_manifest_rejection": "pass",
+    "wrong_identity_rejection": "pass"
+  },
+  "cross_host": {
+    "host_class": "mac-mini-arm64",
+    "transport": "qingdao-reverse-management-tunnel",
+    "direct_lan_used": false,
+    "sudo_used": false,
+    "system_wide_cosign_install": false,
+    "workstation_artifact_persistence": false,
+    "binary_revision": "efe3ad6d532a28b3efed10c00de1e300bdc947fa",
+    "evidence_manifest_entries": 23
+  },
+  "branch_protection": {
+    "strict": true,
+    "required_checks": [
+      "test",
+      "sign-snapshot"
+    ]
+  },
+  "publication": {
+    "tag_created": false,
+    "github_release_created": false,
+    "pull_request_state": "OPEN",
+    "pull_request_draft": true
+  },
+  "claim_boundary": {
+    "qualified": "one protected pull-request complete-manifest signing and cross-host verification path",
+    "not_qualified": [
+      "manual workflow_dispatch execution",
+      "tagged release publication",
+      "macOS notarization",
+      "package-manager distribution",
+      "container image signing",
+      "SLSA provenance",
+      "external sealed evaluation",
+      "complete Vermory platform"
+    ]
+  }
+}

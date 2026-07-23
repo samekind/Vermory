@@ -1,0 +1,77 @@
+{
+  "schema_version": "benchmark-execution/v1",
+  "benchmark": "LongMemEval",
+  "qualification_path": "casebook/benchmarks/qualifications/longmemeval-s-cleaned-qa.json",
+  "dataset_sha256": "d6f21ea9d60a0d56f34a05b609c79c88a451d2ae03597821ea3d5a9678c3a442",
+  "evaluation_target": "qa",
+  "execution_scope": "full",
+  "claim_scope": "qualified_dataset_full",
+  "selection_mode": "all_records",
+  "record_set_sha256": "f038965c54b03632f86a59104dd77848b66e3f80c08d5fbabdd3984d16457811",
+  "expected_session_count": 23867,
+  "expected_turn_count": 246750,
+  "expected_scored_record_count": 470,
+  "hard_factual": true,
+  "scorers": [
+    {
+      "name": "normalized_exact_match",
+      "class": "deterministic"
+    },
+    {
+      "name": "token_f1",
+      "class": "deterministic"
+    },
+    {
+      "name": "answer_token_recall",
+      "class": "deterministic"
+    },
+    {
+      "name": "abstention_phrase_detection",
+      "class": "deterministic"
+    },
+    {
+      "name": "upstream_prompt_custom_judge",
+      "class": "custom_model_judge"
+    }
+  ],
+  "run_id": "longmemeval-s-full-reader-qa-grok-20260715-v3",
+  "conditions": [
+    "plain_token_overlap_k10",
+    "vermory_lexical_k10"
+  ],
+  "reader": {
+    "provider": "grok-cli",
+    "model": "grok-composer-2.5-fast",
+    "interface": "isolated_stateless_cli",
+    "max_output_tokens": 128,
+    "timeout_seconds": 180,
+    "workers": 4,
+    "max_attempts": 3
+  },
+  "judge": {
+    "provider": "grok-cli",
+    "model": "grok-4.5",
+    "interface": "isolated_stateless_cli",
+    "scorer_class": "custom_model_judge",
+    "max_output_tokens": 10,
+    "timeout_seconds": 120,
+    "workers": 4,
+    "max_attempts": 3
+  },
+  "retrieval_input": {
+    "path": "retrieval-results.jsonl",
+    "sha256": "a4caa0a6b2b30975bcab97791b19fa0e0a32d81c58128b00df4c47c8783227ad",
+    "run_id": "longmemeval-s-full-retrieval-20260715-v1",
+    "implementation_revision": "0f59bf58d9a107ce47f79ba86fd61a7c35c8324b",
+    "k": 10
+  },
+  "non_claims": [
+    "This execution does not report official GPT-4o LongMemEval accuracy.",
+    "The tested Grok models are compatibility targets, not a model ranking or product default selection.",
+    "This execution does not evaluate LongMemEval-M.",
+    "This execution replays frozen W14 production retrieval rankings and does not measure automatic memory formation from raw chats.",
+    "This execution does not create source supersession chains from benchmark labels.",
+    "This execution does not tune lexical retrieval, change K, switch the lexical default, or promote semantic retrieval.",
+    "This public benchmark execution is not withheld or externally sealed evidence."
+  ]
+}

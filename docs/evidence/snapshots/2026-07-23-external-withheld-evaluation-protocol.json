@@ -1,0 +1,64 @@
+{
+  "version": 1,
+  "case_id": "I10-external-withheld-evaluation-protocol",
+  "status": "protocol-qualified",
+  "source_head": "bb3c919efbd298f47f61fb781d6e6924480a44a4",
+  "public_case": {
+    "fixture_lock_sha256": "e6a43f0245da0be519576939abed640186b378ca1f58d1be82353d198a1546b1",
+    "manifest_sha256": "d678c0c91b1df512b62ab0900d47f21239b432269c577c6b6cf83cde081e9c0f",
+    "events_sha256": "02c530b795ed20852673eca79a1aa0b2d94ecff1167358e5f2173d253c729bf9",
+    "reality_validation_cases": 22,
+    "reality_validation_pass": true
+  },
+  "github": {
+    "repository": "samekind/Vermory",
+    "run_id": 29962727959,
+    "run_url": "https://github.com/samekind/Vermory/actions/runs/29962727959",
+    "run_conclusion": "success",
+    "test_job_id": 89067294746,
+    "test_job_conclusion": "success",
+    "sign_snapshot_job_id": 89068059759,
+    "sign_snapshot_job_conclusion": "success",
+    "all_jobs_conclusion": "success"
+  },
+  "signed_snapshot": {
+    "artifact_id": 8546725792,
+    "artifact_name": "vermory-pr-snapshot-bb3c919efbd298f47f61fb781d6e6924480a44a4",
+    "artifact_zip_sha256": "7c42b067ec2776d0a45f31d9ae11d947634464ceffb35f10b519fdc672ed7b5f",
+    "github_artifact_digest": "sha256:7c42b067ec2776d0a45f31d9ae11d947634464ceffb35f10b519fdc672ed7b5f",
+    "release_manifest_entries": 16,
+    "release_manifest_sha256": "d4831976f1a5bb8eea80b5b838c4a4d85433fe6d364ca10c882ef8f96570f8cb",
+    "sigstore_bundle_sha256": "24e5671d4a70896fe623cc008245402457c1cb2075cd5adb58765aa4bf5da737",
+    "all_payload_hashes_verified": true,
+    "workflow_identity": "https://github.com/samekind/Vermory/.github/workflows/ci.yml@refs/pull/1/merge",
+    "oidc_issuer": "https://token.actions.githubusercontent.com",
+    "positive_verification": "pass",
+    "modified_manifest_rejection": "pass",
+    "wrong_workflow_identity_rejection": "pass",
+    "darwin_arm64_runtime_revision": "bb3c919efbd298f47f61fb781d6e6924480a44a4"
+  },
+  "protocol_hard_gates": {
+    "strict_submission_schema": true,
+    "unknown_field_rejection": true,
+    "unsafe_artifact_uri_rejection": true,
+    "canonical_submission_digest": true,
+    "exact_artifact_filename_size_and_sha256": true,
+    "artifact_mutation_rejection": true,
+    "version_1_attestation_compatibility": true,
+    "version_1_unsigned_v2_field_rejection": true,
+    "version_2_exact_evaluator_key_binding": true,
+    "version_2_exact_submission_and_implementation_binding": true,
+    "version_2_protocol_suite_and_validity_binding": true,
+    "version_2_count_and_hard_gate_consistency": true,
+    "version_2_payload_signature_and_false_pass_rejection": true,
+    "production_cli_has_no_attestation_signer": true
+  },
+  "claim_boundary": {
+    "external_run_recorded": false,
+    "sealed_qualified": false,
+    "private_cases_in_repository": false,
+    "expected_answers_in_repository": false,
+    "evaluator_private_key_in_repository": false,
+    "meaning": "The public submission and verifier protocol is qualified. No independent private-suite attestation is claimed."
+  }
+}

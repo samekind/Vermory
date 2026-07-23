@@ -19,3 +19,17 @@ func TestRedactSecrets(t *testing.T) {
 		t.Fatal("redacted text still contains sensitive content")
 	}
 }
+
+func TestContainsSensitiveRejectsCredentialAssignmentsAndPrivateKeys(t *testing.T) {
+	for _, input := range []string{
+		"api_token=W23_SYNTHETIC_SECRET_MUST_NOT_PERSIST",
+		"api_key: synthetic-value-123456",
+		"secret = synthetic-value-123456",
+		"token=synthetic-value-123456",
+		"-----BEGIN PRIVATE KEY-----",
+	} {
+		if !ContainsSensitive(input) {
+			t.Fatalf("credential-shaped input was not detected: %q", input)
+		}
+	}
+}

@@ -1,0 +1,26 @@
+{
+  "id": "W06-unkeyed-source-target-match",
+  "evidence_level": "public",
+  "repo_root": "/fixtures/release-control-unkeyed",
+  "source_ref": "repo:deploy/production.yaml@sha-unkeyed-new",
+  "new_fact": "Production releases now use GitHub Actions OIDC keyless signing.",
+  "expected_memory_key": "release.signing.mode",
+  "current_facts": [
+    {
+      "memory_key": "release.signing.mode",
+      "content": "Production releases use a macOS keychain certificate."
+    },
+    {
+      "memory_key": "deploy.api.timeout",
+      "content": "The deployment API timeout is 800 ms."
+    },
+    {
+      "memory_key": "release.attestation.format",
+      "content": "Production releases publish a signed SLSA provenance statement."
+    }
+  ],
+  "other_tenant_fact": "Production releases use static cloud credentials.",
+  "ambiguous_fact": "Production releases now use an identity-bound release flow and publish signed release evidence.",
+  "unrelated_fact": "Production deployments are paused during the quarterly maintenance window.",
+  "task": "Create release-control-policy.md with the current production signing mode, deployment API timeout, and release attestation format."
+}

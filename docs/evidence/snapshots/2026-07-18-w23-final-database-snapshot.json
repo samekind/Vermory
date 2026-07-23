@@ -1,0 +1,227 @@
+{
+  "run_id": "7e76df6f05",
+  "runtime": {
+    "api": "127.0.0.1:8795",
+    "database": "vermory_w23_f04_7e76df6f05",
+    "openclaw": "127.0.0.1:18793",
+    "retrieval_profile": "siliconflow-bge-m3-1024-v1",
+    "conversation_model": "deepseek-ai/DeepSeek-V4-Flash",
+    "current_formation_worker": "siliconflow/Qwen/Qwen3-30B-A3B-Instruct-2507",
+    "accepted_initial_formation_provider": "grok-cli/grok-4.5"
+  },
+  "tenant_id": "tenant-w23-f04-7e76df6f05",
+  "post_delete": {
+    "answer": "清理包部署：安全\n设备可用容量：不可用（当前治理上下文未提供）",
+    "status": "completed",
+    "turn_id": "f9fe49bc-75dd-4087-9f81-d914d403598c",
+    "degraded": false,
+    "profile_id": "siliconflow-bge-m3-1024-v1",
+    "delivery_id": "2d5a7f49-f9a2-4d67-8d7a-54296e9ab1c9",
+    "context_body": "Governed memory:\nCleanup bundle staging is safe.",
+    "failure_code": "",
+    "operation_id": "openclaw:w23-post-delete-recall-7e76df6f05",
+    "effective_mode": "vector",
+    "provider_model": "siliconflow/deepseek-ai/DeepSeek-V4-Flash",
+    "requested_mode": "vector",
+    "delivered_count": 1,
+    "eligibility_as_of": "2026-07-18T16:56:12.356722+08:00",
+    "vector_memory_ids": [
+      "f16ebb29-5e3d-4724-a649-2c75a3f6607d"
+    ],
+    "lexical_memory_ids": [],
+    "projection_current": true,
+    "delivered_memory_ids": [
+      "f16ebb29-5e3d-4724-a649-2c75a3f6607d"
+    ]
+  },
+  "schema_version": 2,
+  "shared_evidence": {
+    "bytes": 106,
+    "content": "Device storage inspection completed successfully.\n[redacted]**************\nCleanup bundle staging is safe.",
+    "tool_name": "read",
+    "expected_bytes": 106,
+    "observation_id": "f9601b41-b648-41f4-91ed-50b7ae1378b5",
+    "contains_safety": true,
+    "observation_kind": "tool_result",
+    "contains_capacity": false,
+    "assistant_evidence_rows": 0
+  },
+  "delivery_residue": {
+    "total_deliveries": 7,
+    "deliveries_with_safety": 2,
+    "deliveries_with_capacity": 0
+  },
+  "governed_memories": [
+    {
+      "id": "18026f23-a1de-46c8-9099-a5fa17b44923",
+      "content": "[redacted]",
+      "thread_id": "agent:main:w23-final-main-7e76df6f05",
+      "memory_key": "device.storage.free_capacity_gb",
+      "vector_rows": 0,
+      "lexical_rows": 0,
+      "lifecycle_status": "deleted"
+    },
+    {
+      "id": "f16ebb29-5e3d-4724-a649-2c75a3f6607d",
+      "content": "Cleanup bundle staging is safe.",
+      "thread_id": "agent:main:w23-final-main-7e76df6f05",
+      "memory_key": "device.cleanup_bundle_staging_safe",
+      "vector_rows": 1,
+      "lexical_rows": 1,
+      "lifecycle_status": "active"
+    },
+    {
+      "id": "5c3ee3fe-e28b-466b-bd10-47346e75a4ff",
+      "content": "Unrelated session status reports printer room C-204.",
+      "thread_id": "agent:main:w23-final-unrelated-7e76df6f05",
+      "memory_key": "unrelated-session-status.printer-room",
+      "vector_rows": 0,
+      "lexical_rows": 0,
+      "lifecycle_status": "proposed"
+    }
+  ],
+  "tool_result_counts": [
+    {
+      "rows": 0,
+      "thread_id": "agent:main:w23-final-failed-read-7e76df6f05"
+    },
+    {
+      "rows": 1,
+      "thread_id": "agent:main:w23-final-main-7e76df6f05"
+    },
+    {
+      "rows": 0,
+      "thread_id": "agent:main:w23-final-sensitive-read-7e76df6f05"
+    },
+    {
+      "rows": 0,
+      "thread_id": "agent:main:w23-final-unallowed-exec-7e76df6f05"
+    },
+    {
+      "rows": 1,
+      "thread_id": "agent:main:w23-final-unrelated-7e76df6f05"
+    }
+  ],
+  "formation_schedules": [
+    {
+      "state": "idle",
+      "thread_id": "agent:main:w23-final-failed-read-7e76df6f05",
+      "last_status": "abstained",
+      "failure_code": "",
+      "attempt_count": 1,
+      "processed_through": 10,
+      "requested_through": 10
+    },
+    {
+      "state": "retry_wait",
+      "thread_id": "agent:main:w23-final-main-7e76df6f05",
+      "last_status": "failed",
+      "failure_code": "provider_error",
+      "attempt_count": 10,
+      "processed_through": 11,
+      "requested_through": 21
+    },
+    {
+      "state": "idle",
+      "thread_id": "agent:main:w23-final-sensitive-read-7e76df6f05",
+      "last_status": "abstained",
+      "failure_code": "",
+      "attempt_count": 1,
+      "processed_through": 13,
+      "requested_through": 13
+    },
+    {
+      "state": "idle",
+      "thread_id": "agent:main:w23-final-unallowed-exec-7e76df6f05",
+      "last_status": "abstained",
+      "failure_code": "",
+      "attempt_count": 1,
+      "processed_through": 9,
+      "requested_through": 9
+    },
+    {
+      "state": "idle",
+      "thread_id": "agent:main:w23-final-unrelated-7e76df6f05",
+      "last_status": "completed",
+      "failure_code": "",
+      "attempt_count": 1,
+      "processed_through": 17,
+      "requested_through": 17
+    }
+  ],
+  "implementation_commit": "7e76df6",
+  "post_delete_formation_attempts": [
+    {
+      "status": "failed",
+      "failure_code": "provider_error",
+      "operation_id": "auto-conversation:c9d1d4f0-394f-4add-b0a2-96287008abc9:21-21:attempt-3",
+      "provider_name": "grok-cli",
+      "resolved_model": "grok-4.5",
+      "requested_model": "grok-4.5",
+      "reason_class": "provider_not_authenticated"
+    },
+    {
+      "status": "failed",
+      "failure_code": "provider_error",
+      "operation_id": "auto-conversation:c9d1d4f0-394f-4add-b0a2-96287008abc9:21-21:attempt-4",
+      "provider_name": "grok-cli",
+      "resolved_model": "grok-4.5",
+      "requested_model": "grok-4.5",
+      "reason_class": "provider_not_authenticated"
+    },
+    {
+      "status": "failed",
+      "failure_code": "provider_error",
+      "operation_id": "auto-conversation:c9d1d4f0-394f-4add-b0a2-96287008abc9:21-21:attempt-5",
+      "provider_name": "grok-cli",
+      "resolved_model": "grok-4.5",
+      "requested_model": "grok-4.5",
+      "reason_class": "provider_not_authenticated"
+    },
+    {
+      "status": "failed",
+      "failure_code": "invalid_provider_output",
+      "operation_id": "auto-conversation:c9d1d4f0-394f-4add-b0a2-96287008abc9:21-21:attempt-6",
+      "provider_name": "siliconflow",
+      "resolved_model": "deepseek-ai/DeepSeek-V4-Flash",
+      "requested_model": "deepseek-ai/DeepSeek-V4-Flash",
+      "reason_class": "invalid_provider_output"
+    },
+    {
+      "status": "failed",
+      "failure_code": "evidence_observation_outside_manifest",
+      "operation_id": "auto-conversation:c9d1d4f0-394f-4add-b0a2-96287008abc9:21-21:attempt-7",
+      "provider_name": "siliconflow",
+      "resolved_model": "Qwen/Qwen3-30B-A3B-Instruct-2507",
+      "requested_model": "Qwen/Qwen3-30B-A3B-Instruct-2507",
+      "reason_class": "evidence_observation_outside_manifest"
+    },
+    {
+      "status": "failed",
+      "failure_code": "provider_error",
+      "operation_id": "auto-conversation:c9d1d4f0-394f-4add-b0a2-96287008abc9:21-21:attempt-8",
+      "provider_name": "siliconflow",
+      "resolved_model": "Qwen/Qwen3-235B-A22B-Instruct-2507",
+      "requested_model": "Qwen/Qwen3-235B-A22B-Instruct-2507",
+      "reason_class": "model_disabled"
+    },
+    {
+      "status": "failed",
+      "failure_code": "invalid_provider_output",
+      "operation_id": "auto-conversation:c9d1d4f0-394f-4add-b0a2-96287008abc9:21-21:attempt-9",
+      "provider_name": "siliconflow",
+      "resolved_model": "MiniMaxAI/MiniMax-M2.5",
+      "requested_model": "MiniMaxAI/MiniMax-M2.5",
+      "reason_class": "invalid_provider_output"
+    },
+    {
+      "status": "failed",
+      "failure_code": "provider_error",
+      "operation_id": "auto-conversation:c9d1d4f0-394f-4add-b0a2-96287008abc9:21-21:attempt-10",
+      "provider_name": "siliconflow",
+      "resolved_model": "zai-org/GLM-4.6",
+      "requested_model": "zai-org/GLM-4.6",
+      "reason_class": "model_disabled"
+    }
+  ]
+}

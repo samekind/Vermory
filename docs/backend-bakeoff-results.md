@@ -4,15 +4,19 @@
 
 ## Decision
 
-Vermory uses native PostgreSQL with pgvector as its default memory retrieval backend.
+Vermory selects PostgreSQL with pgvector as the native retrieval substrate.
 mem0, MemOS, and Supermemory remain optional adapters, not mandatory platform
 dependencies.
 
-This decision does not mean that PostgreSQL replaces the whole Vermory
-platform. PostgreSQL already owns governed claims, source versions, continuity
-identity, lifecycle state, bridge records, and audit history. The native backend
-adds a disposable vector index over active records. Vermory can erase and
-rebuild that index from authoritative records at any time.
+This decision does not mean that PostgreSQL already implements the whole
+Vermory authority model. The current migration is the legacy project-centric
+vertical slice: it persists projects, sources, source versions, claims,
+capsules, packets, audit logs, and WCEF runs. The Product Constitution assigns
+PostgreSQL the future authoritative boundary for continuity bindings,
+observations, governed memory, history, deletion, and delivery; that runtime
+schema is intentionally not frozen or implemented yet. The native backend is a
+disposable vector projection over eligible records and can be erased and
+rebuilt once authoritative records exist.
 
 ## Test Environment
 

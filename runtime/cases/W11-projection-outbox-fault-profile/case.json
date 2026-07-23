@@ -1,0 +1,19 @@
+{
+  "version": "1",
+  "id": "W11-projection-outbox-fault-profile",
+  "tenant_id": "outbox-fault-tenant",
+  "real_provider_tenant_id": "outbox-real-provider-tenant",
+  "record_count": 1000,
+  "worker_batch_size": 128,
+  "profile_id": "siliconflow-bge-m3-1024-v1",
+  "hard_gates": [
+    "initial backlog equals authoritative event count",
+    "provider failure does not advance the projection cursor",
+    "cursor rewind and duplicate event replay do not duplicate vectors",
+    "PostgreSQL immediate restart during embedding commits no partial vector",
+    "the same runtime pool recovers after PostgreSQL restart",
+    "concurrent deletion wins over an in-flight embedding completion",
+    "all backlog reaches zero lag after retry",
+    "direct SiliconFlow projection and retrieval succeed after restart"
+  ]
+}

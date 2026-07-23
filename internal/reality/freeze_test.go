@@ -75,6 +75,43 @@ func TestValidateRootRejectsLockedSymlinkOutsideCase(t *testing.T) {
 	}
 }
 
+func TestMemoryEligibilityRealityCases(t *testing.T) {
+	report := ValidateRoot("../../reality/cases")
+	if !report.Pass {
+		t.Fatalf("reality case root did not validate: %#v", report)
+	}
+	want := map[string]map[string]bool{
+		"C02-housing-viewing-validity": {
+			"temporal_validity": true,
+			"exact_boundary":    true,
+		},
+		"W03-workspace-workaround-validity": {
+			"temporal_validity":   true,
+			"archive_not_current": true,
+			"explicit_forgetting": true,
+		},
+	}
+	for _, result := range report.Results {
+		required, ok := want[result.CaseID]
+		if !ok {
+			continue
+		}
+		if !result.Pass || result.EvidenceLevel != EvidencePublic || result.LockSHA256 == "" {
+			t.Fatalf("case %s is not frozen public evidence: %#v", result.CaseID, result)
+		}
+		for _, pressure := range result.Pressures {
+			delete(required, pressure)
+		}
+		if len(required) != 0 {
+			t.Fatalf("case %s lacks required pressures: %#v", result.CaseID, required)
+		}
+		delete(want, result.CaseID)
+	}
+	if len(want) != 0 {
+		t.Fatalf("memory eligibility cases were not found: %#v", want)
+	}
+}
+
 func cloneCaseTree(t *testing.T, source, destination string) string {
 	t.Helper()
 	err := filepath.WalkDir(source, func(path string, entry fs.DirEntry, walkErr error) error {

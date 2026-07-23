@@ -1,0 +1,6 @@
+=== RUN   TestServerQualificationScaleProfile
+    server_scale_profile_test.go:191: failed to connect to `user=jstar database=vermory_outbox_fault`: /tmp/vermory-w11-pg-3373794382/socket/.s.PGSQL.62907 (/tmp/vermory-w11-pg-3373794382/socket): server error: FATAL: unrecognized configuration parameter "pool_max_conns" (SQLSTATE 42704); failed to connect to `user=jstar database=vermory_outbox_fault`: /tmp/vermory-w11-pg-3373794382/socket/.s.PGSQL.62907 (/tmp/vermory-w11-pg-3373794382/socket): server error: FATAL: unrecognized configuration parameter "pool_max_conns" (SQLSTATE 42704)
+--- FAIL: TestServerQualificationScaleProfile (0.82s)
+FAIL
+FAIL	vermory/internal/runtime	1.889s
+FAIL

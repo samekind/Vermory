@@ -8,6 +8,7 @@ import (
 	"strings"
 	"testing"
 
+	"vermory/internal/casebook"
 	"vermory/internal/domain"
 	"vermory/internal/eval"
 	"vermory/internal/runner"
@@ -43,6 +44,17 @@ func TestEvalCasebookRequiresLineAndCaseDir(t *testing.T) {
 			t.Fatalf("expected case-dir validation error, got %v", err)
 		}
 	})
+}
+
+func TestConversationHistoryDoesNotInjectWorkspaceFraming(t *testing.T) {
+	history := conversationHistory(casebook.Case{SourceMD: "# Apartment search"})
+	joined := strings.Join(history, "\n")
+	if strings.Contains(strings.ToLower(joined), "repository") || strings.Contains(strings.ToLower(joined), "workspace") {
+		t.Fatalf("conversation history must not inject workspace framing: %q", joined)
+	}
+	if !strings.Contains(joined, "provided continuity facts") {
+		t.Fatalf("expected neutral continuity framing, got %q", joined)
+	}
 }
 
 func TestEvalCasebookWorkspaceMockWritesArtifacts(t *testing.T) {

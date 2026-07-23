@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"sync/atomic"
 	"time"
 
 	"github.com/jackc/pgx/v5"
@@ -23,9 +24,10 @@ type NativeConfig struct {
 }
 
 type NativeBackend struct {
-	pool       *pgxpool.Pool
-	embedder   *openAIEmbedder
-	dimensions int
+	pool              *pgxpool.Pool
+	embedder          *openAIEmbedder
+	dimensions        int
+	embeddingRequests atomic.Int64
 }
 
 func NewNativeBackend(ctx context.Context, config NativeConfig) (*NativeBackend, error) {
@@ -69,6 +71,7 @@ func (b *NativeBackend) Health(ctx context.Context) error {
 }
 
 func (b *NativeBackend) Put(ctx context.Context, record Record) error {
+	b.embeddingRequests.Add(1)
 	vector, err := b.embedder.Embed(ctx, record.Content)
 	if err != nil {
 		return fmt.Errorf("embed record %q: %w", record.ID, err)
@@ -115,6 +118,7 @@ func (b *NativeBackend) Search(ctx context.Context, query Query) ([]Result, erro
 			ORDER BY record_id
 			LIMIT $4`, query.Scope.TenantID, query.Scope.ContinuityID, query.IncludeHistory, limit)
 	} else {
+		b.embeddingRequests.Add(1)
 		vector, embedErr := b.embedder.Embed(ctx, query.Text)
 		if embedErr != nil {
 			return nil, fmt.Errorf("embed search query: %w", embedErr)
@@ -192,7 +196,9 @@ func (b *NativeBackend) RebuildScope(ctx context.Context, scope Scope, records [
 }
 
 func (b *NativeBackend) Stats(ctx context.Context) (Stats, error) {
-	stats := Stats{MeasuredAt: time.Now().UTC(), Extra: map[string]any{"provider": "postgresql-pgvector"}}
+	stats := Stats{MeasuredAt: time.Now().UTC(), Extra: map[string]any{
+		"provider": "postgresql-pgvector", "embedding_requests": b.embeddingRequests.Load(),
+	}}
 	if err := b.pool.QueryRow(ctx, `SELECT count(*), pg_total_relation_size('`+nativeIndexTable+`')`).Scan(&stats.RecordCount, &stats.DiskBytes); err != nil {
 		return Stats{}, fmt.Errorf("read native backend stats: %w", err)
 	}

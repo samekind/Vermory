@@ -1,0 +1,848 @@
+{
+  "schema_version": "longmemeval-s-full-vector-retrieval-evidence/v1",
+  "run_id": "longmemeval-s-full-vector-retrieval-20260719-v7",
+  "implementation_revision": "837149e2c4ded381d749abc3b5a43513f24b40b3",
+  "source": {
+    "dataset_sha256": "d6f21ea9d60a0d56f34a05b609c79c88a451d2ae03597821ea3d5a9678c3a442",
+    "record_set_sha256": "f038965c54b03632f86a59104dd77848b66e3f80c08d5fbabdd3984d16457811",
+    "record_count": 500,
+    "scored_record_count": 470,
+    "abstention_record_count": 30,
+    "session_count": 23867,
+    "turn_count": 246750
+  },
+  "execution": {
+    "run_exit": 0,
+    "total_run_seconds": 7457.74,
+    "projection_seconds": 7210.157,
+    "maximum_resident_set_bytes": 55099392,
+    "peak_memory_footprint_bytes": 38175560,
+    "database_size_bytes": 1211463359,
+    "schema_version": 23,
+    "conversation_continuities": 500,
+    "observations": 23867,
+    "distinct_observation_operation_ids": 23867,
+    "governed_memories": 23867,
+    "active_memories": 23867,
+    "lexical_projection_rows": 23867,
+    "vector_projection_rows": 23867,
+    "retrieval_runs": 500,
+    "distinct_retrieval_operation_ids": 500,
+    "delivered_memory_ids": 6000,
+    "runtime_failures": 0,
+    "scope_or_lifecycle_violations": 0,
+    "vector_authority_hash_violations": 0,
+    "active_database_sessions_after_cleanup": 0,
+    "launchagent_runs": 1,
+    "launchagent_loaded_after_cleanup": false
+  },
+  "environment": {
+    "os": "macOS 26.5.1 (25F80)",
+    "architecture": "arm64",
+    "cpu": "Apple M4",
+    "memory_bytes": 17179869184,
+    "go": "go1.26.5",
+    "postgresql": "18.3",
+    "pgvector": "0.8.5"
+  },
+  "vector": {
+    "profile_id": "w28-longmemeval-s-vector-retrieval-v5",
+    "profile_sha256": "031dc0a1829a7ec9571fcd2a1a43bdb642ef121f8fd4d27645cacf026122f82c",
+    "provider": "siliconflow-direct",
+    "retrieval_profile": "siliconflow-bge-m3-1024-chunked-mean-v2",
+    "model": "BAAI/bge-m3",
+    "dimensions": 1024,
+    "projection_class": "vector_1024",
+    "worker_batch_size": 1,
+    "embedding_batch_size": 16,
+    "embedding_input_policy": "utf8-byte-chunks-v1",
+    "max_chunk_bytes": 7500,
+    "chunk_overlap_bytes": 500,
+    "chunk_pooling": "normalized_mean",
+    "http_timeout_seconds": 120,
+    "max_attempts": 5,
+    "retry_delay_milliseconds": 2000,
+    "retry_backoff": "linear",
+    "projection_max_recoveries": 10,
+    "projection_recovery_delay_seconds": 30,
+    "recovered_projection_failures": 0,
+    "unrecovered_projection_failures": 0,
+    "projection_recovery_sleeps": 0,
+    "projection_duration_ms": 7210157,
+    "projection": {
+      "tenant_id": "benchmark:longmemeval-s-full-vector-retrieval-20260719-v7",
+      "profile_id": "siliconflow-bge-m3-1024-chunked-mean-v2",
+      "last_event_id": 23867,
+      "latest_event_id": 23867,
+      "pruned_through_event_id": 0,
+      "lag": 0,
+      "status": "idle",
+      "rebuild_required": false,
+      "attempt_count": 23867,
+      "last_attempt_at": "2026-07-20T01:59:21.197237+08:00",
+      "vector_count": 23867
+    },
+    "embedding": {
+      "logical_operations": 24367,
+      "logical_embedding_items": 24367,
+      "provider_attempts": 25455,
+      "attempted_items": 48777,
+      "successful_items": 46657,
+      "failed_attempts": 1088,
+      "retried_operations": 1088,
+      "terminal_failures": 0
+    },
+    "expected_logical_embedding_items": 24367,
+    "expected_provider_items": 46657,
+    "successful_provider_items": 46657,
+    "effective_vector_queries": 500,
+    "degraded_vector_queries": 0,
+    "failure_code_breakdown": {},
+    "hard_gates_pass": true
+  },
+  "latency_ms": {
+    "plain_token_overlap": {
+      "count": 500,
+      "min": 11,
+      "p50": 13,
+      "p95": 32,
+      "max": 118,
+      "mean": 16.88
+    },
+    "vermory_lexical": {
+      "count": 500,
+      "min": 6,
+      "p50": 54,
+      "p95": 72,
+      "max": 104,
+      "mean": 56.37
+    },
+    "vermory_vector": {
+      "count": 500,
+      "min": 146,
+      "p50": 178,
+      "p95": 274,
+      "max": 4048,
+      "mean": 199.28
+    }
+  },
+  "aggregates": {
+    "plain_token_overlap": {
+      "count": 470,
+      "at_5": {
+        "count": 470,
+        "mean_recall_any": 0.9064,
+        "mean_recall_all": 0.7234,
+        "mean_ndcg_any": 0.769,
+        "mean_mrr": 0.8063
+      },
+      "at_10": {
+        "count": 470,
+        "mean_recall_any": 0.9489,
+        "mean_recall_all": 0.8383,
+        "mean_ndcg_any": 0.7983,
+        "mean_mrr": 0.8119
+      },
+      "at_12": {
+        "count": 470,
+        "mean_recall_any": 0.9596,
+        "mean_recall_all": 0.866,
+        "mean_ndcg_any": 0.8036,
+        "mean_mrr": 0.8128
+      }
+    },
+    "vermory_lexical": {
+      "count": 470,
+      "at_5": {
+        "count": 470,
+        "mean_recall_any": 0.8234,
+        "mean_recall_all": 0.6,
+        "mean_ndcg_any": 0.6529,
+        "mean_mrr": 0.6871
+      },
+      "at_10": {
+        "count": 470,
+        "mean_recall_any": 0.9021,
+        "mean_recall_all": 0.734,
+        "mean_ndcg_any": 0.6918,
+        "mean_mrr": 0.6974
+      },
+      "at_12": {
+        "count": 470,
+        "mean_recall_any": 0.9213,
+        "mean_recall_all": 0.7638,
+        "mean_ndcg_any": 0.7005,
+        "mean_mrr": 0.6991
+      }
+    },
+    "vermory_vector": {
+      "count": 470,
+      "at_5": {
+        "count": 470,
+        "mean_recall_any": 0.9638,
+        "mean_recall_all": 0.8553,
+        "mean_ndcg_any": 0.8901,
+        "mean_mrr": 0.8978
+      },
+      "at_10": {
+        "count": 470,
+        "mean_recall_any": 0.983,
+        "mean_recall_all": 0.9404,
+        "mean_ndcg_any": 0.9069,
+        "mean_mrr": 0.9006
+      },
+      "at_12": {
+        "count": 470,
+        "mean_recall_any": 0.9872,
+        "mean_recall_all": 0.9553,
+        "mean_ndcg_any": 0.91,
+        "mean_mrr": 0.901
+      }
+    }
+  },
+  "question_type_aggregates": {
+    "knowledge-update": {
+      "plain_token_overlap": {
+        "count": 72,
+        "at_5": {
+          "count": 72,
+          "mean_recall_any": 0.9722,
+          "mean_recall_all": 0.8889,
+          "mean_ndcg_any": 0.891,
+          "mean_mrr": 0.9421
+        },
+        "at_10": {
+          "count": 72,
+          "mean_recall_any": 0.9861,
+          "mean_recall_all": 0.9583,
+          "mean_ndcg_any": 0.9048,
+          "mean_mrr": 0.9439
+        },
+        "at_12": {
+          "count": 72,
+          "mean_recall_any": 1,
+          "mean_recall_all": 0.9583,
+          "mean_ndcg_any": 0.9068,
+          "mean_mrr": 0.945
+        }
+      },
+      "vermory_lexical": {
+        "count": 72,
+        "at_5": {
+          "count": 72,
+          "mean_recall_any": 0.9861,
+          "mean_recall_all": 0.7917,
+          "mean_ndcg_any": 0.8115,
+          "mean_mrr": 0.8604
+        },
+        "at_10": {
+          "count": 72,
+          "mean_recall_any": 0.9861,
+          "mean_recall_all": 0.8889,
+          "mean_ndcg_any": 0.829,
+          "mean_mrr": 0.8604
+        },
+        "at_12": {
+          "count": 72,
+          "mean_recall_any": 1,
+          "mean_recall_all": 0.8889,
+          "mean_ndcg_any": 0.8309,
+          "mean_mrr": 0.8616
+        }
+      },
+      "vermory_vector": {
+        "count": 72,
+        "at_5": {
+          "count": 72,
+          "mean_recall_any": 1,
+          "mean_recall_all": 0.9444,
+          "mean_ndcg_any": 0.9317,
+          "mean_mrr": 0.9444
+        },
+        "at_10": {
+          "count": 72,
+          "mean_recall_any": 1,
+          "mean_recall_all": 0.9861,
+          "mean_ndcg_any": 0.9398,
+          "mean_mrr": 0.9444
+        },
+        "at_12": {
+          "count": 72,
+          "mean_recall_any": 1,
+          "mean_recall_all": 1,
+          "mean_ndcg_any": 0.9417,
+          "mean_mrr": 0.9444
+        }
+      }
+    },
+    "multi-session": {
+      "plain_token_overlap": {
+        "count": 121,
+        "at_5": {
+          "count": 121,
+          "mean_recall_any": 0.9421,
+          "mean_recall_all": 0.5537,
+          "mean_ndcg_any": 0.7234,
+          "mean_mrr": 0.8607
+        },
+        "at_10": {
+          "count": 121,
+          "mean_recall_any": 0.9752,
+          "mean_recall_all": 0.7438,
+          "mean_ndcg_any": 0.7678,
+          "mean_mrr": 0.8659
+        },
+        "at_12": {
+          "count": 121,
+          "mean_recall_any": 0.9835,
+          "mean_recall_all": 0.7603,
+          "mean_ndcg_any": 0.7719,
+          "mean_mrr": 0.8665
+        }
+      },
+      "vermory_lexical": {
+        "count": 121,
+        "at_5": {
+          "count": 121,
+          "mean_recall_any": 0.8264,
+          "mean_recall_all": 0.3967,
+          "mean_ndcg_any": 0.5739,
+          "mean_mrr": 0.6955
+        },
+        "at_10": {
+          "count": 121,
+          "mean_recall_any": 0.9421,
+          "mean_recall_all": 0.562,
+          "mean_ndcg_any": 0.6318,
+          "mean_mrr": 0.7111
+        },
+        "at_12": {
+          "count": 121,
+          "mean_recall_any": 0.9504,
+          "mean_recall_all": 0.595,
+          "mean_ndcg_any": 0.6416,
+          "mean_mrr": 0.7118
+        }
+      },
+      "vermory_vector": {
+        "count": 121,
+        "at_5": {
+          "count": 121,
+          "mean_recall_any": 0.9835,
+          "mean_recall_all": 0.7769,
+          "mean_ndcg_any": 0.8741,
+          "mean_mrr": 0.9242
+        },
+        "at_10": {
+          "count": 121,
+          "mean_recall_any": 0.9917,
+          "mean_recall_all": 0.9421,
+          "mean_ndcg_any": 0.9008,
+          "mean_mrr": 0.9256
+        },
+        "at_12": {
+          "count": 121,
+          "mean_recall_any": 0.9917,
+          "mean_recall_all": 0.9421,
+          "mean_ndcg_any": 0.9016,
+          "mean_mrr": 0.9256
+        }
+      }
+    },
+    "single-session-assistant": {
+      "plain_token_overlap": {
+        "count": 56,
+        "at_5": {
+          "count": 56,
+          "mean_recall_any": 0.8929,
+          "mean_recall_all": 0.8929,
+          "mean_ndcg_any": 0.8481,
+          "mean_mrr": 0.781
+        },
+        "at_10": {
+          "count": 56,
+          "mean_recall_any": 0.9643,
+          "mean_recall_all": 0.9643,
+          "mean_ndcg_any": 0.8719,
+          "mean_mrr": 0.7899
+        },
+        "at_12": {
+          "count": 56,
+          "mean_recall_any": 0.9643,
+          "mean_recall_all": 0.9643,
+          "mean_ndcg_any": 0.8719,
+          "mean_mrr": 0.7899
+        }
+      },
+      "vermory_lexical": {
+        "count": 56,
+        "at_5": {
+          "count": 56,
+          "mean_recall_any": 0.7143,
+          "mean_recall_all": 0.7143,
+          "mean_ndcg_any": 0.6642,
+          "mean_mrr": 0.6182
+        },
+        "at_10": {
+          "count": 56,
+          "mean_recall_any": 0.7321,
+          "mean_recall_all": 0.7321,
+          "mean_ndcg_any": 0.6698,
+          "mean_mrr": 0.6201
+        },
+        "at_12": {
+          "count": 56,
+          "mean_recall_any": 0.7679,
+          "mean_recall_all": 0.7679,
+          "mean_ndcg_any": 0.6801,
+          "mean_mrr": 0.6234
+        }
+      },
+      "vermory_vector": {
+        "count": 56,
+        "at_5": {
+          "count": 56,
+          "mean_recall_any": 1,
+          "mean_recall_all": 1,
+          "mean_ndcg_any": 1,
+          "mean_mrr": 1
+        },
+        "at_10": {
+          "count": 56,
+          "mean_recall_any": 1,
+          "mean_recall_all": 1,
+          "mean_ndcg_any": 1,
+          "mean_mrr": 1
+        },
+        "at_12": {
+          "count": 56,
+          "mean_recall_any": 1,
+          "mean_recall_all": 1,
+          "mean_ndcg_any": 1,
+          "mean_mrr": 1
+        }
+      }
+    },
+    "single-session-preference": {
+      "plain_token_overlap": {
+        "count": 30,
+        "at_5": {
+          "count": 30,
+          "mean_recall_any": 0.5,
+          "mean_recall_all": 0.5,
+          "mean_ndcg_any": 0.3585,
+          "mean_mrr": 0.2633
+        },
+        "at_10": {
+          "count": 30,
+          "mean_recall_any": 0.6333,
+          "mean_recall_all": 0.6333,
+          "mean_ndcg_any": 0.403,
+          "mean_mrr": 0.2801
+        },
+        "at_12": {
+          "count": 30,
+          "mean_recall_any": 0.7,
+          "mean_recall_all": 0.7,
+          "mean_ndcg_any": 0.4216,
+          "mean_mrr": 0.2856
+        }
+      },
+      "vermory_lexical": {
+        "count": 30,
+        "at_5": {
+          "count": 30,
+          "mean_recall_any": 0.4667,
+          "mean_recall_all": 0.4667,
+          "mean_ndcg_any": 0.381,
+          "mean_mrr": 0.29
+        },
+        "at_10": {
+          "count": 30,
+          "mean_recall_any": 0.6333,
+          "mean_recall_all": 0.6333,
+          "mean_ndcg_any": 0.4401,
+          "mean_mrr": 0.3135
+        },
+        "at_12": {
+          "count": 30,
+          "mean_recall_any": 0.6667,
+          "mean_recall_all": 0.6667,
+          "mean_ndcg_any": 0.4497,
+          "mean_mrr": 0.3166
+        }
+      },
+      "vermory_vector": {
+        "count": 30,
+        "at_5": {
+          "count": 30,
+          "mean_recall_any": 0.9,
+          "mean_recall_all": 0.9,
+          "mean_ndcg_any": 0.8544,
+          "mean_mrr": 0.7944
+        },
+        "at_10": {
+          "count": 30,
+          "mean_recall_any": 0.9333,
+          "mean_recall_all": 0.9333,
+          "mean_ndcg_any": 0.8673,
+          "mean_mrr": 0.8
+        },
+        "at_12": {
+          "count": 30,
+          "mean_recall_any": 0.9667,
+          "mean_recall_all": 0.9667,
+          "mean_ndcg_any": 0.8769,
+          "mean_mrr": 0.803
+        }
+      }
+    },
+    "single-session-user": {
+      "plain_token_overlap": {
+        "count": 64,
+        "at_5": {
+          "count": 64,
+          "mean_recall_any": 0.9531,
+          "mean_recall_all": 0.9531,
+          "mean_ndcg_any": 0.9102,
+          "mean_mrr": 0.8461
+        },
+        "at_10": {
+          "count": 64,
+          "mean_recall_any": 0.9844,
+          "mean_recall_all": 0.9844,
+          "mean_ndcg_any": 0.9196,
+          "mean_mrr": 0.8492
+        },
+        "at_12": {
+          "count": 64,
+          "mean_recall_any": 0.9844,
+          "mean_recall_all": 0.9844,
+          "mean_ndcg_any": 0.9196,
+          "mean_mrr": 0.8492
+        }
+      },
+      "vermory_lexical": {
+        "count": 64,
+        "at_5": {
+          "count": 64,
+          "mean_recall_any": 0.8594,
+          "mean_recall_all": 0.8594,
+          "mean_ndcg_any": 0.7841,
+          "mean_mrr": 0.6656
+        },
+        "at_10": {
+          "count": 64,
+          "mean_recall_any": 0.9375,
+          "mean_recall_all": 0.9375,
+          "mean_ndcg_any": 0.8084,
+          "mean_mrr": 0.674
+        },
+        "at_12": {
+          "count": 64,
+          "mean_recall_any": 0.9531,
+          "mean_recall_all": 0.9531,
+          "mean_ndcg_any": 0.8129,
+          "mean_mrr": 0.6754
+        }
+      },
+      "vermory_vector": {
+        "count": 64,
+        "at_5": {
+          "count": 64,
+          "mean_recall_any": 0.9375,
+          "mean_recall_all": 0.9375,
+          "mean_ndcg_any": 0.9144,
+          "mean_mrr": 0.8099
+        },
+        "at_10": {
+          "count": 64,
+          "mean_recall_any": 0.9688,
+          "mean_recall_all": 0.9688,
+          "mean_ndcg_any": 0.9257,
+          "mean_mrr": 0.8145
+        },
+        "at_12": {
+          "count": 64,
+          "mean_recall_any": 0.9688,
+          "mean_recall_all": 0.9688,
+          "mean_ndcg_any": 0.9257,
+          "mean_mrr": 0.8145
+        }
+      }
+    },
+    "temporal-reasoning": {
+      "plain_token_overlap": {
+        "count": 127,
+        "at_5": {
+          "count": 127,
+          "mean_recall_any": 0.9134,
+          "mean_recall_all": 0.6535,
+          "mean_ndcg_any": 0.7344,
+          "mean_mrr": 0.7967
+        },
+        "at_10": {
+          "count": 127,
+          "mean_recall_any": 0.9528,
+          "mean_recall_all": 0.7795,
+          "mean_ndcg_any": 0.7666,
+          "mean_mrr": 0.8021
+        },
+        "at_12": {
+          "count": 127,
+          "mean_recall_any": 0.9606,
+          "mean_recall_all": 0.8504,
+          "mean_ndcg_any": 0.777,
+          "mean_mrr": 0.8028
+        }
+      },
+      "vermory_lexical": {
+        "count": 127,
+        "at_5": {
+          "count": 127,
+          "mean_recall_any": 0.8425,
+          "mean_recall_all": 0.5354,
+          "mean_ndcg_any": 0.6314,
+          "mean_mrr": 0.7159
+        },
+        "at_10": {
+          "count": 127,
+          "mean_recall_any": 0.937,
+          "mean_recall_all": 0.7323,
+          "mean_ndcg_any": 0.6817,
+          "mean_mrr": 0.7285
+        },
+        "at_12": {
+          "count": 127,
+          "mean_recall_any": 0.9606,
+          "mean_recall_all": 0.7795,
+          "mean_ndcg_any": 0.6943,
+          "mean_mrr": 0.7305
+        }
+      },
+      "vermory_vector": {
+        "count": 127,
+        "at_5": {
+          "count": 127,
+          "mean_recall_any": 0.937,
+          "mean_recall_all": 0.7638,
+          "mean_ndcg_any": 0.8296,
+          "mean_mrr": 0.8697
+        },
+        "at_10": {
+          "count": 127,
+          "mean_recall_any": 0.9764,
+          "mean_recall_all": 0.874,
+          "mean_ndcg_any": 0.853,
+          "mean_mrr": 0.8752
+        },
+        "at_12": {
+          "count": 127,
+          "mean_recall_any": 0.9843,
+          "mean_recall_all": 0.9134,
+          "mean_ndcg_any": 0.8601,
+          "mean_mrr": 0.8759
+        }
+      }
+    }
+  },
+  "classification_counts_at_12": {
+    "plain_token_overlap": {
+      "abstention_unscored": 30,
+      "all_evidence_retrieved": 407,
+      "no_evidence_retrieved": 19,
+      "partial_evidence_retrieved": 44
+    },
+    "vermory_lexical": {
+      "abstention_unscored": 30,
+      "all_evidence_retrieved": 359,
+      "no_evidence_retrieved": 37,
+      "partial_evidence_retrieved": 74
+    },
+    "vermory_vector": {
+      "abstention_unscored": 30,
+      "all_evidence_retrieved": 449,
+      "no_evidence_retrieved": 6,
+      "partial_evidence_retrieved": 15
+    }
+  },
+  "vector_failure_cohort_at_12": [
+    {
+      "record_id": "0bc8ad92",
+      "question_type": "temporal-reasoning",
+      "classification": "partial_evidence_retrieved"
+    },
+    {
+      "record_id": "0bc8ad93",
+      "question_type": "temporal-reasoning",
+      "classification": "partial_evidence_retrieved"
+    },
+    {
+      "record_id": "10d9b85a",
+      "question_type": "multi-session",
+      "classification": "partial_evidence_retrieved"
+    },
+    {
+      "record_id": "129d1232",
+      "question_type": "multi-session",
+      "classification": "partial_evidence_retrieved"
+    },
+    {
+      "record_id": "1a8a66a6",
+      "question_type": "multi-session",
+      "classification": "partial_evidence_retrieved"
+    },
+    {
+      "record_id": "3c1045c8",
+      "question_type": "multi-session",
+      "classification": "partial_evidence_retrieved"
+    },
+    {
+      "record_id": "4dfccbf8",
+      "question_type": "temporal-reasoning",
+      "classification": "partial_evidence_retrieved"
+    },
+    {
+      "record_id": "6d550036",
+      "question_type": "multi-session",
+      "classification": "partial_evidence_retrieved"
+    },
+    {
+      "record_id": "726462e0",
+      "question_type": "single-session-user",
+      "classification": "no_evidence_retrieved"
+    },
+    {
+      "record_id": "8e91e7d9",
+      "question_type": "multi-session",
+      "classification": "no_evidence_retrieved"
+    },
+    {
+      "record_id": "92a0aa75",
+      "question_type": "multi-session",
+      "classification": "partial_evidence_retrieved"
+    },
+    {
+      "record_id": "af082822",
+      "question_type": "temporal-reasoning",
+      "classification": "no_evidence_retrieved"
+    },
+    {
+      "record_id": "b46e15ed",
+      "question_type": "temporal-reasoning",
+      "classification": "partial_evidence_retrieved"
+    },
+    {
+      "record_id": "d6233ab6",
+      "question_type": "single-session-preference",
+      "classification": "no_evidence_retrieved"
+    },
+    {
+      "record_id": "e47becba",
+      "question_type": "single-session-user",
+      "classification": "no_evidence_retrieved"
+    },
+    {
+      "record_id": "gpt4_45189cb4",
+      "question_type": "temporal-reasoning",
+      "classification": "partial_evidence_retrieved"
+    },
+    {
+      "record_id": "gpt4_468eb064",
+      "question_type": "temporal-reasoning",
+      "classification": "no_evidence_retrieved"
+    },
+    {
+      "record_id": "gpt4_4929293b",
+      "question_type": "temporal-reasoning",
+      "classification": "partial_evidence_retrieved"
+    },
+    {
+      "record_id": "gpt4_68e94288",
+      "question_type": "temporal-reasoning",
+      "classification": "partial_evidence_retrieved"
+    },
+    {
+      "record_id": "gpt4_7abb270c",
+      "question_type": "temporal-reasoning",
+      "classification": "partial_evidence_retrieved"
+    },
+    {
+      "record_id": "gpt4_a1b77f9c",
+      "question_type": "temporal-reasoning",
+      "classification": "partial_evidence_retrieved"
+    }
+  ],
+  "retained_sample_attribution": {
+    "0a995998": {
+      "finding": "All three answer sessions are the first three vector results, so the earlier wrong count remains downstream of retrieval.",
+      "ranked_answer_sessions": [
+        {
+          "session_id": "answer_afa9873b_1",
+          "rank": 1
+        },
+        {
+          "session_id": "answer_afa9873b_2",
+          "rank": 2
+        },
+        {
+          "session_id": "answer_afa9873b_3",
+          "rank": 3
+        }
+      ],
+      "recall_all_at_5": 1.0
+    },
+    "6a1eabeb": {
+      "finding": "Vector ranks the newer answer session first and the older answer session third; both remain separate source memories.",
+      "ranked_answer_sessions": [
+        {
+          "session_id": "answer_a25d4a91_2",
+          "rank": 1
+        },
+        {
+          "session_id": "answer_a25d4a91_1",
+          "rank": 3
+        }
+      ],
+      "recall_all_at_5": 1.0
+    }
+  },
+  "hard_gate_checks": {
+    "report_hard_gates_pass": true,
+    "scored_records_with_all_conditions": 470,
+    "degraded_vector_queries": 0,
+    "unrecovered_projection_failures": 0,
+    "terminal_embedding_failures": 0,
+    "runtime_failures": 0,
+    "scope_or_lifecycle_violations": 0,
+    "vector_authority_hash_violations": 0,
+    "candidate_remained_inactive": true
+  },
+  "frozen_input_sha256": {
+    "binary": "e09b0b4389e1ea00e5b9bea40ed816b309e1ef5254d8c785aaeb21d19af6ad53",
+    "vector_profile": "031dc0a1829a7ec9571fcd2a1a43bdb642ef121f8fd4d27645cacf026122f82c",
+    "runner_script": "1c0b7ba13bd50d20850a451e88bf24e3e549458d169b564773eee3e122158706",
+    "dataset": "d6f21ea9d60a0d56f34a05b609c79c88a451d2ae03597821ea3d5a9678c3a442"
+  },
+  "raw_artifact_sha256": {
+    "source_json": "907e3037736842404d6d0a4592d578e343889338d2cd01c6ea490f9b81f59ca6",
+    "execution_manifest_json": "612e8ff146a9cd312df770616309e4d3c6dcc4fb05f68d39dc777b1c2f2bfa8e",
+    "failure_ledger_json": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+    "scores_json": "e247e913372beaf403e8195dd08c685ffa74c1d5984f000c13f194ae613b15cd",
+    "retrieval_results_jsonl": "1d2f0b50f618cdd94654c70afcfccf1ef9bc6471bc3921ff6de327a4ede453b6",
+    "report_json": "0563fd84b0789d05bb41a3c558ccb43c43ab3a304ce120fe750b8cf86015f31d",
+    "report_markdown": "f6bad5b6a07088899cd47fa241e23523c6e21aaa4e89304654583f9d9a4e7383",
+    "stdout_log": "d3799226c7366f98461fa229cf766d1fec363da39a8b9a4122a7fb3a9af453de",
+    "stderr_log": "dd428aeefdb4f151ab6934ca62b94321dda52dfaf82f152f58db630962f165fa",
+    "run_exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "complete_512_entry_manifest": "1c5e24232a62fb95faa4b790c54b38d550a96d0e165977e4bba9589c695dc9dc"
+  },
+  "non_claims": [
+    "This is not a full LongMemEval QA score.",
+    "This execution does not use an LLM judge.",
+    "This execution does not evaluate LongMemEval-M.",
+    "This execution evaluates governed session import and retrieval, not automatic memory formation from raw chats.",
+    "This execution does not rank embedding providers or switch the product retrieval default.",
+    "This public benchmark execution is not withheld or externally sealed evidence."
+  ]
+}

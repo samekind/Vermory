@@ -52,7 +52,7 @@ func profileIntro(profile ProfileID) string {
 	case ProfileGeneralChineseChat:
 		return "目标平台：通用中文对话平台，如通义千问、豆包、Kimi、文心、智谱、腾讯元宝。"
 	case ProfileCodingAgent:
-		return "目标平台：代码开发工具，如 Codex、Cursor、Claude Code、Gemini CLI、通义灵码、CodeGeeX、Comate、Trae、MarsCode。"
+		return "目标平台：代码开发工具，如 Codex、Cursor、Claude Code、Grok、通义灵码、CodeGeeX、Comate、Trae、MarsCode。"
 	case ProfileTeamHandoff:
 		return "目标平台：团队交接。请先说明当前目标、已确认决策和下一步。"
 	default:

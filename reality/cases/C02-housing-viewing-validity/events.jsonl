@@ -1,0 +1,4 @@
+{"id":"c02-event-1","sequence":1,"actor":"user","channel":"housing_search","source_id":"c02-housing","content":"Keep the monthly housing budget at or below CNY 6,500."}
+{"id":"c02-event-2","sequence":2,"actor":"user","channel":"housing_search","source_id":"c02-housing","content":"The apartment viewing is booked for 2026-07-20 at 14:00 China Standard Time and is valid only before that exact event boundary."}
+{"id":"c02-event-3","sequence":3,"actor":"evaluation_probe","channel":"before_boundary","source_id":"c02-housing","content":"Before the event boundary, summarize the active viewing and budget constraints."}
+{"id":"c02-event-4","sequence":4,"actor":"evaluation_probe","channel":"exact_boundary","source_id":"c02-housing","content":"At 2026-07-20T14:00:00+08:00, state the current housing-search constraints without treating the old viewing as actionable."}

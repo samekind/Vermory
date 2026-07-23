@@ -1,6 +1,7 @@
 name: CI
 
 on:
+  workflow_dispatch:
   push:
     branches: [main]
   pull_request:
@@ -11,15 +12,839 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: pgvector/pgvector:pg18@sha256:12a379b47ad65289572ea0756efc11b7c241a6662833e8af7038cd3b73d647e0
+        env:
+          POSTGRES_DB: vermory_test
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d vermory_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      VERMORY_TEST_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/vermory_test?sslmode=disable
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
         with:
           go-version-file: go.mod
           cache: true
-      - name: Test
-        run: go test -count=1 ./...
+      - uses: pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa # v4
+        with:
+          version: 11.12.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: integrations/openclaw/pnpm-lock.yaml
+      - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6
+        with:
+          version: 0.11.28
+      - name: Verify repository policy
+        run: bash scripts/repository-policy.sh
+      - name: Lint GitHub Actions workflows
+        run: go run github.com/rhysd/actionlint/cmd/actionlint@v1.7.12
+      - name: Install PostgreSQL 18 client tools
+        run: |
+          sudo install -d -m 0755 /usr/share/postgresql-common/pgdg
+          curl --fail --silent --show-error \
+            https://www.postgresql.org/media/keys/ACCC4CF8.asc \
+            | sudo tee /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc >/dev/null
+          . /etc/os-release
+          echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt ${VERSION_CODENAME}-pgdg main" \
+            | sudo tee /etc/apt/sources.list.d/pgdg.list >/dev/null
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends postgresql-client-18
+          /usr/lib/postgresql/18/bin/pg_dump --version | grep -E '^pg_dump \(PostgreSQL\) 18\.'
+          /usr/lib/postgresql/18/bin/pg_restore --version | grep -E '^pg_restore \(PostgreSQL\) 18\.'
+          echo "/usr/lib/postgresql/18/bin" >> "$GITHUB_PATH"
+      - name: Test with PostgreSQL
+        run: go test -p 1 -count=1 ./...
+      - name: Runtime race tests
+        run: >-
+          go test -race -p 1 -count=1
+          ./internal/authn
+          ./internal/runtime
+          ./internal/webchat
+          ./internal/identitycli
+          ./internal/operatorcli
+          ./internal/mcpserver
+          ./cmd/vermory
+          ./internal/provider
+          ./internal/memorybackend
+          ./internal/retrievalablation
       - name: Reality race tests
         run: go test -count=1 -race ./internal/reality
       - name: Vet
         run: go vet ./...
+      - name: Verify Go module files
+        run: |
+          go mod tidy
+          git diff --exit-code -- go.mod go.sum
+      - name: Build release binary
+        run: go build -trimpath -o /tmp/vermory ./cmd/vermory
+      - name: Install OpenClaw integration dependencies
+        run: pnpm -C integrations/openclaw install --frozen-lockfile
+      - name: Check OpenClaw integration
+        run: pnpm -C integrations/openclaw check
+      - name: Verify OpenClaw package
+        run: pnpm -C integrations/openclaw pack --dry-run
+      - name: Test Hermes integration without workspace pollution
+        env:
+          PYTHONDONTWRITEBYTECODE: "1"
+          UV_PROJECT_ENVIRONMENT: /tmp/vermory-hermes-ci
+        run: |
+          uv run --project integrations/hermes --locked --python 3.12 \
+            python -m unittest discover -s integrations/hermes/tests -v
+          test ! -e integrations/hermes/.venv
+          test -z "$(find integrations/hermes -type d -name __pycache__ -print -quit)"
+      - name: Build release snapshot
+        uses: goreleaser/goreleaser-action@f06c13b6b1a9625abc9e6e439d9c05a8f2190e94 # v7.2.3
+        with:
+          distribution: goreleaser
+          version: v2.17.0
+          args: release --snapshot --clean --skip=publish --config .goreleaser.yaml
+      - name: Pack OpenClaw release artifact
+        run: pnpm -C integrations/openclaw pack --pack-destination ../../dist
+      - name: Pack and verify deterministic Hermes release artifact
+        run: |
+          integrations/hermes/package.sh /tmp/hermes-package-a
+          integrations/hermes/package.sh /tmp/hermes-package-b
+          cmp \
+            /tmp/hermes-package-a/vermory-hermes-0.1.0.tar.gz \
+            /tmp/hermes-package-b/vermory-hermes-0.1.0.tar.gz
+          cmp \
+            /tmp/hermes-package-a/vermory-hermes-0.1.0.tar.gz.sha256 \
+            /tmp/hermes-package-b/vermory-hermes-0.1.0.tar.gz.sha256
+          (cd /tmp/hermes-package-a && sha256sum --check vermory-hermes-0.1.0.tar.gz.sha256)
+          tar -tzf /tmp/hermes-package-a/vermory-hermes-0.1.0.tar.gz \
+            | grep -v '/$' | sort > /tmp/hermes-package.actual
+          cat > /tmp/hermes-package.expected <<'EOF'
+          vermory-hermes-0.1.0/LICENSE
+          vermory-hermes-0.1.0/integrations/hermes/README.md
+          vermory-hermes-0.1.0/integrations/hermes/pyproject.toml
+          vermory-hermes-0.1.0/integrations/hermes/uv.lock
+          vermory-hermes-0.1.0/integrations/hermes/vermory/__init__.py
+          vermory-hermes-0.1.0/integrations/hermes/vermory/plugin.yaml
+          EOF
+          diff -u /tmp/hermes-package.expected /tmp/hermes-package.actual
+          cp /tmp/hermes-package-a/vermory-hermes-0.1.0.tar.gz* dist/
+      - name: Build and verify complete release manifest
+        run: |
+          bash scripts/release-manifest.sh create dist
+          cp dist/release-manifest.sha256 /tmp/release-manifest.first
+          bash scripts/release-manifest.sh verify dist
+          bash scripts/release-manifest.sh create dist
+          cmp /tmp/release-manifest.first dist/release-manifest.sha256
+          cp -R dist /tmp/vermory-tampered-dist
+          printf 'tampered\n' >> /tmp/vermory-tampered-dist/vermory-openclaw-0.1.0.tgz
+          if bash scripts/release-manifest.sh verify /tmp/vermory-tampered-dist; then
+            echo "modified release payload passed manifest verification" >&2
+            exit 1
+          fi
+      - name: Verify clean diff
+        run: git diff --check
+
+  linux-service-lifecycle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      POSTGRES_PASSWORD: i05-ci-postgres
+      I05_QUALIFICATION: github-hosted-ubuntu-systemd-amd64
+      I05_EXPECTED_MACHINE: x86_64
+    services:
+      postgres:
+        image: pgvector/pgvector:pg18@sha256:12a379b47ad65289572ea0756efc11b7c241a6662833e8af7038cd3b73d647e0
+        env:
+          POSTGRES_DB: postgres
+          POSTGRES_PASSWORD: i05-ci-postgres
+          POSTGRES_USER: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 0
+          ref: ${{ env.SOURCE_SHA }}
+      - name: Verify lifecycle source revision
+        run: |
+          test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
+          test "$(uname -m)" = "$I05_EXPECTED_MACHINE"
+      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
+        with:
+          go-version-file: go.mod
+          cache: true
+      - name: Install PostgreSQL 18 client tools
+        run: |
+          sudo install -d -m 0755 /usr/share/postgresql-common/pgdg
+          curl --fail --silent --show-error \
+            https://www.postgresql.org/media/keys/ACCC4CF8.asc \
+            | sudo tee /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc >/dev/null
+          . /etc/os-release
+          echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt ${VERSION_CODENAME}-pgdg main" \
+            | sudo tee /etc/apt/sources.list.d/pgdg.list >/dev/null
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends jq postgresql-client-18
+          echo "/usr/lib/postgresql/18/bin" >> "$GITHUB_PATH"
+      - name: Run exact-head systemd and PostgreSQL lifecycle
+        run: |
+          sudo --preserve-env=SOURCE_SHA,POSTGRES_PASSWORD,I05_QUALIFICATION,I05_EXPECTED_MACHINE -- \
+            env \
+              "PATH=$PATH:/usr/lib/postgresql/18/bin" \
+              "GOCACHE=$RUNNER_TEMP/i05-go-build" \
+              "GOMODCACHE=$RUNNER_TEMP/i05-go-mod" \
+              deploy/linux/run-i05-acceptance.sh \
+                "$GITHUB_WORKSPACE" \
+                "$RUNNER_TEMP/i05-evidence"
+          test -z "$(git status --porcelain)"
+          jq -e \
+            --arg source_sha "$SOURCE_SHA" \
+            '.source_sha == $source_sha and .qualification == "github-hosted-ubuntu-systemd-amd64" and .runtime.machine == "x86_64" and .runtime.goarch == "amd64" and .runtime.native == true and (.hard_gates | to_entries | all(.value == true))' \
+            "$RUNNER_TEMP/i05-evidence/report.json"
+      - name: Upload normalized I05 evidence
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: vermory-i05-linux-service-amd64-${{ env.SOURCE_SHA }}
+          path: ${{ runner.temp }}/i05-evidence/report.json
+          if-no-files-found: error
+          retention-days: 7
+
+  linux-service-lifecycle-arm64:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 30
+    env:
+      SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      POSTGRES_PASSWORD: i05-ci-postgres
+      I05_QUALIFICATION: github-hosted-ubuntu-systemd-arm64
+      I05_EXPECTED_MACHINE: aarch64
+    services:
+      postgres:
+        image: pgvector/pgvector:pg18@sha256:12a379b47ad65289572ea0756efc11b7c241a6662833e8af7038cd3b73d647e0
+        env:
+          POSTGRES_DB: postgres
+          POSTGRES_PASSWORD: i05-ci-postgres
+          POSTGRES_USER: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 0
+          ref: ${{ env.SOURCE_SHA }}
+      - name: Verify native ARM64 lifecycle source and architecture
+        run: |
+          test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
+          test "$(uname -m)" = "$I05_EXPECTED_MACHINE"
+      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
+        with:
+          go-version-file: go.mod
+          cache: true
+      - name: Install PostgreSQL 18 client tools
+        run: |
+          sudo install -d -m 0755 /usr/share/postgresql-common/pgdg
+          curl --fail --silent --show-error \
+            https://www.postgresql.org/media/keys/ACCC4CF8.asc \
+            | sudo tee /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc >/dev/null
+          . /etc/os-release
+          echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt ${VERSION_CODENAME}-pgdg main" \
+            | sudo tee /etc/apt/sources.list.d/pgdg.list >/dev/null
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends jq postgresql-client-18
+          echo "/usr/lib/postgresql/18/bin" >> "$GITHUB_PATH"
+      - name: Run exact-head native ARM64 systemd and PostgreSQL lifecycle
+        run: |
+          sudo --preserve-env=SOURCE_SHA,POSTGRES_PASSWORD,I05_QUALIFICATION,I05_EXPECTED_MACHINE -- \
+            env \
+              "PATH=$PATH:/usr/lib/postgresql/18/bin" \
+              "GOCACHE=$RUNNER_TEMP/i05-go-build" \
+              "GOMODCACHE=$RUNNER_TEMP/i05-go-mod" \
+              deploy/linux/run-i05-acceptance.sh \
+                "$GITHUB_WORKSPACE" \
+                "$RUNNER_TEMP/i05-evidence"
+          test -z "$(git status --porcelain)"
+          jq -e \
+            --arg source_sha "$SOURCE_SHA" \
+            '.source_sha == $source_sha and .qualification == "github-hosted-ubuntu-systemd-arm64" and .runtime.machine == "aarch64" and .runtime.goarch == "arm64" and .runtime.native == true and (.hard_gates | to_entries | all(.value == true))' \
+            "$RUNNER_TEMP/i05-evidence/report.json"
+      - name: Upload normalized native ARM64 I05 evidence
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: vermory-i05-linux-service-arm64-${{ env.SOURCE_SHA }}
+          path: ${{ runner.temp }}/i05-evidence/report.json
+          if-no-files-found: error
+          retention-days: 7
+
+  linux-package-install:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - format: deb
+            runner: ubuntu-latest
+            arch: amd64
+            machine: x86_64
+          - format: rpm
+            runner: ubuntu-latest
+            arch: amd64
+            machine: x86_64
+          - format: deb
+            runner: ubuntu-24.04-arm
+            arch: arm64
+            machine: aarch64
+          - format: rpm
+            runner: ubuntu-24.04-arm
+            arch: arm64
+            machine: aarch64
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 20
+    env:
+      SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      I06_EXPECTED_MACHINE: ${{ matrix.machine }}
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 0
+          ref: ${{ env.SOURCE_SHA }}
+      - name: Verify package source revision and architecture
+        run: |
+          test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
+          test "$(uname -m)" = "$I06_EXPECTED_MACHINE"
+      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
+        with:
+          go-version-file: go.mod
+          cache: true
+      - name: Install package acceptance tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends file jq
+      - name: Install RPM tooling
+        if: matrix.format == 'rpm'
+        run: sudo apt-get install --yes --no-install-recommends rpm
+      - name: Build native package snapshot
+        uses: goreleaser/goreleaser-action@f06c13b6b1a9625abc9e6e439d9c05a8f2190e94 # v7.2.3
+        with:
+          distribution: goreleaser
+          version: v2.17.0
+          args: release --snapshot --clean --skip=publish --config .goreleaser.yaml
+      - name: Run native package install and removal acceptance
+        run: |
+          sudo --preserve-env=SOURCE_SHA,I06_EXPECTED_MACHINE -- \
+            env "PATH=$PATH" \
+              deploy/linux/run-i06-package-acceptance.sh \
+                "$GITHUB_WORKSPACE" \
+                "$GITHUB_WORKSPACE/dist" \
+                "${{ matrix.format }}" \
+                "${{ matrix.arch }}" \
+                "$RUNNER_TEMP/i06-evidence"
+          test -z "$(git status --porcelain)"
+          jq -e \
+            --arg source_sha "$SOURCE_SHA" \
+            --arg format "${{ matrix.format }}" \
+            --arg architecture "${{ matrix.arch }}" \
+            '.source_sha == $source_sha and .package.format == $format and .package.architecture == $architecture and .package.native == true and (.hard_gates | length == 16) and (.hard_gates | to_entries | all(.value == true))' \
+            "$RUNNER_TEMP/i06-evidence/report.json"
+      - name: Upload normalized I06 package evidence
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: vermory-i06-linux-package-${{ matrix.format }}-${{ matrix.arch }}-${{ env.SOURCE_SHA }}
+          path: ${{ runner.temp }}/i06-evidence
+          if-no-files-found: error
+          retention-days: 7
+
+  linux-repository-apt:
+    needs: linux-package-install
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            arch: amd64
+            machine: x86_64
+          - runner: ubuntu-24.04-arm
+            arch: arm64
+            machine: aarch64
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 20
+    env:
+      SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      I08_EXPECTED_MACHINE: ${{ matrix.machine }}
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 0
+          ref: ${{ env.SOURCE_SHA }}
+      - name: Verify APT repository source revision and architecture
+        run: |
+          test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
+          test "$(uname -m)" = "$I08_EXPECTED_MACHINE"
+      - name: Install APT repository qualification tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends apt-utils dpkg-dev gnupg jq
+      - name: Download exact I06-qualified DEB
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: vermory-i06-linux-package-deb-${{ matrix.arch }}-${{ env.SOURCE_SHA }}
+          path: ${{ runner.temp }}/i06-evidence
+      - name: Build signed APT repository from accepted package bytes
+        run: >-
+          bash scripts/build-linux-repository.sh
+          "$RUNNER_TEMP/i06-evidence"
+          apt
+          "${{ matrix.arch }}"
+          "$SOURCE_SHA"
+          "$RUNNER_TEMP/i08-repository"
+      - name: Run native APT repository acceptance
+        run: |
+          sudo --preserve-env=SOURCE_SHA,I08_EXPECTED_MACHINE -- \
+            env "PATH=$PATH" \
+              deploy/linux/run-i08-repository-acceptance.sh \
+                "$RUNNER_TEMP/i08-repository" \
+                apt \
+                "${{ matrix.arch }}" \
+                "$RUNNER_TEMP/i08-evidence"
+          jq -e \
+            --arg source_sha "$SOURCE_SHA" \
+            --arg architecture "${{ matrix.arch }}" \
+            '.source_sha == $source_sha and .repository.kind == "apt" and .repository.architecture == $architecture and .repository.native == true and .repository.package_manager == "apt" and .repository.transport == "file://" and .repository.metadata_signature_enforced == true and (.hard_gates | length == 18) and (.hard_gates | to_entries | all(.value == true))' \
+            "$RUNNER_TEMP/i08-evidence/report.json"
+      - name: Upload normalized I08 APT repository evidence
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: vermory-i08-linux-repository-apt-${{ matrix.arch }}-${{ env.SOURCE_SHA }}
+          path: ${{ runner.temp }}/i08-evidence
+          if-no-files-found: error
+          retention-days: 7
+
+  linux-repository-dnf:
+    needs: linux-package-install
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            arch: amd64
+            machine: x86_64
+          - runner: ubuntu-24.04-arm
+            arch: arm64
+            machine: aarch64
+    runs-on: ${{ matrix.runner }}
+    container:
+      image: fedora:43@sha256:762d73ba1c455232b0272c5d445a34f36c4b9f421cbc05ce8102552325b6a222
+      options: --user 0
+    timeout-minutes: 20
+    env:
+      SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      I08_EXPECTED_MACHINE: ${{ matrix.machine }}
+    steps:
+      - name: Install Fedora checkout and repository qualification tools
+        run: >-
+          dnf install --assumeyes
+          createrepo_c
+          bzip2
+          dnf5-plugins
+          findutils
+          git
+          gnupg2
+          gzip
+          jq
+          rpm
+          shadow-utils
+          systemd
+          tar
+          xz
+          zstd
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 0
+          ref: ${{ env.SOURCE_SHA }}
+      - name: Verify DNF repository source revision and architecture
+        run: |
+          test "$(git -c safe.directory="$GITHUB_WORKSPACE" rev-parse HEAD)" = "$SOURCE_SHA"
+          test "$(uname -m)" = "$I08_EXPECTED_MACHINE"
+      - name: Download exact I06-qualified RPM
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: vermory-i06-linux-package-rpm-${{ matrix.arch }}-${{ env.SOURCE_SHA }}
+          path: ${{ runner.temp }}/i06-evidence
+      - name: Build signed DNF repository from accepted package bytes
+        run: >-
+          bash scripts/build-linux-repository.sh
+          "$RUNNER_TEMP/i06-evidence"
+          dnf
+          "${{ matrix.arch }}"
+          "$SOURCE_SHA"
+          "$RUNNER_TEMP/i08-repository"
+      - name: Run native DNF repository acceptance
+        run: |
+          deploy/linux/run-i08-repository-acceptance.sh \
+            "$RUNNER_TEMP/i08-repository" \
+            dnf \
+            "${{ matrix.arch }}" \
+            "$RUNNER_TEMP/i08-evidence"
+          jq -e \
+            --arg source_sha "$SOURCE_SHA" \
+            --arg architecture "${{ matrix.arch }}" \
+            '.source_sha == $source_sha and .repository.kind == "dnf" and .repository.architecture == $architecture and .repository.native == true and .repository.package_manager == "dnf" and .repository.transport == "file://" and .repository.metadata_signature_enforced == true and (.hard_gates | length == 18) and (.hard_gates | to_entries | all(.value == true)) and .qualification_boundaries.rpm_payload_signature == false' \
+            "$RUNNER_TEMP/i08-evidence/report.json"
+      - name: Upload normalized I08 DNF repository evidence
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: vermory-i08-linux-repository-dnf-${{ matrix.arch }}-${{ env.SOURCE_SHA }}
+          path: ${{ runner.temp }}/i08-evidence
+          if-no-files-found: error
+          retention-days: 7
+
+  linux-versioned-packages:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            arch: amd64
+            machine: x86_64
+          - runner: ubuntu-24.04-arm
+            arch: arm64
+            machine: aarch64
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
+    env:
+      SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      I09_EXPECTED_MACHINE: ${{ matrix.machine }}
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 0
+          ref: ${{ env.SOURCE_SHA }}
+      - name: Verify versioned package source revision and architecture
+        run: |
+          test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
+          test "$(uname -m)" = "$I09_EXPECTED_MACHINE"
+      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
+        with:
+          go-version-file: go.mod
+          cache: true
+      - name: Install versioned package inspection tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends jq rpm
+      - name: Install GoReleaser
+        uses: goreleaser/goreleaser-action@f06c13b6b1a9625abc9e6e439d9c05a8f2190e94 # v7.2.3
+        with:
+          distribution: goreleaser
+          version: v2.17.0
+          install-only: true
+      - name: Build exact base and candidate qualification packages
+        run: >-
+          bash scripts/build-i09-versioned-packages.sh
+          "${{ matrix.arch }}"
+          "$SOURCE_SHA"
+          "$RUNNER_TEMP/i09-versioned-packages"
+      - name: Verify versioned package manifest
+        run: |
+          jq -e \
+            --arg source_sha "$SOURCE_SHA" \
+            --arg architecture "${{ matrix.arch }}" \
+            '.case_id == "I09-linux-repository-lifecycle" and .candidate_source_sha == $source_sha and .architecture == $architecture and (.packages.deb | length == 2) and (.packages.rpm | length == 2)' \
+            "$RUNNER_TEMP/i09-versioned-packages/package-set.json"
+          test -z "$(git status --porcelain)"
+      - name: Upload I09 versioned package set
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: vermory-i09-versioned-packages-${{ matrix.arch }}-${{ env.SOURCE_SHA }}
+          path: ${{ runner.temp }}/i09-versioned-packages
+          if-no-files-found: error
+          retention-days: 7
+
+  linux-repository-lifecycle-apt:
+    needs: linux-versioned-packages
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            arch: amd64
+            machine: x86_64
+          - runner: ubuntu-24.04-arm
+            arch: arm64
+            machine: aarch64
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 25
+    env:
+      SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      I09_EXPECTED_MACHINE: ${{ matrix.machine }}
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 0
+          ref: ${{ env.SOURCE_SHA }}
+      - name: Verify APT lifecycle source revision and architecture
+        run: |
+          test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
+          test "$(uname -m)" = "$I09_EXPECTED_MACHINE"
+      - name: Install APT lifecycle qualification tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends apt-utils dpkg-dev gnupg jq
+      - name: Download exact I09 versioned package set
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: vermory-i09-versioned-packages-${{ matrix.arch }}-${{ env.SOURCE_SHA }}
+          path: ${{ runner.temp }}/i09-versioned-packages
+      - name: Build signed APT lifecycle repository snapshots
+        run: >-
+          bash scripts/build-i09-lifecycle-repository.sh
+          "$RUNNER_TEMP/i09-versioned-packages"
+          apt
+          "${{ matrix.arch }}"
+          "$SOURCE_SHA"
+          "$RUNNER_TEMP/i09-repository"
+      - name: Run native APT upgrade and rollback lifecycle
+        run: |
+          sudo --preserve-env=SOURCE_SHA,I09_EXPECTED_MACHINE -- \
+            env "PATH=$PATH" \
+              deploy/linux/run-i09-repository-lifecycle-acceptance.sh \
+                "$RUNNER_TEMP/i09-repository" \
+                apt \
+                "${{ matrix.arch }}" \
+                "$RUNNER_TEMP/i09-evidence"
+          jq -e \
+            --arg source_sha "$SOURCE_SHA" \
+            --arg architecture "${{ matrix.arch }}" \
+            '.sources.candidate == $source_sha and .repository.kind == "apt" and .repository.architecture == $architecture and .repository.native == true and .repository.metadata_signature_enforced == true and (.hard_gates | length == 26) and (.hard_gates | to_entries | all(.value == true))' \
+            "$RUNNER_TEMP/i09-evidence/report.json"
+      - name: Upload normalized I09 APT lifecycle evidence
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: vermory-i09-linux-repository-lifecycle-apt-${{ matrix.arch }}-${{ env.SOURCE_SHA }}
+          path: ${{ runner.temp }}/i09-evidence
+          if-no-files-found: error
+          retention-days: 7
+
+  linux-repository-lifecycle-dnf:
+    needs: linux-versioned-packages
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            arch: amd64
+            machine: x86_64
+          - runner: ubuntu-24.04-arm
+            arch: arm64
+            machine: aarch64
+    runs-on: ${{ matrix.runner }}
+    container:
+      image: fedora:43@sha256:762d73ba1c455232b0272c5d445a34f36c4b9f421cbc05ce8102552325b6a222
+      options: --user 0
+    timeout-minutes: 25
+    env:
+      SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      I09_EXPECTED_MACHINE: ${{ matrix.machine }}
+    steps:
+      - name: Install Fedora checkout and lifecycle qualification tools
+        run: >-
+          dnf install --assumeyes
+          createrepo_c
+          bzip2
+          findutils
+          git
+          gnupg2
+          gzip
+          jq
+          rpm
+          shadow-utils
+          systemd
+          tar
+          xz
+          zstd
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 0
+          ref: ${{ env.SOURCE_SHA }}
+      - name: Verify DNF lifecycle source revision and architecture
+        run: |
+          test "$(git -c safe.directory="$GITHUB_WORKSPACE" rev-parse HEAD)" = "$SOURCE_SHA"
+          test "$(uname -m)" = "$I09_EXPECTED_MACHINE"
+      - name: Download exact I09 versioned package set
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: vermory-i09-versioned-packages-${{ matrix.arch }}-${{ env.SOURCE_SHA }}
+          path: ${{ runner.temp }}/i09-versioned-packages
+      - name: Build signed DNF lifecycle repository snapshots
+        run: >-
+          bash scripts/build-i09-lifecycle-repository.sh
+          "$RUNNER_TEMP/i09-versioned-packages"
+          dnf
+          "${{ matrix.arch }}"
+          "$SOURCE_SHA"
+          "$RUNNER_TEMP/i09-repository"
+      - name: Run native DNF upgrade and rollback lifecycle
+        run: |
+          deploy/linux/run-i09-repository-lifecycle-acceptance.sh \
+            "$RUNNER_TEMP/i09-repository" \
+            dnf \
+            "${{ matrix.arch }}" \
+            "$RUNNER_TEMP/i09-evidence"
+          jq -e \
+            --arg source_sha "$SOURCE_SHA" \
+            --arg architecture "${{ matrix.arch }}" \
+            '.sources.candidate == $source_sha and .repository.kind == "dnf" and .repository.architecture == $architecture and .repository.native == true and .repository.metadata_signature_enforced == true and (.hard_gates | length == 26) and (.hard_gates | to_entries | all(.value == true)) and .qualification_boundaries.rpm_payload_signature == false' \
+            "$RUNNER_TEMP/i09-evidence/report.json"
+      - name: Upload normalized I09 DNF lifecycle evidence
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: vermory-i09-linux-repository-lifecycle-dnf-${{ matrix.arch }}-${{ env.SOURCE_SHA }}
+          path: ${{ runner.temp }}/i09-evidence
+          if-no-files-found: error
+          retention-days: 7
+
+  sign-snapshot:
+    needs:
+      - test
+      - linux-service-lifecycle
+      - linux-service-lifecycle-arm64
+      - linux-package-install
+      - linux-repository-apt
+      - linux-repository-dnf
+      - linux-versioned-packages
+      - linux-repository-lifecycle-apt
+      - linux-repository-lifecycle-dnf
+    if: >-
+      github.event_name == 'push' ||
+      github.event.pull_request.head.repo.full_name == github.repository
+    permissions:
+      contents: read
+      id-token: write
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 0
+          ref: ${{ env.SOURCE_SHA }}
+      - name: Verify snapshot source revision
+        run: test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
+      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
+        with:
+          go-version-file: go.mod
+          cache: true
+      - uses: pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa # v4
+        with:
+          version: 11.12.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: integrations/openclaw/pnpm-lock.yaml
+      - name: Install OpenClaw integration dependencies
+        run: pnpm -C integrations/openclaw install --frozen-lockfile
+      - name: Build release snapshot
+        uses: goreleaser/goreleaser-action@f06c13b6b1a9625abc9e6e439d9c05a8f2190e94 # v7.2.3
+        with:
+          distribution: goreleaser
+          version: v2.17.0
+          args: release --snapshot --clean --skip=publish --config .goreleaser.yaml
+      - name: Download exact packages qualified on native runners
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          pattern: vermory-i06-linux-package-*-${{ env.SOURCE_SHA }}
+          path: ${{ runner.temp }}/i06-qualified-packages
+      - name: Assemble exact qualified packages into the signed snapshot
+        run: >-
+          bash scripts/assemble-qualified-packages.sh
+          "$RUNNER_TEMP/i06-qualified-packages"
+          dist
+          "$SOURCE_SHA"
+      - name: Download exact repositories qualified on native package managers
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          pattern: vermory-i08-linux-repository-*-${{ env.SOURCE_SHA }}
+          path: ${{ runner.temp }}/i08-qualified-repositories
+      - name: Assemble exact qualified repositories into the signed snapshot
+        run: >-
+          bash scripts/assemble-qualified-repositories.sh
+          "$RUNNER_TEMP/i08-qualified-repositories"
+          dist
+          "$SOURCE_SHA"
+      - name: Pack OpenClaw release artifact
+        run: pnpm -C integrations/openclaw pack --pack-destination ../../dist
+      - name: Pack Hermes release artifact
+        run: integrations/hermes/package.sh dist
+      - name: Build and verify complete release manifest
+        run: |
+          bash scripts/release-manifest.sh create dist
+          bash scripts/release-manifest.sh verify dist
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6 # v4.1.2
+        with:
+          cosign-release: v3.0.6
+      - name: Sign and verify complete release manifest
+        env:
+          EXPECTED_IDENTITY: ${{ github.server_url }}/${{ github.repository }}/.github/workflows/ci.yml@${{ github.ref }}
+          EXPECTED_ISSUER: https://token.actions.githubusercontent.com
+        run: |
+          cosign sign-blob \
+            --yes \
+            --bundle dist/release-manifest.sigstore.json \
+            dist/release-manifest.sha256
+          cosign verify-blob \
+            --bundle dist/release-manifest.sigstore.json \
+            --certificate-identity "$EXPECTED_IDENTITY" \
+            --certificate-oidc-issuer "$EXPECTED_ISSUER" \
+            dist/release-manifest.sha256
+
+          cp dist/release-manifest.sha256 /tmp/release-manifest.tampered
+          printf '\n' >> /tmp/release-manifest.tampered
+          if cosign verify-blob \
+            --bundle dist/release-manifest.sigstore.json \
+            --certificate-identity "$EXPECTED_IDENTITY" \
+            --certificate-oidc-issuer "$EXPECTED_ISSUER" \
+            /tmp/release-manifest.tampered; then
+            echo "modified manifest passed signature verification" >&2
+            exit 1
+          fi
+
+          if cosign verify-blob \
+            --bundle dist/release-manifest.sigstore.json \
+            --certificate-identity "${{ github.server_url }}/${{ github.repository }}/.github/workflows/release.yml@${{ github.ref }}" \
+            --certificate-oidc-issuer "$EXPECTED_ISSUER" \
+            dist/release-manifest.sha256; then
+            echo "wrong workflow identity passed signature verification" >&2
+            exit 1
+          fi
+      - name: Upload signed release snapshot
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: vermory-pr-snapshot-${{ env.SOURCE_SHA }}
+          path: |
+            dist/*.tar.gz
+            dist/*.deb
+            dist/*.rpm
+            dist/vermory-repository-*.tar.gz
+            dist/checksums.txt
+            dist/*.tgz
+            dist/vermory-hermes-*.sha256
+            dist/release-manifest.sha256
+            dist/release-manifest.sigstore.json
+          if-no-files-found: error
+          retention-days: 7

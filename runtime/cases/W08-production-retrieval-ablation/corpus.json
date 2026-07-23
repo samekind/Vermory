@@ -1,0 +1,117 @@
+{
+  "version": "1",
+  "name": "W08 production retrieval ablation",
+  "scopes": [
+    {"id":"workspace-release","tenant_id":"retrieval-local","line":"workspace","anchor":"/fixtures/w08/release-control"},
+    {"id":"workspace-api","tenant_id":"retrieval-local","line":"workspace","anchor":"/fixtures/w08/context-router"},
+    {"id":"conversation-device","tenant_id":"retrieval-local","line":"conversation","anchor":"openclaw:device-maintenance"},
+    {"id":"conversation-housing","tenant_id":"retrieval-local","line":"conversation","anchor":"webchat:housing-search"},
+    {"id":"workspace-research","tenant_id":"retrieval-research","line":"workspace","anchor":"/fixtures/w08/thesis-research"},
+    {"id":"workspace-design","tenant_id":"retrieval-design","line":"workspace","anchor":"/fixtures/w08/product-design"},
+    {"id":"workspace-other-tenant","tenant_id":"retrieval-other","line":"workspace","anchor":"/fixtures/w08/release-control"},
+    {"id":"conversation-other-tenant","tenant_id":"retrieval-other","line":"conversation","anchor":"openclaw:device-maintenance"}
+  ],
+  "records": [
+    {"id":"release-command-current","scope_id":"workspace-release","memory_key":"release.verify.command","content":"Use pnpm exec release:verify --mode locked for the governed release check.","lifecycle":"active","provenance_case":"106-workspace-source-revision"},
+    {"id":"release-timeout-800ms","scope_id":"workspace-release","memory_key":"release.api.timeout","content":"The release verification API timeout remains 800 ms.","lifecycle":"active","provenance_case":"106-workspace-source-revision"},
+    {"id":"release-signing-oidc","scope_id":"workspace-release","memory_key":"release.signing.mode","content":"Production release signing uses GitHub Actions OIDC keyless signing.","lifecycle":"active","provenance_case":"108-workspace-unkeyed-source-target-match"},
+    {"id":"release-attestation-slsa","scope_id":"workspace-release","memory_key":"release.attestation.format","content":"Production releases publish a signed SLSA provenance statement.","lifecycle":"active","provenance_case":"109-workspace-multifact-document-formation"},
+    {"id":"release-region-us-east-1","scope_id":"workspace-release","memory_key":"deploy.region.primary","content":"The primary production deployment region is us-east-1.","lifecycle":"active","provenance_case":"109-workspace-multifact-document-formation"},
+    {"id":"release-retry-five","scope_id":"workspace-release","memory_key":"deploy.retry.max","content":"Production deployments retry at most 5 times.","lifecycle":"active","provenance_case":"109-workspace-multifact-document-formation"},
+    {"id":"release-rollback-two-maintainers","scope_id":"workspace-release","memory_key":"deploy.rollback.maintainers","content":"Rollback approval requires two maintainers.","lifecycle":"active","provenance_case":"109-workspace-multifact-document-formation"},
+    {"id":"release-log-path","scope_id":"workspace-release","memory_key":"release.audit.log","content":"Release audit events are written to /var/log/vermory/release-control.log.","lifecycle":"active","provenance_case":"107-workspace-source-conflict-candidate"},
+    {"id":"release-error-attestation","scope_id":"workspace-release","memory_key":"release.error.attestation","content":"Error E_ATTESTATION_412 means the signed provenance statement is missing.","lifecycle":"active","provenance_case":"107-workspace-source-conflict-candidate"},
+    {"id":"release-cutoff-date","scope_id":"workspace-release","memory_key":"release.cutoff.date","content":"The release-control migration cutoff is 2026-08-15.","lifecycle":"active","provenance_case":"105-workspace-multi-coder-relay"},
+
+    {"id":"api-resolver-path","scope_id":"workspace-api","memory_key":"resolver.entrypoint","content":"The workspace resolver entrypoint is internal/resolver/resolver.go.","lifecycle":"active","provenance_case":"101-workspace-parallel-repos"},
+    {"id":"api-route-flag-v3","scope_id":"workspace-api","memory_key":"resolver.route.flag","content":"The current routing feature flag is workspace_route_v3.","lifecycle":"active","provenance_case":"101-workspace-parallel-repos"},
+    {"id":"api-error-ambiguous","scope_id":"workspace-api","memory_key":"resolver.error.ambiguous","content":"E_SCOPE_AMBIGUOUS is returned when a workspace anchor has multiple safe candidates.","lifecycle":"active","provenance_case":"102-workspace-rebind-relocation"},
+    {"id":"api-confirm-on-conflict","scope_id":"workspace-api","memory_key":"resolver.conflict.policy","content":"When cwd and repo root conflict, require_confirmation and do not bind a fallback workspace.","lifecycle":"active","provenance_case":"101-workspace-parallel-repos"},
+    {"id":"api-confirm-endpoint","scope_id":"workspace-api","memory_key":"api.memory.confirm","content":"Operators confirm a proposed memory through POST /v1/memories/confirm.","lifecycle":"active","provenance_case":"105-workspace-multi-coder-relay"},
+    {"id":"api-context-limit","scope_id":"workspace-api","memory_key":"context.max.items","content":"A prepared context packet contains at most 12 governed memory items.","lifecycle":"active","provenance_case":"105-workspace-multi-coder-relay"},
+    {"id":"api-postgresql-version","scope_id":"workspace-api","memory_key":"database.version","content":"The qualified authority database is PostgreSQL 18.","lifecycle":"active","provenance_case":"104-workspace-product-design"},
+    {"id":"api-embedding-profile","scope_id":"workspace-api","memory_key":"retrieval.embedding.profile","content":"Mixed Chinese and English retrieval uses BAAI/bge-m3 with 1024-dimensional embeddings for the vector condition.","lifecycle":"active","provenance_case":"103-workspace-research-notebook"},
+
+    {"id":"device-recovery-code-rotation","scope_id":"conversation-device","content":"After a recovery code is used successfully, rotate it immediately.","lifecycle":"active","provenance_case":"203-conversation-device-troubleshooting"},
+    {"id":"device-power-cycle","scope_id":"conversation-device","content":"Power-cycle the hub for 30 seconds before repeating Bluetooth pairing.","lifecycle":"active","provenance_case":"203-conversation-device-troubleshooting"},
+    {"id":"device-firmware-current","scope_id":"conversation-device","content":"The current hub firmware is 2.4.1.","lifecycle":"active","provenance_case":"203-conversation-device-troubleshooting"},
+    {"id":"device-error-bt-e104","scope_id":"conversation-device","content":"BT-E104 indicates that the pairing token expired before confirmation.","lifecycle":"active","provenance_case":"203-conversation-device-troubleshooting"},
+    {"id":"device-reset-button","scope_id":"conversation-device","content":"Hold the recessed reset button for 8 seconds only after exporting the device profile.","lifecycle":"active","provenance_case":"203-conversation-device-troubleshooting"},
+    {"id":"device-profile-path","scope_id":"conversation-device","content":"The exported device profile is stored at ~/Documents/device-backups/hub-profile.json.","lifecycle":"active","provenance_case":"203-conversation-device-troubleshooting"},
+
+    {"id":"housing-budget-6500","scope_id":"conversation-housing","content":"The monthly housing budget ceiling is CNY 6500.","lifecycle":"active","provenance_case":"201-conversation-housing-search"},
+    {"id":"housing-commute-35","scope_id":"conversation-housing","content":"The acceptable one-way commute is at most 35 minutes.","lifecycle":"active","provenance_case":"201-conversation-housing-search"},
+    {"id":"housing-area-pudong","scope_id":"conversation-housing","content":"Preferred search areas are Zhangjiang and Jinqiao in Pudong.","lifecycle":"active","provenance_case":"201-conversation-housing-search"},
+    {"id":"housing-move-date","scope_id":"conversation-housing","content":"The target move-in date is 2026-09-01.","lifecycle":"active","provenance_case":"201-conversation-housing-search"},
+    {"id":"housing-no-basement","scope_id":"conversation-housing","content":"Basement apartments and windowless rooms are excluded.","lifecycle":"active","provenance_case":"201-conversation-housing-search"},
+
+    {"id":"research-topic","scope_id":"workspace-research","content":"The thesis studies continuity failures in long-running AI coding workflows.","lifecycle":"active","provenance_case":"103-workspace-research-notebook"},
+    {"id":"research-dataset-current","scope_id":"workspace-research","content":"The cleaned interview dataset is /data/thesis/interviews-v2.csv.","lifecycle":"active","provenance_case":"103-workspace-research-notebook"},
+    {"id":"research-citation-standard","scope_id":"workspace-research","content":"Chinese references use the GB/T 7714-2015 numeric citation style.","lifecycle":"active","provenance_case":"103-workspace-research-notebook"},
+    {"id":"research-deadline","scope_id":"workspace-research","content":"The complete thesis draft is due on 2026-09-30.","lifecycle":"active","provenance_case":"103-workspace-research-notebook"},
+    {"id":"research-coding-model","scope_id":"workspace-research","content":"Repository analysis is replayed with grok-4.5 and official Codex when account capacity is available.","lifecycle":"active","provenance_case":"105-workspace-multi-coder-relay"},
+    {"id":"research-method","scope_id":"workspace-research","content":"The study compares no context, full history, lexical retrieval, vector retrieval, and governed hybrid packets.","lifecycle":"active","provenance_case":"103-workspace-research-notebook"},
+
+    {"id":"design-copy-rule","scope_id":"workspace-design","content":"User-facing copy leads with the next action and user outcome instead of internal state names.","lifecycle":"active","provenance_case":"104-workspace-product-design"},
+    {"id":"design-font-rule","scope_id":"workspace-design","content":"The interface uses a purposeful editorial type family rather than Inter or a default system stack.","lifecycle":"active","provenance_case":"104-workspace-product-design"},
+    {"id":"design-mobile-rule","scope_id":"workspace-design","content":"The review flow must load and remain usable on both desktop and mobile widths.","lifecycle":"active","provenance_case":"104-workspace-product-design"},
+    {"id":"design-handoff-rule","scope_id":"workspace-design","content":"Codex and Grok share the same confirmed workspace continuity but never share another repository's memory.","lifecycle":"active","provenance_case":"105-workspace-multi-coder-relay"},
+    {"id":"design-motion-rule","scope_id":"workspace-design","content":"Use one meaningful page-load reveal and avoid generic motion on every control.","lifecycle":"active","provenance_case":"104-workspace-product-design"},
+
+    {"id":"other-release-command","scope_id":"workspace-other-tenant","content":"Use make release-legacy in the unrelated tenant.","lifecycle":"active","provenance_case":"101-workspace-parallel-repos"},
+    {"id":"other-static-credentials","scope_id":"workspace-other-tenant","content":"The unrelated tenant stores static cloud credentials in a private vault.","lifecycle":"active","provenance_case":"109-workspace-multifact-document-formation"},
+    {"id":"other-timeout-900ms","scope_id":"workspace-other-tenant","content":"The unrelated tenant uses a 900 ms release timeout.","lifecycle":"active","provenance_case":"101-workspace-parallel-repos"},
+    {"id":"other-region-eu-west-1","scope_id":"workspace-other-tenant","content":"The unrelated tenant deploys to eu-west-1.","lifecycle":"active","provenance_case":"101-workspace-parallel-repos"},
+
+    {"id":"other-device-firmware","scope_id":"conversation-other-tenant","content":"The unrelated device fleet remains on firmware 1.9.7.","lifecycle":"active","provenance_case":"203-conversation-device-troubleshooting"},
+    {"id":"other-device-error","scope_id":"conversation-other-tenant","content":"BT-E104 is ignored in the unrelated test fleet.","lifecycle":"active","provenance_case":"203-conversation-device-troubleshooting"},
+    {"id":"other-housing-budget","scope_id":"conversation-other-tenant","content":"The unrelated household budget is CNY 12000.","lifecycle":"active","provenance_case":"204-conversation-household-admin"},
+    {"id":"other-job-deadline","scope_id":"conversation-other-tenant","content":"The unrelated job application deadline is 2026-08-20.","lifecycle":"active","provenance_case":"202-conversation-job-search"},
+
+    {"id":"release-command-proposed-unsafe","scope_id":"workspace-release","content":"Skip release verification and push the tag directly.","lifecycle":"proposed","provenance_case":"107-workspace-source-conflict-candidate"},
+    {"id":"api-autobind-proposed","scope_id":"workspace-api","content":"Automatically bind every ambiguous cwd to the first repository candidate.","lifecycle":"proposed","provenance_case":"101-workspace-parallel-repos"},
+    {"id":"device-factory-reset-proposed","scope_id":"conversation-device","content":"Factory-reset the hub immediately without exporting its profile.","lifecycle":"proposed","provenance_case":"203-conversation-device-troubleshooting"},
+    {"id":"housing-overbudget-proposed","scope_id":"conversation-housing","content":"Accept a CNY 9200 apartment because it looks convenient.","lifecycle":"proposed","provenance_case":"201-conversation-housing-search"},
+
+    {"id":"release-command-superseded","scope_id":"workspace-release","memory_key":"release.verify.command","content":"Use npm run release:verify -- --legacy for the release check.","lifecycle":"superseded","replacement_id":"release-command-current","provenance_case":"106-workspace-source-revision"},
+    {"id":"api-route-flag-v2","scope_id":"workspace-api","memory_key":"resolver.route.flag","content":"The routing feature flag is workspace_route_v2.","lifecycle":"superseded","replacement_id":"api-route-flag-v3","provenance_case":"101-workspace-parallel-repos"},
+    {"id":"device-firmware-old","scope_id":"conversation-device","content":"The current hub firmware is 2.3.0.","lifecycle":"superseded","replacement_id":"device-firmware-current","provenance_case":"203-conversation-device-troubleshooting"},
+    {"id":"research-dataset-old","scope_id":"workspace-research","content":"The interview dataset is /data/thesis/interviews-v1.csv.","lifecycle":"superseded","replacement_id":"research-dataset-current","provenance_case":"103-workspace-research-notebook"},
+
+    {"id":"release-secret-deleted","scope_id":"workspace-release","content":"Deleted release credential marker W08-RELEASE-SECRET.","lifecycle":"deleted","provenance_case":"109-workspace-multifact-document-formation"},
+    {"id":"housing-phone-deleted","scope_id":"conversation-housing","content":"Deleted landlord phone marker W08-HOUSING-PHONE.","lifecycle":"deleted","provenance_case":"201-conversation-housing-search"},
+    {"id":"design-token-deleted","scope_id":"workspace-design","content":"Deleted design access token marker W08-DESIGN-TOKEN.","lifecycle":"deleted","provenance_case":"104-workspace-product-design"},
+    {"id":"device-pin-deleted","scope_id":"conversation-device","content":"Deleted pairing PIN marker W08-DEVICE-PIN.","lifecycle":"deleted","provenance_case":"203-conversation-device-troubleshooting"}
+  ],
+  "queries": [
+    {"id":"release-command-paraphrase","scope_id":"workspace-release","text":"Which locked release verification command should I run?","limit":6,"relevant_record_ids":["release-command-current"],"forbidden_record_ids":["release-command-superseded","release-command-proposed-unsafe","other-release-command"],"cohorts":["semantic_paraphrase","technical_command"]},
+    {"id":"release-attestation-error-exact","scope_id":"workspace-release","text":"E_ATTESTATION_412","limit":4,"relevant_record_ids":["release-error-attestation"],"forbidden_record_ids":["release-secret-deleted","other-static-credentials"],"cohorts":["exact_identifier","error_code"]},
+    {"id":"release-rollback-chinese","scope_id":"workspace-release","text":"发布失败回滚需要谁批准，还要保留什么供应链证明？","limit":6,"relevant_record_ids":["release-rollback-two-maintainers","release-attestation-slsa"],"forbidden_record_ids":["release-command-proposed-unsafe","other-static-credentials"],"cohorts":["chinese_semantic","multi_fact"]},
+    {"id":"release-signing-mixed","scope_id":"workspace-release","text":"production 签名是不是 OIDC keyless，目标 region 是什么？","limit":6,"relevant_record_ids":["release-signing-oidc","release-region-us-east-1"],"forbidden_record_ids":["other-static-credentials","other-region-eu-west-1"],"cohorts":["mixed_language","multi_fact"]},
+    {"id":"release-retry-numeric","scope_id":"workspace-release","text":"How many deployment retries are allowed?","limit":4,"relevant_record_ids":["release-retry-five"],"forbidden_record_ids":["release-command-superseded","other-timeout-900ms"],"cohorts":["numeric_constraint","semantic_paraphrase"]},
+    {"id":"release-log-path-exact","scope_id":"workspace-release","text":"/var/log/vermory/release-control.log","limit":4,"relevant_record_ids":["release-log-path"],"forbidden_record_ids":["release-secret-deleted","other-static-credentials"],"cohorts":["exact_identifier","path"]},
+
+    {"id":"api-resolver-path-exact","scope_id":"workspace-api","text":"internal/resolver/resolver.go","limit":4,"relevant_record_ids":["api-resolver-path"],"forbidden_record_ids":["api-autobind-proposed","other-release-command"],"cohorts":["exact_identifier","path"]},
+    {"id":"api-route-flag-exact","scope_id":"workspace-api","text":"workspace_route_v3","limit":4,"relevant_record_ids":["api-route-flag-v3"],"forbidden_record_ids":["api-route-flag-v2","api-autobind-proposed"],"cohorts":["exact_identifier","feature_flag"]},
+    {"id":"api-ambiguity-chinese","scope_id":"workspace-api","text":"cwd 和 repo root 冲突时怎么处理歧义？","limit":6,"relevant_record_ids":["api-error-ambiguous","api-confirm-on-conflict"],"forbidden_record_ids":["api-autobind-proposed","other-release-command"],"cohorts":["chinese_semantic","multi_fact"]},
+    {"id":"api-confirm-endpoint","scope_id":"workspace-api","text":"Which endpoint confirms a proposed memory?","limit":4,"relevant_record_ids":["api-confirm-endpoint"],"forbidden_record_ids":["api-autobind-proposed","release-command-proposed-unsafe"],"cohorts":["semantic_paraphrase","api_path"]},
+    {"id":"api-context-database-multi","scope_id":"workspace-api","text":"What is the packet item cap and qualified PostgreSQL version?","limit":6,"relevant_record_ids":["api-context-limit","api-postgresql-version"],"forbidden_record_ids":["api-route-flag-v2","other-timeout-900ms"],"cohorts":["numeric_constraint","multi_fact"]},
+    {"id":"api-embedding-chinese","scope_id":"workspace-api","text":"中英混合检索用什么 embedding 模型和维度？","limit":4,"relevant_record_ids":["api-embedding-profile"],"forbidden_record_ids":["api-autobind-proposed","other-static-credentials"],"cohorts":["mixed_language","model_name","numeric_constraint"]},
+
+    {"id":"device-error-exact","scope_id":"conversation-device","text":"BT-E104","limit":4,"relevant_record_ids":["device-error-bt-e104"],"forbidden_record_ids":["other-device-error","device-pin-deleted"],"cohorts":["exact_identifier","error_code"]},
+    {"id":"device-recovery-semantic","scope_id":"conversation-device","text":"恢复码成功使用以后还要做什么？","limit":4,"relevant_record_ids":["device-recovery-code-rotation"],"forbidden_record_ids":["device-factory-reset-proposed","other-device-error"],"cohorts":["chinese_semantic","semantic_paraphrase"]},
+    {"id":"device-firmware-current","scope_id":"conversation-device","text":"current hub firmware version","limit":4,"relevant_record_ids":["device-firmware-current"],"forbidden_record_ids":["device-firmware-old","other-device-firmware"],"cohorts":["version","semantic_paraphrase"]},
+    {"id":"device-safe-reset-multi","scope_id":"conversation-device","text":"Before resetting the hub, where is the profile and how long should I hold the button?","limit":6,"relevant_record_ids":["device-profile-path","device-reset-button"],"forbidden_record_ids":["device-factory-reset-proposed","device-pin-deleted"],"cohorts":["multi_fact","path","numeric_constraint"]},
+
+    {"id":"housing-budget","scope_id":"conversation-housing","text":"租房每月预算上限是多少？","limit":4,"relevant_record_ids":["housing-budget-6500"],"forbidden_record_ids":["housing-overbudget-proposed","other-housing-budget"],"cohorts":["chinese_semantic","numeric_constraint"]},
+    {"id":"housing-commute","scope_id":"conversation-housing","text":"单程通勤最长能接受多久？","limit":4,"relevant_record_ids":["housing-commute-35"],"forbidden_record_ids":["housing-overbudget-proposed","housing-phone-deleted"],"cohorts":["chinese_semantic","duration"]},
+    {"id":"housing-move-constraints","scope_id":"conversation-housing","text":"When is move-in and which room types are excluded?","limit":6,"relevant_record_ids":["housing-move-date","housing-no-basement"],"forbidden_record_ids":["housing-overbudget-proposed","other-job-deadline"],"cohorts":["date","multi_fact","semantic_paraphrase"]},
+
+    {"id":"research-dataset-path","scope_id":"workspace-research","text":"cleaned interview dataset path","limit":4,"relevant_record_ids":["research-dataset-current"],"forbidden_record_ids":["research-dataset-old","design-token-deleted"],"cohorts":["path","semantic_paraphrase"]},
+    {"id":"research-citation-deadline","scope_id":"workspace-research","text":"论文引用格式和完整初稿截止日期是什么？","limit":6,"relevant_record_ids":["research-citation-standard","research-deadline"],"forbidden_record_ids":["research-dataset-old","other-job-deadline"],"cohorts":["chinese_semantic","date","multi_fact"]},
+    {"id":"research-method-semantic","scope_id":"workspace-research","text":"How are memory conditions compared in the thesis?","limit":6,"relevant_record_ids":["research-method","research-topic"],"forbidden_record_ids":["research-dataset-old","other-static-credentials"],"cohorts":["semantic_paraphrase","multi_fact"]},
+
+    {"id":"design-copy-action","scope_id":"workspace-design","text":"用户界面文案应该先告诉用户什么？","limit":4,"relevant_record_ids":["design-copy-rule"],"forbidden_record_ids":["design-token-deleted","api-autobind-proposed"],"cohorts":["chinese_semantic","semantic_paraphrase"]},
+    {"id":"design-multi-coder-isolation","scope_id":"workspace-design","text":"Can Codex and Grok share this workspace without leaking another repository?","limit":6,"relevant_record_ids":["design-handoff-rule"],"forbidden_record_ids":["other-release-command","other-static-credentials"],"cohorts":["semantic_paraphrase","continuity_isolation"]}
+  ]
+}

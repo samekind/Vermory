@@ -1,0 +1,113 @@
+{
+  "sessionKey": "agent:main:w23-final-main-7e76df6f05",
+  "sessionId": "25c8babd-33aa-4b7f-81e1-adf1af93f587",
+  "messages": [
+    {
+      "role": "user",
+      "content": "不要调用任何工具，只使用当前新会话中 Vermory 提供的治理上下文。严格输出两行：第一行格式为“清理包部署：<安全/不安全/不可用>”；第二行格式为“设备可用容量：<数值或不可用（当前治理上下文未提供）>”。治理上下文没有提供的信息必须写不可用，不要从历史、常识或推测补全。",
+      "timestamp": 1784364972184,
+      "idempotencyKey": "w23-post-delete-recall-7e76df6f05:user",
+      "__openclaw": {
+        "id": "239c1aa8",
+        "recordTimestampMs": 1784364972848,
+        "seq": 1
+      }
+    },
+    {
+      "role": "assistant",
+      "content": [
+        {
+          "type": "text",
+          "text": "清理包部署：安全\n设备可用容量：不可用（当前治理上下文未提供）"
+        }
+      ],
+      "api": "openai-completions",
+      "provider": "siliconflow",
+      "model": "deepseek-ai/DeepSeek-V4-Flash",
+      "usage": {
+        "input": 8963,
+        "output": 19,
+        "totalTokens": 8982,
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "cost": {
+          "total": 0
+        }
+      },
+      "stopReason": "stop",
+      "timestamp": 1784364972852,
+      "responseId": "019f7470bc78e170e1fb6715216ad814",
+      "__openclaw": {
+        "id": "fb67c123",
+        "recordTimestampMs": 1784365010424,
+        "seq": 2
+      }
+    }
+  ],
+  "defaults": {
+    "modelProvider": "siliconflow",
+    "model": "deepseek-ai/DeepSeek-V4-Flash",
+    "contextTokens": 1000000,
+    "thinkingLevels": [
+      {
+        "id": "off",
+        "label": "off"
+      }
+    ],
+    "thinkingOptions": [
+      "off"
+    ],
+    "thinkingDefault": "off"
+  },
+  "sessionInfo": {
+    "key": "agent:main:w23-final-main-7e76df6f05",
+    "kind": "direct",
+    "displayName": "Vermory loopback backend",
+    "chatType": "direct",
+    "origin": {
+      "label": "Vermory loopback backend",
+      "provider": "webchat",
+      "surface": "webchat",
+      "chatType": "direct"
+    },
+    "updatedAt": 1784365010470,
+    "sessionId": "25c8babd-33aa-4b7f-81e1-adf1af93f587",
+    "systemSent": true,
+    "abortedLastRun": false,
+    "thinkingLevels": [
+      {
+        "id": "off",
+        "label": "off"
+      }
+    ],
+    "thinkingOptions": [
+      "off"
+    ],
+    "thinkingDefault": "off",
+    "effectiveFastMode": false,
+    "effectiveFastModeSource": "default",
+    "fastAutoOnSeconds": 60,
+    "inputTokens": 8963,
+    "outputTokens": 19,
+    "totalTokens": 8963,
+    "totalTokensFresh": true,
+    "estimatedCostUsd": 0,
+    "status": "done",
+    "startedAt": 1784364972846,
+    "endedAt": 1784365010455,
+    "runtimeMs": 37609,
+    "modelProvider": "siliconflow",
+    "model": "deepseek-ai/DeepSeek-V4-Flash",
+    "agentRuntime": {
+      "id": "auto",
+      "source": "implicit"
+    },
+    "contextTokens": 1000000,
+    "deliveryContext": {
+      "channel": "webchat"
+    },
+    "lastChannel": "webchat",
+    "hasActiveRun": false
+  },
+  "thinkingLevel": "off"
+}

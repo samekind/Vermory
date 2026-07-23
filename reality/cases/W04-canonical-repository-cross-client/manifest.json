@@ -1,0 +1,90 @@
+{
+  "version": 1,
+  "id": "W04-canonical-repository-cross-client",
+  "title": "Canonical repository continuity reaches a new coding client without stale or same-name leakage",
+  "evidence_level": "public",
+  "continuity_lines": ["workspace", "security"],
+  "pressures": [
+    "real_cursor_agent",
+    "cross_client_continuity",
+    "canonical_repository_migration",
+    "source_revision",
+    "same_name_workspace_isolation",
+    "current_only_delivery",
+    "proposed_only_writeback",
+    "client_failure_retention"
+  ],
+  "sources": [
+    {
+      "id": "w04-canonical-repository",
+      "kind": "authorized_repository_migration_and_synthetic_marker",
+      "fixture_path": "fixtures/canonical-repository-state.md",
+      "original_ref": "https://github.com/samekind/Vermory",
+      "original_revision": "b2173fdd128eb02b7fda96c826dce04b0dca017a",
+      "sha256": "f40b016cfcfd34a4029ae6fbed7d29e551b034e056903ff43577d0d9280ce398",
+      "authorized": true,
+      "anonymization": "Only public repository state and one explicitly synthetic non-secret qualification marker are retained; local paths, credentials, account data, and private transcripts are excluded."
+    },
+    {
+      "id": "w04-same-name-distractor",
+      "kind": "synthetic_authorized_workspace_distractor",
+      "fixture_path": "fixtures/same-name-distractor.md",
+      "original_ref": "synthetic:same-name-workspace-distractor-v1",
+      "original_revision": "1",
+      "sha256": "8888373d3f9d18bb678ac1a80f605ff884c33073cab4e50834896e92b268fd90",
+      "authorized": true,
+      "anonymization": "The unrelated workspace and marker are fully synthetic and contain no real repository, host, credential, customer, or personal data."
+    }
+  ],
+  "anchors": [
+    {
+      "kind": "repository_identity",
+      "value": "samekind/Vermory",
+      "ambiguous": false
+    },
+    {
+      "kind": "git_remote",
+      "value": "https://github.com/samekind/Vermory",
+      "ambiguous": false
+    },
+    {
+      "kind": "workspace_id",
+      "value": "synthetic-vermory-same-name-distractor",
+      "ambiguous": false
+    }
+  ],
+  "expectations": {
+    "current_facts": [
+      "The canonical repository is https://github.com/samekind/Vermory.",
+      "The canonical repository is an independent organization repository, not a GitHub fork.",
+      "The current continuation marker is samekind-w25-current.",
+      "A coding-client write-back remains proposed until a trusted governance action accepts or replaces it."
+    ],
+    "forbidden_facts": [
+      "https://github.com/jstar0/Vermory is the current canonical repository.",
+      "The canonical workspace continuation marker is distractor-w25-only.",
+      "A same-name repository may be merged into the canonical continuity by name similarity.",
+      "A coding client may activate, correct, delete, rebind, or change the tenant of its own write-back."
+    ],
+    "allowed_unknowns": [
+      "Whether the external Cursor account can complete a generation request at execution time."
+    ],
+    "expected_action": "A real Cursor Agent calls Vermory prepare_context for the exact confirmed canonical workspace, creates and verifies continuity-report.md with only the current repository and continuation marker, then calls commit_observation and receives proposed status."
+  },
+  "task": {
+    "prompt": "Use the governed context for this exact workspace to create continuity-report.md with the current canonical_repository and continuation_marker. Verify the artifact, then record the completed result through the governed observation tool. If workspace resolution or MCP access fails, stop without guessing.",
+    "artifact_checks": [
+      "canonical organization repository present",
+      "current continuation marker present",
+      "personal repository absent as current",
+      "same-name distractor absent",
+      "post-task memory remains proposed"
+    ],
+    "deterministic_checks": [
+      "contains:canonical_repository=https://github.com/samekind/Vermory",
+      "contains:continuation_marker=samekind-w25-current",
+      "not_contains:https://github.com/jstar0/Vermory",
+      "not_contains:distractor-w25-only"
+    ]
+  }
+}

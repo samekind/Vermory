@@ -47,3 +47,13 @@ func TestBuildPacketIncludesOnlyVerifiedActiveClaims(t *testing.T) {
 		}
 	}
 }
+
+func TestCodingAgentPacketOmitsRetiredGeminiCLI(t *testing.T) {
+	packet := Build(ProfileCodingAgent, "Vermory", "继续开发", nil)
+	if strings.Contains(packet.Body, "Gemini CLI") {
+		t.Fatalf("coding-agent packet must not advertise retired Gemini CLI: %q", packet.Body)
+	}
+	if !strings.Contains(packet.Body, "Grok") {
+		t.Fatalf("coding-agent packet must list Grok as a supported current target: %q", packet.Body)
+	}
+}

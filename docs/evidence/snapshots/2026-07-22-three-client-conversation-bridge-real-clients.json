@@ -1,0 +1,163 @@
+{
+  "case_id": "B03-three-client-conversation-bridge",
+  "status": "client-qualified",
+  "accepted_at": "2026-07-22",
+  "run_id": "b03-20260722-82609f0",
+  "hard_gates": {
+    "passed": 30,
+    "total": 30,
+    "results": {
+      "protected_exact_revision": true,
+      "protected_signed_artifact_verified": true,
+      "loopback_only": true,
+      "no_sudo": true,
+      "no_newapi": true,
+      "web_chat_real_model_turns": true,
+      "raw_only_unremembered": true,
+      "governed_source_memory_active": true,
+      "unrelated_web_chat_memory_empty": true,
+      "hermes_official_version": true,
+      "openclaw_official_gateway_surface": true,
+      "hermes_prelink_empty": true,
+      "openclaw_prelink_empty": true,
+      "hermes_explicit_link_delivery": true,
+      "openclaw_explicit_link_delivery": true,
+      "hermes_link_replay_idempotent": true,
+      "hermes_unrelated_isolated": true,
+      "openclaw_unrelated_isolated": true,
+      "raw_marker_delivery_zero": true,
+      "unrelated_marker_delivery_zero": true,
+      "exactly_two_bridge_operations": true,
+      "append_only_bridge_events": true,
+      "hermes_reverse_effective": true,
+      "openclaw_reverse_effective": true,
+      "postreverse_delivery_empty": true,
+      "source_memory_retained": true,
+      "hermes_history_retained": true,
+      "openclaw_history_retained": true,
+      "all_external_turns_completed": true,
+      "failure_ledger_retained_and_fallback_excluded": true
+    }
+  },
+  "implementation": {
+    "revision": "82609f095c32db1935d27ecb569557847a78c337",
+    "version": "0.0.0-SNAPSHOT-82609f0",
+    "go_version": "go1.25.7",
+    "binary_sha256": "9bec0940ad33c3baf12d03cd0301d2d75aa3f46266a12daf3538d56741b00900"
+  },
+  "deployment": {
+    "host_class": "Mac mini",
+    "os": "macOS 26.5.1",
+    "architecture": "arm64",
+    "postgresql": "18.3",
+    "schema_version": 23,
+    "service_scope": "user LaunchAgents",
+    "loopback_only": true,
+    "sudo_used": false,
+    "web_chat_running_after_run": true,
+    "openclaw_gateway_running_after_run": true
+  },
+  "clients": {
+    "web_chat": {
+      "browser": "Google Chrome 150",
+      "real_model_turns": 3,
+      "raw_only_answer": "RAW_ONLY_ACK",
+      "bundle_answer": "BUNDLE_ACK",
+      "unrelated_answer": "UNRELATED_ACK",
+      "source_active_memories": 1,
+      "unrelated_active_memories": 0
+    },
+    "hermes": {
+      "version": "0.18.2",
+      "local_revision": "0f102fa4",
+      "provider_source_sha256": "9b2dbda2c33bc728515318f9e7522623dcdf4cd38eae7f23b5f29b39720afdbb",
+      "accepted_real_model_turns": 4,
+      "primary_session_observations_after_reversal": 8,
+      "unrelated_session_observations": 2,
+      "prelink_answer": "NO_LINKED_BUNDLE",
+      "linked_answer": "vermory-v8.tgz",
+      "unrelated_answer": "NO_LINKED_BUNDLE",
+      "postreverse_answer": "NO_LINKED_BUNDLE"
+    },
+    "openclaw": {
+      "version": "2026.6.11",
+      "revision": "e085fa1",
+      "accepted_surface": "Gateway OpenAI-compatible HTTP agent path",
+      "accepted_real_model_turns": 4,
+      "primary_session_observations_after_reversal": 10,
+      "unrelated_session_observations": 2,
+      "prelink_answer": "NO_LINKED_BUNDLE",
+      "linked_answer": "vermory-v8.tgz",
+      "unrelated_answer": "NO_LINKED_BUNDLE",
+      "postreverse_answer": "NO_LINKED_BUNDLE",
+      "embedded_fallback_accepted": false
+    }
+  },
+  "model_execution": {
+    "client": "Codex CLI 0.144.3",
+    "provider_profile": "main",
+    "model": "gpt-5.6-terra",
+    "route": "temporary loopback-only OpenAI-compatible relay over SSH reverse forwarding",
+    "accepted_real_model_turns": 11,
+    "smoke_turns": 2,
+    "rejected_openclaw_fallback_turns": 1,
+    "logged_successful_requests": 14,
+    "logged_failed_requests": 0,
+    "newapi_used": false,
+    "relay_persisted_as_product_provider": false,
+    "relay_log_sha256": "a13d8a7d88a65302b98be30126f8b1666d7d32da621bd529a899bfde911bea20"
+  },
+  "database_assertions": {
+    "external_turns": 11,
+    "external_completed_turns": 11,
+    "linked_bundle_deliveries": 2,
+    "external_raw_marker_deliveries": 0,
+    "external_unrelated_marker_deliveries": 0,
+    "postreverse_nonempty_deliveries": 0,
+    "source_active_memories": 1,
+    "retained_server_failed_turns": 3
+  },
+  "bridge_assertions": {
+    "bridge_operations": 2,
+    "bridge_events": 4,
+    "hermes_replay_same_bridge_id": true,
+    "hermes_replay_reported_replayed": true,
+    "active_conversation_links_after_reversal": 0,
+    "reversed_conversation_links": 2,
+    "source_memory_retained": true,
+    "external_transcripts_retained": true
+  },
+  "protected_input": {
+    "github_actions_run": 29903259886,
+    "signed_artifact_id": 8522876048,
+    "signed_artifact_name": "vermory-pr-snapshot-82609f095c32db1935d27ecb569557847a78c337",
+    "darwin_arm64_archive_sha256": "fbeff2afce1d9f9068def55f869478008cc0de2b6205b941757a6885cc408163",
+    "openclaw_package_sha256": "46ba8fec85ac83b09af5177dde0e9cacd35c25475e537cfa8d8f31f4a61f4b14",
+    "hermes_package_sha256": "501457db314e9c1221450ea4d92a8c3709c8d9f9a8a357b803e5675a96834b42"
+  },
+  "integrity": {
+    "database_audit_sha256": "e3ef379f2b95df6a987c4b35d957ed47b757753d1278ec4c49dc8e08dc6ef42e",
+    "linked_delivery_audit_sha256": "60ac284d35b2986cc95c6279b2345714eaec8529ddbdb10113bdf05d50e4ec61",
+    "hermes_link_sha256": "5b133d8f43867d2abe187be95654fbec1246a87c866534a1ff3595b3b62bda09",
+    "hermes_link_replay_sha256": "ea3ed16a4529c0d1f7e8343d58be16c5aaeabf61212be114bff547e1963ef115",
+    "hermes_reverse_sha256": "2d0d42fce175af12fc967ea41c53dd5613b56e80ddb98c9a240b61c815240914",
+    "openclaw_link_sha256": "d0a78a491982b0f6ca16f422aa4ed8490392c944df71f2b125da889b1ba94521",
+    "openclaw_reverse_sha256": "2c79f0fec91f8f65483be73458769994e4bdda81b5165d805a6706753da5ca73"
+  },
+  "failure_ledger": {
+    "retained_server_provider_failures": 3,
+    "browser_transport_failures_before_acceptance": 2,
+    "rejected_openclaw_embedded_fallback_attempts": 1,
+    "transient_launchagent_bootstrap_retries": 1,
+    "siliconflow_balance_failure_retained": true,
+    "grok_auth_failure_retained": true
+  },
+  "privacy": {
+    "raw_transcripts_committed": false,
+    "provider_bodies_committed": false,
+    "credentials_committed": false,
+    "database_urls_committed": false,
+    "private_host_references_committed": false,
+    "temporary_relay_source_committed": false
+  }
+}

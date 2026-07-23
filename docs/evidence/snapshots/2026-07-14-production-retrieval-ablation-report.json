@@ -1,0 +1,4549 @@
+{
+  "run_id": "w08-siliconflow-bge-m3-20260714-v3",
+  "request_fingerprint": "644c1fea9df1ce822e271d3f40851bda480d80769629a5232cec00442024d639",
+  "corpus_sha256": "d8dc705d6a073d628dae7999d1123182e01982217aac1c65bdf98f1162e4f0a1",
+  "implementation_revision": "eda70a4bcccbe760572eca72e455058af2947782",
+  "engine_version": "rrf-v1",
+  "schema_version": 13,
+  "authority_fingerprint": "5dc376455f701c2cf1083825c1640b0d1a198eaa8b578fcf96225dfbc1ba2e55",
+  "embedding": {
+    "base_url": "https://api.siliconflow.cn/v1",
+    "model": "BAAI/bge-m3",
+    "dimensions": 1024
+  },
+  "embedding_request_count": 152,
+  "started_at": "2026-07-14T12:14:06.993652Z",
+  "duration": 20682242000,
+  "conditions": [
+    {
+      "name": "lexical_runtime",
+      "queries": [
+        {
+          "query_id": "api-ambiguity-chinese",
+          "cohorts": [
+            "chinese_semantic",
+            "multi_fact"
+          ],
+          "duration": 606916,
+          "results": [
+            {
+              "memory_id": "4437fba0-8cb5-4ab1-a5c1-a9ecd0392240",
+              "record_id": "api-confirm-on-conflict",
+              "content": "When cwd and repo root conflict, require_confirmation and do not bind a fallback workspace.",
+              "score": 0,
+              "lexical_rank": 1,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 0.5,
+            "mrr": 1,
+            "ndcg_at_k": 0.6131471927654585,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "api-confirm-endpoint",
+          "cohorts": [
+            "api_path",
+            "semantic_paraphrase"
+          ],
+          "duration": 324000,
+          "results": [
+            {
+              "memory_id": "99f51013-bd4c-4d81-a758-3f922d6954b3",
+              "record_id": "api-confirm-endpoint",
+              "content": "Operators confirm a proposed memory through POST /v1/memories/confirm.",
+              "score": 0,
+              "lexical_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "71b69a09-001e-459c-8f76-c2a4af995ca8",
+              "record_id": "api-context-limit",
+              "content": "A prepared context packet contains at most 12 governed memory items.",
+              "score": 0,
+              "lexical_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "4437fba0-8cb5-4ab1-a5c1-a9ecd0392240",
+              "record_id": "api-confirm-on-conflict",
+              "content": "When cwd and repo root conflict, require_confirmation and do not bind a fallback workspace.",
+              "score": 0,
+              "lexical_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "be08ce9b-d9cc-4c8f-8682-cf056149099c",
+              "record_id": "api-error-ambiguous",
+              "content": "E_SCOPE_AMBIGUOUS is returned when a workspace anchor has multiple safe candidates.",
+              "score": 0,
+              "lexical_rank": 4,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "api-context-database-multi",
+          "cohorts": [
+            "multi_fact",
+            "numeric_constraint"
+          ],
+          "duration": 445041,
+          "results": [
+            {
+              "memory_id": "759d0f5e-b316-4385-8546-d79849296499",
+              "record_id": "api-postgresql-version",
+              "content": "The qualified authority database is PostgreSQL 18.",
+              "score": 0,
+              "lexical_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "20874bf2-e651-4113-b4ee-9b898e044847",
+              "record_id": "api-resolver-path",
+              "content": "The workspace resolver entrypoint is internal/resolver/resolver.go.",
+              "score": 0,
+              "lexical_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "d6866c5c-e410-4d24-a5b1-8c8babc2bf2b",
+              "record_id": "api-route-flag-v3",
+              "content": "The current routing feature flag is workspace_route_v3.",
+              "score": 0,
+              "lexical_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "fcb7514b-caa2-4327-8de2-8275a8f0a1a9",
+              "record_id": "api-embedding-profile",
+              "content": "Mixed Chinese and English retrieval uses BAAI/bge-m3 with 1024-dimensional embeddings for the vector condition.",
+              "score": 0,
+              "lexical_rank": 4,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "4437fba0-8cb5-4ab1-a5c1-a9ecd0392240",
+              "record_id": "api-confirm-on-conflict",
+              "content": "When cwd and repo root conflict, require_confirmation and do not bind a fallback workspace.",
+              "score": 0,
+              "lexical_rank": 5,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "71b69a09-001e-459c-8f76-c2a4af995ca8",
+              "record_id": "api-context-limit",
+              "content": "A prepared context packet contains at most 12 governed memory items.",
+              "score": 0,
+              "lexical_rank": 6,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 0.8315546295836226,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "api-embedding-chinese",
+          "cohorts": [
+            "mixed_language",
+            "model_name",
+            "numeric_constraint"
+          ],
+          "duration": 2168791,
+          "results": null,
+          "metrics": {
+            "hit_at_1": 0,
+            "recall_at_k": 0,
+            "mrr": 0,
+            "ndcg_at_k": 0,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "api-resolver-path-exact",
+          "cohorts": [
+            "exact_identifier",
+            "path"
+          ],
+          "duration": 652875,
+          "results": [
+            {
+              "memory_id": "20874bf2-e651-4113-b4ee-9b898e044847",
+              "record_id": "api-resolver-path",
+              "content": "The workspace resolver entrypoint is internal/resolver/resolver.go.",
+              "score": 0,
+              "lexical_rank": 1,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "api-route-flag-exact",
+          "cohorts": [
+            "exact_identifier",
+            "feature_flag"
+          ],
+          "duration": 3138042,
+          "results": [
+            {
+              "memory_id": "d6866c5c-e410-4d24-a5b1-8c8babc2bf2b",
+              "record_id": "api-route-flag-v3",
+              "content": "The current routing feature flag is workspace_route_v3.",
+              "score": 0,
+              "lexical_rank": 1,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "design-copy-action",
+          "cohorts": [
+            "chinese_semantic",
+            "semantic_paraphrase"
+          ],
+          "duration": 4612875,
+          "results": null,
+          "metrics": {
+            "hit_at_1": 0,
+            "recall_at_k": 0,
+            "mrr": 0,
+            "ndcg_at_k": 0,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "design-multi-coder-isolation",
+          "cohorts": [
+            "continuity_isolation",
+            "semantic_paraphrase"
+          ],
+          "duration": 2246292,
+          "results": [
+            {
+              "memory_id": "32936f4d-641a-4f73-bc89-a1689dbdf122",
+              "record_id": "design-handoff-rule",
+              "content": "Codex and Grok share the same confirmed workspace continuity but never share another repository's memory.",
+              "score": 0,
+              "lexical_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "41307871-2ecb-46e6-8d7d-80b6b3128c65",
+              "record_id": "design-mobile-rule",
+              "content": "The review flow must load and remain usable on both desktop and mobile widths.",
+              "score": 0,
+              "lexical_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "64d8692f-f292-4cd7-be73-106f9daad970",
+              "record_id": "design-copy-rule",
+              "content": "User-facing copy leads with the next action and user outcome instead of internal state names.",
+              "score": 0,
+              "lexical_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "d573ce2c-b679-4d10-8bec-febfc22ac820",
+              "record_id": "design-motion-rule",
+              "content": "Use one meaningful page-load reveal and avoid generic motion on every control.",
+              "score": 0,
+              "lexical_rank": 4,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "device-error-exact",
+          "cohorts": [
+            "error_code",
+            "exact_identifier"
+          ],
+          "duration": 862042,
+          "results": [
+            {
+              "memory_id": "9c6c33fa-2994-48a2-b413-d33b7441cc7b",
+              "record_id": "device-error-bt-e104",
+              "content": "BT-E104 indicates that the pairing token expired before confirmation.",
+              "score": 0,
+              "lexical_rank": 1,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "device-firmware-current",
+          "cohorts": [
+            "semantic_paraphrase",
+            "version"
+          ],
+          "duration": 495125,
+          "results": [
+            {
+              "memory_id": "0821ff06-c9cb-48c2-9415-bb45cba57a7a",
+              "record_id": "device-firmware-current",
+              "content": "The current hub firmware is 2.4.1.",
+              "score": 0,
+              "lexical_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "2c18ea5f-ec46-484c-a86a-5b753852f257",
+              "record_id": "device-power-cycle",
+              "content": "Power-cycle the hub for 30 seconds before repeating Bluetooth pairing.",
+              "score": 0,
+              "lexical_rank": 2,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "device-recovery-semantic",
+          "cohorts": [
+            "chinese_semantic",
+            "semantic_paraphrase"
+          ],
+          "duration": 293959,
+          "results": null,
+          "metrics": {
+            "hit_at_1": 0,
+            "recall_at_k": 0,
+            "mrr": 0,
+            "ndcg_at_k": 0,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "device-safe-reset-multi",
+          "cohorts": [
+            "multi_fact",
+            "numeric_constraint",
+            "path"
+          ],
+          "duration": 438417,
+          "results": [
+            {
+              "memory_id": "b03fd2ad-45fe-4454-8c36-442e1b0a5b18",
+              "record_id": "device-reset-button",
+              "content": "Hold the recessed reset button for 8 seconds only after exporting the device profile.",
+              "score": 0,
+              "lexical_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "0821ff06-c9cb-48c2-9415-bb45cba57a7a",
+              "record_id": "device-firmware-current",
+              "content": "The current hub firmware is 2.4.1.",
+              "score": 0,
+              "lexical_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "479bb360-b14a-4662-99e2-c3fc7a4189ef",
+              "record_id": "device-profile-path",
+              "content": "The exported device profile is stored at ~/Documents/device-backups/hub-profile.json.",
+              "score": 0,
+              "lexical_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "2c18ea5f-ec46-484c-a86a-5b753852f257",
+              "record_id": "device-power-cycle",
+              "content": "Power-cycle the hub for 30 seconds before repeating Bluetooth pairing.",
+              "score": 0,
+              "lexical_rank": 4,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "9c6c33fa-2994-48a2-b413-d33b7441cc7b",
+              "record_id": "device-error-bt-e104",
+              "content": "BT-E104 indicates that the pairing token expired before confirmation.",
+              "score": 0,
+              "lexical_rank": 5,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "0affce18-53e7-4f31-b4ac-9b013bd1a5ee",
+              "record_id": "device-recovery-code-rotation",
+              "content": "After a recovery code is used successfully, rotate it immediately.",
+              "score": 0,
+              "lexical_rank": 6,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 0.9197207891481877,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "housing-budget",
+          "cohorts": [
+            "chinese_semantic",
+            "numeric_constraint"
+          ],
+          "duration": 308583,
+          "results": null,
+          "metrics": {
+            "hit_at_1": 0,
+            "recall_at_k": 0,
+            "mrr": 0,
+            "ndcg_at_k": 0,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "housing-commute",
+          "cohorts": [
+            "chinese_semantic",
+            "duration"
+          ],
+          "duration": 205917,
+          "results": null,
+          "metrics": {
+            "hit_at_1": 0,
+            "recall_at_k": 0,
+            "mrr": 0,
+            "ndcg_at_k": 0,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "housing-move-constraints",
+          "cohorts": [
+            "date",
+            "multi_fact",
+            "semantic_paraphrase"
+          ],
+          "duration": 220459,
+          "results": [
+            {
+              "memory_id": "637865bc-a99f-4f02-ab0d-d4b939ba6d3e",
+              "record_id": "housing-move-date",
+              "content": "The target move-in date is 2026-09-01.",
+              "score": 0,
+              "lexical_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "56e4754f-741e-4816-b40d-ffc5896d80a0",
+              "record_id": "housing-area-pudong",
+              "content": "Preferred search areas are Zhangjiang and Jinqiao in Pudong.",
+              "score": 0,
+              "lexical_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "7157d562-3711-4e37-b2b1-ad21c9fa6923",
+              "record_id": "housing-no-basement",
+              "content": "Basement apartments and windowless rooms are excluded.",
+              "score": 0,
+              "lexical_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "6b4976ab-6f31-42f6-aeef-c6390b07fcd6",
+              "record_id": "housing-commute-35",
+              "content": "The acceptable one-way commute is at most 35 minutes.",
+              "score": 0,
+              "lexical_rank": 4,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "ff92dd65-2183-48df-9ce3-551e5d92ab20",
+              "record_id": "housing-budget-6500",
+              "content": "The monthly housing budget ceiling is CNY 6500.",
+              "score": 0,
+              "lexical_rank": 5,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 0.9197207891481877,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "release-attestation-error-exact",
+          "cohorts": [
+            "error_code",
+            "exact_identifier"
+          ],
+          "duration": 1369833,
+          "results": [
+            {
+              "memory_id": "bc1f2f14-2bd4-441f-b437-af57de6853a2",
+              "record_id": "release-error-attestation",
+              "content": "Error E_ATTESTATION_412 means the signed provenance statement is missing.",
+              "score": 0,
+              "lexical_rank": 1,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "release-command-paraphrase",
+          "cohorts": [
+            "semantic_paraphrase",
+            "technical_command"
+          ],
+          "duration": 1696083,
+          "results": [
+            {
+              "memory_id": "4d9845be-6a07-4ad4-939c-7c7da9bd0f19",
+              "record_id": "release-command-current",
+              "content": "Use pnpm exec release:verify --mode locked for the governed release check.",
+              "score": 0,
+              "lexical_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "3b8fd8f9-da3c-4c61-9ab0-b25ff4fbbde7",
+              "record_id": "release-timeout-800ms",
+              "content": "The release verification API timeout remains 800 ms.",
+              "score": 0,
+              "lexical_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "599ad807-1a43-486a-a23e-5ecec971d26e",
+              "record_id": "release-cutoff-date",
+              "content": "The release-control migration cutoff is 2026-08-15.",
+              "score": 0,
+              "lexical_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "9fd0a8e6-5041-429b-b28a-3ea10f3c6d2a",
+              "record_id": "release-log-path",
+              "content": "Release audit events are written to /var/log/vermory/release-control.log.",
+              "score": 0,
+              "lexical_rank": 4,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "0ad33c28-cb99-4a20-bd55-6824991250bc",
+              "record_id": "release-signing-oidc",
+              "content": "Production release signing uses GitHub Actions OIDC keyless signing.",
+              "score": 0,
+              "lexical_rank": 5,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "release-log-path-exact",
+          "cohorts": [
+            "exact_identifier",
+            "path"
+          ],
+          "duration": 901208,
+          "results": [
+            {
+              "memory_id": "9fd0a8e6-5041-429b-b28a-3ea10f3c6d2a",
+              "record_id": "release-log-path",
+              "content": "Release audit events are written to /var/log/vermory/release-control.log.",
+              "score": 0,
+              "lexical_rank": 1,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "release-retry-numeric",
+          "cohorts": [
+            "numeric_constraint",
+            "semantic_paraphrase"
+          ],
+          "duration": 1621959,
+          "results": [
+            {
+              "memory_id": "ef3f327e-b779-4e46-a375-12e6f375e9fd",
+              "record_id": "release-region-us-east-1",
+              "content": "The primary production deployment region is us-east-1.",
+              "score": 0,
+              "lexical_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "9fd0a8e6-5041-429b-b28a-3ea10f3c6d2a",
+              "record_id": "release-log-path",
+              "content": "Release audit events are written to /var/log/vermory/release-control.log.",
+              "score": 0,
+              "lexical_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "b771ceb1-8063-42ca-a697-07051a53e606",
+              "record_id": "release-retry-five",
+              "content": "Production deployments retry at most 5 times.",
+              "score": 0,
+              "lexical_rank": 3,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 0,
+            "recall_at_k": 1,
+            "mrr": 0.3333333333333333,
+            "ndcg_at_k": 0.5,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "release-rollback-chinese",
+          "cohorts": [
+            "chinese_semantic",
+            "multi_fact"
+          ],
+          "duration": 1060459,
+          "results": null,
+          "metrics": {
+            "hit_at_1": 0,
+            "recall_at_k": 0,
+            "mrr": 0,
+            "ndcg_at_k": 0,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "release-signing-mixed",
+          "cohorts": [
+            "mixed_language",
+            "multi_fact"
+          ],
+          "duration": 1636625,
+          "results": [
+            {
+              "memory_id": "0ad33c28-cb99-4a20-bd55-6824991250bc",
+              "record_id": "release-signing-oidc",
+              "content": "Production release signing uses GitHub Actions OIDC keyless signing.",
+              "score": 0,
+              "lexical_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "ef3f327e-b779-4e46-a375-12e6f375e9fd",
+              "record_id": "release-region-us-east-1",
+              "content": "The primary production deployment region is us-east-1.",
+              "score": 0,
+              "lexical_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "b771ceb1-8063-42ca-a697-07051a53e606",
+              "record_id": "release-retry-five",
+              "content": "Production deployments retry at most 5 times.",
+              "score": 0,
+              "lexical_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "35ac7bae-32e2-44e4-a34b-c376e65d2121",
+              "record_id": "release-attestation-slsa",
+              "content": "Production releases publish a signed SLSA provenance statement.",
+              "score": 0,
+              "lexical_rank": 4,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "research-citation-deadline",
+          "cohorts": [
+            "chinese_semantic",
+            "date",
+            "multi_fact"
+          ],
+          "duration": 2871292,
+          "results": null,
+          "metrics": {
+            "hit_at_1": 0,
+            "recall_at_k": 0,
+            "mrr": 0,
+            "ndcg_at_k": 0,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "research-dataset-path",
+          "cohorts": [
+            "path",
+            "semantic_paraphrase"
+          ],
+          "duration": 338958,
+          "results": [
+            {
+              "memory_id": "8b232eb8-c23f-4c5d-98da-59bdb1b5ad73",
+              "record_id": "research-dataset-current",
+              "content": "The cleaned interview dataset is /data/thesis/interviews-v2.csv.",
+              "score": 0,
+              "lexical_rank": 1,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "research-method-semantic",
+          "cohorts": [
+            "multi_fact",
+            "semantic_paraphrase"
+          ],
+          "duration": 2201833,
+          "results": [
+            {
+              "memory_id": "1d5d2132-6ae8-4227-93a8-bd074e4fc6ad",
+              "record_id": "research-topic",
+              "content": "The thesis studies continuity failures in long-running AI coding workflows.",
+              "score": 0,
+              "lexical_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "278e430e-cd0e-42cb-b75b-0cf7d235b27c",
+              "record_id": "research-deadline",
+              "content": "The complete thesis draft is due on 2026-09-30.",
+              "score": 0,
+              "lexical_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "8b232eb8-c23f-4c5d-98da-59bdb1b5ad73",
+              "record_id": "research-dataset-current",
+              "content": "The cleaned interview dataset is /data/thesis/interviews-v2.csv.",
+              "score": 0,
+              "lexical_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "97b7f147-ef43-46eb-9a57-0b773b9eec32",
+              "record_id": "research-method",
+              "content": "The study compares no context, full history, lexical retrieval, vector retrieval, and governed hybrid packets.",
+              "score": 0,
+              "lexical_rank": 4,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "4a1b5242-5ba7-4cbb-9f6d-8c755c068af9",
+              "record_id": "research-citation-standard",
+              "content": "Chinese references use the GB/T 7714-2015 numeric citation style.",
+              "score": 0,
+              "lexical_rank": 5,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 0.8772153153380494,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        }
+      ],
+      "metrics": {
+        "query_count": 24,
+        "hit_at_1": 0.6666666666666666,
+        "recall_at_k": 0.6875,
+        "mrr": 0.6805555555555557,
+        "ndcg_at_k": 0.6525566131659795,
+        "forbidden_count": 0,
+        "ineligible_count": 0,
+        "search_p50": 862042,
+        "search_p95": 2871292
+      },
+      "cohorts": {
+        "api_path": {
+          "query_count": 1,
+          "hit_at_1": 1,
+          "recall_at_k": 1,
+          "mrr": 1,
+          "ndcg_at_k": 1,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 324000,
+          "search_p95": 324000
+        },
+        "chinese_semantic": {
+          "query_count": 7,
+          "hit_at_1": 0.14285714285714285,
+          "recall_at_k": 0.07142857142857142,
+          "mrr": 0.14285714285714285,
+          "ndcg_at_k": 0.08759245610935121,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 606916,
+          "search_p95": 2871292
+        },
+        "continuity_isolation": {
+          "query_count": 1,
+          "hit_at_1": 1,
+          "recall_at_k": 1,
+          "mrr": 1,
+          "ndcg_at_k": 1,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 2246292,
+          "search_p95": 2246292
+        },
+        "date": {
+          "query_count": 2,
+          "hit_at_1": 0.5,
+          "recall_at_k": 0.5,
+          "mrr": 0.5,
+          "ndcg_at_k": 0.45986039457409383,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 220459,
+          "search_p95": 220459
+        },
+        "duration": {
+          "query_count": 1,
+          "hit_at_1": 0,
+          "recall_at_k": 0,
+          "mrr": 0,
+          "ndcg_at_k": 0,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 205917,
+          "search_p95": 205917
+        },
+        "error_code": {
+          "query_count": 2,
+          "hit_at_1": 1,
+          "recall_at_k": 1,
+          "mrr": 1,
+          "ndcg_at_k": 1,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 862042,
+          "search_p95": 862042
+        },
+        "exact_identifier": {
+          "query_count": 5,
+          "hit_at_1": 1,
+          "recall_at_k": 1,
+          "mrr": 1,
+          "ndcg_at_k": 1,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 901208,
+          "search_p95": 1369833
+        },
+        "feature_flag": {
+          "query_count": 1,
+          "hit_at_1": 1,
+          "recall_at_k": 1,
+          "mrr": 1,
+          "ndcg_at_k": 1,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 3138042,
+          "search_p95": 3138042
+        },
+        "mixed_language": {
+          "query_count": 2,
+          "hit_at_1": 0.5,
+          "recall_at_k": 0.5,
+          "mrr": 0.5,
+          "ndcg_at_k": 0.5,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 1636625,
+          "search_p95": 1636625
+        },
+        "model_name": {
+          "query_count": 1,
+          "hit_at_1": 0,
+          "recall_at_k": 0,
+          "mrr": 0,
+          "ndcg_at_k": 0,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 2168791,
+          "search_p95": 2168791
+        },
+        "multi_fact": {
+          "query_count": 8,
+          "hit_at_1": 0.75,
+          "recall_at_k": 0.6875,
+          "mrr": 0.75,
+          "ndcg_at_k": 0.6451698394979383,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 606916,
+          "search_p95": 2201833
+        },
+        "numeric_constraint": {
+          "query_count": 5,
+          "hit_at_1": 0.4,
+          "recall_at_k": 0.6,
+          "mrr": 0.4666666666666666,
+          "ndcg_at_k": 0.45025508374636203,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 445041,
+          "search_p95": 1621959
+        },
+        "path": {
+          "query_count": 4,
+          "hit_at_1": 1,
+          "recall_at_k": 1,
+          "mrr": 1,
+          "ndcg_at_k": 0.9799301972870469,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 438417,
+          "search_p95": 652875
+        },
+        "semantic_paraphrase": {
+          "query_count": 10,
+          "hit_at_1": 0.7,
+          "recall_at_k": 0.8,
+          "mrr": 0.7333333333333333,
+          "ndcg_at_k": 0.7296936104486237,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 495125,
+          "search_p95": 2246292
+        },
+        "technical_command": {
+          "query_count": 1,
+          "hit_at_1": 1,
+          "recall_at_k": 1,
+          "mrr": 1,
+          "ndcg_at_k": 1,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 1696083,
+          "search_p95": 1696083
+        },
+        "version": {
+          "query_count": 1,
+          "hit_at_1": 1,
+          "recall_at_k": 1,
+          "mrr": 1,
+          "ndcg_at_k": 1,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 495125,
+          "search_p95": 495125
+        }
+      }
+    },
+    {
+      "name": "vector_pg",
+      "queries": [
+        {
+          "query_id": "api-ambiguity-chinese",
+          "cohorts": [
+            "chinese_semantic",
+            "multi_fact"
+          ],
+          "duration": 100583959,
+          "results": [
+            {
+              "memory_id": "4437fba0-8cb5-4ab1-a5c1-a9ecd0392240",
+              "record_id": "api-confirm-on-conflict",
+              "content": "When cwd and repo root conflict, require_confirmation and do not bind a fallback workspace.",
+              "score": 0.7975731375003124,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "20874bf2-e651-4113-b4ee-9b898e044847",
+              "record_id": "api-resolver-path",
+              "content": "The workspace resolver entrypoint is internal/resolver/resolver.go.",
+              "score": 0.4795931793593238,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "d6866c5c-e410-4d24-a5b1-8c8babc2bf2b",
+              "record_id": "api-route-flag-v3",
+              "content": "The current routing feature flag is workspace_route_v3.",
+              "score": 0.40806732918036204,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "99f51013-bd4c-4d81-a758-3f922d6954b3",
+              "record_id": "api-confirm-endpoint",
+              "content": "Operators confirm a proposed memory through POST /v1/memories/confirm.",
+              "score": 0.39598056614109534,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "759d0f5e-b316-4385-8546-d79849296499",
+              "record_id": "api-postgresql-version",
+              "content": "The qualified authority database is PostgreSQL 18.",
+              "score": 0.3874823469695017,
+              "vector_rank": 5,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "be08ce9b-d9cc-4c8f-8682-cf056149099c",
+              "record_id": "api-error-ambiguous",
+              "content": "E_SCOPE_AMBIGUOUS is returned when a workspace anchor has multiple safe candidates.",
+              "score": 0.36580919929064926,
+              "vector_rank": 6,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 0.8315546295836226,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "api-confirm-endpoint",
+          "cohorts": [
+            "api_path",
+            "semantic_paraphrase"
+          ],
+          "duration": 97131666,
+          "results": [
+            {
+              "memory_id": "99f51013-bd4c-4d81-a758-3f922d6954b3",
+              "record_id": "api-confirm-endpoint",
+              "content": "Operators confirm a proposed memory through POST /v1/memories/confirm.",
+              "score": 0.7041740022639361,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "71b69a09-001e-459c-8f76-c2a4af995ca8",
+              "record_id": "api-context-limit",
+              "content": "A prepared context packet contains at most 12 governed memory items.",
+              "score": 0.5256094049751129,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "4437fba0-8cb5-4ab1-a5c1-a9ecd0392240",
+              "record_id": "api-confirm-on-conflict",
+              "content": "When cwd and repo root conflict, require_confirmation and do not bind a fallback workspace.",
+              "score": 0.44587637361186405,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "20874bf2-e651-4113-b4ee-9b898e044847",
+              "record_id": "api-resolver-path",
+              "content": "The workspace resolver entrypoint is internal/resolver/resolver.go.",
+              "score": 0.4373868368499898,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "api-context-database-multi",
+          "cohorts": [
+            "multi_fact",
+            "numeric_constraint"
+          ],
+          "duration": 102587208,
+          "results": [
+            {
+              "memory_id": "759d0f5e-b316-4385-8546-d79849296499",
+              "record_id": "api-postgresql-version",
+              "content": "The qualified authority database is PostgreSQL 18.",
+              "score": 0.5981803185294919,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "71b69a09-001e-459c-8f76-c2a4af995ca8",
+              "record_id": "api-context-limit",
+              "content": "A prepared context packet contains at most 12 governed memory items.",
+              "score": 0.5127331767301103,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "99f51013-bd4c-4d81-a758-3f922d6954b3",
+              "record_id": "api-confirm-endpoint",
+              "content": "Operators confirm a proposed memory through POST /v1/memories/confirm.",
+              "score": 0.43271881742963225,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "be08ce9b-d9cc-4c8f-8682-cf056149099c",
+              "record_id": "api-error-ambiguous",
+              "content": "E_SCOPE_AMBIGUOUS is returned when a workspace anchor has multiple safe candidates.",
+              "score": 0.40053582175498625,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "4437fba0-8cb5-4ab1-a5c1-a9ecd0392240",
+              "record_id": "api-confirm-on-conflict",
+              "content": "When cwd and repo root conflict, require_confirmation and do not bind a fallback workspace.",
+              "score": 0.38609582600121983,
+              "vector_rank": 5,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "d6866c5c-e410-4d24-a5b1-8c8babc2bf2b",
+              "record_id": "api-route-flag-v3",
+              "content": "The current routing feature flag is workspace_route_v3.",
+              "score": 0.3839886670116194,
+              "vector_rank": 6,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "api-embedding-chinese",
+          "cohorts": [
+            "mixed_language",
+            "model_name",
+            "numeric_constraint"
+          ],
+          "duration": 107426959,
+          "results": [
+            {
+              "memory_id": "fcb7514b-caa2-4327-8de2-8275a8f0a1a9",
+              "record_id": "api-embedding-profile",
+              "content": "Mixed Chinese and English retrieval uses BAAI/bge-m3 with 1024-dimensional embeddings for the vector condition.",
+              "score": 0.6917239907075213,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "4437fba0-8cb5-4ab1-a5c1-a9ecd0392240",
+              "record_id": "api-confirm-on-conflict",
+              "content": "When cwd and repo root conflict, require_confirmation and do not bind a fallback workspace.",
+              "score": 0.3893849419814528,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "71b69a09-001e-459c-8f76-c2a4af995ca8",
+              "record_id": "api-context-limit",
+              "content": "A prepared context packet contains at most 12 governed memory items.",
+              "score": 0.3878851180755132,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "d6866c5c-e410-4d24-a5b1-8c8babc2bf2b",
+              "record_id": "api-route-flag-v3",
+              "content": "The current routing feature flag is workspace_route_v3.",
+              "score": 0.3868049093623124,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "api-resolver-path-exact",
+          "cohorts": [
+            "exact_identifier",
+            "path"
+          ],
+          "duration": 126280667,
+          "results": [
+            {
+              "memory_id": "20874bf2-e651-4113-b4ee-9b898e044847",
+              "record_id": "api-resolver-path",
+              "content": "The workspace resolver entrypoint is internal/resolver/resolver.go.",
+              "score": 0.8271848993391457,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "d6866c5c-e410-4d24-a5b1-8c8babc2bf2b",
+              "record_id": "api-route-flag-v3",
+              "content": "The current routing feature flag is workspace_route_v3.",
+              "score": 0.5043009068697258,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "4437fba0-8cb5-4ab1-a5c1-a9ecd0392240",
+              "record_id": "api-confirm-on-conflict",
+              "content": "When cwd and repo root conflict, require_confirmation and do not bind a fallback workspace.",
+              "score": 0.4888506869611702,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "99f51013-bd4c-4d81-a758-3f922d6954b3",
+              "record_id": "api-confirm-endpoint",
+              "content": "Operators confirm a proposed memory through POST /v1/memories/confirm.",
+              "score": 0.4818348608214137,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "api-route-flag-exact",
+          "cohorts": [
+            "exact_identifier",
+            "feature_flag"
+          ],
+          "duration": 98969792,
+          "results": [
+            {
+              "memory_id": "d6866c5c-e410-4d24-a5b1-8c8babc2bf2b",
+              "record_id": "api-route-flag-v3",
+              "content": "The current routing feature flag is workspace_route_v3.",
+              "score": 0.7901832638338198,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "20874bf2-e651-4113-b4ee-9b898e044847",
+              "record_id": "api-resolver-path",
+              "content": "The workspace resolver entrypoint is internal/resolver/resolver.go.",
+              "score": 0.6084037552363315,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "4437fba0-8cb5-4ab1-a5c1-a9ecd0392240",
+              "record_id": "api-confirm-on-conflict",
+              "content": "When cwd and repo root conflict, require_confirmation and do not bind a fallback workspace.",
+              "score": 0.5123758956347049,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "be08ce9b-d9cc-4c8f-8682-cf056149099c",
+              "record_id": "api-error-ambiguous",
+              "content": "E_SCOPE_AMBIGUOUS is returned when a workspace anchor has multiple safe candidates.",
+              "score": 0.4987801309038562,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "design-copy-action",
+          "cohorts": [
+            "chinese_semantic",
+            "semantic_paraphrase"
+          ],
+          "duration": 125514500,
+          "results": [
+            {
+              "memory_id": "41307871-2ecb-46e6-8d7d-80b6b3128c65",
+              "record_id": "design-mobile-rule",
+              "content": "The review flow must load and remain usable on both desktop and mobile widths.",
+              "score": 0.5479925626438962,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "64d8692f-f292-4cd7-be73-106f9daad970",
+              "record_id": "design-copy-rule",
+              "content": "User-facing copy leads with the next action and user outcome instead of internal state names.",
+              "score": 0.5382199356695766,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "d573ce2c-b679-4d10-8bec-febfc22ac820",
+              "record_id": "design-motion-rule",
+              "content": "Use one meaningful page-load reveal and avoid generic motion on every control.",
+              "score": 0.533988575628829,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "c2125006-34bf-4f9d-9b03-e375851df736",
+              "record_id": "design-font-rule",
+              "content": "The interface uses a purposeful editorial type family rather than Inter or a default system stack.",
+              "score": 0.5323284542641415,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 0,
+            "recall_at_k": 1,
+            "mrr": 0.5,
+            "ndcg_at_k": 0.6309297535714574,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "design-multi-coder-isolation",
+          "cohorts": [
+            "continuity_isolation",
+            "semantic_paraphrase"
+          ],
+          "duration": 95278459,
+          "results": [
+            {
+              "memory_id": "32936f4d-641a-4f73-bc89-a1689dbdf122",
+              "record_id": "design-handoff-rule",
+              "content": "Codex and Grok share the same confirmed workspace continuity but never share another repository's memory.",
+              "score": 0.8199634689060008,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "c2125006-34bf-4f9d-9b03-e375851df736",
+              "record_id": "design-font-rule",
+              "content": "The interface uses a purposeful editorial type family rather than Inter or a default system stack.",
+              "score": 0.40266719460487366,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "d573ce2c-b679-4d10-8bec-febfc22ac820",
+              "record_id": "design-motion-rule",
+              "content": "Use one meaningful page-load reveal and avoid generic motion on every control.",
+              "score": 0.3937881805139485,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "41307871-2ecb-46e6-8d7d-80b6b3128c65",
+              "record_id": "design-mobile-rule",
+              "content": "The review flow must load and remain usable on both desktop and mobile widths.",
+              "score": 0.3890357482072493,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "64d8692f-f292-4cd7-be73-106f9daad970",
+              "record_id": "design-copy-rule",
+              "content": "User-facing copy leads with the next action and user outcome instead of internal state names.",
+              "score": 0.3545656475034107,
+              "vector_rank": 5,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "device-error-exact",
+          "cohorts": [
+            "error_code",
+            "exact_identifier"
+          ],
+          "duration": 95082833,
+          "results": [
+            {
+              "memory_id": "9c6c33fa-2994-48a2-b413-d33b7441cc7b",
+              "record_id": "device-error-bt-e104",
+              "content": "BT-E104 indicates that the pairing token expired before confirmation.",
+              "score": 0.5859222761347109,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "0821ff06-c9cb-48c2-9415-bb45cba57a7a",
+              "record_id": "device-firmware-current",
+              "content": "The current hub firmware is 2.4.1.",
+              "score": 0.4494431286718973,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "2c18ea5f-ec46-484c-a86a-5b753852f257",
+              "record_id": "device-power-cycle",
+              "content": "Power-cycle the hub for 30 seconds before repeating Bluetooth pairing.",
+              "score": 0.44743446295181855,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "b03fd2ad-45fe-4454-8c36-442e1b0a5b18",
+              "record_id": "device-reset-button",
+              "content": "Hold the recessed reset button for 8 seconds only after exporting the device profile.",
+              "score": 0.3240579849568621,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "device-firmware-current",
+          "cohorts": [
+            "semantic_paraphrase",
+            "version"
+          ],
+          "duration": 100156791,
+          "results": [
+            {
+              "memory_id": "0821ff06-c9cb-48c2-9415-bb45cba57a7a",
+              "record_id": "device-firmware-current",
+              "content": "The current hub firmware is 2.4.1.",
+              "score": 0.8875756062703201,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "2c18ea5f-ec46-484c-a86a-5b753852f257",
+              "record_id": "device-power-cycle",
+              "content": "Power-cycle the hub for 30 seconds before repeating Bluetooth pairing.",
+              "score": 0.4895017209639141,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "479bb360-b14a-4662-99e2-c3fc7a4189ef",
+              "record_id": "device-profile-path",
+              "content": "The exported device profile is stored at ~/Documents/device-backups/hub-profile.json.",
+              "score": 0.4771276996808085,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "9c6c33fa-2994-48a2-b413-d33b7441cc7b",
+              "record_id": "device-error-bt-e104",
+              "content": "BT-E104 indicates that the pairing token expired before confirmation.",
+              "score": 0.42186443600618384,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "device-recovery-semantic",
+          "cohorts": [
+            "chinese_semantic",
+            "semantic_paraphrase"
+          ],
+          "duration": 100061459,
+          "results": [
+            {
+              "memory_id": "0affce18-53e7-4f31-b4ac-9b013bd1a5ee",
+              "record_id": "device-recovery-code-rotation",
+              "content": "After a recovery code is used successfully, rotate it immediately.",
+              "score": 0.7366002421558528,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "b03fd2ad-45fe-4454-8c36-442e1b0a5b18",
+              "record_id": "device-reset-button",
+              "content": "Hold the recessed reset button for 8 seconds only after exporting the device profile.",
+              "score": 0.5780785693691103,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "2c18ea5f-ec46-484c-a86a-5b753852f257",
+              "record_id": "device-power-cycle",
+              "content": "Power-cycle the hub for 30 seconds before repeating Bluetooth pairing.",
+              "score": 0.5312901828174821,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "9c6c33fa-2994-48a2-b413-d33b7441cc7b",
+              "record_id": "device-error-bt-e104",
+              "content": "BT-E104 indicates that the pairing token expired before confirmation.",
+              "score": 0.4837198536062616,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "device-safe-reset-multi",
+          "cohorts": [
+            "multi_fact",
+            "numeric_constraint",
+            "path"
+          ],
+          "duration": 94030500,
+          "results": [
+            {
+              "memory_id": "b03fd2ad-45fe-4454-8c36-442e1b0a5b18",
+              "record_id": "device-reset-button",
+              "content": "Hold the recessed reset button for 8 seconds only after exporting the device profile.",
+              "score": 0.6751538537856219,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "2c18ea5f-ec46-484c-a86a-5b753852f257",
+              "record_id": "device-power-cycle",
+              "content": "Power-cycle the hub for 30 seconds before repeating Bluetooth pairing.",
+              "score": 0.6404181477915769,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "0821ff06-c9cb-48c2-9415-bb45cba57a7a",
+              "record_id": "device-firmware-current",
+              "content": "The current hub firmware is 2.4.1.",
+              "score": 0.5757254795537757,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "479bb360-b14a-4662-99e2-c3fc7a4189ef",
+              "record_id": "device-profile-path",
+              "content": "The exported device profile is stored at ~/Documents/device-backups/hub-profile.json.",
+              "score": 0.5554310414452228,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "0affce18-53e7-4f31-b4ac-9b013bd1a5ee",
+              "record_id": "device-recovery-code-rotation",
+              "content": "After a recovery code is used successfully, rotate it immediately.",
+              "score": 0.5390534882891607,
+              "vector_rank": 5,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "9c6c33fa-2994-48a2-b413-d33b7441cc7b",
+              "record_id": "device-error-bt-e104",
+              "content": "BT-E104 indicates that the pairing token expired before confirmation.",
+              "score": 0.43378420480211066,
+              "vector_rank": 6,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 0.8772153153380494,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "housing-budget",
+          "cohorts": [
+            "chinese_semantic",
+            "numeric_constraint"
+          ],
+          "duration": 194449084,
+          "results": [
+            {
+              "memory_id": "ff92dd65-2183-48df-9ce3-551e5d92ab20",
+              "record_id": "housing-budget-6500",
+              "content": "The monthly housing budget ceiling is CNY 6500.",
+              "score": 0.7099659982213318,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "6b4976ab-6f31-42f6-aeef-c6390b07fcd6",
+              "record_id": "housing-commute-35",
+              "content": "The acceptable one-way commute is at most 35 minutes.",
+              "score": 0.5222681764414442,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "7157d562-3711-4e37-b2b1-ad21c9fa6923",
+              "record_id": "housing-no-basement",
+              "content": "Basement apartments and windowless rooms are excluded.",
+              "score": 0.4954930369367777,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "637865bc-a99f-4f02-ab0d-d4b939ba6d3e",
+              "record_id": "housing-move-date",
+              "content": "The target move-in date is 2026-09-01.",
+              "score": 0.4613352005482282,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "housing-commute",
+          "cohorts": [
+            "chinese_semantic",
+            "duration"
+          ],
+          "duration": 172069125,
+          "results": [
+            {
+              "memory_id": "6b4976ab-6f31-42f6-aeef-c6390b07fcd6",
+              "record_id": "housing-commute-35",
+              "content": "The acceptable one-way commute is at most 35 minutes.",
+              "score": 0.7827460040299384,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "637865bc-a99f-4f02-ab0d-d4b939ba6d3e",
+              "record_id": "housing-move-date",
+              "content": "The target move-in date is 2026-09-01.",
+              "score": 0.4367532288409306,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "7157d562-3711-4e37-b2b1-ad21c9fa6923",
+              "record_id": "housing-no-basement",
+              "content": "Basement apartments and windowless rooms are excluded.",
+              "score": 0.4061424192105463,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "ff92dd65-2183-48df-9ce3-551e5d92ab20",
+              "record_id": "housing-budget-6500",
+              "content": "The monthly housing budget ceiling is CNY 6500.",
+              "score": 0.40424382560139205,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "housing-move-constraints",
+          "cohorts": [
+            "date",
+            "multi_fact",
+            "semantic_paraphrase"
+          ],
+          "duration": 107744584,
+          "results": [
+            {
+              "memory_id": "7157d562-3711-4e37-b2b1-ad21c9fa6923",
+              "record_id": "housing-no-basement",
+              "content": "Basement apartments and windowless rooms are excluded.",
+              "score": 0.7028996832131584,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "637865bc-a99f-4f02-ab0d-d4b939ba6d3e",
+              "record_id": "housing-move-date",
+              "content": "The target move-in date is 2026-09-01.",
+              "score": 0.5868694717833884,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "ff92dd65-2183-48df-9ce3-551e5d92ab20",
+              "record_id": "housing-budget-6500",
+              "content": "The monthly housing budget ceiling is CNY 6500.",
+              "score": 0.4068838953971978,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "6b4976ab-6f31-42f6-aeef-c6390b07fcd6",
+              "record_id": "housing-commute-35",
+              "content": "The acceptable one-way commute is at most 35 minutes.",
+              "score": 0.3963475154689038,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "56e4754f-741e-4816-b40d-ffc5896d80a0",
+              "record_id": "housing-area-pudong",
+              "content": "Preferred search areas are Zhangjiang and Jinqiao in Pudong.",
+              "score": 0.26754978338619906,
+              "vector_rank": 5,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "release-attestation-error-exact",
+          "cohorts": [
+            "error_code",
+            "exact_identifier"
+          ],
+          "duration": 96543792,
+          "results": [
+            {
+              "memory_id": "bc1f2f14-2bd4-441f-b437-af57de6853a2",
+              "record_id": "release-error-attestation",
+              "content": "Error E_ATTESTATION_412 means the signed provenance statement is missing.",
+              "score": 0.6988698272886721,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "3b8fd8f9-da3c-4c61-9ab0-b25ff4fbbde7",
+              "record_id": "release-timeout-800ms",
+              "content": "The release verification API timeout remains 800 ms.",
+              "score": 0.46244883537292814,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "35ac7bae-32e2-44e4-a34b-c376e65d2121",
+              "record_id": "release-attestation-slsa",
+              "content": "Production releases publish a signed SLSA provenance statement.",
+              "score": 0.4573098353823528,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "4d9845be-6a07-4ad4-939c-7c7da9bd0f19",
+              "record_id": "release-command-current",
+              "content": "Use pnpm exec release:verify --mode locked for the governed release check.",
+              "score": 0.4374125525668573,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "release-command-paraphrase",
+          "cohorts": [
+            "semantic_paraphrase",
+            "technical_command"
+          ],
+          "duration": 96715083,
+          "results": [
+            {
+              "memory_id": "4d9845be-6a07-4ad4-939c-7c7da9bd0f19",
+              "record_id": "release-command-current",
+              "content": "Use pnpm exec release:verify --mode locked for the governed release check.",
+              "score": 0.6994425745646564,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "3b8fd8f9-da3c-4c61-9ab0-b25ff4fbbde7",
+              "record_id": "release-timeout-800ms",
+              "content": "The release verification API timeout remains 800 ms.",
+              "score": 0.5993417680067418,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "599ad807-1a43-486a-a23e-5ecec971d26e",
+              "record_id": "release-cutoff-date",
+              "content": "The release-control migration cutoff is 2026-08-15.",
+              "score": 0.5321183565538101,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "9fd0a8e6-5041-429b-b28a-3ea10f3c6d2a",
+              "record_id": "release-log-path",
+              "content": "Release audit events are written to /var/log/vermory/release-control.log.",
+              "score": 0.5089902422735062,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "53b73d65-a424-4737-94df-f7c3a804a6a8",
+              "record_id": "release-rollback-two-maintainers",
+              "content": "Rollback approval requires two maintainers.",
+              "score": 0.49849383474648645,
+              "vector_rank": 5,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "0ad33c28-cb99-4a20-bd55-6824991250bc",
+              "record_id": "release-signing-oidc",
+              "content": "Production release signing uses GitHub Actions OIDC keyless signing.",
+              "score": 0.49204374683815943,
+              "vector_rank": 6,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "release-log-path-exact",
+          "cohorts": [
+            "exact_identifier",
+            "path"
+          ],
+          "duration": 100141584,
+          "results": [
+            {
+              "memory_id": "9fd0a8e6-5041-429b-b28a-3ea10f3c6d2a",
+              "record_id": "release-log-path",
+              "content": "Release audit events are written to /var/log/vermory/release-control.log.",
+              "score": 0.8569526416971953,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "4d9845be-6a07-4ad4-939c-7c7da9bd0f19",
+              "record_id": "release-command-current",
+              "content": "Use pnpm exec release:verify --mode locked for the governed release check.",
+              "score": 0.6023571067687654,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "3b8fd8f9-da3c-4c61-9ab0-b25ff4fbbde7",
+              "record_id": "release-timeout-800ms",
+              "content": "The release verification API timeout remains 800 ms.",
+              "score": 0.5610621477123157,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "599ad807-1a43-486a-a23e-5ecec971d26e",
+              "record_id": "release-cutoff-date",
+              "content": "The release-control migration cutoff is 2026-08-15.",
+              "score": 0.5265916679459987,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "release-retry-numeric",
+          "cohorts": [
+            "numeric_constraint",
+            "semantic_paraphrase"
+          ],
+          "duration": 98715292,
+          "results": [
+            {
+              "memory_id": "b771ceb1-8063-42ca-a697-07051a53e606",
+              "record_id": "release-retry-five",
+              "content": "Production deployments retry at most 5 times.",
+              "score": 0.7160219424995723,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "53b73d65-a424-4737-94df-f7c3a804a6a8",
+              "record_id": "release-rollback-two-maintainers",
+              "content": "Rollback approval requires two maintainers.",
+              "score": 0.5561684405163979,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "599ad807-1a43-486a-a23e-5ecec971d26e",
+              "record_id": "release-cutoff-date",
+              "content": "The release-control migration cutoff is 2026-08-15.",
+              "score": 0.48602156799328255,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "ef3f327e-b779-4e46-a375-12e6f375e9fd",
+              "record_id": "release-region-us-east-1",
+              "content": "The primary production deployment region is us-east-1.",
+              "score": 0.44605179291809405,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "release-rollback-chinese",
+          "cohorts": [
+            "chinese_semantic",
+            "multi_fact"
+          ],
+          "duration": 107550958,
+          "results": [
+            {
+              "memory_id": "53b73d65-a424-4737-94df-f7c3a804a6a8",
+              "record_id": "release-rollback-two-maintainers",
+              "content": "Rollback approval requires two maintainers.",
+              "score": 0.611450230233481,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "3b8fd8f9-da3c-4c61-9ab0-b25ff4fbbde7",
+              "record_id": "release-timeout-800ms",
+              "content": "The release verification API timeout remains 800 ms.",
+              "score": 0.5858310388771756,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "4d9845be-6a07-4ad4-939c-7c7da9bd0f19",
+              "record_id": "release-command-current",
+              "content": "Use pnpm exec release:verify --mode locked for the governed release check.",
+              "score": 0.5385998234928991,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "35ac7bae-32e2-44e4-a34b-c376e65d2121",
+              "record_id": "release-attestation-slsa",
+              "content": "Production releases publish a signed SLSA provenance statement.",
+              "score": 0.5350418895732936,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "bc1f2f14-2bd4-441f-b437-af57de6853a2",
+              "record_id": "release-error-attestation",
+              "content": "Error E_ATTESTATION_412 means the signed provenance statement is missing.",
+              "score": 0.5337874651767289,
+              "vector_rank": 5,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "b771ceb1-8063-42ca-a697-07051a53e606",
+              "record_id": "release-retry-five",
+              "content": "Production deployments retry at most 5 times.",
+              "score": 0.5290515649755029,
+              "vector_rank": 6,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 0.8772153153380494,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "release-signing-mixed",
+          "cohorts": [
+            "mixed_language",
+            "multi_fact"
+          ],
+          "duration": 98298583,
+          "results": [
+            {
+              "memory_id": "0ad33c28-cb99-4a20-bd55-6824991250bc",
+              "record_id": "release-signing-oidc",
+              "content": "Production release signing uses GitHub Actions OIDC keyless signing.",
+              "score": 0.7412718667874111,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "ef3f327e-b779-4e46-a375-12e6f375e9fd",
+              "record_id": "release-region-us-east-1",
+              "content": "The primary production deployment region is us-east-1.",
+              "score": 0.5338355302810707,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "35ac7bae-32e2-44e4-a34b-c376e65d2121",
+              "record_id": "release-attestation-slsa",
+              "content": "Production releases publish a signed SLSA provenance statement.",
+              "score": 0.49901907096283027,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "bc1f2f14-2bd4-441f-b437-af57de6853a2",
+              "record_id": "release-error-attestation",
+              "content": "Error E_ATTESTATION_412 means the signed provenance statement is missing.",
+              "score": 0.4500470563811414,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "3b8fd8f9-da3c-4c61-9ab0-b25ff4fbbde7",
+              "record_id": "release-timeout-800ms",
+              "content": "The release verification API timeout remains 800 ms.",
+              "score": 0.44973042607307756,
+              "vector_rank": 5,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "599ad807-1a43-486a-a23e-5ecec971d26e",
+              "record_id": "release-cutoff-date",
+              "content": "The release-control migration cutoff is 2026-08-15.",
+              "score": 0.44872520902005497,
+              "vector_rank": 6,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "research-citation-deadline",
+          "cohorts": [
+            "chinese_semantic",
+            "date",
+            "multi_fact"
+          ],
+          "duration": 109288583,
+          "results": [
+            {
+              "memory_id": "278e430e-cd0e-42cb-b75b-0cf7d235b27c",
+              "record_id": "research-deadline",
+              "content": "The complete thesis draft is due on 2026-09-30.",
+              "score": 0.5695431658761874,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "4a1b5242-5ba7-4cbb-9f6d-8c755c068af9",
+              "record_id": "research-citation-standard",
+              "content": "Chinese references use the GB/T 7714-2015 numeric citation style.",
+              "score": 0.49473242508778936,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "8b232eb8-c23f-4c5d-98da-59bdb1b5ad73",
+              "record_id": "research-dataset-current",
+              "content": "The cleaned interview dataset is /data/thesis/interviews-v2.csv.",
+              "score": 0.47002922445102713,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "38e2be07-c003-4df2-9b4c-3eae22ba31c6",
+              "record_id": "research-coding-model",
+              "content": "Repository analysis is replayed with grok-4.5 and official Codex when account capacity is available.",
+              "score": 0.4373816084081462,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "1d5d2132-6ae8-4227-93a8-bd074e4fc6ad",
+              "record_id": "research-topic",
+              "content": "The thesis studies continuity failures in long-running AI coding workflows.",
+              "score": 0.42485136767139386,
+              "vector_rank": 5,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "97b7f147-ef43-46eb-9a57-0b773b9eec32",
+              "record_id": "research-method",
+              "content": "The study compares no context, full history, lexical retrieval, vector retrieval, and governed hybrid packets.",
+              "score": 0.39381029028266656,
+              "vector_rank": 6,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "research-dataset-path",
+          "cohorts": [
+            "path",
+            "semantic_paraphrase"
+          ],
+          "duration": 126526292,
+          "results": [
+            {
+              "memory_id": "8b232eb8-c23f-4c5d-98da-59bdb1b5ad73",
+              "record_id": "research-dataset-current",
+              "content": "The cleaned interview dataset is /data/thesis/interviews-v2.csv.",
+              "score": 0.7348609796912197,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "97b7f147-ef43-46eb-9a57-0b773b9eec32",
+              "record_id": "research-method",
+              "content": "The study compares no context, full history, lexical retrieval, vector retrieval, and governed hybrid packets.",
+              "score": 0.4549190590123361,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "38e2be07-c003-4df2-9b4c-3eae22ba31c6",
+              "record_id": "research-coding-model",
+              "content": "Repository analysis is replayed with grok-4.5 and official Codex when account capacity is available.",
+              "score": 0.3821056012729749,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "278e430e-cd0e-42cb-b75b-0cf7d235b27c",
+              "record_id": "research-deadline",
+              "content": "The complete thesis draft is due on 2026-09-30.",
+              "score": 0.38006844160085973,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "research-method-semantic",
+          "cohorts": [
+            "multi_fact",
+            "semantic_paraphrase"
+          ],
+          "duration": 109104416,
+          "results": [
+            {
+              "memory_id": "1d5d2132-6ae8-4227-93a8-bd074e4fc6ad",
+              "record_id": "research-topic",
+              "content": "The thesis studies continuity failures in long-running AI coding workflows.",
+              "score": 0.5323311292139077,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "278e430e-cd0e-42cb-b75b-0cf7d235b27c",
+              "record_id": "research-deadline",
+              "content": "The complete thesis draft is due on 2026-09-30.",
+              "score": 0.471573352813734,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "8b232eb8-c23f-4c5d-98da-59bdb1b5ad73",
+              "record_id": "research-dataset-current",
+              "content": "The cleaned interview dataset is /data/thesis/interviews-v2.csv.",
+              "score": 0.451284622992947,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "97b7f147-ef43-46eb-9a57-0b773b9eec32",
+              "record_id": "research-method",
+              "content": "The study compares no context, full history, lexical retrieval, vector retrieval, and governed hybrid packets.",
+              "score": 0.43990573287011436,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "38e2be07-c003-4df2-9b4c-3eae22ba31c6",
+              "record_id": "research-coding-model",
+              "content": "Repository analysis is replayed with grok-4.5 and official Codex when account capacity is available.",
+              "score": 0.41436933960732525,
+              "vector_rank": 5,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "4a1b5242-5ba7-4cbb-9f6d-8c755c068af9",
+              "record_id": "research-citation-standard",
+              "content": "Chinese references use the GB/T 7714-2015 numeric citation style.",
+              "score": 0.3711181061793667,
+              "vector_rank": 6,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 0.8772153153380494,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        }
+      ],
+      "metrics": {
+        "query_count": 24,
+        "hit_at_1": 0.9583333333333334,
+        "recall_at_k": 1,
+        "mrr": 0.9791666666666666,
+        "ndcg_at_k": 0.9622554303820511,
+        "forbidden_count": 0,
+        "ineligible_count": 0,
+        "search_p50": 100156791,
+        "search_p95": 126526292
+      },
+      "cohorts": {
+        "api_path": {
+          "query_count": 1,
+          "hit_at_1": 1,
+          "recall_at_k": 1,
+          "mrr": 1,
+          "ndcg_at_k": 1,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 97131666,
+          "search_p95": 97131666
+        },
+        "chinese_semantic": {
+          "query_count": 7,
+          "hit_at_1": 0.8571428571428571,
+          "recall_at_k": 1,
+          "mrr": 0.9285714285714286,
+          "ndcg_at_k": 0.9056713854990185,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 109288583,
+          "search_p95": 172069125
+        },
+        "continuity_isolation": {
+          "query_count": 1,
+          "hit_at_1": 1,
+          "recall_at_k": 1,
+          "mrr": 1,
+          "ndcg_at_k": 1,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 95278459,
+          "search_p95": 95278459
+        },
+        "date": {
+          "query_count": 2,
+          "hit_at_1": 1,
+          "recall_at_k": 1,
+          "mrr": 1,
+          "ndcg_at_k": 1,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 107744584,
+          "search_p95": 107744584
+        },
+        "duration": {
+          "query_count": 1,
+          "hit_at_1": 1,
+          "recall_at_k": 1,
+          "mrr": 1,
+          "ndcg_at_k": 1,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 172069125,
+          "search_p95": 172069125
+        },
+        "error_code": {
+          "query_count": 2,
+          "hit_at_1": 1,
+          "recall_at_k": 1,
+          "mrr": 1,
+          "ndcg_at_k": 1,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 95082833,
+          "search_p95": 95082833
+        },
+        "exact_identifier": {
+          "query_count": 5,
+          "hit_at_1": 1,
+          "recall_at_k": 1,
+          "mrr": 1,
+          "ndcg_at_k": 1,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 98969792,
+          "search_p95": 100141584
+        },
+        "feature_flag": {
+          "query_count": 1,
+          "hit_at_1": 1,
+          "recall_at_k": 1,
+          "mrr": 1,
+          "ndcg_at_k": 1,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 98969792,
+          "search_p95": 98969792
+        },
+        "mixed_language": {
+          "query_count": 2,
+          "hit_at_1": 1,
+          "recall_at_k": 1,
+          "mrr": 1,
+          "ndcg_at_k": 1,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 98298583,
+          "search_p95": 98298583
+        },
+        "model_name": {
+          "query_count": 1,
+          "hit_at_1": 1,
+          "recall_at_k": 1,
+          "mrr": 1,
+          "ndcg_at_k": 1,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 107426959,
+          "search_p95": 107426959
+        },
+        "multi_fact": {
+          "query_count": 8,
+          "hit_at_1": 1,
+          "recall_at_k": 1,
+          "mrr": 1,
+          "ndcg_at_k": 0.9329000719497214,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 102587208,
+          "search_p95": 109104416
+        },
+        "numeric_constraint": {
+          "query_count": 5,
+          "hit_at_1": 1,
+          "recall_at_k": 1,
+          "mrr": 1,
+          "ndcg_at_k": 0.9754430630676099,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 102587208,
+          "search_p95": 107426959
+        },
+        "path": {
+          "query_count": 4,
+          "hit_at_1": 1,
+          "recall_at_k": 1,
+          "mrr": 1,
+          "ndcg_at_k": 0.9693038288345124,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 100141584,
+          "search_p95": 126280667
+        },
+        "semantic_paraphrase": {
+          "query_count": 10,
+          "hit_at_1": 0.9,
+          "recall_at_k": 1,
+          "mrr": 0.95,
+          "ndcg_at_k": 0.9508145068909506,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 100061459,
+          "search_p95": 125514500
+        },
+        "technical_command": {
+          "query_count": 1,
+          "hit_at_1": 1,
+          "recall_at_k": 1,
+          "mrr": 1,
+          "ndcg_at_k": 1,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 96715083,
+          "search_p95": 96715083
+        },
+        "version": {
+          "query_count": 1,
+          "hit_at_1": 1,
+          "recall_at_k": 1,
+          "mrr": 1,
+          "ndcg_at_k": 1,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 100156791,
+          "search_p95": 100156791
+        }
+      }
+    },
+    {
+      "name": "hybrid_rrf",
+      "queries": [
+        {
+          "query_id": "api-ambiguity-chinese",
+          "cohorts": [
+            "chinese_semantic",
+            "multi_fact"
+          ],
+          "duration": 101198583,
+          "results": [
+            {
+              "memory_id": "4437fba0-8cb5-4ab1-a5c1-a9ecd0392240",
+              "record_id": "api-confirm-on-conflict",
+              "content": "When cwd and repo root conflict, require_confirmation and do not bind a fallback workspace.",
+              "score": 0.03278688524590164,
+              "lexical_rank": 1,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "20874bf2-e651-4113-b4ee-9b898e044847",
+              "record_id": "api-resolver-path",
+              "content": "The workspace resolver entrypoint is internal/resolver/resolver.go.",
+              "score": 0.016129032258064516,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "d6866c5c-e410-4d24-a5b1-8c8babc2bf2b",
+              "record_id": "api-route-flag-v3",
+              "content": "The current routing feature flag is workspace_route_v3.",
+              "score": 0.015873015873015872,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "99f51013-bd4c-4d81-a758-3f922d6954b3",
+              "record_id": "api-confirm-endpoint",
+              "content": "Operators confirm a proposed memory through POST /v1/memories/confirm.",
+              "score": 0.015625,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "759d0f5e-b316-4385-8546-d79849296499",
+              "record_id": "api-postgresql-version",
+              "content": "The qualified authority database is PostgreSQL 18.",
+              "score": 0.015384615384615385,
+              "vector_rank": 5,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "be08ce9b-d9cc-4c8f-8682-cf056149099c",
+              "record_id": "api-error-ambiguous",
+              "content": "E_SCOPE_AMBIGUOUS is returned when a workspace anchor has multiple safe candidates.",
+              "score": 0.015151515151515152,
+              "vector_rank": 6,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 0.8315546295836226,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "api-confirm-endpoint",
+          "cohorts": [
+            "api_path",
+            "semantic_paraphrase"
+          ],
+          "duration": 97461375,
+          "results": [
+            {
+              "memory_id": "99f51013-bd4c-4d81-a758-3f922d6954b3",
+              "record_id": "api-confirm-endpoint",
+              "content": "Operators confirm a proposed memory through POST /v1/memories/confirm.",
+              "score": 0.03278688524590164,
+              "lexical_rank": 1,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "71b69a09-001e-459c-8f76-c2a4af995ca8",
+              "record_id": "api-context-limit",
+              "content": "A prepared context packet contains at most 12 governed memory items.",
+              "score": 0.03225806451612903,
+              "lexical_rank": 2,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "4437fba0-8cb5-4ab1-a5c1-a9ecd0392240",
+              "record_id": "api-confirm-on-conflict",
+              "content": "When cwd and repo root conflict, require_confirmation and do not bind a fallback workspace.",
+              "score": 0.031746031746031744,
+              "lexical_rank": 3,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "be08ce9b-d9cc-4c8f-8682-cf056149099c",
+              "record_id": "api-error-ambiguous",
+              "content": "E_SCOPE_AMBIGUOUS is returned when a workspace anchor has multiple safe candidates.",
+              "score": 0.031009615384615385,
+              "lexical_rank": 4,
+              "vector_rank": 5,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "api-context-database-multi",
+          "cohorts": [
+            "multi_fact",
+            "numeric_constraint"
+          ],
+          "duration": 103043041,
+          "results": [
+            {
+              "memory_id": "759d0f5e-b316-4385-8546-d79849296499",
+              "record_id": "api-postgresql-version",
+              "content": "The qualified authority database is PostgreSQL 18.",
+              "score": 0.03278688524590164,
+              "lexical_rank": 1,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "71b69a09-001e-459c-8f76-c2a4af995ca8",
+              "record_id": "api-context-limit",
+              "content": "A prepared context packet contains at most 12 governed memory items.",
+              "score": 0.03128054740957967,
+              "lexical_rank": 6,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "d6866c5c-e410-4d24-a5b1-8c8babc2bf2b",
+              "record_id": "api-route-flag-v3",
+              "content": "The current routing feature flag is workspace_route_v3.",
+              "score": 0.031024531024531024,
+              "lexical_rank": 3,
+              "vector_rank": 6,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "20874bf2-e651-4113-b4ee-9b898e044847",
+              "record_id": "api-resolver-path",
+              "content": "The workspace resolver entrypoint is internal/resolver/resolver.go.",
+              "score": 0.030834914611005692,
+              "lexical_rank": 2,
+              "vector_rank": 8,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "4437fba0-8cb5-4ab1-a5c1-a9ecd0392240",
+              "record_id": "api-confirm-on-conflict",
+              "content": "When cwd and repo root conflict, require_confirmation and do not bind a fallback workspace.",
+              "score": 0.03076923076923077,
+              "lexical_rank": 5,
+              "vector_rank": 5,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "fcb7514b-caa2-4327-8de2-8275a8f0a1a9",
+              "record_id": "api-embedding-profile",
+              "content": "Mixed Chinese and English retrieval uses BAAI/bge-m3 with 1024-dimensional embeddings for the vector condition.",
+              "score": 0.03055037313432836,
+              "lexical_rank": 4,
+              "vector_rank": 7,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "api-embedding-chinese",
+          "cohorts": [
+            "mixed_language",
+            "model_name",
+            "numeric_constraint"
+          ],
+          "duration": 109605500,
+          "results": [
+            {
+              "memory_id": "fcb7514b-caa2-4327-8de2-8275a8f0a1a9",
+              "record_id": "api-embedding-profile",
+              "content": "Mixed Chinese and English retrieval uses BAAI/bge-m3 with 1024-dimensional embeddings for the vector condition.",
+              "score": 0.01639344262295082,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "4437fba0-8cb5-4ab1-a5c1-a9ecd0392240",
+              "record_id": "api-confirm-on-conflict",
+              "content": "When cwd and repo root conflict, require_confirmation and do not bind a fallback workspace.",
+              "score": 0.016129032258064516,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "71b69a09-001e-459c-8f76-c2a4af995ca8",
+              "record_id": "api-context-limit",
+              "content": "A prepared context packet contains at most 12 governed memory items.",
+              "score": 0.015873015873015872,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "d6866c5c-e410-4d24-a5b1-8c8babc2bf2b",
+              "record_id": "api-route-flag-v3",
+              "content": "The current routing feature flag is workspace_route_v3.",
+              "score": 0.015625,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "api-resolver-path-exact",
+          "cohorts": [
+            "exact_identifier",
+            "path"
+          ],
+          "duration": 126942167,
+          "results": [
+            {
+              "memory_id": "20874bf2-e651-4113-b4ee-9b898e044847",
+              "record_id": "api-resolver-path",
+              "content": "The workspace resolver entrypoint is internal/resolver/resolver.go.",
+              "score": 0.03278688524590164,
+              "lexical_rank": 1,
+              "vector_rank": 1,
+              "exact": true,
+              "eligible": true
+            },
+            {
+              "memory_id": "d6866c5c-e410-4d24-a5b1-8c8babc2bf2b",
+              "record_id": "api-route-flag-v3",
+              "content": "The current routing feature flag is workspace_route_v3.",
+              "score": 0.016129032258064516,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "4437fba0-8cb5-4ab1-a5c1-a9ecd0392240",
+              "record_id": "api-confirm-on-conflict",
+              "content": "When cwd and repo root conflict, require_confirmation and do not bind a fallback workspace.",
+              "score": 0.015873015873015872,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "99f51013-bd4c-4d81-a758-3f922d6954b3",
+              "record_id": "api-confirm-endpoint",
+              "content": "Operators confirm a proposed memory through POST /v1/memories/confirm.",
+              "score": 0.015625,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "api-route-flag-exact",
+          "cohorts": [
+            "exact_identifier",
+            "feature_flag"
+          ],
+          "duration": 102113917,
+          "results": [
+            {
+              "memory_id": "d6866c5c-e410-4d24-a5b1-8c8babc2bf2b",
+              "record_id": "api-route-flag-v3",
+              "content": "The current routing feature flag is workspace_route_v3.",
+              "score": 0.03278688524590164,
+              "lexical_rank": 1,
+              "vector_rank": 1,
+              "exact": true,
+              "eligible": true
+            },
+            {
+              "memory_id": "20874bf2-e651-4113-b4ee-9b898e044847",
+              "record_id": "api-resolver-path",
+              "content": "The workspace resolver entrypoint is internal/resolver/resolver.go.",
+              "score": 0.016129032258064516,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "4437fba0-8cb5-4ab1-a5c1-a9ecd0392240",
+              "record_id": "api-confirm-on-conflict",
+              "content": "When cwd and repo root conflict, require_confirmation and do not bind a fallback workspace.",
+              "score": 0.015873015873015872,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "be08ce9b-d9cc-4c8f-8682-cf056149099c",
+              "record_id": "api-error-ambiguous",
+              "content": "E_SCOPE_AMBIGUOUS is returned when a workspace anchor has multiple safe candidates.",
+              "score": 0.015625,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "design-copy-action",
+          "cohorts": [
+            "chinese_semantic",
+            "semantic_paraphrase"
+          ],
+          "duration": 130133500,
+          "results": [
+            {
+              "memory_id": "41307871-2ecb-46e6-8d7d-80b6b3128c65",
+              "record_id": "design-mobile-rule",
+              "content": "The review flow must load and remain usable on both desktop and mobile widths.",
+              "score": 0.01639344262295082,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "64d8692f-f292-4cd7-be73-106f9daad970",
+              "record_id": "design-copy-rule",
+              "content": "User-facing copy leads with the next action and user outcome instead of internal state names.",
+              "score": 0.016129032258064516,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "d573ce2c-b679-4d10-8bec-febfc22ac820",
+              "record_id": "design-motion-rule",
+              "content": "Use one meaningful page-load reveal and avoid generic motion on every control.",
+              "score": 0.015873015873015872,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "c2125006-34bf-4f9d-9b03-e375851df736",
+              "record_id": "design-font-rule",
+              "content": "The interface uses a purposeful editorial type family rather than Inter or a default system stack.",
+              "score": 0.015625,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 0,
+            "recall_at_k": 1,
+            "mrr": 0.5,
+            "ndcg_at_k": 0.6309297535714574,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "design-multi-coder-isolation",
+          "cohorts": [
+            "continuity_isolation",
+            "semantic_paraphrase"
+          ],
+          "duration": 97530043,
+          "results": [
+            {
+              "memory_id": "32936f4d-641a-4f73-bc89-a1689dbdf122",
+              "record_id": "design-handoff-rule",
+              "content": "Codex and Grok share the same confirmed workspace continuity but never share another repository's memory.",
+              "score": 0.03278688524590164,
+              "lexical_rank": 1,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "41307871-2ecb-46e6-8d7d-80b6b3128c65",
+              "record_id": "design-mobile-rule",
+              "content": "The review flow must load and remain usable on both desktop and mobile widths.",
+              "score": 0.031754032258064516,
+              "lexical_rank": 2,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "d573ce2c-b679-4d10-8bec-febfc22ac820",
+              "record_id": "design-motion-rule",
+              "content": "Use one meaningful page-load reveal and avoid generic motion on every control.",
+              "score": 0.03149801587301587,
+              "lexical_rank": 4,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "64d8692f-f292-4cd7-be73-106f9daad970",
+              "record_id": "design-copy-rule",
+              "content": "User-facing copy leads with the next action and user outcome instead of internal state names.",
+              "score": 0.03125763125763126,
+              "lexical_rank": 3,
+              "vector_rank": 5,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "c2125006-34bf-4f9d-9b03-e375851df736",
+              "record_id": "design-font-rule",
+              "content": "The interface uses a purposeful editorial type family rather than Inter or a default system stack.",
+              "score": 0.016129032258064516,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "device-error-exact",
+          "cohorts": [
+            "error_code",
+            "exact_identifier"
+          ],
+          "duration": 95949125,
+          "results": [
+            {
+              "memory_id": "9c6c33fa-2994-48a2-b413-d33b7441cc7b",
+              "record_id": "device-error-bt-e104",
+              "content": "BT-E104 indicates that the pairing token expired before confirmation.",
+              "score": 0.03278688524590164,
+              "lexical_rank": 1,
+              "vector_rank": 1,
+              "exact": true,
+              "eligible": true
+            },
+            {
+              "memory_id": "0821ff06-c9cb-48c2-9415-bb45cba57a7a",
+              "record_id": "device-firmware-current",
+              "content": "The current hub firmware is 2.4.1.",
+              "score": 0.016129032258064516,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "2c18ea5f-ec46-484c-a86a-5b753852f257",
+              "record_id": "device-power-cycle",
+              "content": "Power-cycle the hub for 30 seconds before repeating Bluetooth pairing.",
+              "score": 0.015873015873015872,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "b03fd2ad-45fe-4454-8c36-442e1b0a5b18",
+              "record_id": "device-reset-button",
+              "content": "Hold the recessed reset button for 8 seconds only after exporting the device profile.",
+              "score": 0.015625,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "device-firmware-current",
+          "cohorts": [
+            "semantic_paraphrase",
+            "version"
+          ],
+          "duration": 100656624,
+          "results": [
+            {
+              "memory_id": "0821ff06-c9cb-48c2-9415-bb45cba57a7a",
+              "record_id": "device-firmware-current",
+              "content": "The current hub firmware is 2.4.1.",
+              "score": 0.03278688524590164,
+              "lexical_rank": 1,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "2c18ea5f-ec46-484c-a86a-5b753852f257",
+              "record_id": "device-power-cycle",
+              "content": "Power-cycle the hub for 30 seconds before repeating Bluetooth pairing.",
+              "score": 0.03225806451612903,
+              "lexical_rank": 2,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "479bb360-b14a-4662-99e2-c3fc7a4189ef",
+              "record_id": "device-profile-path",
+              "content": "The exported device profile is stored at ~/Documents/device-backups/hub-profile.json.",
+              "score": 0.015873015873015872,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "9c6c33fa-2994-48a2-b413-d33b7441cc7b",
+              "record_id": "device-error-bt-e104",
+              "content": "BT-E104 indicates that the pairing token expired before confirmation.",
+              "score": 0.015625,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "device-recovery-semantic",
+          "cohorts": [
+            "chinese_semantic",
+            "semantic_paraphrase"
+          ],
+          "duration": 100361334,
+          "results": [
+            {
+              "memory_id": "0affce18-53e7-4f31-b4ac-9b013bd1a5ee",
+              "record_id": "device-recovery-code-rotation",
+              "content": "After a recovery code is used successfully, rotate it immediately.",
+              "score": 0.01639344262295082,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "b03fd2ad-45fe-4454-8c36-442e1b0a5b18",
+              "record_id": "device-reset-button",
+              "content": "Hold the recessed reset button for 8 seconds only after exporting the device profile.",
+              "score": 0.016129032258064516,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "2c18ea5f-ec46-484c-a86a-5b753852f257",
+              "record_id": "device-power-cycle",
+              "content": "Power-cycle the hub for 30 seconds before repeating Bluetooth pairing.",
+              "score": 0.015873015873015872,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "9c6c33fa-2994-48a2-b413-d33b7441cc7b",
+              "record_id": "device-error-bt-e104",
+              "content": "BT-E104 indicates that the pairing token expired before confirmation.",
+              "score": 0.015625,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "device-safe-reset-multi",
+          "cohorts": [
+            "multi_fact",
+            "numeric_constraint",
+            "path"
+          ],
+          "duration": 94479167,
+          "results": [
+            {
+              "memory_id": "b03fd2ad-45fe-4454-8c36-442e1b0a5b18",
+              "record_id": "device-reset-button",
+              "content": "Hold the recessed reset button for 8 seconds only after exporting the device profile.",
+              "score": 0.03278688524590164,
+              "lexical_rank": 1,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "0821ff06-c9cb-48c2-9415-bb45cba57a7a",
+              "record_id": "device-firmware-current",
+              "content": "The current hub firmware is 2.4.1.",
+              "score": 0.03200204813108039,
+              "lexical_rank": 2,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "2c18ea5f-ec46-484c-a86a-5b753852f257",
+              "record_id": "device-power-cycle",
+              "content": "Power-cycle the hub for 30 seconds before repeating Bluetooth pairing.",
+              "score": 0.031754032258064516,
+              "lexical_rank": 4,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "479bb360-b14a-4662-99e2-c3fc7a4189ef",
+              "record_id": "device-profile-path",
+              "content": "The exported device profile is stored at ~/Documents/device-backups/hub-profile.json.",
+              "score": 0.03149801587301587,
+              "lexical_rank": 3,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "9c6c33fa-2994-48a2-b413-d33b7441cc7b",
+              "record_id": "device-error-bt-e104",
+              "content": "BT-E104 indicates that the pairing token expired before confirmation.",
+              "score": 0.030536130536130537,
+              "lexical_rank": 5,
+              "vector_rank": 6,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "0affce18-53e7-4f31-b4ac-9b013bd1a5ee",
+              "record_id": "device-recovery-code-rotation",
+              "content": "After a recovery code is used successfully, rotate it immediately.",
+              "score": 0.030536130536130537,
+              "lexical_rank": 6,
+              "vector_rank": 5,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 0.8772153153380494,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "housing-budget",
+          "cohorts": [
+            "chinese_semantic",
+            "numeric_constraint"
+          ],
+          "duration": 194765542,
+          "results": [
+            {
+              "memory_id": "ff92dd65-2183-48df-9ce3-551e5d92ab20",
+              "record_id": "housing-budget-6500",
+              "content": "The monthly housing budget ceiling is CNY 6500.",
+              "score": 0.01639344262295082,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "6b4976ab-6f31-42f6-aeef-c6390b07fcd6",
+              "record_id": "housing-commute-35",
+              "content": "The acceptable one-way commute is at most 35 minutes.",
+              "score": 0.016129032258064516,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "7157d562-3711-4e37-b2b1-ad21c9fa6923",
+              "record_id": "housing-no-basement",
+              "content": "Basement apartments and windowless rooms are excluded.",
+              "score": 0.015873015873015872,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "637865bc-a99f-4f02-ab0d-d4b939ba6d3e",
+              "record_id": "housing-move-date",
+              "content": "The target move-in date is 2026-09-01.",
+              "score": 0.015625,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "housing-commute",
+          "cohorts": [
+            "chinese_semantic",
+            "duration"
+          ],
+          "duration": 172280459,
+          "results": [
+            {
+              "memory_id": "6b4976ab-6f31-42f6-aeef-c6390b07fcd6",
+              "record_id": "housing-commute-35",
+              "content": "The acceptable one-way commute is at most 35 minutes.",
+              "score": 0.01639344262295082,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "637865bc-a99f-4f02-ab0d-d4b939ba6d3e",
+              "record_id": "housing-move-date",
+              "content": "The target move-in date is 2026-09-01.",
+              "score": 0.016129032258064516,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "7157d562-3711-4e37-b2b1-ad21c9fa6923",
+              "record_id": "housing-no-basement",
+              "content": "Basement apartments and windowless rooms are excluded.",
+              "score": 0.015873015873015872,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "ff92dd65-2183-48df-9ce3-551e5d92ab20",
+              "record_id": "housing-budget-6500",
+              "content": "The monthly housing budget ceiling is CNY 6500.",
+              "score": 0.015625,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "housing-move-constraints",
+          "cohorts": [
+            "date",
+            "multi_fact",
+            "semantic_paraphrase"
+          ],
+          "duration": 107969834,
+          "results": [
+            {
+              "memory_id": "637865bc-a99f-4f02-ab0d-d4b939ba6d3e",
+              "record_id": "housing-move-date",
+              "content": "The target move-in date is 2026-09-01.",
+              "score": 0.03252247488101534,
+              "lexical_rank": 1,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "7157d562-3711-4e37-b2b1-ad21c9fa6923",
+              "record_id": "housing-no-basement",
+              "content": "Basement apartments and windowless rooms are excluded.",
+              "score": 0.032266458495966696,
+              "lexical_rank": 3,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "56e4754f-741e-4816-b40d-ffc5896d80a0",
+              "record_id": "housing-area-pudong",
+              "content": "Preferred search areas are Zhangjiang and Jinqiao in Pudong.",
+              "score": 0.0315136476426799,
+              "lexical_rank": 2,
+              "vector_rank": 5,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "ff92dd65-2183-48df-9ce3-551e5d92ab20",
+              "record_id": "housing-budget-6500",
+              "content": "The monthly housing budget ceiling is CNY 6500.",
+              "score": 0.03125763125763126,
+              "lexical_rank": 5,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "6b4976ab-6f31-42f6-aeef-c6390b07fcd6",
+              "record_id": "housing-commute-35",
+              "content": "The acceptable one-way commute is at most 35 minutes.",
+              "score": 0.03125,
+              "lexical_rank": 4,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "release-attestation-error-exact",
+          "cohorts": [
+            "error_code",
+            "exact_identifier"
+          ],
+          "duration": 97920750,
+          "results": [
+            {
+              "memory_id": "bc1f2f14-2bd4-441f-b437-af57de6853a2",
+              "record_id": "release-error-attestation",
+              "content": "Error E_ATTESTATION_412 means the signed provenance statement is missing.",
+              "score": 0.03278688524590164,
+              "lexical_rank": 1,
+              "vector_rank": 1,
+              "exact": true,
+              "eligible": true
+            },
+            {
+              "memory_id": "3b8fd8f9-da3c-4c61-9ab0-b25ff4fbbde7",
+              "record_id": "release-timeout-800ms",
+              "content": "The release verification API timeout remains 800 ms.",
+              "score": 0.016129032258064516,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "35ac7bae-32e2-44e4-a34b-c376e65d2121",
+              "record_id": "release-attestation-slsa",
+              "content": "Production releases publish a signed SLSA provenance statement.",
+              "score": 0.015873015873015872,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "4d9845be-6a07-4ad4-939c-7c7da9bd0f19",
+              "record_id": "release-command-current",
+              "content": "Use pnpm exec release:verify --mode locked for the governed release check.",
+              "score": 0.015625,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "release-command-paraphrase",
+          "cohorts": [
+            "semantic_paraphrase",
+            "technical_command"
+          ],
+          "duration": 98421458,
+          "results": [
+            {
+              "memory_id": "4d9845be-6a07-4ad4-939c-7c7da9bd0f19",
+              "record_id": "release-command-current",
+              "content": "Use pnpm exec release:verify --mode locked for the governed release check.",
+              "score": 0.03278688524590164,
+              "lexical_rank": 1,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "3b8fd8f9-da3c-4c61-9ab0-b25ff4fbbde7",
+              "record_id": "release-timeout-800ms",
+              "content": "The release verification API timeout remains 800 ms.",
+              "score": 0.03225806451612903,
+              "lexical_rank": 2,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "599ad807-1a43-486a-a23e-5ecec971d26e",
+              "record_id": "release-cutoff-date",
+              "content": "The release-control migration cutoff is 2026-08-15.",
+              "score": 0.031746031746031744,
+              "lexical_rank": 3,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "9fd0a8e6-5041-429b-b28a-3ea10f3c6d2a",
+              "record_id": "release-log-path",
+              "content": "Release audit events are written to /var/log/vermory/release-control.log.",
+              "score": 0.03125,
+              "lexical_rank": 4,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "0ad33c28-cb99-4a20-bd55-6824991250bc",
+              "record_id": "release-signing-oidc",
+              "content": "Production release signing uses GitHub Actions OIDC keyless signing.",
+              "score": 0.030536130536130537,
+              "lexical_rank": 5,
+              "vector_rank": 6,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "53b73d65-a424-4737-94df-f7c3a804a6a8",
+              "record_id": "release-rollback-two-maintainers",
+              "content": "Rollback approval requires two maintainers.",
+              "score": 0.015384615384615385,
+              "vector_rank": 5,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "release-log-path-exact",
+          "cohorts": [
+            "exact_identifier",
+            "path"
+          ],
+          "duration": 101049167,
+          "results": [
+            {
+              "memory_id": "9fd0a8e6-5041-429b-b28a-3ea10f3c6d2a",
+              "record_id": "release-log-path",
+              "content": "Release audit events are written to /var/log/vermory/release-control.log.",
+              "score": 0.03278688524590164,
+              "lexical_rank": 1,
+              "vector_rank": 1,
+              "exact": true,
+              "eligible": true
+            },
+            {
+              "memory_id": "4d9845be-6a07-4ad4-939c-7c7da9bd0f19",
+              "record_id": "release-command-current",
+              "content": "Use pnpm exec release:verify --mode locked for the governed release check.",
+              "score": 0.016129032258064516,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "3b8fd8f9-da3c-4c61-9ab0-b25ff4fbbde7",
+              "record_id": "release-timeout-800ms",
+              "content": "The release verification API timeout remains 800 ms.",
+              "score": 0.015873015873015872,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "599ad807-1a43-486a-a23e-5ecec971d26e",
+              "record_id": "release-cutoff-date",
+              "content": "The release-control migration cutoff is 2026-08-15.",
+              "score": 0.015625,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "release-retry-numeric",
+          "cohorts": [
+            "numeric_constraint",
+            "semantic_paraphrase"
+          ],
+          "duration": 100344334,
+          "results": [
+            {
+              "memory_id": "b771ceb1-8063-42ca-a697-07051a53e606",
+              "record_id": "release-retry-five",
+              "content": "Production deployments retry at most 5 times.",
+              "score": 0.032266458495966696,
+              "lexical_rank": 3,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "ef3f327e-b779-4e46-a375-12e6f375e9fd",
+              "record_id": "release-region-us-east-1",
+              "content": "The primary production deployment region is us-east-1.",
+              "score": 0.032018442622950824,
+              "lexical_rank": 1,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "9fd0a8e6-5041-429b-b28a-3ea10f3c6d2a",
+              "record_id": "release-log-path",
+              "content": "Release audit events are written to /var/log/vermory/release-control.log.",
+              "score": 0.03128054740957967,
+              "lexical_rank": 2,
+              "vector_rank": 6,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "53b73d65-a424-4737-94df-f7c3a804a6a8",
+              "record_id": "release-rollback-two-maintainers",
+              "content": "Rollback approval requires two maintainers.",
+              "score": 0.016129032258064516,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "release-rollback-chinese",
+          "cohorts": [
+            "chinese_semantic",
+            "multi_fact"
+          ],
+          "duration": 108631333,
+          "results": [
+            {
+              "memory_id": "53b73d65-a424-4737-94df-f7c3a804a6a8",
+              "record_id": "release-rollback-two-maintainers",
+              "content": "Rollback approval requires two maintainers.",
+              "score": 0.01639344262295082,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "3b8fd8f9-da3c-4c61-9ab0-b25ff4fbbde7",
+              "record_id": "release-timeout-800ms",
+              "content": "The release verification API timeout remains 800 ms.",
+              "score": 0.016129032258064516,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "4d9845be-6a07-4ad4-939c-7c7da9bd0f19",
+              "record_id": "release-command-current",
+              "content": "Use pnpm exec release:verify --mode locked for the governed release check.",
+              "score": 0.015873015873015872,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "35ac7bae-32e2-44e4-a34b-c376e65d2121",
+              "record_id": "release-attestation-slsa",
+              "content": "Production releases publish a signed SLSA provenance statement.",
+              "score": 0.015625,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "bc1f2f14-2bd4-441f-b437-af57de6853a2",
+              "record_id": "release-error-attestation",
+              "content": "Error E_ATTESTATION_412 means the signed provenance statement is missing.",
+              "score": 0.015384615384615385,
+              "vector_rank": 5,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "b771ceb1-8063-42ca-a697-07051a53e606",
+              "record_id": "release-retry-five",
+              "content": "Production deployments retry at most 5 times.",
+              "score": 0.015151515151515152,
+              "vector_rank": 6,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 0.8772153153380494,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "release-signing-mixed",
+          "cohorts": [
+            "mixed_language",
+            "multi_fact"
+          ],
+          "duration": 99943666,
+          "results": [
+            {
+              "memory_id": "0ad33c28-cb99-4a20-bd55-6824991250bc",
+              "record_id": "release-signing-oidc",
+              "content": "Production release signing uses GitHub Actions OIDC keyless signing.",
+              "score": 0.03278688524590164,
+              "lexical_rank": 1,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "ef3f327e-b779-4e46-a375-12e6f375e9fd",
+              "record_id": "release-region-us-east-1",
+              "content": "The primary production deployment region is us-east-1.",
+              "score": 0.03225806451612903,
+              "lexical_rank": 2,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "35ac7bae-32e2-44e4-a34b-c376e65d2121",
+              "record_id": "release-attestation-slsa",
+              "content": "Production releases publish a signed SLSA provenance statement.",
+              "score": 0.03149801587301587,
+              "lexical_rank": 4,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "b771ceb1-8063-42ca-a697-07051a53e606",
+              "record_id": "release-retry-five",
+              "content": "Production deployments retry at most 5 times.",
+              "score": 0.030798389007344232,
+              "lexical_rank": 3,
+              "vector_rank": 7,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "bc1f2f14-2bd4-441f-b437-af57de6853a2",
+              "record_id": "release-error-attestation",
+              "content": "Error E_ATTESTATION_412 means the signed provenance statement is missing.",
+              "score": 0.015625,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "3b8fd8f9-da3c-4c61-9ab0-b25ff4fbbde7",
+              "record_id": "release-timeout-800ms",
+              "content": "The release verification API timeout remains 800 ms.",
+              "score": 0.015384615384615385,
+              "vector_rank": 5,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "research-citation-deadline",
+          "cohorts": [
+            "chinese_semantic",
+            "date",
+            "multi_fact"
+          ],
+          "duration": 112166042,
+          "results": [
+            {
+              "memory_id": "278e430e-cd0e-42cb-b75b-0cf7d235b27c",
+              "record_id": "research-deadline",
+              "content": "The complete thesis draft is due on 2026-09-30.",
+              "score": 0.01639344262295082,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "4a1b5242-5ba7-4cbb-9f6d-8c755c068af9",
+              "record_id": "research-citation-standard",
+              "content": "Chinese references use the GB/T 7714-2015 numeric citation style.",
+              "score": 0.016129032258064516,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "8b232eb8-c23f-4c5d-98da-59bdb1b5ad73",
+              "record_id": "research-dataset-current",
+              "content": "The cleaned interview dataset is /data/thesis/interviews-v2.csv.",
+              "score": 0.015873015873015872,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "38e2be07-c003-4df2-9b4c-3eae22ba31c6",
+              "record_id": "research-coding-model",
+              "content": "Repository analysis is replayed with grok-4.5 and official Codex when account capacity is available.",
+              "score": 0.015625,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "1d5d2132-6ae8-4227-93a8-bd074e4fc6ad",
+              "record_id": "research-topic",
+              "content": "The thesis studies continuity failures in long-running AI coding workflows.",
+              "score": 0.015384615384615385,
+              "vector_rank": 5,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "97b7f147-ef43-46eb-9a57-0b773b9eec32",
+              "record_id": "research-method",
+              "content": "The study compares no context, full history, lexical retrieval, vector retrieval, and governed hybrid packets.",
+              "score": 0.015151515151515152,
+              "vector_rank": 6,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "research-dataset-path",
+          "cohorts": [
+            "path",
+            "semantic_paraphrase"
+          ],
+          "duration": 126873167,
+          "results": [
+            {
+              "memory_id": "8b232eb8-c23f-4c5d-98da-59bdb1b5ad73",
+              "record_id": "research-dataset-current",
+              "content": "The cleaned interview dataset is /data/thesis/interviews-v2.csv.",
+              "score": 0.03278688524590164,
+              "lexical_rank": 1,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "97b7f147-ef43-46eb-9a57-0b773b9eec32",
+              "record_id": "research-method",
+              "content": "The study compares no context, full history, lexical retrieval, vector retrieval, and governed hybrid packets.",
+              "score": 0.016129032258064516,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "38e2be07-c003-4df2-9b4c-3eae22ba31c6",
+              "record_id": "research-coding-model",
+              "content": "Repository analysis is replayed with grok-4.5 and official Codex when account capacity is available.",
+              "score": 0.015873015873015872,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "278e430e-cd0e-42cb-b75b-0cf7d235b27c",
+              "record_id": "research-deadline",
+              "content": "The complete thesis draft is due on 2026-09-30.",
+              "score": 0.015625,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 1,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        },
+        {
+          "query_id": "research-method-semantic",
+          "cohorts": [
+            "multi_fact",
+            "semantic_paraphrase"
+          ],
+          "duration": 111314332,
+          "results": [
+            {
+              "memory_id": "1d5d2132-6ae8-4227-93a8-bd074e4fc6ad",
+              "record_id": "research-topic",
+              "content": "The thesis studies continuity failures in long-running AI coding workflows.",
+              "score": 0.03278688524590164,
+              "lexical_rank": 1,
+              "vector_rank": 1,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "278e430e-cd0e-42cb-b75b-0cf7d235b27c",
+              "record_id": "research-deadline",
+              "content": "The complete thesis draft is due on 2026-09-30.",
+              "score": 0.03225806451612903,
+              "lexical_rank": 2,
+              "vector_rank": 2,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "8b232eb8-c23f-4c5d-98da-59bdb1b5ad73",
+              "record_id": "research-dataset-current",
+              "content": "The cleaned interview dataset is /data/thesis/interviews-v2.csv.",
+              "score": 0.031746031746031744,
+              "lexical_rank": 3,
+              "vector_rank": 3,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "97b7f147-ef43-46eb-9a57-0b773b9eec32",
+              "record_id": "research-method",
+              "content": "The study compares no context, full history, lexical retrieval, vector retrieval, and governed hybrid packets.",
+              "score": 0.03125,
+              "lexical_rank": 4,
+              "vector_rank": 4,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "4a1b5242-5ba7-4cbb-9f6d-8c755c068af9",
+              "record_id": "research-citation-standard",
+              "content": "Chinese references use the GB/T 7714-2015 numeric citation style.",
+              "score": 0.030536130536130537,
+              "lexical_rank": 5,
+              "vector_rank": 6,
+              "exact": false,
+              "eligible": true
+            },
+            {
+              "memory_id": "38e2be07-c003-4df2-9b4c-3eae22ba31c6",
+              "record_id": "research-coding-model",
+              "content": "Repository analysis is replayed with grok-4.5 and official Codex when account capacity is available.",
+              "score": 0.015384615384615385,
+              "vector_rank": 5,
+              "exact": false,
+              "eligible": true
+            }
+          ],
+          "metrics": {
+            "hit_at_1": 1,
+            "recall_at_k": 1,
+            "mrr": 1,
+            "ndcg_at_k": 0.8772153153380494,
+            "forbidden_count": 0,
+            "ineligible_count": 0
+          },
+          "degraded_to_lexical": false
+        }
+      ],
+      "metrics": {
+        "query_count": 24,
+        "hit_at_1": 0.9583333333333334,
+        "recall_at_k": 1,
+        "mrr": 0.9791666666666666,
+        "ndcg_at_k": 0.9622554303820511,
+        "forbidden_count": 0,
+        "ineligible_count": 0,
+        "search_p50": 101198583,
+        "search_p95": 130133500
+      },
+      "cohorts": {
+        "api_path": {
+          "query_count": 1,
+          "hit_at_1": 1,
+          "recall_at_k": 1,
+          "mrr": 1,
+          "ndcg_at_k": 1,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 97461375,
+          "search_p95": 97461375
+        },
+        "chinese_semantic": {
+          "query_count": 7,
+          "hit_at_1": 0.8571428571428571,
+          "recall_at_k": 1,
+          "mrr": 0.9285714285714286,
+          "ndcg_at_k": 0.9056713854990185,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 112166042,
+          "search_p95": 172280459
+        },
+        "continuity_isolation": {
+          "query_count": 1,
+          "hit_at_1": 1,
+          "recall_at_k": 1,
+          "mrr": 1,
+          "ndcg_at_k": 1,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 97530043,
+          "search_p95": 97530043
+        },
+        "date": {
+          "query_count": 2,
+          "hit_at_1": 1,
+          "recall_at_k": 1,
+          "mrr": 1,
+          "ndcg_at_k": 1,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 107969834,
+          "search_p95": 107969834
+        },
+        "duration": {
+          "query_count": 1,
+          "hit_at_1": 1,
+          "recall_at_k": 1,
+          "mrr": 1,
+          "ndcg_at_k": 1,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 172280459,
+          "search_p95": 172280459
+        },
+        "error_code": {
+          "query_count": 2,
+          "hit_at_1": 1,
+          "recall_at_k": 1,
+          "mrr": 1,
+          "ndcg_at_k": 1,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 95949125,
+          "search_p95": 95949125
+        },
+        "exact_identifier": {
+          "query_count": 5,
+          "hit_at_1": 1,
+          "recall_at_k": 1,
+          "mrr": 1,
+          "ndcg_at_k": 1,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 101049167,
+          "search_p95": 102113917
+        },
+        "feature_flag": {
+          "query_count": 1,
+          "hit_at_1": 1,
+          "recall_at_k": 1,
+          "mrr": 1,
+          "ndcg_at_k": 1,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 102113917,
+          "search_p95": 102113917
+        },
+        "mixed_language": {
+          "query_count": 2,
+          "hit_at_1": 1,
+          "recall_at_k": 1,
+          "mrr": 1,
+          "ndcg_at_k": 1,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 99943666,
+          "search_p95": 99943666
+        },
+        "model_name": {
+          "query_count": 1,
+          "hit_at_1": 1,
+          "recall_at_k": 1,
+          "mrr": 1,
+          "ndcg_at_k": 1,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 109605500,
+          "search_p95": 109605500
+        },
+        "multi_fact": {
+          "query_count": 8,
+          "hit_at_1": 1,
+          "recall_at_k": 1,
+          "mrr": 1,
+          "ndcg_at_k": 0.9329000719497214,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 103043041,
+          "search_p95": 111314332
+        },
+        "numeric_constraint": {
+          "query_count": 5,
+          "hit_at_1": 1,
+          "recall_at_k": 1,
+          "mrr": 1,
+          "ndcg_at_k": 0.9754430630676099,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 103043041,
+          "search_p95": 109605500
+        },
+        "path": {
+          "query_count": 4,
+          "hit_at_1": 1,
+          "recall_at_k": 1,
+          "mrr": 1,
+          "ndcg_at_k": 0.9693038288345124,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 101049167,
+          "search_p95": 126873167
+        },
+        "semantic_paraphrase": {
+          "query_count": 10,
+          "hit_at_1": 0.9,
+          "recall_at_k": 1,
+          "mrr": 0.95,
+          "ndcg_at_k": 0.9508145068909506,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 100361334,
+          "search_p95": 126873167
+        },
+        "technical_command": {
+          "query_count": 1,
+          "hit_at_1": 1,
+          "recall_at_k": 1,
+          "mrr": 1,
+          "ndcg_at_k": 1,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 98421458,
+          "search_p95": 98421458
+        },
+        "version": {
+          "query_count": 1,
+          "hit_at_1": 1,
+          "recall_at_k": 1,
+          "mrr": 1,
+          "ndcg_at_k": 1,
+          "forbidden_count": 0,
+          "ineligible_count": 0,
+          "search_p50": 100656624,
+          "search_p95": 100656624
+        }
+      }
+    }
+  ],
+  "hard_gates": {
+    "pass": true,
+    "forbidden_count": 0,
+    "ineligible_count": 0
+  },
+  "projection_rebuild_equivalent": true,
+  "qualification_status": "measured",
+  "non_claims": [
+    "not a production default switch",
+    "not a scale qualification",
+    "not a sealed result",
+    "not a source-authority ranking result"
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "run_id": "w11-projection-outbox-fault-profile-20260715-v1",
+  "implementation_revision": "9dcfa8599b456d5ae1f419553061bb14fdca1580",
+  "case_sha256": "c2922e1ce832d74435b8aefffa0bd32bfc740108d6f2dbf50c768549e2400366",
+  "raw_log_sha256": "ffdb9fd0701467abe36fb71ab3fa24455d963bc2789629176c2fbb78688a44a8",
+  "environment": {
+    "os": "Darwin 27.0.0 arm64",
+    "cpu": "Apple M4 Pro",
+    "memory_bytes": 51539607552,
+    "go": "go1.26.5 darwin/arm64",
+    "postgresql": "18.4",
+    "pgvector": "0.8.5",
+    "embedding_route": "direct SiliconFlow",
+    "embedding_model": "BAAI/bge-m3"
+  },
+  "profile": {
+    "records": 1000,
+    "initial_backlog": 1000,
+    "worker_batch_size": 128,
+    "first_batch_processed": 128,
+    "duplicate_replay_vector_count": 1000,
+    "real_provider_requests": 2,
+    "duration_seconds": 5.92
+  },
+  "hard_gates": {
+    "pass": true,
+    "provider_failure_cursor_unchanged": true,
+    "postgres_restart_during_embedding": true,
+    "partial_vector_after_restart_failure": 0,
+    "same_pool_recovered": true,
+    "concurrent_delete_won": true,
+    "deleted_vector_after_retry": 0,
+    "final_lag": 0,
+    "real_provider_projection_and_retrieval": true
+  },
+  "non_claims": [
+    "not a 100k active memory qualification",
+    "not a 1M projection qualification",
+    "not an HA or PITR claim",
+    "not a sustained multi-worker throughput SLO"
+  ]
+}

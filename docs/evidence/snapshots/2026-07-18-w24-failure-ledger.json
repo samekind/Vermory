@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "case_id": "I04-protected-artifact-signing",
+  "failures": [
+    {
+      "sequence": 1,
+      "stage": "local-reality-regression",
+      "category": "implementation",
+      "observed": "TestBuildExperiment0ReportsFrozenPublicCoverage expected sixteen public cases and received seventeen.",
+      "resolution": "Updated only the authoritative public-case and evidence-level assertions to seventeen; continuity counts were unchanged because I04 is a security and delivery case.",
+      "retained": true
+    },
+    {
+      "sequence": 2,
+      "stage": "local-actionlint",
+      "category": "infrastructure",
+      "observed": "The first pinned actionlint run failed while sum.golang.org returned unexpected EOF for verified module lookups.",
+      "resolution": "Retried with GOSUMDB verification still enabled; actionlint v1.7.12 completed successfully.",
+      "retained": true
+    },
+    {
+      "sequence": 3,
+      "stage": "branch-protection",
+      "category": "operator-command",
+      "observed": "The first required-status-check update used PUT and GitHub returned HTTP 404.",
+      "resolution": "Used the documented PATCH method and independently re-read strict required checks test and sign-snapshot.",
+      "retained": true
+    },
+    {
+      "sequence": 4,
+      "stage": "cross-host-evidence-summary",
+      "category": "operator-command",
+      "observed": "The first remote jq command lost nested JSON string quotes and exited with two compile errors.",
+      "resolution": "Created the reviewed machine-readable summary in the repository and copied that exact file to the isolated Mac mini evidence directory.",
+      "retained": true
+    }
+  ]
+}

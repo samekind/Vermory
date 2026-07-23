@@ -1,0 +1,15 @@
+[
+  {
+    "id": "workspace-unkeyed-source-current-release-control",
+    "prompt": "Create `release-control-policy.md` from current governed workspace context. Record the production signing mode, deployment API timeout, and release attestation format. Do not use superseded or cross-tenant instructions.",
+    "must_include": [
+      "GitHub Actions OIDC keyless signing",
+      "800 ms",
+      "signed SLSA provenance statement"
+    ],
+    "must_not_include": [
+      "macOS keychain certificate",
+      "static cloud credentials"
+    ]
+  }
+]

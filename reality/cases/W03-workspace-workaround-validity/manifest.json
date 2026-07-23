@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "id": "W03-workspace-workaround-validity",
+  "title": "A temporary repository workaround expires while durable engineering constraints remain",
+  "evidence_level": "public",
+  "continuity_lines": ["workspace", "security"],
+  "pressures": ["temporal_validity", "exact_boundary", "cross_client_continuity", "archive_not_current", "explicit_forgetting", "secret_redaction"],
+  "sources": [
+    {
+      "id": "w03-workspace",
+      "kind": "synthetic_authorized_workspace_trajectory",
+      "fixture_path": "fixtures/workspace-workaround.md",
+      "original_ref": "synthetic:workspace-workaround-validity-v1",
+      "original_revision": "1",
+      "sha256": "b797a42d9c34687cc61773683dcaf0c6e9c1b1d04109c961d273fbb291dd60c7",
+      "authorized": true,
+      "anonymization": "The repository, command, workaround, and secret are fully synthetic and contain no real host, path, credential, or customer data."
+    }
+  ],
+  "anchors": [
+    {
+      "kind": "workspace_id",
+      "value": "synthetic-workspace-workaround",
+      "ambiguous": false
+    }
+  ],
+  "expectations": {
+    "current_facts": [
+      "The durable verification command is go test -p 1 -count=1 ./....",
+      ".env files and secret-bearing local configuration must never be committed.",
+      "The cache-disable workaround is expired at 2026-07-20T18:00:00+08:00.",
+      "The synthetic temporary secret has been forgotten."
+    ],
+    "forbidden_facts": [
+      "VERMORY_CACHE_DISABLED=1 remains a current workaround at or after the boundary.",
+      "The forgotten synthetic temporary secret is TEMP-NEBULA-5521.",
+      "Archiving a workaround makes it eligible for current delivery.",
+      "A different coding client should receive different current workspace memory."
+    ],
+    "expected_action": "At the exact boundary, use the durable verification and security constraints, omit the expired workaround and forgotten secret, and preserve the same eligible state across coding clients."
+  },
+  "task": {
+    "prompt": "Prepare the workspace at the exact workaround boundary. State the current verification and security constraints without stale or forgotten content.",
+    "artifact_checks": ["durable test command present", "security constraint present", "expired workaround absent", "forgotten secret absent"],
+    "deterministic_checks": ["contains:go test -p 1 -count=1 ./...", "contains:.env", "not_contains:VERMORY_CACHE_DISABLED=1", "not_contains:TEMP-NEBULA-5521"]
+  }
+}

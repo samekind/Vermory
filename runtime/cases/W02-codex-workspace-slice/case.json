@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "id": "W02-codex-workspace-slice",
+  "title": "Workspace current-fact correction and deletion",
+  "evidence_level": "public",
+  "classification": "synthetic_acceptance_fixture",
+  "fixture": "seed.sql",
+  "current_fact": "Use checkout_eta_v2 for the staged checkout release.",
+  "stale_fact": "Use checkout_eta_v1 for the staged checkout release.",
+  "distractor_fact": "Run ops_exception_queue_refresh before handling incidents.",
+  "correction_fact": "Use checkout_eta_v3 for the staged checkout release.",
+  "deletion_probe": "checkout_eta_v3",
+  "paraphrase_probe": "Which checkout flag should the staged release use?"
+}

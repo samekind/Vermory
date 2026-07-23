@@ -1,0 +1,72 @@
+{
+  "version": 1,
+  "id": "B02-linked-conversations-workspace-rebind",
+  "title": "Governed cross-channel matter link with reversible workspace path migration",
+  "evidence_level": "public",
+  "continuity_lines": ["conversation", "workspace", "bridge"],
+  "pressures": ["cross_channel_link", "raw_history_isolation", "unrelated_thread_isolation", "link_reversal", "workspace_rebind", "rebind_reversal"],
+  "sources": [
+    {
+      "id": "b02-channels",
+      "kind": "authorized_transcript_excerpt",
+      "fixture_path": "fixtures/thesis-channels.md",
+      "original_ref": "authorized-synthetic:thesis-submission-channels",
+      "original_revision": "2026-07-14",
+      "sha256": "d0b05f0d33d1666b17cb386df08d82511b0c981db3b707d6ec7e5c77f85ee74e",
+      "authorized": true,
+      "anonymization": "Synthetic deadlines, channels, and formatting rules preserve cross-channel continuity pressure."
+    },
+    {
+      "id": "b02-workspace",
+      "kind": "repository_state_excerpt",
+      "fixture_path": "fixtures/workspace-move.md",
+      "original_ref": "authorized-synthetic:thesis-workspace-move",
+      "original_revision": "2026-07-14",
+      "sha256": "a8f5491689c1b77e531df6f28a4d204c2b9cef43c3cf1a3dcd7c64d37c9f3122",
+      "authorized": true,
+      "anonymization": "Only synthetic paths and build facts are retained."
+    }
+  ],
+  "anchors": [
+    {
+      "kind": "conversation_id",
+      "value": "openclaw_dm/thesis-submission",
+      "ambiguous": false
+    },
+    {
+      "kind": "conversation_id",
+      "value": "web_chat/thesis-submission",
+      "ambiguous": false
+    },
+    {
+      "kind": "conversation_id",
+      "value": "web_chat/literature-plan",
+      "ambiguous": false
+    },
+    {
+      "kind": "workspace_path",
+      "value": "/fixtures/thesis-old -> /fixtures/thesis-new",
+      "ambiguous": false
+    }
+  ],
+  "expectations": {
+    "current_facts": [
+      "The thesis submission package is due on 18 July at 17:00.",
+      "References use GB/T 7714-2015 numeric style.",
+      "Linked channels share governed active memory but retain local raw history.",
+      "Rebind preserves the workspace continuity ID and governed build fact."
+    ],
+    "forbidden_facts": [
+      "The unrelated literature-plan thread joins the submission matter.",
+      "Link copies all raw turns between channels.",
+      "Reversing link deletes either source continuity.",
+      "Rebind creates a new empty workspace continuity."
+    ],
+    "expected_action": "Link the two named submission anchors, prove bounded governed-memory sharing, reverse the link, then rebind and reverse the exact workspace path."
+  },
+  "task": {
+    "prompt": "Continue the thesis submission matter across the two approved channels while preserving unrelated-thread and raw-history boundaries, then verify workspace continuity through path migration and rollback.",
+    "artifact_checks": ["delivery ledger distinguishes linked governed memory from anchor-local recent history"],
+    "deterministic_checks": ["contains:18 July at 17:00", "contains:GB/T 7714-2015", "not_contains:literature-reading plan", "link_reversal:isolated", "rebind:continuity_preserved"]
+  }
+}

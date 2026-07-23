@@ -1,0 +1,117 @@
+{
+  "schema_version": "longmemeval-s-full-retrieval-evidence/v1",
+  "run_id": "longmemeval-s-full-retrieval-20260715-v1",
+  "implementation_revision": "0f59bf58d9a107ce47f79ba86fd61a7c35c8324b",
+  "source": {
+    "dataset_sha256": "d6f21ea9d60a0d56f34a05b609c79c88a451d2ae03597821ea3d5a9678c3a442",
+    "record_set_sha256": "f038965c54b03632f86a59104dd77848b66e3f80c08d5fbabdd3984d16457811",
+    "record_count": 500,
+    "scored_record_count": 470,
+    "abstention_record_count": 30,
+    "session_count": 23867,
+    "turn_count": 246750
+  },
+  "execution": {
+    "clean_run_seconds": 156.3,
+    "clean_run_max_rss_bytes": 46088192,
+    "resume_seconds": 5.03,
+    "resume_max_rss_bytes": 39272448,
+    "database_size_bytes": 824350399,
+    "conversation_continuities": 500,
+    "observations": 23867,
+    "distinct_operation_ids": 23867,
+    "governed_memories": 23867,
+    "active_memories": 23867,
+    "lexical_projection_rows": 23867,
+    "runtime_failures": 0
+  },
+  "aggregates": {
+    "plain_token_overlap": {
+      "at_5": {"recall_any": 0.9064, "recall_all": 0.7234, "ndcg_any": 0.769, "mrr": 0.8063},
+      "at_10": {"recall_any": 0.9489, "recall_all": 0.8383, "ndcg_any": 0.7983, "mrr": 0.8119},
+      "at_12": {"recall_any": 0.9596, "recall_all": 0.866, "ndcg_any": 0.8036, "mrr": 0.8128}
+    },
+    "vermory_lexical": {
+      "at_5": {"recall_any": 0.8234, "recall_all": 0.6, "ndcg_any": 0.6529, "mrr": 0.6871},
+      "at_10": {"recall_any": 0.9021, "recall_all": 0.734, "ndcg_any": 0.6918, "mrr": 0.6974},
+      "at_12": {"recall_any": 0.9213, "recall_all": 0.7638, "ndcg_any": 0.7005, "mrr": 0.6991}
+    }
+  },
+  "question_type_at_10": {
+    "knowledge-update": {
+      "count": 72,
+      "plain_token_overlap": {"recall_any": 0.9861, "recall_all": 0.9583, "ndcg_any": 0.9048, "mrr": 0.9439},
+      "vermory_lexical": {"recall_any": 0.9861, "recall_all": 0.8889, "ndcg_any": 0.829, "mrr": 0.8604}
+    },
+    "multi-session": {
+      "count": 121,
+      "plain_token_overlap": {"recall_any": 0.9752, "recall_all": 0.7438, "ndcg_any": 0.7678, "mrr": 0.8659},
+      "vermory_lexical": {"recall_any": 0.9421, "recall_all": 0.562, "ndcg_any": 0.6318, "mrr": 0.7111}
+    },
+    "single-session-assistant": {
+      "count": 56,
+      "plain_token_overlap": {"recall_any": 0.9643, "recall_all": 0.9643, "ndcg_any": 0.8719, "mrr": 0.7899},
+      "vermory_lexical": {"recall_any": 0.7321, "recall_all": 0.7321, "ndcg_any": 0.6698, "mrr": 0.6201}
+    },
+    "single-session-preference": {
+      "count": 30,
+      "plain_token_overlap": {"recall_any": 0.6333, "recall_all": 0.6333, "ndcg_any": 0.403, "mrr": 0.2801},
+      "vermory_lexical": {"recall_any": 0.6333, "recall_all": 0.6333, "ndcg_any": 0.4401, "mrr": 0.3135}
+    },
+    "single-session-user": {
+      "count": 64,
+      "plain_token_overlap": {"recall_any": 0.9844, "recall_all": 0.9844, "ndcg_any": 0.9196, "mrr": 0.8492},
+      "vermory_lexical": {"recall_any": 0.9375, "recall_all": 0.9375, "ndcg_any": 0.8084, "mrr": 0.674}
+    },
+    "temporal-reasoning": {
+      "count": 127,
+      "plain_token_overlap": {"recall_any": 0.9528, "recall_all": 0.7795, "ndcg_any": 0.7666, "mrr": 0.8021},
+      "vermory_lexical": {"recall_any": 0.937, "recall_all": 0.7323, "ndcg_any": 0.6817, "mrr": 0.7285}
+    }
+  },
+  "classification_counts_at_12": {
+    "plain_token_overlap": {
+      "abstention_unscored": 30,
+      "all_evidence_retrieved": 407,
+      "partial_evidence_retrieved": 44,
+      "no_evidence_retrieved": 19
+    },
+    "vermory_lexical": {
+      "abstention_unscored": 30,
+      "all_evidence_retrieved": 359,
+      "partial_evidence_retrieved": 74,
+      "no_evidence_retrieved": 37
+    }
+  },
+  "retained_sample_attribution": {
+    "0a995998": {
+      "finding": "The previous multi-session counting failure is downstream of retrieval.",
+      "vermory_ranked_answer_sessions": [
+        {"session_id": "answer_afa9873b_3", "rank": 1},
+        {"session_id": "answer_afa9873b_1", "rank": 2},
+        {"session_id": "answer_afa9873b_2", "rank": 3}
+      ],
+      "vermory_recall_all_at_5": 1.0
+    },
+    "6a1eabeb": {
+      "finding": "Both update sessions are available by K10, but the older and newer source facts remain separate governed sessions.",
+      "vermory_ranked_answer_sessions": [
+        {"session_id": "answer_a25d4a91_2", "rank": 1},
+        {"session_id": "answer_a25d4a91_1", "rank": 6}
+      ],
+      "vermory_recall_all_at_5": 0.0,
+      "vermory_recall_all_at_10": 1.0
+    }
+  },
+  "raw_artifact_sha256": {
+    "scores.json": "2fd109eb7a4cc991eae2ee546a185b85bf734d1b1ddd0e4621f5210ce8ae81bb",
+    "failure-ledger.json": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+    "retrieval-results.jsonl": "a4caa0a6b2b30975bcab97791b19fa0e0a32d81c58128b00df4c47c8783227ad",
+    "report.json": "4a7966d5d6646fa0b083d46190952662bae303c2a07d47d734b3f39f288cbcfe",
+    "report.md": "b4dfc702951879b44f9f6da6aeea39d9a622b725f7aac051bee6e7448f6bdbd9",
+    "execution-manifest.json": "a37a9e8ace521fd0ff0f544c5096f30b93a06f9883d2a960f14930a17a798ef6",
+    "source.json": "794bbf54c9fa062d21f866e38b217f30371b19b91cd5ed84728249e0fb2ce1d3",
+    "clean-run.log": "e0ddfe2bf0b4d47f82f0eb3c2bc6d9675ea4db49ffbf8da91d5fe2472bd81b4e",
+    "final-resume.log": "f8fe8bd38aa212d1720aab902fd6277b56a90bc10a2b681a9b9ced66c1c4d1d0"
+  }
+}

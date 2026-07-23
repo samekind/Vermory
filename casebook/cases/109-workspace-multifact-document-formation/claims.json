@@ -1,0 +1,18 @@
+[
+  {
+    "type": "constraint",
+    "content": "Production deploys to us-east-1."
+  },
+  {
+    "type": "constraint",
+    "content": "Production deployments retry at most 5 times."
+  },
+  {
+    "type": "constraint",
+    "content": "Rollback approval requires two maintainers."
+  },
+  {
+    "type": "constraint",
+    "content": "Production releases publish a signed SLSA provenance statement."
+  }
+]

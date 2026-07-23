@@ -5,6 +5,8 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+
+	"vermory/internal/provider"
 )
 
 func TestEvalSelfCaseMockWritesPlatformRunArtifacts(t *testing.T) {
@@ -31,5 +33,18 @@ func TestEvalSelfCaseMockWritesPlatformRunArtifacts(t *testing.T) {
 	}
 	if _, err := os.Stat(filepath.Join(root, "platform-runs", "eval-test", "contextmesh_packet", "packet.md")); err != nil {
 		t.Fatalf("expected contextmesh packet artifact: %v", err)
+	}
+}
+
+func TestBuildProviderSelectsLocallyAuthenticatedGrokCLI(t *testing.T) {
+	llm, mode, name, model, err := buildProvider(EvalSelfCaseOptions{Provider: "grok-cli"})
+	if err != nil {
+		t.Fatalf("buildProvider returned error: %v", err)
+	}
+	if _, ok := llm.(*provider.GrokCLI); !ok {
+		t.Fatalf("expected GrokCLI provider, got %T", llm)
+	}
+	if mode != "real" || name != "grok-cli" || model != "grok-4.5" {
+		t.Fatalf("unexpected Grok provider identity: mode=%q name=%q model=%q", mode, name, model)
 	}
 }

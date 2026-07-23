@@ -12,6 +12,9 @@ func TestResolveWorkspacePrefersExplicitBinding(t *testing.T) {
 		ExplicitBindingID:  "workspace:contextmesh",
 		CandidateRepoRoot:  "/repo/contextmesh",
 		KnownWorkspaceName: "ContextMesh",
+		Candidates: []WorkspaceCandidate{
+			{ID: "workspace:contextmesh", Path: "/repo/contextmesh"},
+		},
 	})
 
 	if result.Status != ResolutionResolved {
@@ -42,6 +45,16 @@ func TestResolveWorkspaceRequiresConfirmationForAmbiguousParent(t *testing.T) {
 	}
 	if len(result.Candidates) != 2 {
 		t.Fatalf("expected two candidates, got %d", len(result.Candidates))
+	}
+}
+
+func TestResolveWorkspaceDoesNotDeriveIdentityFromRepositoryBasename(t *testing.T) {
+	result := ResolveWorkspace(WorkspaceInput{CandidateRepoRoot: "/archive/Vermory"})
+	if result.Status != ResolutionNeedsConfirmation {
+		t.Fatalf("basename-derived workspace identity was accepted: %#v", result)
+	}
+	if result.SpaceID != "" {
+		t.Fatalf("unbound workspace received a guessed space id: %#v", result)
 	}
 }
 

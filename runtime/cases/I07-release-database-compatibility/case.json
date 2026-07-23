@@ -1,0 +1,19 @@
+{
+  "version": "1",
+  "id": "I07-release-database-compatibility",
+  "hard_gate_count": 12,
+  "hard_gates": [
+    "the binary reports one deterministic inclusive PostgreSQL schema support interval",
+    "the current supported schema returns compatible through admin and restricted runtime inspection",
+    "an older schema returns migration_required and serve refuses to listen",
+    "a synthetic future schema returns binary_too_old and serve refuses to listen",
+    "an unreadable schema version fails closed before provider construction or application writes",
+    "the restricted runtime role can execute only the bounded schema-version inspection function",
+    "the restricted runtime role cannot read or mutate goose_db_version",
+    "database compatibility emits stable JSON without a database URL or credential",
+    "database migrate remains an explicit admin operation",
+    "package and systemd lifecycle scripts never run database migrations",
+    "binary-only rollback is allowed only inside the older binary schema support interval",
+    "schema-incompatible rollback is documented as PostgreSQL backup or PITR recovery"
+  ]
+}

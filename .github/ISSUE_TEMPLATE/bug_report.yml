@@ -1,0 +1,79 @@
+name: Reproducible defect
+description: Report a public, reproducible Vermory defect with synthetic or authorized data.
+title: "[Bug]: "
+labels:
+  - bug
+  - needs-triage
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not use this form for credential exposure, cross-tenant leakage with real data, or another vulnerability whose public reproduction creates risk. Follow SECURITY.md instead.
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Observed failure
+      description: What happened, and what user or operational task failed?
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected and forbidden behavior
+      description: State what should happen and what must never happen.
+    validations:
+      required: true
+  - type: dropdown
+    id: boundary
+    attributes:
+      label: Primary boundary
+      options:
+        - Workspace-backed continuity
+        - Conversation-backed continuity
+        - Global Defaults
+        - Bridge or rebind
+        - Formation or governance
+        - Retrieval or context delivery
+        - Deletion or lifecycle
+        - Authentication or tenant isolation
+        - Provider or client integration
+        - Packaging, deployment, or recovery
+        - Documentation or tooling
+    validations:
+      required: true
+  - type: input
+    id: revision
+    attributes:
+      label: Vermory revision or version
+      placeholder: commit SHA, tag, or vermory version output
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Use synthetic or authorized minimized data. Include exact commands when safe.
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, architecture, PostgreSQL version, client/provider version, and relevant non-secret configuration.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Redacted evidence
+      description: Logs, hashes, screenshots, or artifacts with credentials and private content removed.
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Safety confirmation
+      options:
+        - label: I removed credentials, private transcripts, tenant data, database dumps, and personal absolute paths.
+          required: true
+        - label: This can be discussed publicly without increasing security or privacy risk.
+          required: true

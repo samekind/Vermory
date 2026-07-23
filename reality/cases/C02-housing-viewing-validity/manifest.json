@@ -1,0 +1,46 @@
+{
+  "version": 1,
+  "id": "C02-housing-viewing-validity",
+  "title": "A viewing appointment expires while the durable housing budget remains current",
+  "evidence_level": "public",
+  "continuity_lines": ["conversation"],
+  "pressures": ["temporal_validity", "exact_boundary", "durable_fact_preservation", "expiry_not_deletion", "stale_action_rejection"],
+  "sources": [
+    {
+      "id": "c02-housing",
+      "kind": "synthetic_authorized_trajectory",
+      "fixture_path": "fixtures/housing-viewing.md",
+      "original_ref": "synthetic:housing-viewing-validity-v1",
+      "original_revision": "1",
+      "sha256": "68a5526837a9aadbceda343204e1ce8b1b5de4b571dea6ca3995ffab962f9e2f",
+      "authorized": true,
+      "anonymization": "The trajectory is fully synthetic and contains no real address, person, contact detail, or financial account."
+    }
+  ],
+  "anchors": [
+    {
+      "kind": "conversation_matter",
+      "value": "housing-search-validity",
+      "ambiguous": false
+    }
+  ],
+  "expectations": {
+    "current_facts": [
+      "The monthly housing budget ceiling remains CNY 6,500.",
+      "The 2026-07-20 14:00 viewing is expired at its exact event boundary.",
+      "Expiry preserves authorized history but removes current actionability."
+    ],
+    "forbidden_facts": [
+      "The old 2026-07-20 14:00 viewing is still actionable at or after the boundary.",
+      "The viewing expiry deleted the independent CNY 6,500 budget ceiling.",
+      "An expired appointment should be represented as a current plan."
+    ],
+    "expected_action": "At the exact boundary, omit the old viewing from current recommendations, preserve the durable budget ceiling, and distinguish expiry from deletion."
+  },
+  "task": {
+    "prompt": "At the exact viewing boundary, summarize the current housing-search constraints and explain what happened to the old appointment.",
+    "artifact_checks": ["old viewing is not actionable", "budget ceiling remains", "expiry is distinguished from deletion"],
+    "deterministic_checks": ["contains:CNY 6,500", "contains:expired", "not_contains:still actionable", "not_contains:budget was deleted"]
+  }
+}
+

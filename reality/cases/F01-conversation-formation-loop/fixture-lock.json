@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "case_id": "F01-conversation-formation-loop",
+  "manifest_sha256": "eb63a7535982caa6a84e119995edff0ced2e818bde46688eee9427d1bbdebbf4",
+  "events_sha256": "ae86e40ec6d44acfcd0702042714efc445a43fb50ce43934195b48a9ca6d50e2",
+  "files": [
+    {
+      "path": "fixtures/formation-governance.md",
+      "sha256": "3986a52576e49e1f3778208bef92e1c2e9ea689c8a59719792f4cd11e51e30ac",
+      "bytes": 1317
+    },
+    {
+      "path": "fixtures/formation-transcript.md",
+      "sha256": "c3f8c472594ef63f2927e6be37c6382b1aaf31a0947d7918706c0bfc3740d859",
+      "bytes": 1070
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "case_id": "B01-conversation-workspace-promotion",
+  "manifest_sha256": "d7cf14f976fdbb6e104e5e7ca6dcf645c5cbfdd6299616f6b46cd1319f16cbab",
+  "events_sha256": "a328d232692f3f891153f86fcc266b76b0d689c466fdfcaf841dbbe4ba64ec69",
+  "files": [
+    {
+      "path": "fixtures/release-planning.md",
+      "sha256": "86537c107cb6a6cb86547f36b211db82a22e3275fb5eeb7e221ce8ca5dc6627c",
+      "bytes": 395
+    },
+    {
+      "path": "fixtures/workspace-state.md",
+      "sha256": "e736d7d3d491c99b606c832870481e437b4dcdebdd3e88b8a3955f95663eb384",
+      "bytes": 372
+    }
+  ]
+}

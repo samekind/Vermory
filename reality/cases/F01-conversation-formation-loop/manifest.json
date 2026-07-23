@@ -1,0 +1,86 @@
+{
+  "version": 1,
+  "id": "F01-conversation-formation-loop",
+  "title": "Conversation observations form governed candidates, corrections, and deletion-safe reuse",
+  "evidence_level": "public",
+  "continuity_lines": ["conversation", "global_defaults", "bridge", "security"],
+  "pressures": ["real_client_observations", "bounded_formation_window", "exact_observation_evidence", "transient_noise_exclusion", "explicit_candidate_governance", "correction", "deletion", "input_manifest_drift", "active_snapshot_drift", "idempotent_replay", "cross_continuity_isolation", "global_default_non_promotion"],
+  "sources": [
+    {
+      "id": "f01-transcript",
+      "kind": "authorized_transcript_excerpt",
+      "fixture_path": "fixtures/formation-transcript.md",
+      "original_ref": "authorized-openclaw-case:home-maintenance",
+      "original_revision": "2026-07-14T00:00:00Z",
+      "sha256": "c3f8c472594ef63f2927e6be37c6382b1aaf31a0947d7918706c0bfc3740d859",
+      "authorized": true,
+      "anonymization": "Derived from the authorized O01 trajectory; names, address, building identity, contacts, account identifiers, and credentials are synthetic."
+    },
+    {
+      "id": "f01-governance",
+      "kind": "authorized_governance_trajectory",
+      "fixture_path": "fixtures/formation-governance.md",
+      "original_ref": "vermory-design:conversation-formation-f01",
+      "original_revision": "2026-07-18",
+      "sha256": "3986a52576e49e1f3778208bef92e1c2e9ea689c8a59719792f4cd11e51e30ac",
+      "authorized": true,
+      "anonymization": "All anchors, schedules, names, and sensitive values are synthetic and scoped to this public fixture."
+    }
+  ],
+  "anchors": [
+    {
+      "kind": "openclaw_session_key",
+      "value": "agent:main:formation-home-maintenance-a",
+      "ambiguous": false
+    },
+    {
+      "kind": "openclaw_session_key",
+      "value": "agent:main:formation-home-maintenance-b",
+      "ambiguous": false
+    },
+    {
+      "kind": "openclaw_session_key",
+      "value": "agent:main:formation-unrelated-c",
+      "ambiguous": false
+    }
+  ],
+  "expectations": {
+    "current_facts": [
+      "The current plumbing inspection is Saturday at 10:00.",
+      "The technician must check in with the concierge.",
+      "Only explicitly accepted formation candidates become current memory.",
+      "The stable language default is unchanged by a one-turn English request."
+    ],
+    "forbidden_facts": [
+      "The current appointment is Friday at 15:30.",
+      "The temporary access code is CEDAR-4826.",
+      "Rain and lunch chatter are governed memory.",
+      "Assistant output is authoritative formation evidence.",
+      "Session B or Session C raw observations enter Session A formation.",
+      "A one-turn English request becomes a Global Default.",
+      "A replay invokes the provider or duplicates candidates."
+    ],
+    "allowed_unknowns": [
+      "Whether a future scheduler triggers formation automatically or an operator triggers it.",
+      "Whether the building changes the appointment again after the frozen trajectory."
+    ],
+    "expected_action": "Form only exact-evidence candidates from the bound same-continuity user-observation manifest, require explicit governance, use the accepted correction as current, and eliminate the forgotten code from all native covered surfaces."
+  },
+  "task": {
+    "prompt": "Continue the home-maintenance matter after conversation formation, candidate review, correction, transient language override, deletion, projection rebuild, and fresh real-client restart.",
+    "artifact_checks": [
+      "formation run records ordered evidence observation IDs without duplicating raw transcript text",
+      "fresh delivery contains Saturday and concierge only as current visit facts",
+      "deleted code is absent from inspection, search, replay, provider audit, and delivery history",
+      "cross-continuity and task-local inputs create no candidate"
+    ],
+    "deterministic_checks": [
+      "contains:Saturday at 10:00",
+      "contains:concierge",
+      "not_contains:Friday at 15:30",
+      "not_contains:CEDAR-4826",
+      "not_contains:rain",
+      "not_contains:lunch"
+    ]
+  }
+}

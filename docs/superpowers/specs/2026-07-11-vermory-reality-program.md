@@ -45,13 +45,20 @@ Examples include a repository changing decisions over several sessions, a long-r
 Priority sources are:
 
 1. Authorized real local workflows across varied projects and domains.
-2. Real Codex, Claude Code, Gemini CLI, domestic coding-tool, Web Chat, and everyday-assistant trajectories.
+2. Real Codex, Grok, cursor-agent, domestic coding-tool, Web Chat, OpenClaw, Hermes, and everyday-assistant trajectories. `cursor-agent` is a real external-client target and is not interchangeable with editor implementation delegation. Gemini CLI is retired and is not an active client target.
 3. Authorized long-running conversation matters with privacy-safe anonymization.
 4. Public repositories, issues, pull requests, releases, documentation, and migrations.
 5. Official or verified public benchmark datasets where licensing permits.
 6. Synthetic mutations, secrets, attacks, and load records where real data would be unsafe or insufficient.
 
 No single repository, client, model family, or domain may dominate the quality corpus.
+
+When one client is unavailable, another client may execute a separate trajectory
+against the same platform contract. The unavailable-client failure remains in
+the evidence, and the substitute result must name its own client, version,
+permissions, and interaction boundary. A cursor-agent pass therefore cannot be
+reported as a Grok CLI pass, and an implementation delegation report is not a
+cursor-agent runtime qualification.
 
 ## 5. Initial Discovery Batch
 
@@ -116,7 +123,19 @@ The coding agent and implementation process must not have read access to sealed 
 
 Before that boundary exists, an owner-controlled directory outside the repository may be used only as a `withheld_local` holdout. It is not reported as blind or sealed if the implementation process could technically read it.
 
-External sealed results use `reality/schema/attestation.schema.json`. Vermory accepts only a versioned Ed25519-signed attestation that names the evaluator, suite, implementation digest, run time, hard-gate result, counts, and optional failure categories. The repository provides verification only; it does not provide a command that signs a local case or upgrades readable evidence to sealed evidence.
+Historical external results use `reality/schema/attestation.schema.json`.
+New external runs use
+`reality/schema/external-evaluation-submission-v1.schema.json` and
+`reality/schema/attestation-v2.schema.json`. The public submission binds an
+exact immutable artifact, protocol, suite profile, validity interval, declared
+interfaces, runtime platforms, and evaluator-controlled execution boundary.
+The version-2 Ed25519 attestation additionally binds the evaluator key,
+submission digest, implementation digest, run identity, aggregate counts,
+named hard-gate results, and evaluator-owned detailed-result digest. The
+repository provides submission creation and verification plus attestation
+verification only; it does not provide a command that signs a local result or
+upgrades readable evidence to sealed evidence. See the
+[external evaluator handoff](../../integrations/external-evaluator.md).
 
 Experiment 0 may complete while a genuine external sealed evaluator is unavailable. In that state, the readout must report sealed infrastructure as unavailable and retain the limitation explicitly; it must not substitute `withheld_local` or a repository directory for sealed evidence.
 

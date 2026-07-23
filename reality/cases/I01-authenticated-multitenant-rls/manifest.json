@@ -1,0 +1,84 @@
+{
+  "version": 1,
+  "id": "I01-authenticated-multitenant-rls",
+  "title": "Authenticated same-anchor tenant isolation with token revocation and PostgreSQL RLS",
+  "evidence_level": "public",
+  "continuity_lines": ["conversation", "global_defaults", "bridge", "security"],
+  "pressures": ["token_expiry", "token_revocation", "role_denial", "same_anchor_cross_tenant", "filter_omission", "cross_tenant_foreign_key", "pool_reuse", "authenticated_openclaw"],
+  "sources": [
+    {
+      "id": "i01-token-lifecycle",
+      "kind": "authorized_security_trajectory",
+      "fixture_path": "fixtures/token-lifecycle.md",
+      "original_ref": "vermory-design:i01-token-lifecycle",
+      "original_revision": "2026-07-14",
+      "sha256": "62a91dd8680e21eb48457d377c92f3979e028ca33b7c3359ee3717e80dc87d8d",
+      "authorized": true,
+      "anonymization": "All tenant, subject, token, and operation identifiers are synthetic. No real credential or digest is retained."
+    },
+    {
+      "id": "i01-tenant-isolation",
+      "kind": "authorized_multitenant_attack_trajectory",
+      "fixture_path": "fixtures/tenant-isolation.md",
+      "original_ref": "vermory-design:i01-tenant-isolation",
+      "original_revision": "2026-07-14",
+      "sha256": "f83cab3d1c392ac55bbf48bf0fc152bfa0745b7906a21e4b3eabee56fe30b6f1",
+      "authorized": true,
+      "anonymization": "The same anchor, governed fact, foreign-key targets, and pool sequence are synthetic and contain no user data."
+    }
+  ],
+  "anchors": [
+    {
+      "kind": "authenticated_conversation_anchor",
+      "value": "identity-a/openclaw/agent:main:shared-anchor",
+      "ambiguous": false
+    },
+    {
+      "kind": "authenticated_conversation_anchor",
+      "value": "identity-b/openclaw/agent:main:shared-anchor",
+      "ambiguous": false
+    }
+  ],
+  "expectations": {
+    "current_facts": [
+      "Tenant identity-a owns governed fact TENANT-A-ONLY under the shared anchor.",
+      "Tenant identity-b resolves the same channel and thread to a different continuity.",
+      "Only operator and owner roles may inspect or mutate governed memory.",
+      "A revoked or expired token cannot authenticate the next request.",
+      "PostgreSQL RLS limits filter-omission queries to the connection tenant context.",
+      "An authenticated OpenClaw client derives tenant identity from its bearer token."
+    ],
+    "forbidden_facts": [
+      "Tenant identity-b receives TENANT-A-ONLY.",
+      "A client token confirms, corrects, deletes, or bridges memory.",
+      "Request JSON selects tenant identity or role.",
+      "A released pooled connection carries identity-a into identity-b.",
+      "A tenant row references another tenant's continuity, observation, memory, delivery, or bridge.",
+      "OpenClaw reports successful Vermory persistence after token revocation."
+    ],
+    "allowed_unknowns": [
+      "Which external identity provider may map to Vermory tokens in a later release.",
+      "Whether a hosted control plane will automate runtime database role creation."
+    ],
+    "expected_action": "Authenticate from the bearer token, enforce the role before route execution, derive one tenant-scoped service set, preserve the tenant context through PostgreSQL RLS, and fail closed after expiry or revocation."
+  },
+  "task": {
+    "prompt": "Run the same OpenClaw conversation anchor under two authenticated tenants, exercise client/operator role boundaries, omit application tenant filters under the runtime role, reuse pooled connections, and revoke the OpenClaw token.",
+    "artifact_checks": [
+      "token lifecycle evidence contains no real token or digest",
+      "tenant A and B deliveries remain distinct for the same anchor",
+      "filter-omission and cross-tenant foreign-key attacks fail at PostgreSQL",
+      "post-revocation OpenClaw availability does not create a Vermory success receipt"
+    ],
+    "deterministic_checks": [
+      "tenant_a:contains:TENANT-A-ONLY",
+      "tenant_b:not_contains:TENANT-A-ONLY",
+      "client_governance:forbidden",
+      "rls_filter_omission:isolated",
+      "cross_tenant_fk:rejected",
+      "pool_reuse:no_stale_tenant",
+      "revoked_token:unauthorized",
+      "openclaw_post_revoke:no_persistence"
+    ]
+  }
+}

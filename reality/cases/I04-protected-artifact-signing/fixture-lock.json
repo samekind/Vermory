@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "case_id": "I04-protected-artifact-signing",
+  "manifest_sha256": "e3450f412531341a288a57c331dc80366feb4bb1de3c6ad046a9987d2a07efc2",
+  "events_sha256": "39d01a8335e054084b77c964d8ece26a045d798094933431d48e394a82ebb9e0",
+  "files": [
+    {
+      "path": "fixtures/signing-contract.md",
+      "sha256": "4ecab38541b3191f2db8efbce7aa4d82f9493a4e4e579ce99a7a341597703111",
+      "bytes": 2735
+    }
+  ]
+}

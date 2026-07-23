@@ -17,25 +17,66 @@ func TestBuildExperiment0ReportsFrozenPublicCoverage(t *testing.T) {
 	if !report.Pass || !report.PublicValidation.Pass {
 		t.Fatalf("expected public evidence to pass: %#v", report)
 	}
-	if len(report.PublicValidation.Results) != 4 {
-		t.Fatalf("expected four cases, got %d", len(report.PublicValidation.Results))
+	if len(report.PublicValidation.Results) != 22 {
+		t.Fatalf("expected twenty-two cases, got %d", len(report.PublicValidation.Results))
 	}
 	for _, result := range report.PublicValidation.Results {
 		if result.LockSHA256 == "" {
 			t.Fatalf("case %s has no fixture lock hash", result.CaseID)
 		}
 	}
-	if len(report.ContinuityCoverage[string(LineWorkspace)]) != 1 || len(report.ContinuityCoverage[string(LineConversation)]) != 2 {
+	if len(report.ContinuityCoverage[string(LineWorkspace)]) != 6 || len(report.ContinuityCoverage[string(LineConversation)]) != 12 {
 		t.Fatalf("unexpected continuity coverage: %#v", report.ContinuityCoverage)
+	}
+	if len(report.ContinuityCoverage[string(LineBridge)]) != 7 {
+		t.Fatalf("expected seven bridge cases, got %#v", report.ContinuityCoverage)
+	}
+	if len(report.ContinuityCoverage[string(LineSecurity)]) != 15 {
+		t.Fatalf("expected fifteen security cases, got %#v", report.ContinuityCoverage)
 	}
 	if len(report.PressureCoverage["explicit_deletion"]) != 1 {
 		t.Fatalf("expected deletion pressure coverage: %#v", report.PressureCoverage)
 	}
-	if report.EvidenceLevels[string(EvidencePublic)] != 4 || report.SealedStatus != "unavailable" {
+	if report.EvidenceLevels[string(EvidencePublic)] != 22 || report.SealedStatus != "unavailable" {
 		t.Fatalf("unexpected evidence status: levels=%#v sealed=%q", report.EvidenceLevels, report.SealedStatus)
 	}
 	if !containsText(report.Limitations, "target discovery coverage remains incomplete") {
 		t.Fatalf("expected incomplete-target limitation: %#v", report.Limitations)
+	}
+	if got := report.HypothesisSignals["H-013"]; len(got) != 1 || got[0] != "I01-authenticated-multitenant-rls" {
+		t.Fatalf("unexpected RLS hypothesis signal: %#v", got)
+	}
+	if got := report.HypothesisSignals["H-014"]; len(got) != 2 || got[0] != "I02-postgresql-operations-recovery" || got[1] != "I03-postgresql-ha-pitr" {
+		t.Fatalf("unexpected operations recovery hypothesis signal: %#v", got)
+	}
+	if got := report.HypothesisSignals["hermes_client_seed"]; len(got) != 1 || got[0] != "H01-hermes-linked-sessions" {
+		t.Fatalf("unexpected Hermes client seed: %#v", got)
+	}
+	if got := report.HypothesisSignals["bridge_seed"]; len(got) != 3 ||
+		got[0] != "B01-conversation-workspace-promotion" ||
+		got[1] != "B02-linked-conversations-workspace-rebind" ||
+		got[2] != "B03-three-client-conversation-bridge" {
+		t.Fatalf("unexpected bridge seed: %#v", got)
+	}
+	if got := report.HypothesisSignals["H-005"]; len(got) != 4 ||
+		got[0] != "C01-device-maintenance-continuity" ||
+		got[1] != "F03-verified-tool-outcome-formation" ||
+		got[2] != "S01-deletion-and-source-injection" ||
+		got[3] != "W01-synapseloom-continuity" {
+		t.Fatalf("unexpected revision hypothesis signal: %#v", got)
+	}
+	if got := report.HypothesisSignals["H-008"]; len(got) != 3 ||
+		got[0] != "C01-device-maintenance-continuity" ||
+		got[1] != "F03-verified-tool-outcome-formation" ||
+		got[2] != "S01-deletion-and-source-injection" {
+		t.Fatalf("unexpected lifecycle hypothesis signal: %#v", got)
+	}
+	if got := report.HypothesisSignals["H-007"]; len(got) != 4 ||
+		got[0] != "C02-housing-viewing-validity" ||
+		got[1] != "G01-language-default-local-override" ||
+		got[2] != "S01-deletion-and-source-injection" ||
+		got[3] != "W03-workspace-workaround-validity" {
+		t.Fatalf("unexpected retention hypothesis signal: %#v", got)
 	}
 }
 

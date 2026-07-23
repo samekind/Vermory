@@ -1,0 +1,86 @@
+{
+  "version": 1,
+  "id": "H01-hermes-linked-sessions",
+  "title": "Hermes real-model cross-session continuity, reversal, isolation, and fail-open behavior",
+  "evidence_level": "public",
+  "continuity_lines": ["conversation", "bridge", "security"],
+  "pressures": ["real_hermes_cli", "domestic_openai_compatible_model", "new_session", "resume_semantics", "built_in_memory_isolation", "stale_fact", "explicit_link", "transcript_isolation", "unrelated_continuity_isolation", "link_reversal", "fail_open", "credential_hygiene"],
+  "sources": [
+    {
+      "id": "h01-trajectory",
+      "kind": "authorized_client_trajectory",
+      "fixture_path": "fixtures/hermes-session-trajectory.md",
+      "original_ref": "authorized-hermes-case:thesis-upload",
+      "original_revision": "2026-07-17",
+      "sha256": "3bd321135c10ddada7dd0b2c159f5a7c894ee8a1c10fe18cb5a6e98c8b053414",
+      "authorized": true,
+      "anonymization": "The thesis topic, user identity, institution, provider credential, and original filenames were replaced with synthetic public fixture values."
+    },
+    {
+      "id": "h01-contract",
+      "kind": "acceptance_contract",
+      "fixture_path": "fixtures/acceptance-contract.md",
+      "original_ref": "vermory-design:hermes-h01",
+      "original_revision": "2026-07-17",
+      "sha256": "fb6d6379777ac365b13f35eb4207e793496abcddd02406912d3dbd75a99d75c4",
+      "authorized": true,
+      "anonymization": "All session anchors, operation identifiers, filenames, and evidence paths in the public contract are synthetic."
+    }
+  ],
+  "anchors": [
+    {
+      "kind": "hermes_session_id",
+      "value": "session:<runtime-session-a>",
+      "ambiguous": false
+    },
+    {
+      "kind": "hermes_session_id",
+      "value": "session:<runtime-session-b>",
+      "ambiguous": false
+    },
+    {
+      "kind": "hermes_session_id",
+      "value": "session:<unrelated-session-c>",
+      "ambiguous": false
+    }
+  ],
+  "expectations": {
+    "current_facts": [
+      "The current thesis upload bundle is thesis-defense-v7.zip.",
+      "thesis-defense-v6.zip is obsolete.",
+      "Session B receives session A governed memory only while the explicit link is active.",
+      "Hermes remains available for a visible answer when Vermory prepare is unavailable."
+    ],
+    "forbidden_facts": [
+      "The current thesis upload bundle is thesis-defense-v6.zip.",
+      "Session B receives session A raw transcript history.",
+      "An unrelated Hermes or OpenClaw continuity receives the thesis filename.",
+      "Link reversal erases Hermes-owned transcript history.",
+      "A fail-open Hermes answer is reported as successfully persisted by Vermory.",
+      "Provider credentials appear in evidence artifacts."
+    ],
+    "allowed_unknowns": [
+      "The eventual thesis submission timestamp.",
+      "Whether a later user correction replaces thesis-defense-v7.zip."
+    ],
+    "expected_action": "Use a confirmed current fact from session A in a newly linked Hermes session B, exclude stale and unrelated context, stop future sharing after reversal, and preserve Hermes answer availability without making a false persistence claim when Vermory is unavailable."
+  },
+  "task": {
+    "prompt": "Execute the official Hermes CLI across two independent sessions and prove governed cross-session recall, transcript isolation, link reversal, and fail-open behavior with a real model provider.",
+    "artifact_checks": [
+      "session B transcript before linking contains no thesis filename",
+      "linked delivery contains the confirmed v7 fact and excludes unrelated continuity",
+      "post-reversal direct prepare excludes session A thesis facts",
+      "fail-open turn returns a visible answer without a successful persistence receipt",
+      "privacy scan finds no credential-shaped value"
+    ],
+    "deterministic_checks": [
+      "contains:thesis-defense-v7.zip",
+      "not_current:thesis-defense-v6.zip",
+      "not_contains:unrelated continuity",
+      "post_reverse_not_contains:thesis-defense-v7.zip",
+      "fail_open_answer_nonempty:true",
+      "credential_leak_count:0"
+    ]
+  }
+}

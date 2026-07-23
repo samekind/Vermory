@@ -1,0 +1,51 @@
+{
+  "version": "2",
+  "id": "W12-server-qualification-scale-profile",
+  "profile_name": "server-qualification-v1",
+  "tenant_count": 10,
+  "continuities_per_tenant": 10,
+  "records_per_continuity": 1000,
+  "active_memory_count": 100000,
+  "governed_memory_count": 550000,
+  "revision_count": 450000,
+  "full_revision_rounds": 4,
+  "partial_revision_count": 50000,
+  "projection_event_count": 1000000,
+  "query_client_count": 50,
+  "queries_per_client": 20,
+  "delete_count": 1000,
+  "snapshot_page_size": 500,
+  "tail_worker_competitors_per_tenant": 2,
+  "pool_max_connections": 64,
+  "profile_id": "siliconflow-bge-m3-1024-v1",
+  "reference_hardware": {
+    "os": "Darwin arm64",
+    "cpu": "Apple M4 Pro",
+    "memory_gib": 48,
+    "storage": "local NVMe",
+    "postgresql": "18.4",
+    "pgvector": "0.8.5"
+  },
+  "calibrated_limits": {
+    "authority_seed_seconds": 1800,
+    "history_generation_seconds": 1200,
+    "lexical_rebuild_seconds": 300,
+    "vector_snapshot_seconds": 1800,
+    "tail_catchup_seconds": 300,
+    "query_p95_ms": 2000,
+    "query_p99_ms": 5000,
+    "database_size_gib": 20
+  },
+  "hard_gates": [
+    "tenant lag equals the count of that tenant's pending events despite global event ID gaps",
+    "100000 active governed facts produce exactly 100000 current lexical documents",
+    "450000 append-only governed revisions preserve 100000 active and 450000 superseded memories",
+    "initial writes plus revision activation and supersession produce exactly 1000000 durable projection events",
+    "snapshot bootstrap embeds current active authority once instead of replaying event history",
+    "snapshot bootstrap plus tail workers reach zero lag for every tenant",
+    "1000 concurrent deletes leave zero active lexical or vector rows for deleted memories",
+    "50 concurrent clients complete 1000 scoped lexical and vector queries with zero leakage",
+    "competing workers do not duplicate vectors or move cursors backward",
+    "a direct SiliconFlow probe still projects and retrieves after the scale run"
+  ]
+}

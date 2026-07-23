@@ -1,0 +1,43 @@
+{
+  "version": "1",
+  "id": "W19-memory-eligibility-retention",
+  "profile_name": "memory-eligibility-retention-v1",
+  "tenant_count": 4,
+  "continuities_per_tenant": 5,
+  "total_governed_facts": 10000,
+  "current_open_ended": 4000,
+  "scheduled": 1500,
+  "expired": 1500,
+  "archived": 1000,
+  "superseded": 1000,
+  "deleted": 1000,
+  "query_client_count": 16,
+  "queries_per_client": 20,
+  "active_profile_id": "siliconflow-bge-m3-1024-v1",
+  "direct_provider_tenant_id": "w19-direct-provider-tenant",
+  "reality_case_ids": [
+    "G01-language-default-local-override",
+    "S01-deletion-and-source-injection",
+    "C02-housing-viewing-validity",
+    "W03-workspace-workaround-validity"
+  ],
+  "hard_gate_count": 16,
+  "hard_gates": [
+    "schema 18 adds tenant-isolated temporal eligibility archive and immutable operation audit",
+    "working input does not silently create durable or global memory",
+    "one request uses one PostgreSQL-derived eligibility timestamp across every context source",
+    "scheduled facts are absent before valid_from and eligible at the boundary",
+    "facts are eligible before valid_until and absent exactly at the boundary",
+    "expiry preserves inspectable history while removing current reuse",
+    "archive preserves inspectable history and removes lexical vector and delivery eligibility",
+    "forget redacts current scheduled expired archived and superseded targets without deleting unrelated guidance",
+    "G01 local override leaves the Global Default unchanged",
+    "workspace and conversation durable facts remain available across client restart and client change",
+    "lexical shadow vector bridge Web Chat OpenClaw and MCP enforce identical eligibility",
+    "projection rebuild and PostgreSQL restore preserve effective results without reviving forgotten content",
+    "validity and archive operations are scoped idempotent conflict rejecting and content-free in audit",
+    "concurrent forget wins over validity and archive without resurrection or false receipt",
+    "provider outage degrades safely without stale deleted or cross-scope exposure",
+    "real Web Chat Grok and MCP Codex or Grok artifacts complete tasks using only eligible memory"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "case_id": "W03-workspace-workaround-validity",
+  "manifest_sha256": "74d93bab1e170aaa60a03f142e1a1328fc32f1d584f1b444b347a3623bc0c061",
+  "events_sha256": "a7488fa3aa306e7200498f0aabf0bd22661fa7b099f141f29b1f8f6ecac51ec0",
+  "files": [
+    {
+      "path": "fixtures/workspace-workaround.md",
+      "sha256": "b797a42d9c34687cc61773683dcaf0c6e9c1b1d04109c961d273fbb291dd60c7",
+      "bytes": 524
+    }
+  ]
+}

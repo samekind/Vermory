@@ -1,0 +1,153 @@
+{
+  "schema_version": 1,
+  "run_id": "w09-production-retrieval-runtime-20260715",
+  "qualification_status": "production_path_integrated",
+  "default_mode": "lexical",
+  "implementation_revision": "bde15c29f8f044addc6624adc403ecd1f19ba468",
+  "binary": {
+    "sha256": "e4ab396e4002760c3ec191e13bd83d783924027a2d52210557959e3f7d679f64",
+    "go_version": "go1.26.5",
+    "platform": "darwin/arm64"
+  },
+  "runtime": {
+    "postgresql": "18.4",
+    "pgvector": "0.8.5",
+    "database_schema": 14,
+    "grok_cli": "0.2.101 (5bc4b5dfadcf)",
+    "grok_model": "grok-4.5"
+  },
+  "case": {
+    "path": "runtime/cases/W09-production-retrieval-runtime/case.json",
+    "sha256": "84950c650a2e20f70cce98d33561f899d9cd38d5890fd0190fff3a9a0d9ffd6e"
+  },
+  "embedding_profile": {
+    "id": "siliconflow-bge-m3-1024-v1",
+    "base_url": "https://api.siliconflow.cn/v1",
+    "model": "BAAI/bge-m3",
+    "dimensions": 1024,
+    "provider_route": "direct"
+  },
+  "projection": {
+    "initial_target_processed": 15,
+    "initial_target_cursor": 16,
+    "initial_target_lag": 0,
+    "initial_target_vectors": 10,
+    "other_tenant_vectors": 1,
+    "final_target_cursor": 20,
+    "final_target_latest_event": 20,
+    "final_target_vectors": 11,
+    "final_target_eligible_active_facts": 11,
+    "active_only_equality": true
+  },
+  "workspace_grok": {
+    "session_id": "019f6196-c04a-7e70-a5d9-a7a4217a3d6a",
+    "prepare_operation": "w09-grok-vector",
+    "retrieval_operation": "workspace-retrieval:w09-grok-vector",
+    "requested_mode": "vector",
+    "effective_mode": "vector",
+    "delivered_id_count": 6,
+    "delivery_id": "5c016f19-0d10-4b5e-ab06-4487187c4566",
+    "writeback_operation": "w09-grok-writeback",
+    "observation_id": "6796e252-4153-4a49-a45e-4da15941743c",
+    "memory_id": "7a4b2e64-dd33-4e57-a7f9-294315c67d1d",
+    "memory_status": "proposed",
+    "artifact_sha256": "b0bb9ca96782b92f1458595a801f4fd47309dc8ead58340d90d81ec3f6dd9bc7",
+    "client_json_sha256": "7bd538b9788d799d9213b9c634b66bba5cf9a824e365c2b2805b46ade58f8ce9"
+  },
+  "conversation": {
+    "failed_lag_operation": "w09-real-vector-conversation",
+    "failed_lag_code": "projection_lag",
+    "successful_operation": "w09-real-vector-conversation-current",
+    "requested_mode": "vector",
+    "effective_mode": "vector",
+    "authorized_continuity_count": 2,
+    "delivered_id_count": 2,
+    "expected_time_present": true,
+    "expected_prerequisite_present": true,
+    "unlinked_fact_absent": true
+  },
+  "shadow": {
+    "operation": "w09-shadow-parity-linked",
+    "context_sha256": "a1acb83a30b20609cf73d70fdcdbac775ae4640c076516f28815056b8046b77b",
+    "lexical_id_count": 1,
+    "vector_id_count": 2,
+    "delivered_equals_lexical": true,
+    "byte_equal": true
+  },
+  "degradation": {
+    "projection_lag": {
+      "operation": "workspace-retrieval:w09-lag-vector",
+      "effective_mode": "lexical",
+      "failure_code": "projection_lag",
+      "context_sha256": "80334f77ee257fa5a7754e1a101fa292aefe07b55e2030d547cdb73c8479ab82",
+      "lexical_byte_equal": true
+    },
+    "embedding_unavailable": {
+      "operation": "workspace-retrieval:w09-outage-vector",
+      "effective_mode": "lexical",
+      "failure_code": "embedding_unavailable",
+      "context_sha256": "80334f77ee257fa5a7754e1a101fa292aefe07b55e2030d547cdb73c8479ab82",
+      "lexical_byte_equal": true,
+      "failure_injection": "process-scoped local HTTP 503 proxy"
+    }
+  },
+  "rebuild": {
+    "vectors_before_reset": 11,
+    "vectors_after_reset": 0,
+    "vectors_after_replay": 11,
+    "result_id_count": 7,
+    "result_ids_and_order_equal": true,
+    "context_sha256": "76898dc86a0cb8125ad2a03ee152944fcc8834cf9367b7d1aa9bcba4a90ec04f",
+    "authority_sha256": "7548e4705968e976619570c0fc944975409d83a67b3e4e4c920e58ca2a39881b",
+    "authority_unchanged": true
+  },
+  "restricted_role": {
+    "superuser": false,
+    "bypass_rls": false,
+    "owned_served_tables": 0,
+    "no_context_counts": [0, 0, 0, 0],
+    "target_counts": [19, 1, 11, 7],
+    "other_tenant_counts": [1, 1, 1, 0],
+    "count_order": ["events", "cursors", "vectors", "audits"],
+    "cross_tenant_fk_rejected": true
+  },
+  "recovery": {
+    "dump_format": "postgresql_custom",
+    "dump_bytes": 190635,
+    "dump_sha256": "2915ff9b8430870641c2b2e4d4a037ecdb225e1f80328637c9e4ca34c032f42f",
+    "source_counts": [20, 2, 12, 7],
+    "restored_counts": [20, 2, 12, 7],
+    "count_order": ["events", "cursors", "vectors", "audits"],
+    "authority_sha256": "16cc09f9158d2b8dd0b8d05705ed74d753dc6f7ad82f2845510d542c9e6ce7ca",
+    "authority_equal": true,
+    "post_restore_rebuild_equal": true,
+    "post_restore_result_ids_and_order_equal": true
+  },
+  "credential_scan": {
+    "exact_secret_tracked": 0,
+    "exact_secret_worktree": 0,
+    "exact_secret_runtime": 0,
+    "authorization_headers_runtime": 0,
+    "new_password_database_urls": 0,
+    "known_placeholder_files": 2,
+    "pass": true
+  },
+  "preserved_failures": [
+    "startup HTTP 503 was initially misclassified as readiness",
+    "MCP doctor initially rejected the untrusted project folder",
+    "the successful Grok workspace wrapper used zsh reserved variable status and returned exit 1 after EndTurn",
+    "the first vector conversation turn degraded on projection lag and answered incorrectly",
+    "the frozen profile rejected a local embedding base URL before the 503 proxy method was used",
+    "the first credential scan lacked shell fail-fast and printed a false PASS"
+  ],
+  "non_claims": [
+    "not a second independent retrieval batch",
+    "not accepted_default",
+    "not evidence of an RRF benefit",
+    "not source-authority or conflict ranking",
+    "not embedding generation migration",
+    "not million-record, HA, PITR, or long-running fault qualification",
+    "not withheld or sealed evaluation",
+    "not signed or final release acceptance"
+  ]
+}

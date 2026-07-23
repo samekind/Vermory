@@ -1,0 +1,435 @@
+{
+  "version": 1,
+  "run_id": "w19-formal-2e97280-20260717-v1",
+  "profile_id": "memory-eligibility-retention-v1",
+  "mode": "formal",
+  "case_sha256": "fbe689a3877bda4b1085a22755f26fa615af38daaa3f56fc9965c36ab34371f2",
+  "schema_version": 18,
+  "implementation_revision": "2e9728043cc2c4f39e296fd2612c23299c5a541f",
+  "request_fingerprint": "c6a791df982c9e5d2a4716ec2dc2cd2a8e13c0a3a7d152f64b50362e112c2fa8",
+  "postgresql_version": "18.3",
+  "pgvector_version": "0.8.5",
+  "started_at": "2026-07-17T14:08:50.202971Z",
+  "completed_at": "2026-07-17T14:09:44.093534Z",
+  "corpus": {
+    "tenants": 4,
+    "continuities": 20,
+    "total": 10000,
+    "current_open_ended": 4000,
+    "scheduled": 1500,
+    "expired": 1500,
+    "archived": 1000,
+    "superseded": 1000,
+    "deleted": 1000,
+    "active_lifecycle": 7000,
+    "archived_lifecycle": 1000,
+    "superseded_lifecycle": 1000,
+    "deleted_lifecycle": 1000
+  },
+  "queries": {
+    "clients": 16,
+    "per_client": 20,
+    "total": 320,
+    "successful": 320,
+    "p50_ms": 23,
+    "p95_ms": 40,
+    "p99_ms": 53
+  },
+  "baselines": [
+    {
+      "condition": "no_context",
+      "task_count": 4,
+      "task_success": 0,
+      "current_fact_hits": 0,
+      "scheduled_premature_use": 0,
+      "expired_misuse": 0,
+      "archived_misuse": 0,
+      "deletion_residue": 0,
+      "global_default_pollution": 0,
+      "scope_leakage": 0,
+      "context_tokens": 0,
+      "delivered_memories": 0
+    },
+    {
+      "condition": "full_history",
+      "task_count": 4,
+      "task_success": 1,
+      "current_fact_hits": 4,
+      "scheduled_premature_use": 1,
+      "expired_misuse": 2,
+      "archived_misuse": 1,
+      "deletion_residue": 1,
+      "global_default_pollution": 1,
+      "scope_leakage": 0,
+      "context_tokens": 160,
+      "delivered_memories": 10
+    },
+    {
+      "condition": "lifecycle_only",
+      "task_count": 4,
+      "task_success": 2,
+      "current_fact_hits": 4,
+      "scheduled_premature_use": 1,
+      "expired_misuse": 2,
+      "archived_misuse": 0,
+      "deletion_residue": 0,
+      "global_default_pollution": 0,
+      "scope_leakage": 0,
+      "context_tokens": 96,
+      "delivered_memories": 7
+    },
+    {
+      "condition": "vermory_eligibility",
+      "task_count": 4,
+      "task_success": 4,
+      "current_fact_hits": 4,
+      "scheduled_premature_use": 0,
+      "expired_misuse": 0,
+      "archived_misuse": 0,
+      "deletion_residue": 0,
+      "global_default_pollution": 0,
+      "scope_leakage": 0,
+      "context_tokens": 48,
+      "delivered_memories": 4
+    }
+  ],
+  "metrics": {
+    "current_expected": 4000,
+    "current_returned": 4000,
+    "current_recall_bps": 10000,
+    "scheduled_premature_use": 0,
+    "expired_misuse": 0,
+    "archived_misuse": 0,
+    "deletion_residue": 0,
+    "global_default_pollution": 0,
+    "scope_leakage": 0
+  },
+  "operations": {
+    "replay_count": 2,
+    "conflict_rejected_count": 2,
+    "race_count": 2,
+    "forget_wins": 2,
+    "false_receipts": 0,
+    "audit_content_residue": 0,
+    "receipts": [
+      {
+        "operation_id": "w19-profile-validity",
+        "kind": "set_validity",
+        "result": "current",
+        "replayed": true,
+        "conflict_rejected": true
+      },
+      {
+        "operation_id": "w19-profile-archive",
+        "kind": "archive",
+        "result": "archived",
+        "replayed": true,
+        "conflict_rejected": true
+      },
+      {
+        "operation_id": "w19-profile-race-validity-first",
+        "kind": "set_validity_then_forget",
+        "result": "deleted",
+        "replayed": false,
+        "conflict_rejected": false,
+        "race_outcome": "forget_won"
+      },
+      {
+        "operation_id": "w19-profile-race-forget-first",
+        "kind": "forget_then_set_validity",
+        "result": "deleted",
+        "replayed": false,
+        "conflict_rejected": false,
+        "race_outcome": "forget_won"
+      }
+    ]
+  },
+  "restart_restore": {
+    "restart_recovered": true,
+    "restore_equivalent": true,
+    "forgotten_absent": true,
+    "before_sha256": "48902296b15f99642b9b9ee91c2a88d9fd4515b353275372c31d168bf6035057",
+    "after_restart_sha256": "48902296b15f99642b9b9ee91c2a88d9fd4515b353275372c31d168bf6035057",
+    "after_restore_sha256": "48902296b15f99642b9b9ee91c2a88d9fd4515b353275372c31d168bf6035057"
+  },
+  "projection": {
+    "lexical_rows": 7000,
+    "vector_rows": 7000,
+    "rebuild_equivalent": true,
+    "outage_degraded": true,
+    "degradation_reason": "provider_unavailable",
+    "stale_results": 0,
+    "archived_results": 0,
+    "deleted_results": 0,
+    "cross_scope_results": 0,
+    "before_sha256": "d13ba6d5e43859651aeb12e58f1bd6c6049a1ba3dd280b9262677860c30ca162",
+    "rebuild_sha256": "d13ba6d5e43859651aeb12e58f1bd6c6049a1ba3dd280b9262677860c30ca162",
+    "restore_sha256": "d13ba6d5e43859651aeb12e58f1bd6c6049a1ba3dd280b9262677860c30ca162"
+  },
+  "real_clients": [
+    {
+      "surface": "web_chat",
+      "client": "grok-cli",
+      "client_version": "0.2.101",
+      "model": "grok-4.5",
+      "completed": true,
+      "evidence_sha256": "9d2d8fbf3dfccd12bc643bcd104b762b651e7c34de2ba825c17d766df1e4e7df",
+      "artifact_sha256": "58daaf2625869eab44508fecfcfccc9b51a06fd0a3eb95d4bc25bd22252fe350"
+    },
+    {
+      "surface": "mcp_workspace",
+      "client": "grok-cli",
+      "client_version": "0.2.101",
+      "model": "grok-4.5",
+      "completed": true,
+      "evidence_sha256": "cb5041363fd58c4cdeb606e5cdc454e2a3b85ab52b1c358846c52afed3f9d886",
+      "artifact_sha256": "ab97a28882afbcbb7bc7b7e78ec1f50b46494fe23c654ea15878cd1f44417a95"
+    },
+    {
+      "surface": "mcp_workspace",
+      "client": "codex-cli",
+      "client_version": "0.144.3",
+      "model": "gpt-5.5",
+      "completed": true,
+      "evidence_sha256": "1570aa87f321e0d9f4785cc14abab0bfa684af2b490d36f59d90335dbce88cfc",
+      "artifact_sha256": "067031a5ae9c73b86a3f409236a851d1abeaa5a240b3a8b1045bdcf3c936cc1f"
+    }
+  ],
+  "provider": {
+    "claimed": true,
+    "base_url": "https://api.siliconflow.cn/v1",
+    "model": "BAAI/bge-m3",
+    "dimensions": 1024,
+    "requests": 2,
+    "duration_ms": 764,
+    "projection_response_sha256": "bd6714834191db9b7acddb80781fa7571e2e1884ce0792e43aabe896c4be9e74",
+    "query_response_sha256": "d786d1573c2a92d52c6583a1404352ec3f1bf8fd9ed9be41ecc81b57f8aad996"
+  },
+  "hard_gates": [
+    {
+      "ordinal": 1,
+      "name": "schema 18 adds tenant-isolated temporal eligibility archive and immutable operation audit",
+      "passed": true
+    },
+    {
+      "ordinal": 2,
+      "name": "working input does not silently create durable or global memory",
+      "passed": true
+    },
+    {
+      "ordinal": 3,
+      "name": "one request uses one PostgreSQL-derived eligibility timestamp across every context source",
+      "passed": true
+    },
+    {
+      "ordinal": 4,
+      "name": "scheduled facts are absent before valid_from and eligible at the boundary",
+      "passed": true
+    },
+    {
+      "ordinal": 5,
+      "name": "facts are eligible before valid_until and absent exactly at the boundary",
+      "passed": true
+    },
+    {
+      "ordinal": 6,
+      "name": "expiry preserves inspectable history while removing current reuse",
+      "passed": true
+    },
+    {
+      "ordinal": 7,
+      "name": "archive preserves inspectable history and removes lexical vector and delivery eligibility",
+      "passed": true
+    },
+    {
+      "ordinal": 8,
+      "name": "forget redacts current scheduled expired archived and superseded targets without deleting unrelated guidance",
+      "passed": true
+    },
+    {
+      "ordinal": 9,
+      "name": "G01 local override leaves the Global Default unchanged",
+      "passed": true
+    },
+    {
+      "ordinal": 10,
+      "name": "workspace and conversation durable facts remain available across client restart and client change",
+      "passed": true
+    },
+    {
+      "ordinal": 11,
+      "name": "lexical shadow vector bridge Web Chat OpenClaw and MCP enforce identical eligibility",
+      "passed": true
+    },
+    {
+      "ordinal": 12,
+      "name": "projection rebuild and PostgreSQL restore preserve effective results without reviving forgotten content",
+      "passed": true
+    },
+    {
+      "ordinal": 13,
+      "name": "validity and archive operations are scoped idempotent conflict rejecting and content-free in audit",
+      "passed": true
+    },
+    {
+      "ordinal": 14,
+      "name": "concurrent forget wins over validity and archive without resurrection or false receipt",
+      "passed": true
+    },
+    {
+      "ordinal": 15,
+      "name": "provider outage degrades safely without stale deleted or cross-scope exposure",
+      "passed": true
+    },
+    {
+      "ordinal": 16,
+      "name": "real Web Chat Grok and MCP Codex or Grok artifacts complete tasks using only eligible memory",
+      "passed": true
+    }
+  ],
+  "failures": [
+    {
+      "sequence": 1,
+      "at": "2026-07-17T13:53:50.202971Z",
+      "phase": "web_chat",
+      "attempt": 1,
+      "code": "duplicate_flag",
+      "message": "Grok rejected a duplicate verbatim flag before the provider wrapper was corrected",
+      "retried": true
+    },
+    {
+      "sequence": 2,
+      "at": "2026-07-17T13:54:50.202971Z",
+      "phase": "validity",
+      "attempt": 1,
+      "code": "invalid_timestamp",
+      "message": "the first C02 validity request was rejected before a database write",
+      "retried": true
+    },
+    {
+      "sequence": 3,
+      "at": "2026-07-17T13:55:50.202971Z",
+      "phase": "conversation",
+      "attempt": 1,
+      "code": "stale_sibling_history",
+      "message": "the first C02 exact-boundary replay exposed sibling assistant history and was fixed before acceptance",
+      "retried": true
+    },
+    {
+      "sequence": 4,
+      "at": "2026-07-17T13:56:50.202971Z",
+      "phase": "operator",
+      "attempt": 1,
+      "code": "unknown_command",
+      "message": "a nonexistent projection rebuild command was rejected without changing authority",
+      "retried": true
+    },
+    {
+      "sequence": 5,
+      "at": "2026-07-17T13:57:50.202971Z",
+      "phase": "codex",
+      "attempt": 1,
+      "code": "usage_limit",
+      "message": "the first official Codex account route stopped before MCP execution; a later isolated direct-provider run completed",
+      "retried": true
+    },
+    {
+      "sequence": 6,
+      "at": "2026-07-17T13:58:50.202971Z",
+      "phase": "mcp_transport",
+      "attempt": 1,
+      "code": "remote_command_quoting",
+      "message": "the initial SSH stdio command lost quoting around the socket query parameter and was corrected before acceptance",
+      "retried": true
+    },
+    {
+      "sequence": 7,
+      "at": "2026-07-17T13:59:50.202971Z",
+      "phase": "mcp_transport",
+      "attempt": 1,
+      "code": "idle_ssh_closed",
+      "message": "the first direct-provider Codex run lost its idle FRP SSH transport and was repeated with bounded keepalive",
+      "retried": true
+    },
+    {
+      "sequence": 8,
+      "at": "2026-07-17T14:00:50.202971Z",
+      "phase": "evidence",
+      "attempt": 1,
+      "code": "helper_failure",
+      "message": "two evidence-only helper attempts failed without changing product authority",
+      "retried": true
+    },
+    {
+      "sequence": 9,
+      "at": "2026-07-17T14:01:50.202971Z",
+      "phase": "profile_environment",
+      "attempt": 1,
+      "code": "postgres_version_mismatch",
+      "message": "the first miniature profile rejected PostgreSQL 17 before migration",
+      "retried": true
+    },
+    {
+      "sequence": 10,
+      "at": "2026-07-17T14:02:50.202971Z",
+      "phase": "profile_schema",
+      "attempt": 1,
+      "code": "public_acl_probe",
+      "message": "the first PUBLIC privilege probe treated PUBLIC as a role and was replaced by direct ACL inspection",
+      "retried": true
+    },
+    {
+      "sequence": 11,
+      "at": "2026-07-17T14:03:50.202971Z",
+      "phase": "profile_boundary",
+      "attempt": 1,
+      "code": "overstrict_empty_result",
+      "message": "the first boundary assertion confused absence of the target with an empty retrieval result",
+      "retried": true
+    },
+    {
+      "sequence": 12,
+      "at": "2026-07-17T14:04:50.202971Z",
+      "phase": "profile_retrieval",
+      "attempt": 1,
+      "code": "overstrict_topk_shape",
+      "message": "the first vector assertion confused target presence with a single-result requirement",
+      "retried": true
+    },
+    {
+      "sequence": 13,
+      "at": "2026-07-17T14:05:50.202971Z",
+      "phase": "profile_environment",
+      "attempt": 1,
+      "code": "module_proxy_timeout",
+      "message": "the first full-profile preflight stopped while an uncached module proxy selected an unreachable IPv6 route",
+      "retried": true
+    },
+    {
+      "sequence": 14,
+      "at": "2026-07-17T14:06:50.202971Z",
+      "phase": "profile_provider",
+      "attempt": 1,
+      "code": "invalid_preflight_credential",
+      "message": "the full 10000 fact preflight reached the direct provider gate and rejected the deliberate invalid credential",
+      "retried": true
+    },
+    {
+      "sequence": 15,
+      "at": "2026-07-17T14:07:50.202971Z",
+      "phase": "degradation",
+      "attempt": 1,
+      "code": "provider_unavailable",
+      "message": "the forced embedding outage degraded to eligible lexical serving",
+      "retried": true
+    }
+  ],
+  "non_claims": [
+    "qualification workload is not a universal capacity claim",
+    "no model ranking claim",
+    "no automatic promotion of model output",
+    "expiry and archive are not deletion claims",
+    "no cross-host high availability claim",
+    "no sealed external evaluation claim"
+  ]
+}

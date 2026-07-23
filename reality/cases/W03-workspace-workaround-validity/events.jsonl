@@ -1,0 +1,5 @@
+{"id":"w03-event-1","sequence":1,"actor":"trusted_source","channel":"workspace","source_id":"w03-workspace","content":"Use VERMORY_CACHE_DISABLED=1 only before 2026-07-20T18:00:00+08:00."}
+{"id":"w03-event-2","sequence":2,"actor":"trusted_source","channel":"workspace","source_id":"w03-workspace","content":"The durable verification command is go test -p 1 -count=1 ./... and .env files must never be committed."}
+{"id":"w03-event-3","sequence":3,"actor":"user","channel":"workspace","source_id":"w03-workspace","content":"Forget the synthetic temporary secret TEMP-NEBULA-5521."}
+{"id":"w03-event-4","sequence":4,"actor":"evaluation_probe","channel":"before_boundary","source_id":"w03-workspace","content":"Prepare the workspace before the workaround boundary."}
+{"id":"w03-event-5","sequence":5,"actor":"evaluation_probe","channel":"exact_boundary","source_id":"w03-workspace","content":"Prepare the same workspace at the exact workaround boundary without stale or forgotten content."}

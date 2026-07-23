@@ -94,10 +94,30 @@ func TestVerifyAttestationRejectsUnknownFieldsAndFutureVersions(t *testing.T) {
 	}
 
 	attestation := validTestAttestation()
-	attestation.Version = 2
+	attestation.Version = 3
 	future := signTestAttestation(t, attestation, privateKey)
 	if _, err := VerifyAttestation(future, publicKey); err == nil || !strings.Contains(err.Error(), "version") {
 		t.Fatalf("expected future-version rejection, got %v", err)
+	}
+}
+
+func TestVerifyAttestationV1RejectsUnsignedV2Fields(t *testing.T) {
+	publicKey, privateKey, err := ed25519.GenerateKey(rand.Reader)
+	if err != nil {
+		t.Fatal(err)
+	}
+	signed := signTestAttestation(t, validTestAttestation(), privateKey)
+	var payload map[string]any
+	if err := json.Unmarshal(signed, &payload); err != nil {
+		t.Fatal(err)
+	}
+	payload["submission_digest"] = strings.Repeat("a", 64)
+	modified, err := json.Marshal(payload)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := VerifyAttestation(modified, publicKey); err == nil || !strings.Contains(err.Error(), "version 2 fields") {
+		t.Fatalf("expected unsigned v2 field rejection, got %v", err)
 	}
 }
 

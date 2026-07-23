@@ -1,0 +1,43 @@
+{
+  "version": 1,
+  "date": "2026-07-14",
+  "revision": "429bc04fbb009d1b215fb163f12e564c1c1ff421",
+  "go_version": "go1.26.5",
+  "cgo_enabled": false,
+  "artifacts": [
+    {
+      "path": "artifacts/release/2026-07-14/vermory-linux-amd64",
+      "os": "linux",
+      "arch": "amd64",
+      "bytes": 20841906,
+      "sha256": "b94d5fecca146ff9dcad4353d6199491fdbaa6e8f680b55c4210ff91f3d074ba",
+      "elf": "ELF 64-bit LSB executable, x86-64, statically linked",
+      "help_exit": 0,
+      "unsafe_serve_exit": 1,
+      "unsafe_serve_rejected": true,
+      "database_backed_unauthorized_http": 401,
+      "execution": "QEMU x86_64 binfmt emulation inside an aarch64 Linux VM"
+    },
+    {
+      "path": "artifacts/release/2026-07-14/vermory-linux-arm64",
+      "os": "linux",
+      "arch": "arm64",
+      "bytes": 19561029,
+      "sha256": "8b95e0d1b784168ca21586f296cf8151d52361654e4dc70c366f8eb0a004362f",
+      "elf": "ELF 64-bit LSB executable, ARM aarch64, statically linked",
+      "help_exit": 0,
+      "unsafe_serve_exit": 1,
+      "unsafe_serve_rejected": true,
+      "database_backed_unauthorized_http": 401,
+      "execution": "Same-architecture execution inside an aarch64 Linux VM"
+    }
+  ],
+  "runtime": {
+    "kernel": "Linux 6.8.0-117-generic aarch64",
+    "vm": "Colima 0.10.3 with macOS Virtualization.Framework",
+    "database": "PostgreSQL 18.4 through a temporary TCP-to-Unix-socket bridge",
+    "migration_exit": 0,
+    "grant_runtime_exit": 0,
+    "projection_rebuild_documents": 0
+  }
+}

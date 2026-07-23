@@ -1,0 +1,56 @@
+{
+  "id": "vermory",
+  "name": "Vermory",
+  "description": "Adds governed Vermory continuity to OpenClaw agent turns without replacing OpenClaw memory or model routing.",
+  "activation": {
+    "onStartup": true
+  },
+  "uiHints": {
+    "enabled": {
+      "label": "Enable Vermory continuity",
+      "help": "Attach governed Vermory context to eligible OpenClaw turns."
+    },
+    "baseUrl": {
+      "label": "Vermory URL",
+      "help": "Loopback URL for the Vermory conversation API."
+    },
+    "timeoutMs": {
+      "label": "Request timeout (ms)",
+      "help": "Maximum time each Vermory HTTP request may take."
+	},
+	"toolAllowlist": {
+	  "label": "Tool-result allowlist",
+	  "help": "Exact OpenClaw tool names whose successful text results may be proposed for review."
+    }
+  },
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "enabled": {
+        "type": "boolean",
+        "default": true
+      },
+      "baseUrl": {
+        "type": "string",
+        "default": "http://127.0.0.1:8787"
+      },
+      "timeoutMs": {
+        "type": "integer",
+        "minimum": 250,
+        "maximum": 30000,
+        "default": 5000
+	  },
+	  "toolAllowlist": {
+		"type": "array",
+		"maxItems": 64,
+		"uniqueItems": true,
+		"default": [],
+		"items": {
+		  "type": "string",
+		  "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$"
+		}
+      }
+    }
+  }
+}

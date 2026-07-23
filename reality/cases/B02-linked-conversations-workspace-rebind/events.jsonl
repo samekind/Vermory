@@ -1,0 +1,8 @@
+{"id":"b02-event-1","sequence":1,"actor":"user","channel":"openclaw_dm","source_id":"b02-channels","content":"The thesis submission package is due on 18 July at 17:00."}
+{"id":"b02-event-2","sequence":2,"actor":"user","channel":"web_chat","source_id":"b02-channels","content":"References use GB/T 7714-2015 numeric style."}
+{"id":"b02-event-3","sequence":3,"actor":"user","channel":"web_chat_unrelated","source_id":"b02-channels","content":"Create a general literature-reading plan for next semester."}
+{"id":"b02-event-4","sequence":4,"actor":"operator","channel":"bridge_link","source_id":"b02-channels","content":"Link the OpenClaw and Web Chat submission anchors under one governed-memory group."}
+{"id":"b02-event-5","sequence":5,"actor":"evaluation_probe","channel":"linked_web_chat","source_id":"b02-channels","content":"When is the package due?"}
+{"id":"b02-event-6","sequence":6,"actor":"operator","channel":"bridge_reverse","source_id":"b02-channels","content":"Reverse the conversation link and verify future retrieval is isolated."}
+{"id":"b02-event-7","sequence":7,"actor":"operator","channel":"bridge_rebind","source_id":"b02-workspace","content":"Move the thesis workspace from /fixtures/thesis-old to /fixtures/thesis-new."}
+{"id":"b02-event-8","sequence":8,"actor":"operator","channel":"bridge_reverse","source_id":"b02-workspace","content":"Reverse the workspace rebind."}

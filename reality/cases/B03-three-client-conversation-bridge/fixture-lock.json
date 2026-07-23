@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "case_id": "B03-three-client-conversation-bridge",
+  "manifest_sha256": "6b9a715ec08634b965a4ef7afd3f28c1f7cde1b97d90186820938288253ee589",
+  "events_sha256": "f92fa94973a3a6558ff8fbb33887f04c610a53743b084dea4e0a14f5bd067431",
+  "files": [
+    {
+      "path": "fixtures/release-matter.md",
+      "sha256": "3d0b607378e90298f6faa037fd0381a4c8a1a777755369dc11c0d5a2032fa0b3",
+      "bytes": 518
+    }
+  ]
+}

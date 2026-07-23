@@ -1,0 +1,104 @@
+{
+  "version": 1,
+  "run_id": "postgresql-ha-pitr-20260716-v1",
+  "implementation_revision": "423caeba93086c92af653d38112b4ea1b8f2dce4",
+  "request_fingerprint": "cec550882f4c34a1857e1b2a99b8df9f4dd2a7dc0f4e2a6dceb9cae8b3e8c834",
+  "postgresql_version": "18.4",
+  "started_at": "2026-07-15T21:16:57.960348Z",
+  "completed_at": "2026-07-15T21:17:00.665113Z",
+  "topology": {
+    "primary_system_id": "7662866837654329699",
+    "standby_system_id": "7662866837654329699",
+    "promoted_system_id": "7662866837654329699",
+    "restored_system_id": "7662866837654329699",
+    "same_host": true
+  },
+  "failover": {
+    "primary_flush_lsn": "0/5000000",
+    "standby_replay_lsn": "0/5000000",
+    "detection_duration_ms": 0,
+    "promotion_duration_ms": 171,
+    "reconnect_duration_ms": 234,
+    "pre_failover_rows": 1,
+    "transition_rows": 0,
+    "post_promotion_rows": 1,
+    "same_handler": true,
+    "same_runtime_store": true,
+    "same_auth_pool": true,
+    "same_runtime_pool": true,
+    "promoted_read_write": true
+  },
+  "pitr": {
+    "target_lsn": "0/402ACE0",
+    "restored_replay_lsn": "0/402CCD8",
+    "t2_fingerprint": "4995748eaa075f985141f93ad82cdc058b2bb753ebfbbd87a61d5ad4e4a15103",
+    "restored_fingerprint": "4995748eaa075f985141f93ad82cdc058b2bb753ebfbbd87a61d5ad4e4a15103",
+    "base_backup_bytes": 43641232,
+    "wal_archive_bytes": 83886830,
+    "wal_inventory_sha256": "d0828cb4f58d1ddcae450e14a7f401b3a3fa92fc85a5ef1828143dc0b9c45080",
+    "duration_ms": 243,
+    "historical_state_restored": true,
+    "projection_rebuilt": true
+  },
+  "security": {
+    "historical_token_initially_active": true,
+    "historical_token_revoked": true,
+    "historical_token_rejected": true,
+    "new_token_accepted": true,
+    "current_state_reconciled": true,
+    "rls_policies": 19,
+    "tenant_foreign_keys": 36
+  },
+  "hard_gates": {
+    "credentials_regoverned": true,
+    "historical_token_quarantined": true,
+    "no_false_receipt": true,
+    "pitr_target_reached": true,
+    "projection_rebuilt": true,
+    "promoted_read_write": true,
+    "replication_caught_up": true,
+    "restored_runtime_role_valid": true,
+    "runtime_role_survived_promotion": true,
+    "same_pool_recovered": true,
+    "t3_t4_excluded": true,
+    "target_state_equal": true,
+    "tenant_isolation_after_promotion": true,
+    "wal_inventory_complete": true
+  },
+  "failures": [
+    {
+      "phase": "harness_setup",
+      "attempt": 1,
+      "code": "profile_root_permission_denied",
+      "message": "initial external profile root was not writable",
+      "retried": true
+    },
+    {
+      "phase": "harness_setup",
+      "attempt": 2,
+      "code": "unix_socket_path_too_long",
+      "message": "platform Unix socket path exceeded the supported length",
+      "retried": true
+    },
+    {
+      "phase": "ha_profile",
+      "attempt": 1,
+      "code": "promoted_archive_command_non_idempotent",
+      "message": "promoted standby retried an already archived WAL segment",
+      "retried": true
+    },
+    {
+      "phase": "failover",
+      "attempt": 1,
+      "code": "transition_database_unavailable",
+      "message": "request failed before standby promotion",
+      "retried": true
+    }
+  ],
+  "non_claims": [
+    "same-host PostgreSQL processes are not cross-host HA evidence",
+    "measured timings are not universal SLOs",
+    "no automatic leader election or split-brain prevention is provided",
+    "W15 retrieval quality remains unchanged"
+  ]
+}

@@ -9,6 +9,18 @@ tmp/
 .gotmp/
 .supermemory/
 *.log
+integrations/openclaw/node_modules/
+integrations/openclaw/dist/
+integrations/openclaw/*.tgz
+dist/
+**/.venv/
+**/__pycache__/
+**/*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.out
 
 # Local-only presentation and pre-Vermory planning material.
 bluebridge-report/

@@ -1,0 +1,85 @@
+{
+  "version": 1,
+  "id": "O01-openclaw-home-maintenance",
+  "title": "OpenClaw restart, explicit cross-entry continuity, correction, deletion, and thin defaults",
+  "evidence_level": "public",
+  "continuity_lines": ["conversation", "global_defaults", "bridge", "security"],
+  "pressures": ["restart", "cross_channel_link", "unrelated_session_isolation", "correction", "deletion", "global_default_override", "link_reversal", "provider_owned_transcript"],
+  "sources": [
+    {
+      "id": "o01-thread",
+      "kind": "authorized_transcript_excerpt",
+      "fixture_path": "fixtures/home-maintenance-thread.md",
+      "original_ref": "authorized-openclaw-case:home-maintenance",
+      "original_revision": "2026-07-14T00:00:00Z",
+      "sha256": "58d81b13d600e47090d4bd2389fa84bf879622b6a14599792b52f8f54acbc42b",
+      "authorized": true,
+      "anonymization": "Names, address, building identity, phone numbers, account identifiers, and real access credentials were replaced with synthetic values."
+    },
+    {
+      "id": "o01-governance",
+      "kind": "authorized_governance_trajectory",
+      "fixture_path": "fixtures/governance-actions.md",
+      "original_ref": "vermory-design:openclaw-o01",
+      "original_revision": "2026-07-14",
+      "sha256": "356292ae8fa9e044693d393a71db2f1a7fdfa6aaccf770a8840cfd090ec3d0bf",
+      "authorized": true,
+      "anonymization": "All anchors and sensitive values are synthetic and scoped to this public fixture."
+    }
+  ],
+  "anchors": [
+    {
+      "kind": "openclaw_session_key",
+      "value": "agent:main:home-maintenance-a",
+      "ambiguous": false
+    },
+    {
+      "kind": "openclaw_session_key",
+      "value": "agent:main:home-maintenance-b",
+      "ambiguous": false
+    },
+    {
+      "kind": "openclaw_session_key",
+      "value": "agent:main:unrelated-c",
+      "ambiguous": false
+    }
+  ],
+  "expectations": {
+    "current_facts": [
+      "The current plumbing inspection is Saturday at 10:00.",
+      "The technician must check in with the concierge.",
+      "Chinese remains the stable user-facing reply default.",
+      "Session B receives session A governed memory only while the explicit link is active."
+    ],
+    "forbidden_facts": [
+      "The current appointment is Friday at 15:30.",
+      "The temporary access code is CEDAR-4826.",
+      "Session C shares the maintenance continuity.",
+      "Weather and lunch chatter are governed memory.",
+      "A one-turn English request permanently changes the global default.",
+      "Link reversal erases OpenClaw's own historical transcript."
+    ],
+    "allowed_unknowns": [
+      "Whether the technician will arrive early.",
+      "Whether the building changes the appointment again after the recorded trajectory."
+    ],
+    "expected_action": "Use only current governed facts for the exact OpenClaw session or active explicit link, preserve unrelated-session isolation, honor deletion, and apply thin defaults without converting task-local instructions into global state."
+  },
+  "task": {
+    "prompt": "Continue the home-maintenance matter through OpenClaw after restart, link, correction, deletion, a task-local language override, and link reversal.",
+    "artifact_checks": [
+      "fresh deliveries contain only current governed facts",
+      "linked deliveries exclude raw sibling history",
+      "deleted access code is absent after projection rebuild",
+      "unrelated and post-reversal sessions remain isolated"
+    ],
+    "deterministic_checks": [
+      "contains:Saturday at 10:00",
+      "contains:concierge",
+      "not_contains:Friday at 15:30",
+      "not_contains:CEDAR-4826",
+      "not_contains:rain",
+      "not_contains:lunch"
+    ]
+  }
+}

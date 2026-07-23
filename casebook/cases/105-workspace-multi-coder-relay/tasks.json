@@ -3,7 +3,6 @@
     "id": "workspace-multi-coder-owner-relay",
     "prompt": "同一个 workspace 换到另一个 coder 了。现在下一棒应该给谁、改哪个前端文件、哪些东西不要动？",
     "must_include": ["Claude Code", "frontend/src/pages/Reconciliation.tsx", "backend contract", "frozen"],
-    "must_not_include": ["Gemini CLI should edit source files", "change API names"]
+    "must_not_include": ["Grok should edit source files", "change API names"]
   }
 ]
-

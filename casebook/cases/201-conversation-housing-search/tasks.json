@@ -2,7 +2,8 @@
   {
     "id": "conversation-search-summary",
     "prompt": "接着我们之前的租房搜索，帮我用两三句话总结一下现在的硬条件和偏好，不用展开列所有看过的房源。",
-    "must_include": ["Seattle", "3200", "one-bedroom", "pet-friendly", "Fremont"],
+    "must_include": ["3200", "Fremont"],
+    "must_include_any": [["Seattle", "西雅图"], ["one-bedroom", "一居"], ["pet-friendly", "能养", "可养", "宠物友好"]],
     "must_not_include": ["repository", "workspace", "Aurora 8 is a top choice"]
   },
   {

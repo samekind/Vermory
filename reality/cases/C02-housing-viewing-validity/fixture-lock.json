@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "case_id": "C02-housing-viewing-validity",
+  "manifest_sha256": "0969e75aa42d86074eb3939357e24462d4fa9545475e87935a55083b9378f344",
+  "events_sha256": "8b492b08e095b436c99e6cb0f2856952e078f9a0253270f477dfd34e504fe673",
+  "files": [
+    {
+      "path": "fixtures/housing-viewing.md",
+      "sha256": "68a5526837a9aadbceda343204e1ce8b1b5de4b571dea6ca3995ffab962f9e2f",
+      "bytes": 448
+    }
+  ]
+}

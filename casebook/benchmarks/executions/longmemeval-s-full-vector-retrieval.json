@@ -1,0 +1,47 @@
+{
+  "schema_version": "benchmark-execution/v1",
+  "benchmark": "LongMemEval",
+  "qualification_path": "casebook/benchmarks/qualifications/longmemeval-s-cleaned.json",
+  "dataset_sha256": "d6f21ea9d60a0d56f34a05b609c79c88a451d2ae03597821ea3d5a9678c3a442",
+  "evaluation_target": "retrieval",
+  "execution_scope": "full",
+  "claim_scope": "qualified_dataset_full",
+  "selection_mode": "all_records",
+  "record_set_sha256": "f038965c54b03632f86a59104dd77848b66e3f80c08d5fbabdd3984d16457811",
+  "expected_session_count": 23867,
+  "expected_turn_count": 246750,
+  "expected_scored_record_count": 470,
+  "hard_factual": true,
+  "scorers": [
+    {
+      "name": "session_recall_any_at_5_10_12",
+      "class": "deterministic"
+    },
+    {
+      "name": "session_recall_all_at_5_10_12",
+      "class": "deterministic"
+    },
+    {
+      "name": "session_ndcg_any_at_5_10_12",
+      "class": "deterministic"
+    },
+    {
+      "name": "session_mrr",
+      "class": "deterministic"
+    }
+  ],
+  "run_id": "longmemeval-s-full-vector-retrieval-20260719",
+  "conditions": [
+    "plain_token_overlap",
+    "vermory_lexical",
+    "vermory_vector"
+  ],
+  "non_claims": [
+    "This is not a full LongMemEval QA score.",
+    "This execution does not use an LLM judge.",
+    "This execution does not evaluate LongMemEval-M.",
+    "This execution evaluates governed session import and retrieval, not automatic memory formation from raw chats.",
+    "This execution does not rank embedding providers or switch the product retrieval default.",
+    "This public benchmark execution is not withheld or externally sealed evidence."
+  ]
+}

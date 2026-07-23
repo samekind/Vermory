@@ -1,0 +1,87 @@
+{
+  "version": 1,
+  "id": "F03-verified-tool-outcome-formation",
+  "title": "Successful allowed tool outcomes become reviewable memory without trusting assistant claims",
+  "evidence_level": "public",
+  "continuity_lines": ["conversation", "security"],
+  "pressures": ["tool_result_provenance", "success_only_capture", "tool_allowlist", "failed_tool_exclusion", "assistant_claim_exclusion", "credential_rejection", "cross_turn_binding", "cross_continuity_isolation", "candidate_review", "idempotent_replay", "tool_origin_deletion"],
+  "sources": [
+    {
+      "id": "f03-tool-outcomes",
+      "kind": "authorized_transcript_and_tool_result_excerpt",
+      "fixture_path": "fixtures/verified-tool-outcomes.md",
+      "original_ref": "authorized-session:device-maintenance-2026-05-14",
+      "original_revision": "2026-05-14T15:54:42Z/2026-05-14T16:30:41Z+w23-structured-replay",
+      "sha256": "4fd9a8f78a49021589c0a0d5c29c677780072a58c2337b7caf8a8d8299eb8944",
+      "authorized": true,
+      "anonymization": "Derived from frozen public case C01. Device identifiers, paths, accounts, personal media, and unrelated applications remain excluded; tool names and call IDs are synthetic."
+    },
+    {
+      "id": "f03-governance",
+      "kind": "authorized_governance_trajectory",
+      "fixture_path": "fixtures/governance-contract.md",
+      "original_ref": "vermory-design:verified-tool-outcome-formation-f03",
+      "original_revision": "2026-07-18",
+      "sha256": "3259cd7e242cfed68eede35a8630f43070474eb26b6bfa700c6c0ca8f07a362b",
+      "authorized": true,
+      "anonymization": "The governance contract is synthetic and contains no real credential, path, session, or tool call identifier."
+    }
+  ],
+  "anchors": [
+    {
+      "kind": "openclaw_session_key",
+      "value": "agent:main:verified-device-maintenance-a",
+      "ambiguous": false
+    },
+    {
+      "kind": "openclaw_session_key",
+      "value": "agent:main:verified-device-maintenance-b",
+      "ambiguous": false
+    }
+  ],
+  "expectations": {
+    "current_facts": [
+      "A successful allowed device diagnostic can propose the exact Gboard row count for review.",
+      "The QQ and WeChat exclusion remains explicit user-authority memory.",
+      "A successful allowed removal result can propose that the Game A resource bundle is absent.",
+      "A successful allowed storage result can propose 87 GB free and 82 percent data-partition usage.",
+      "Tool-origin candidates remain proposed until explicitly accepted.",
+      "After forgetting the accepted Gboard row count, later delivery retains the cleanup and storage facts but not 1,333,470."
+    ],
+    "forbidden_facts": [
+      "The failed first removal is represented as successful tool evidence.",
+      "The unsupported assistant deletion claim becomes formation evidence.",
+      "An unallowed weather tool result becomes an observation or candidate.",
+      "The synthetic credential-like assignment reaches PostgreSQL, provider input, review output, logs, or artifacts.",
+      "Raw tool parameters or an unbounded result object are exposed in review or model context.",
+      "Session B storage data appears in session A formation, review, or delivery.",
+      "A duplicate tool-result delivery creates another observation, schedule advance, provider call, or candidate.",
+      "A model activates, rejects, corrects, deletes, bridges, or promotes a tool-origin candidate.",
+      "The forgotten Gboard row count remains available through exact, paraphrased, semantic, review, history, or projection surfaces covered by Vermory."
+    ],
+    "allowed_unknowns": [
+      "Whether a future client exposes a stronger structured verification envelope than OpenClaw after_tool_call.",
+      "Whether other tools require tool-specific result extractors before they can be allowlisted."
+    ],
+    "expected_action": "Capture only bounded successful allowlisted tool outcomes as low-authority exact evidence, require explicit review, preserve user boundaries, and reject assistant-only, failed, sensitive, duplicate, and cross-continuity input."
+  },
+  "task": {
+    "prompt": "Continue the authorized device-maintenance matter through successful and failed OpenClaw tool calls, review the supported outcomes, use accepted current facts in a fresh answer, then forget one tool-origin memory and prove it no longer returns.",
+    "artifact_checks": [
+      "review identifies user-message versus tool-result evidence without raw parameters",
+      "first fresh answer contains the accepted diagnostic, exclusion, successful cleanup, and storage state",
+      "failed tool output, assistant-only claim, unallowed tool output, synthetic secret, and session B data remain absent",
+      "duplicate tool-result replay changes no durable counts",
+      "post-forget delivery contains cleanup and storage but no Gboard row count"
+    ],
+    "deterministic_checks": [
+      "contains:1,333,470",
+      "contains:already been deleted",
+      "contains:87 GB",
+      "contains:82 percent",
+      "not_contains:52 GB",
+      "not_contains:Friday rain",
+      "not_contains:W23_SYNTHETIC_SECRET_MUST_NOT_PERSIST"
+    ]
+  }
+}

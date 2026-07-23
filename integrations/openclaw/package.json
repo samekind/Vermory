@@ -1,0 +1,37 @@
+{
+  "name": "@vermory/openclaw",
+  "version": "0.1.0",
+  "description": "Official OpenClaw lifecycle plugin for Vermory governed conversation continuity",
+  "type": "module",
+  "files": [
+    "dist",
+    "openclaw.plugin.json"
+  ],
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "openclaw": {
+    "extensions": [
+      "./dist/index.js"
+    ]
+  },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "build": "tsc",
+    "prepack": "pnpm run build",
+    "check": "pnpm run test && pnpm run typecheck && pnpm run build"
+  },
+  "engines": {
+    "node": ">=22.19.0"
+  },
+  "peerDependencies": {
+    "openclaw": ">=2026.6.11"
+  },
+  "devDependencies": {
+    "openclaw": "2026.6.11",
+    "typescript": "5.9.3",
+    "vitest": "4.1.10"
+  },
+  "packageManager": "pnpm@11.12.0"
+}

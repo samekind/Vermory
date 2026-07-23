@@ -1,0 +1,10 @@
+[
+  {
+    "type": "decision",
+    "content": "The current release verification command is `pnpm exec release:verify --mode locked`."
+  },
+  {
+    "type": "constraint",
+    "content": "The independent API timeout remains `800 ms`."
+  }
+]

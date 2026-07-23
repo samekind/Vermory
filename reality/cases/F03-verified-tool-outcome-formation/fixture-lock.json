@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "case_id": "F03-verified-tool-outcome-formation",
+  "manifest_sha256": "bcc41e77b5159090af08c13d803043bb7ed71a4fd6160b127814f03b895916b8",
+  "events_sha256": "b91a0cf08a8652308ab0d4ec123f4828a58ca434e55873595215611c3f9e78b3",
+  "files": [
+    {
+      "path": "fixtures/governance-contract.md",
+      "sha256": "3259cd7e242cfed68eede35a8630f43070474eb26b6bfa700c6c0ca8f07a362b",
+      "bytes": 1470
+    },
+    {
+      "path": "fixtures/verified-tool-outcomes.md",
+      "sha256": "4fd9a8f78a49021589c0a0d5c29c677780072a58c2337b7caf8a8d8299eb8944",
+      "bytes": 1493
+    }
+  ]
+}

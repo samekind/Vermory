@@ -1,0 +1,32 @@
+{
+  "version": "1",
+  "id": "W31-real-git-workspace-topology",
+  "reality_case_id": "W05-trusted-workspace-attachment",
+  "tenant_id": "w31-workspace-topology",
+  "other_tenant_id": "w31-workspace-topology-other",
+  "filesystem_namespace": "workstation-alpha",
+  "alternate_filesystem_namespace": "workstation-beta",
+  "current_fact": "continuation_marker=w31-current",
+  "other_tenant_fact": "continuation_marker=w31-other-tenant-only",
+  "hard_gate_count": 18,
+  "hard_gates": [
+    "nested cwd probes to the canonical primary Git root",
+    "primary and linked worktree roots remain distinct attachments",
+    "primary and linked worktree share Git common-directory evidence",
+    "same-name independent repository remains a distinct attachment",
+    "ordinary clone remains a distinct attachment",
+    "unadopted worktree prepare abstains without a delivery",
+    "same-name repository prepare abstains without a delivery",
+    "clone prepare abstains without a delivery",
+    "same path in another filesystem namespace abstains",
+    "same anchor in another tenant cannot read the target tenant fact",
+    "explicit worktree adopt preserves the primary continuity",
+    "adopted worktree receives only current governed memory",
+    "adopt replay is idempotent",
+    "adopt reversal removes worktree access without changing the primary",
+    "a physically moved checkout abstains before explicit rebind",
+    "explicit rebind preserves continuity and current governed memory",
+    "rebind replay and reversal are idempotent and exact",
+    "final rebind restores service at the physically current root"
+  ]
+}

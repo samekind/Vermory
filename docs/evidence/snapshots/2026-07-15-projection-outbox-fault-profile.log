@@ -1,0 +1,21 @@
+=== RUN   TestProjectionOutboxFaultProfile
+2026/07/15 16:27:39 OK   00001_initial.sql (11.68ms)
+2026/07/15 16:27:39 OK   00002_workspace_runtime.sql (9.95ms)
+2026/07/15 16:27:39 OK   00003_governed_memory_origin.sql (352µs)
+2026/07/15 16:27:39 OK   00004_conversation_continuity.sql (3.36ms)
+2026/07/15 16:27:39 OK   00005_conversation_turns.sql (1.75ms)
+2026/07/15 16:27:39 OK   00006_global_defaults.sql (994.67µs)
+2026/07/15 16:27:39 OK   00007_durable_bridges.sql (5.9ms)
+2026/07/15 16:27:39 OK   00008_conversation_turn_fingerprints.sql (939.88µs)
+2026/07/15 16:27:39 OK   00009_identity_authorization_rls.sql (12.25ms)
+2026/07/15 16:27:39 OK   00010_source_conflict_candidates.sql (820µs)
+2026/07/15 16:27:39 OK   00011_source_match_decisions.sql (2.46ms)
+2026/07/15 16:27:39 OK   00012_source_match_continuity_fks.sql (2.34ms)
+2026/07/15 16:27:39 OK   00013_source_document_formation.sql (5.15ms)
+2026/07/15 16:27:39 OK   00014_production_retrieval_runtime.sql (15.31ms)
+2026/07/15 16:27:39 OK   00015_retrieval_profile_migration.sql (2.69ms)
+2026/07/15 16:27:39 goose: successfully migrated database to version: 15
+    projection_outbox_fault_profile_test.go:245: projection outbox fault evidence={"concurrent_delete_won":true,"duplicate_replay_vector_count":1000,"final_lag":0,"first_batch_processed":128,"initial_backlog":1000,"postgres_restart_during_embedding":true,"provider_failure_cursor_unchanged":true,"real_provider_requests":2,"records":1000,"same_pool_recovered":true}
+--- PASS: TestProjectionOutboxFaultProfile (5.92s)
+PASS
+ok  	vermory/internal/runtime	6.839s

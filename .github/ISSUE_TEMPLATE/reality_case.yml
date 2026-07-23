@@ -1,0 +1,66 @@
+name: Reality case or benchmark mapping
+description: Contribute an authorized real trajectory, synthetic hard-gate case, or benchmark mapping.
+title: "[Reality]: "
+labels:
+  - reality-case
+  - needs-validation
+body:
+  - type: dropdown
+    id: evidence_level
+    attributes:
+      label: Proposed evidence level
+      options:
+        - public
+        - withheld_local
+        - external sealed attestation
+        - official_dataset
+        - translated_proxy
+        - inspired_case
+    validations:
+      required: true
+  - type: textarea
+    id: source
+    attributes:
+      label: Source authorization and provenance
+      description: Explain why the source may be used, how it is minimized, and what must remain private.
+    validations:
+      required: true
+  - type: textarea
+    id: trajectory
+    attributes:
+      label: Multi-event trajectory
+      description: Describe anchors, event sequence, corrections, distractors, and the downstream task.
+    validations:
+      required: true
+  - type: textarea
+    id: assertions
+    attributes:
+      label: Expected and forbidden assertions
+      description: Prefer deterministic current-fact, stale-fact, scope, deletion, and artifact checks.
+    validations:
+      required: true
+  - type: textarea
+    id: baselines
+    attributes:
+      label: Relevant baselines
+      description: Identify no-context, full-history, summary, retrieval, external backend, or other comparable conditions.
+    validations:
+      required: true
+  - type: textarea
+    id: privacy
+    attributes:
+      label: Privacy and anonymization
+      description: State removed identifiers, path normalization, transcript minimization, and credential scanning.
+    validations:
+      required: true
+  - type: checkboxes
+    id: integrity
+    attributes:
+      label: Evidence integrity
+      options:
+        - label: I will not label repository-readable data as sealed.
+          required: true
+        - label: Failed baselines and attempts will remain in the evidence.
+          required: true
+        - label: The same generated output will not define the task, expected answer, and sole judgment.
+          required: true

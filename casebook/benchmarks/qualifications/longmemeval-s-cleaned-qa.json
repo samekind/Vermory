@@ -1,0 +1,32 @@
+{
+  "schema_version": "benchmark-qualification/v1",
+  "benchmark": "LongMemEval",
+  "source_class": "official_dataset",
+  "repository": {
+    "url": "https://github.com/xiaowu0162/LongMemEval",
+    "revision": "9e0b455f4ef0e2ab8f2e582289761153549043fc"
+  },
+  "license": "MIT",
+  "dataset": {
+    "url": "https://huggingface.co/datasets/xiaowu0162/longmemeval-cleaned",
+    "path": "longmemeval_s_cleaned.json",
+    "revision": "98d7416c24c778c2fee6e6f3006e7a073259d48f",
+    "sha256": "d6f21ea9d60a0d56f34a05b609c79c88a451d2ae03597821ea3d5a9678c3a442",
+    "size_bytes": 277383467,
+    "record_count": 500
+  },
+  "official_scorer": {
+    "url": "https://github.com/xiaowu0162/LongMemEval",
+    "path": "src/evaluation/evaluate_qa.py",
+    "revision": "9e0b455f4ef0e2ab8f2e582289761153549043fc",
+    "sha256": "ecce9c4c79dc89d99534ac17b383a5cbb5b9f0c69ee98adaf0684742e3d95251",
+    "class": "official_model_judge"
+  },
+  "known_risks": [
+    "The official QA evaluator uses gpt-4o-2024-08-06 and model-judge accuracy is not deterministic.",
+    "A custom judge using the pinned prompt is auxiliary evidence and cannot be reported as official LongMemEval accuracy.",
+    "LongMemEval-S evaluates histories of roughly 115k tokens and is distinct from LongMemEval-M.",
+    "The cleaned dataset replaced the original release after noisy sessions were removed."
+  ],
+  "fixture_redistribution": "The complete upstream dataset remains outside this repository; only source metadata and normalized result evidence are committed."
+}

@@ -1,0 +1,80 @@
+{
+  "version": 1,
+  "slice_id": "W25",
+  "case_id": "W04-canonical-repository-cross-client",
+  "date": "2026-07-19",
+  "status": "blocked",
+  "qualification_pass": false,
+  "failure_class": "client_account_blocked",
+  "implementation_revision": "b2173fdd128eb02b7fda96c826dce04b0dca017a",
+  "workspace_revision": "2fe75531c7d8e85b6d7fadf39e2b42dd70ebaac7",
+  "client": {
+    "name": "cursor-agent",
+    "version": "2026.07.13-7fe37d2",
+    "requested_model": "gpt-5.3-codex",
+    "logged_in": true,
+    "model_available": true,
+    "generation_exit": 1
+  },
+  "runtime": {
+    "host_class": "mac_mini_arm64",
+    "database": "postgresql_18_dedicated",
+    "mcp_transport": "stdio_over_ssh",
+    "binary_sha256": "c52a72195494f0f296080a975ecbc543cabf6bf067f90f7eaabfcb98d59acad9"
+  },
+  "mcp": {
+    "ready": true,
+    "tools_valid": true,
+    "tools": [
+      "prepare_context",
+      "commit_observation"
+    ],
+    "governance_arguments_exposed": false
+  },
+  "seed": {
+    "canonical_current": 3,
+    "canonical_superseded": 1,
+    "stale_active": 0,
+    "distractor_current": 1
+  },
+  "final_attempt": {
+    "run_id": "attempt-005",
+    "prepare_operation_id": "w25-attempt-005-prepare",
+    "observation_operation_id": "w25-attempt-005-observation",
+    "preflight_valid": true,
+    "mcp_ready": true,
+    "mcp_tools_valid": true,
+    "artifact_present": false,
+    "artifact_valid": false,
+    "replay_seen": false,
+    "ledger_valid": false,
+    "deliveries": 0,
+    "agent_results": 0,
+    "proposed_memories": 0,
+    "active_agent_memories": 0
+  },
+  "preserved_attempts": 7,
+  "latest_reprobe": {
+    "date": "2026-07-23",
+    "branch_revision": "d7dd71d6c99bea57dd67d5f1df51ac019c6f0612",
+    "client_version": "2026.07.13-7fe37d2",
+    "requested_model": "gpt-5.3-codex",
+    "workspace_storage": "external_volume",
+    "generation_exit": 1,
+    "failure_class": "client_account_blocked",
+    "mcp_started": false,
+    "vermory_side_effects": 0
+  },
+  "evidence": {
+    "retained_files": 85,
+    "checksum_entries_verified": 85,
+    "checksums_sha256": "bb18d5d816dba0996a28af0bce6969074f77bcf75c60de1dea95542d9df09d29",
+    "privacy_pass": true
+  },
+  "non_claims": [
+    "Cursor Agent did not consume governed context.",
+    "W25 is not a Cursor client qualification pass.",
+    "No other client or provider substitutes for the failed Cursor request.",
+    "This attempt does not complete Vermory."
+  ]
+}

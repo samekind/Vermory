@@ -1,0 +1,53 @@
+{
+  "schema_version": "benchmark-execution/v1",
+  "benchmark": "LongMemEval",
+  "qualification_path": "casebook/benchmarks/qualifications/longmemeval-cleaned-oracle.json",
+  "dataset_sha256": "821a2034d219ab45846873dd14c14f12cfe7776e73527a483f9dac095d38620c",
+  "evaluation_target": "qa",
+  "execution_scope": "sample",
+  "claim_scope": "dataset_sample",
+  "sampling_rule": "Six factual records were frozen before provider execution: the first reviewed non-preference record for knowledge-update, multi-session, single-session-assistant, single-session-user, and temporal-reasoning, plus one single-session-user abstention record.",
+  "fixture_path": "casebook/benchmarks/fixtures/longmemeval-oracle-sample.json",
+  "fixture_sha256": "bfd60ccc2f577a1f4e0596797a5143c4b6cf1169d18ace4b349c7ef87142a3f2",
+  "selected_record_ids": [
+    "6a1eabeb",
+    "0a995998",
+    "7161e7e2",
+    "e47becba",
+    "gpt4_2655b836",
+    "0862e8bf_abs"
+  ],
+  "hard_factual": true,
+  "scorers": [
+    {
+      "name": "normalized_exact_match",
+      "class": "deterministic"
+    },
+    {
+      "name": "token_f1",
+      "class": "deterministic"
+    },
+    {
+      "name": "answer_token_recall",
+      "class": "deterministic"
+    },
+    {
+      "name": "abstention_phrase_detection",
+      "class": "deterministic"
+    }
+  ],
+  "run_id": "longmemeval-original-sample-grok-20260714",
+  "conditions": [
+    "no_context",
+    "full_oracle_history",
+    "plain_lexical_retrieval",
+    "vermory_packet"
+  ],
+  "non_claims": [
+    "This sample is not a full LongMemEval score.",
+    "The oracle artifact does not test retrieval over LongMemEval-S or LongMemEval-M filler sessions.",
+    "The sample excludes single-session-preference questions.",
+    "The governed import path does not measure automatic memory formation or user-confirmation quality.",
+    "The deterministic metrics are local sample metrics, not the official GPT-4o judge accuracy."
+  ]
+}

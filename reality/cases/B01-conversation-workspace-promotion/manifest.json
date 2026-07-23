@@ -1,0 +1,62 @@
+{
+  "version": 1,
+  "id": "B01-conversation-workspace-promotion",
+  "title": "Selected release decision promoted from conversation into a software workspace",
+  "evidence_level": "public",
+  "continuity_lines": ["conversation", "workspace", "bridge"],
+  "pressures": ["explicit_promotion", "bounded_selection", "noise_exclusion", "workspace_consumption", "bounded_export", "reversal"],
+  "sources": [
+    {
+      "id": "b01-conversation",
+      "kind": "authorized_transcript_excerpt",
+      "fixture_path": "fixtures/release-planning.md",
+      "original_ref": "authorized-synthetic:release-planning",
+      "original_revision": "2026-07-14",
+      "sha256": "86537c107cb6a6cb86547f36b211db82a22e3275fb5eeb7e221ce8ca5dc6627c",
+      "authorized": true,
+      "anonymization": "Synthetic product names and flags preserve software-release structure without private repository content."
+    },
+    {
+      "id": "b01-workspace",
+      "kind": "repository_state_excerpt",
+      "fixture_path": "fixtures/workspace-state.md",
+      "original_ref": "authorized-synthetic:checkout-workspace",
+      "original_revision": "2026-07-14",
+      "sha256": "e736d7d3d491c99b606c832870481e437b4dcdebdd3e88b8a3955f95663eb384",
+      "authorized": true,
+      "anonymization": "The fixture contains only synthetic workspace state and no source code or credentials."
+    }
+  ],
+  "anchors": [
+    {
+      "kind": "conversation_id",
+      "value": "web_chat/release-planning",
+      "ambiguous": false
+    },
+    {
+      "kind": "workspace_path",
+      "value": "/fixtures/checkout-workspace",
+      "ambiguous": false
+    }
+  ],
+  "expectations": {
+    "current_facts": [
+      "Use checkout_eta_v2 for the staged checkout release.",
+      "Only explicitly selected active conversation memory is promoted.",
+      "The source conversation remains authoritative after promotion reversal.",
+      "The handoff export contains only explicitly selected active workspace facts."
+    ],
+    "forbidden_facts": [
+      "The mascot tangent is promoted into the checkout workspace.",
+      "The complete conversation transcript is merged into the workspace.",
+      "Reversing promotion deletes the source conversation memory.",
+      "Export merges the target consumer into the workspace continuity."
+    ],
+    "expected_action": "Promote only the selected checkout flag, consume it in workspace context, export a bounded handoff, then reverse promotion without altering source memory."
+  },
+  "task": {
+    "prompt": "Prepare the staged checkout release context and a bounded team handoff using only governed selected facts.",
+    "artifact_checks": ["workspace context and export exclude unconfirmed conversation noise"],
+    "deterministic_checks": ["contains:checkout_eta_v2", "contains:smoke suite", "not_contains:mascot", "bridge_reversal:source_preserved"]
+  }
+}

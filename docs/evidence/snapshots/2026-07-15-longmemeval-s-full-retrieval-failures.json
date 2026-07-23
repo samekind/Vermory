@@ -1,0 +1,19 @@
+{
+  "schema_version": "longmemeval-s-full-retrieval-failures/v1",
+  "run_id": "longmemeval-s-full-retrieval-20260715-v1",
+  "implementation_revision": "0f59bf58d9a107ce47f79ba86fd61a7c35c8324b",
+  "runtime_failures": [],
+  "hard_gate_failures": [],
+  "source_shape_corrections": [
+    {
+      "category": "repeated_distractor_session_id",
+      "affected_records": 13,
+      "disposition": "Retain both timestamped occurrences as distinct governed memories and preserve the raw session ID for upstream-compatible metrics."
+    },
+    {
+      "category": "empty_unlabeled_turn_content",
+      "affected_turns": 12,
+      "disposition": "Retain source turn counts and omit empty semantic content; reject empty answer-labeled turns and all-empty sessions."
+    }
+  ]
+}

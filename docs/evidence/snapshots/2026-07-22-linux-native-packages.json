@@ -1,0 +1,236 @@
+{
+  "evidence_version": 1,
+  "case_id": "I06-linux-native-packages",
+  "status": "runtime-qualified",
+  "source_head": "4a20942b60f3198de25ba53091d23a40e499341e",
+  "github": {
+    "repository": "samekind/Vermory",
+    "run_id": 29923986517,
+    "run_conclusion": "success",
+    "test_job_id": 88936300740,
+    "linux_service_amd64_job_id": 88936300659,
+    "linux_service_arm64_job_id": 88936300730,
+    "sign_snapshot_job_id": 88937403534,
+    "pull_request_state": "OPEN",
+    "pull_request_draft": true
+  },
+  "package_legs": [
+    {
+      "job_id": 88936300805,
+      "artifact_id": 8531128039,
+      "artifact_name": "vermory-i06-linux-package-deb-amd64-4a20942b60f3198de25ba53091d23a40e499341e",
+      "artifact_size_bytes": 5734972,
+      "artifact_sha256": "7a0513d4f49aa781014548470fb04157d98215cbc9b36b77bb0c6584cab36f05",
+      "downloaded_zip_sha256": "7a0513d4f49aa781014548470fb04157d98215cbc9b36b77bb0c6584cab36f05",
+      "report_sha256": "ef1db3ad91c6fd50242c747343890c67bf78e4857ccd28bd813342793d6482fd",
+      "package_size_bytes": 5747198,
+      "signed_snapshot_hash_match": true,
+      "report": {
+        "version": "1",
+        "case_id": "I06-linux-native-packages",
+        "source_sha": "4a20942b60f3198de25ba53091d23a40e499341e",
+        "package": {
+          "format": "deb",
+          "architecture": "amd64",
+          "machine": "x86_64",
+          "file": "vermory_0.0.0-SNAPSHOT-4a20942_linux_amd64.deb",
+          "sha256": "41021b3faa8fd2d6653e7ae97cceba8c2170f73ca16774caf5775e38ae741a57",
+          "native": true
+        },
+        "hard_gates": {
+          "exact_source_head": true,
+          "expected_format": true,
+          "native_architecture": true,
+          "executable_binary": true,
+          "restricted_service_identity": true,
+          "hardened_systemd_unit": true,
+          "environment_example": true,
+          "protected_environment_absent": true,
+          "service_not_activated": true,
+          "scripts_without_sudo": true,
+          "scripts_without_migrations": true,
+          "scripts_without_credentials": true,
+          "true_removal_guard": true,
+          "package_owned_files_removed": true,
+          "operator_state_preserved": true,
+          "report_credential_free": true
+        }
+      }
+    },
+    {
+      "job_id": 88936300802,
+      "artifact_id": 8531138244,
+      "artifact_name": "vermory-i06-linux-package-deb-arm64-4a20942b60f3198de25ba53091d23a40e499341e",
+      "artifact_size_bytes": 5225461,
+      "artifact_sha256": "d59107182de520ed0497b454f5bd23433961d0ff837239fc58c6b940907251a0",
+      "downloaded_zip_sha256": "d59107182de520ed0497b454f5bd23433961d0ff837239fc58c6b940907251a0",
+      "report_sha256": "3349175109e676100e7b97004fcdd94be8debae29ad398d792b7408d91e23e9e",
+      "package_size_bytes": 5238854,
+      "signed_snapshot_hash_match": true,
+      "report": {
+        "version": "1",
+        "case_id": "I06-linux-native-packages",
+        "source_sha": "4a20942b60f3198de25ba53091d23a40e499341e",
+        "package": {
+          "format": "deb",
+          "architecture": "arm64",
+          "machine": "aarch64",
+          "file": "vermory_0.0.0-SNAPSHOT-4a20942_linux_arm64.deb",
+          "sha256": "b64537e1b4e0644635479159dccc7259bc0ea06d90e3d8fded2d467ccb15a77e",
+          "native": true
+        },
+        "hard_gates": {
+          "exact_source_head": true,
+          "expected_format": true,
+          "native_architecture": true,
+          "executable_binary": true,
+          "restricted_service_identity": true,
+          "hardened_systemd_unit": true,
+          "environment_example": true,
+          "protected_environment_absent": true,
+          "service_not_activated": true,
+          "scripts_without_sudo": true,
+          "scripts_without_migrations": true,
+          "scripts_without_credentials": true,
+          "true_removal_guard": true,
+          "package_owned_files_removed": true,
+          "operator_state_preserved": true,
+          "report_credential_free": true
+        }
+      }
+    },
+    {
+      "job_id": 88936300759,
+      "artifact_id": 8531127894,
+      "artifact_name": "vermory-i06-linux-package-rpm-amd64-4a20942b60f3198de25ba53091d23a40e499341e",
+      "artifact_size_bytes": 5716929,
+      "artifact_sha256": "0b684d144c3e5b59abe698dffe0ddf2d49bb2ab6341ccdcd745a15ee0b20994c",
+      "downloaded_zip_sha256": "0b684d144c3e5b59abe698dffe0ddf2d49bb2ab6341ccdcd745a15ee0b20994c",
+      "report_sha256": "c7814e5d4a99e4d584de062ee36ea6c24f98cd78363d414a15d3df63324d239f",
+      "package_size_bytes": 5736075,
+      "signed_snapshot_hash_match": true,
+      "report": {
+        "version": "1",
+        "case_id": "I06-linux-native-packages",
+        "source_sha": "4a20942b60f3198de25ba53091d23a40e499341e",
+        "package": {
+          "format": "rpm",
+          "architecture": "amd64",
+          "machine": "x86_64",
+          "file": "vermory_0.0.0-SNAPSHOT-4a20942_linux_amd64.rpm",
+          "sha256": "7117c84cd9a3a4a8205007ecfdaa616a9ae893105f4c1395d84f647c934bf0b6",
+          "native": true
+        },
+        "hard_gates": {
+          "exact_source_head": true,
+          "expected_format": true,
+          "native_architecture": true,
+          "executable_binary": true,
+          "restricted_service_identity": true,
+          "hardened_systemd_unit": true,
+          "environment_example": true,
+          "protected_environment_absent": true,
+          "service_not_activated": true,
+          "scripts_without_sudo": true,
+          "scripts_without_migrations": true,
+          "scripts_without_credentials": true,
+          "true_removal_guard": true,
+          "package_owned_files_removed": true,
+          "operator_state_preserved": true,
+          "report_credential_free": true
+        }
+      }
+    },
+    {
+      "job_id": 88936300792,
+      "artifact_id": 8531147789,
+      "artifact_name": "vermory-i06-linux-package-rpm-arm64-4a20942b60f3198de25ba53091d23a40e499341e",
+      "artifact_size_bytes": 5193821,
+      "artifact_sha256": "d5139cd36153986e86d49cd1e76a8a0ff7f015d3cd530ea392efa7bd084f81c0",
+      "downloaded_zip_sha256": "d5139cd36153986e86d49cd1e76a8a0ff7f015d3cd530ea392efa7bd084f81c0",
+      "report_sha256": "bb93d89dfb28eac3265b4b8dbf559e93e1361c28e38794186d0a0644665ddd92",
+      "package_size_bytes": 5213993,
+      "signed_snapshot_hash_match": true,
+      "report": {
+        "version": "1",
+        "case_id": "I06-linux-native-packages",
+        "source_sha": "4a20942b60f3198de25ba53091d23a40e499341e",
+        "package": {
+          "format": "rpm",
+          "architecture": "arm64",
+          "machine": "aarch64",
+          "file": "vermory_0.0.0-SNAPSHOT-4a20942_linux_arm64.rpm",
+          "sha256": "e2a344ceb6b4f1ad50800472a3af379f7a0b592c453f980ea299c06884a6e548",
+          "native": true
+        },
+        "hard_gates": {
+          "exact_source_head": true,
+          "expected_format": true,
+          "native_architecture": true,
+          "executable_binary": true,
+          "restricted_service_identity": true,
+          "hardened_systemd_unit": true,
+          "environment_example": true,
+          "protected_environment_absent": true,
+          "service_not_activated": true,
+          "scripts_without_sudo": true,
+          "scripts_without_migrations": true,
+          "scripts_without_credentials": true,
+          "true_removal_guard": true,
+          "package_owned_files_removed": true,
+          "operator_state_preserved": true,
+          "report_credential_free": true
+        }
+      }
+    }
+  ],
+  "signed_snapshot": {
+    "artifact_id": 8531264312,
+    "artifact_name": "vermory-pr-snapshot-4a20942b60f3198de25ba53091d23a40e499341e",
+    "artifact_size_bytes": 44210490,
+    "artifact_sha256": "6728bfa703d01c89634b9364b79378010d65cdc700312d01c61e01ee6dee5164",
+    "downloaded_zip_sha256": "6728bfa703d01c89634b9364b79378010d65cdc700312d01c61e01ee6dee5164",
+    "manifest_sha256": "af1f20906ed2e77fd58a15aefd594ae4361842c0459befac116251958835f0c5",
+    "checksums_sha256": "8dfb5bf0e0f91490f0de77872557383aee16c579a9ebaa0ac6324edce6775b5f",
+    "sigstore_bundle_sha256": "39e94f168342d644cd895ac3a441e87c3cc36c26c65cc63f696b515ffd227187",
+    "manifest_entries": 12,
+    "checksums_entries": 8,
+    "all_payload_hashes_verified": true,
+    "all_accepted_package_hashes_match": true,
+    "sigstore": {
+      "cosign_version": "v3.0.6",
+      "workflow_identity": "https://github.com/samekind/Vermory/.github/workflows/ci.yml@refs/pull/1/merge",
+      "oidc_issuer": "https://token.actions.githubusercontent.com",
+      "bundle_media_type": "application/vnd.dev.sigstore.bundle.v0.3+json",
+      "rekor_log_index": "2218182904",
+      "inclusion_promise": true,
+      "inclusion_proof": true,
+      "positive_verification": "pass",
+      "modified_manifest_rejection": "pass",
+      "wrong_identity_rejection": "pass"
+    }
+  },
+  "retained_failures": [
+    {
+      "run_id": 29922576223,
+      "source_head": "ae803eaf2e5613f5bbb70b0e7d0544d92800454e",
+      "failure": "RPM maintainer scripts were executed by /bin/sh and rejected Bash-only pipefail syntax on both native architectures."
+    },
+    {
+      "run_id": 29922904137,
+      "source_head": "8b9df2bebc9444d022e857a9ca594c5c6be25c26",
+      "failure": "The CI run was green, but evidence review rejected qualification because the installed RPM/ARM64 hash did not match the independently rebuilt signed RPM/ARM64 hash."
+    }
+  ],
+  "claim_boundary": {
+    "qualified": "four exact-head DEB/RPM package artifacts installed and removed on native AMD64/ARM64 runners, then incorporated byte-for-byte into one verified OIDC-signed pull-request snapshot",
+    "not_qualified": [
+      "APT or DNF repository metadata, repository signing, mirrors, or retention",
+      "tagged release publication",
+      "distribution-specific DNF upgrade behavior",
+      "automatic database migration or PostgreSQL migration rollback",
+      "long-duration uptime or a service SLA",
+      "the complete Vermory platform"
+    ]
+  }
+}

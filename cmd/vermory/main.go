@@ -2,15 +2,23 @@ package main
 
 import (
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"os"
 	"sort"
+	"strings"
 
 	"vermory/internal/app"
 	"vermory/internal/brand"
+	"vermory/internal/identitycli"
+	"vermory/internal/mcpserver"
 	"vermory/internal/memorybackend"
+	"vermory/internal/operatorcli"
 	"vermory/internal/reality"
+	"vermory/internal/resolver"
+	"vermory/internal/runtime"
 
+	"github.com/modelcontextprotocol/go-sdk/mcp"
 	"github.com/spf13/cobra"
 )
 
@@ -37,6 +45,23 @@ func newRootCommand() *cobra.Command {
 	var caseLine string
 	var casebookReportPath string
 	var benchmarkMapPath string
+	var utilityProfilePath string
+	var utilityBundlePath string
+	var utilityReportPath string
+	var utilityWritebackEvidencePath string
+	var utilityMem0ContextDir string
+	var utilityNativeContextDir string
+	var utilityResetDedicated bool
+	var utilityRetrievalMode string
+	var utilityRetrievalProfile string
+	var utilityEmbeddingBaseURL string
+	var utilityEmbeddingAPIKeyEnv string
+	var utilityEmbeddingModel string
+	var utilityEmbeddingDimensions int
+	var utilityExpectedNativeRetrievalMode string
+	var mem0BaseURL string
+	var mem0APIKeyEnv string
+	var mem0IncludeSource bool
 	var backendName string
 	var backendBaseURL string
 	var backendAPIKeyEnv string
@@ -49,13 +74,26 @@ func newRootCommand() *cobra.Command {
 	var loadQueries int
 	var loadConcurrency int
 	var loadScopeSuffix string
+	var mcpDatabaseURL string
+	var mcpTenantID string
+	var mcpWorkspaceAttachment string
+	mcpRetrieval := defaultRetrievalRuntimeOptions()
 
 	rootCmd := &cobra.Command{
 		Use:           brand.Slug,
 		Short:         brand.Name + " - " + brand.Tagline,
+		Version:       brand.Version,
 		SilenceErrors: true,
 		SilenceUsage:  true,
 	}
+	rootCmd.AddCommand(&cobra.Command{
+		Use:   "version",
+		Short: "Print release build metadata",
+		Args:  cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return json.NewEncoder(cmd.OutOrStdout()).Encode(brand.Info())
+		},
+	})
 
 	runSelfCaseCmd := &cobra.Command{
 		Use:   "run-self-case",
@@ -71,6 +109,65 @@ func newRootCommand() *cobra.Command {
 	runSelfCaseCmd.Flags().StringVar(&databaseURL, "database-url", "", "PostgreSQL connection URL")
 	runSelfCaseCmd.Flags().StringVar(&artifactRoot, "artifact-root", "./artifacts", "artifact output root")
 	rootCmd.AddCommand(runSelfCaseCmd)
+	rootCmd.AddCommand(operatorcli.NewWorkspaceCommand())
+	rootCmd.AddCommand(operatorcli.NewMemoryCommand())
+	rootCmd.AddCommand(operatorcli.NewDefaultsCommand())
+	rootCmd.AddCommand(operatorcli.NewBridgeCommand())
+	rootCmd.AddCommand(identitycli.NewIdentityCommand())
+	rootCmd.AddCommand(identitycli.NewDatabaseCommand())
+	rootCmd.AddCommand(newWebChatCommand())
+	rootCmd.AddCommand(newServeCommand())
+	rootCmd.AddCommand(newBenchmarkLongMemEvalCommand())
+	rootCmd.AddCommand(newBenchmarkLongMemEvalRetrievalCommand())
+	rootCmd.AddCommand(newBenchmarkLongMemEvalQACommand())
+	rootCmd.AddCommand(newRetrievalAblationCommand())
+	rootCmd.AddCommand(newRetrievalProfileComparisonCommand())
+	rootCmd.AddCommand(newRetrievalWorkerCommand())
+	rootCmd.AddCommand(newConversationFormationWorkerCommand())
+	rootCmd.AddCommand(newRetrievalStatusCommand())
+	rootCmd.AddCommand(newRetrievalRebuildCommand())
+	rootCmd.AddCommand(newRetrievalSnapshotRebuildCommand())
+	rootCmd.AddCommand(newRetrievalPruneEventsCommand())
+
+	mcpStdioCmd := &cobra.Command{
+		Use:   "mcp-stdio",
+		Short: "Run the local workspace continuity MCP server over stdio",
+		Args:  cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if strings.TrimSpace(mcpDatabaseURL) == "" {
+				return fmt.Errorf("--database-url is required")
+			}
+			if strings.TrimSpace(mcpTenantID) == "" {
+				return fmt.Errorf("--tenant-id is required")
+			}
+			attachment, err := resolver.DecodeWorkspaceAttachment(mcpWorkspaceAttachment)
+			if err != nil {
+				return err
+			}
+			store, err := openStandaloneRuntimeStore(cmd.Context(), mcpDatabaseURL, "MCP")
+			if err != nil {
+				return err
+			}
+			defer store.Close()
+			retriever, err := buildRuntimeRetriever(store, mcpRetrieval)
+			if err != nil {
+				return err
+			}
+			service := runtime.NewService(store, mcpTenantID)
+			if retriever != nil {
+				service = runtime.NewServiceWithRetriever(store, mcpTenantID, retriever)
+			}
+			handler := mcpserver.NewWithAttachment(service, mcpTenantID, attachment)
+			return mcpserver.NewServer(handler).Run(cmd.Context(), &mcp.StdioTransport{})
+		},
+	}
+	mcpStdioCmd.Flags().StringVar(&mcpDatabaseURL, "database-url", "", "PostgreSQL connection URL")
+	mcpStdioCmd.Flags().StringVar(&mcpTenantID, "tenant-id", "", "server-owned tenant identifier")
+	mcpStdioCmd.Flags().StringVar(&mcpWorkspaceAttachment, "workspace-attachment", "", "trusted workstation-generated workspace attachment")
+	_ = mcpStdioCmd.MarkFlagRequired("workspace-attachment")
+	addSharedRetrievalFlags(mcpStdioCmd, &mcpRetrieval)
+	rootCmd.AddCommand(mcpStdioCmd)
+	rootCmd.AddCommand(newWorkspaceAttachmentCommand())
 
 	evalSelfCaseCmd := &cobra.Command{
 		Use:   "eval-self-case",
@@ -96,13 +193,184 @@ func newRootCommand() *cobra.Command {
 	}
 	evalSelfCaseCmd.Flags().StringVar(&databaseURL, "database-url", "", "optional PostgreSQL connection URL for migration preflight")
 	evalSelfCaseCmd.Flags().StringVar(&artifactRoot, "artifact-root", "./artifacts", "artifact output root")
-	evalSelfCaseCmd.Flags().StringVar(&providerName, "provider", "mock", "provider: mock, openai-compatible, siliconflow, or duojie")
+	evalSelfCaseCmd.Flags().StringVar(&providerName, "provider", "mock", "provider: mock, grok-cli, openai-compatible, siliconflow, or duojie")
 	evalSelfCaseCmd.Flags().StringVar(&providerBaseURL, "base-url", "", "direct provider base URL")
 	evalSelfCaseCmd.Flags().StringVar(&providerAPIKeyEnv, "api-key-env", "", "environment variable containing provider API key")
 	evalSelfCaseCmd.Flags().StringVar(&providerModel, "model", "", "provider model name")
 	evalSelfCaseCmd.Flags().StringVar(&runID, "run-id", "", "stable platform run id")
 	evalSelfCaseCmd.Flags().IntVar(&maxTokens, "max-tokens", 1024, "maximum output tokens")
 	rootCmd.AddCommand(evalSelfCaseCmd)
+
+	utilityComparisonCmd := &cobra.Command{
+		Use:   "utility-comparison",
+		Short: "Run frozen W27 context conditions against a prepared context bundle",
+		Args:  cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			report, err := app.EvalUtilityComparison(cmd.Context(), app.UtilityComparisonOptions{
+				ProfilePath:  utilityProfilePath,
+				BundlePath:   utilityBundlePath,
+				ArtifactRoot: artifactRoot,
+				Provider:     providerName,
+				BaseURL:      providerBaseURL,
+				APIKeyEnv:    providerAPIKeyEnv,
+				Model:        providerModel,
+				RunID:        runID,
+				MaxTokens:    maxTokens,
+			})
+			if err != nil {
+				return err
+			}
+			fmt.Fprintf(cmd.OutOrStdout(), "provider=%s model=%s calls=%d report=%s\n", report.ProviderName, report.Model, len(report.Results), report.ReportURI)
+			return nil
+		},
+	}
+	utilityComparisonCmd.Flags().StringVar(&utilityProfilePath, "profile", "runtime/cases/W27-real-utility-comparison/case.json", "W27 utility profile JSON")
+	utilityComparisonCmd.Flags().StringVar(&utilityBundlePath, "context-bundle", "", "hashed W27 context bundle JSON")
+	_ = utilityComparisonCmd.MarkFlagRequired("context-bundle")
+	utilityComparisonCmd.Flags().StringVar(&artifactRoot, "artifact-root", "./artifacts", "artifact output root")
+	utilityComparisonCmd.Flags().StringVar(&providerName, "provider", "mock", "provider: mock, grok-cli, openai-compatible, siliconflow, or duojie")
+	utilityComparisonCmd.Flags().StringVar(&providerBaseURL, "base-url", "", "direct provider base URL")
+	utilityComparisonCmd.Flags().StringVar(&providerAPIKeyEnv, "api-key-env", "", "environment variable containing provider API key")
+	utilityComparisonCmd.Flags().StringVar(&providerModel, "model", "", "provider model name")
+	utilityComparisonCmd.Flags().StringVar(&runID, "run-id", "", "stable utility run id")
+	utilityComparisonCmd.Flags().IntVar(&maxTokens, "max-tokens", 1024, "maximum output tokens")
+	rootCmd.AddCommand(utilityComparisonCmd)
+
+	recordUtilityWritebacksCmd := &cobra.Command{
+		Use:   "record-utility-writebacks",
+		Short: "Record successful W27 native model outputs as proposed, idempotent observations",
+		Args:  cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			evidence, err := app.RecordUtilityWritebacks(cmd.Context(), app.UtilityWritebackOptions{
+				ProfilePath:  utilityProfilePath,
+				BundlePath:   utilityBundlePath,
+				ReportPath:   utilityReportPath,
+				DatabaseURL:  databaseURL,
+				EvidencePath: utilityWritebackEvidencePath,
+			})
+			if err != nil {
+				return err
+			}
+			fmt.Fprintf(cmd.OutOrStdout(), "run=%s writebacks=%d state=%s evidence=%s\n", evidence.RunID, len(evidence.Records), evidence.WritebackState, utilityWritebackEvidencePath)
+			return nil
+		},
+	}
+	recordUtilityWritebacksCmd.Flags().StringVar(&utilityProfilePath, "profile", "runtime/cases/W27-real-utility-comparison/case.json", "W27 utility profile JSON")
+	recordUtilityWritebacksCmd.Flags().StringVar(&utilityBundlePath, "context-bundle", "", "hashed W27 context bundle JSON")
+	_ = recordUtilityWritebacksCmd.MarkFlagRequired("context-bundle")
+	recordUtilityWritebacksCmd.Flags().StringVar(&utilityReportPath, "report", "", "completed W27 utility report JSON")
+	_ = recordUtilityWritebacksCmd.MarkFlagRequired("report")
+	recordUtilityWritebacksCmd.Flags().StringVar(&databaseURL, "database-url", "", "dedicated PostgreSQL connection URL")
+	_ = recordUtilityWritebacksCmd.MarkFlagRequired("database-url")
+	recordUtilityWritebacksCmd.Flags().StringVar(&utilityWritebackEvidencePath, "evidence", "", "output writeback receipt JSON")
+	_ = recordUtilityWritebacksCmd.MarkFlagRequired("evidence")
+	rootCmd.AddCommand(recordUtilityWritebacksCmd)
+
+	prepareUtilityContextsCmd := &cobra.Command{
+		Use:   "prepare-utility-contexts",
+		Short: "Prepare W27 native deliveries and freeze the context bundle",
+		Args:  cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			bundle, err := app.PrepareUtilityContextBundle(cmd.Context(), app.UtilityContextBundleOptions{
+				ProfilePath:                 utilityProfilePath,
+				CaseRoot:                    caseRoot,
+				DatabaseURL:                 databaseURL,
+				BundlePath:                  utilityBundlePath,
+				NativeContextDir:            utilityNativeContextDir,
+				Mem0ContextDir:              utilityMem0ContextDir,
+				ExpectedNativeRetrievalMode: utilityExpectedNativeRetrievalMode,
+			})
+			if err != nil {
+				return err
+			}
+			fmt.Fprintf(cmd.OutOrStdout(), "profile=%s cases=%d bundle=%s\n", bundle.ProfileID, len(bundle.Inputs), utilityBundlePath)
+			return nil
+		},
+	}
+	prepareUtilityContextsCmd.Flags().StringVar(&utilityProfilePath, "profile", "runtime/cases/W27-real-utility-comparison/case.json", "W27 utility profile JSON")
+	prepareUtilityContextsCmd.Flags().StringVar(&caseRoot, "case-root", "reality/cases", "frozen reality case root")
+	prepareUtilityContextsCmd.Flags().StringVar(&databaseURL, "database-url", "", "dedicated PostgreSQL connection URL")
+	_ = prepareUtilityContextsCmd.MarkFlagRequired("database-url")
+	prepareUtilityContextsCmd.Flags().StringVar(&utilityBundlePath, "bundle", "", "output hashed context bundle JSON")
+	_ = prepareUtilityContextsCmd.MarkFlagRequired("bundle")
+	prepareUtilityContextsCmd.Flags().StringVar(&utilityNativeContextDir, "native-context-dir", "", "directory containing independently produced native context receipts")
+	_ = prepareUtilityContextsCmd.MarkFlagRequired("native-context-dir")
+	prepareUtilityContextsCmd.Flags().StringVar(&utilityMem0ContextDir, "mem0-context-dir", "", "directory containing independently produced <case-id>.md mem0 contexts")
+	_ = prepareUtilityContextsCmd.MarkFlagRequired("mem0-context-dir")
+	prepareUtilityContextsCmd.Flags().StringVar(&utilityExpectedNativeRetrievalMode, "expected-native-retrieval-mode", "vector", "required native receipt mode: lexical, shadow, or vector")
+	rootCmd.AddCommand(prepareUtilityContextsCmd)
+
+	prepareNativeContextsCmd := &cobra.Command{
+		Use:   "prepare-native-contexts",
+		Short: "Prepare W27 native PostgreSQL deliveries without a mem0 substitution",
+		Args:  cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if err := app.PrepareNativeUtilityContexts(cmd.Context(), app.NativeUtilityContextOptions{
+				ProfilePath:         utilityProfilePath,
+				CaseRoot:            caseRoot,
+				DatabaseURL:         databaseURL,
+				OutputDir:           utilityNativeContextDir,
+				RunID:               runID,
+				ResetDedicated:      utilityResetDedicated,
+				RetrievalMode:       utilityRetrievalMode,
+				RetrievalProfile:    utilityRetrievalProfile,
+				EmbeddingBaseURL:    utilityEmbeddingBaseURL,
+				EmbeddingAPIKey:     os.Getenv(utilityEmbeddingAPIKeyEnv),
+				EmbeddingModel:      utilityEmbeddingModel,
+				EmbeddingDimensions: utilityEmbeddingDimensions,
+			}); err != nil {
+				return err
+			}
+			fmt.Fprintf(cmd.OutOrStdout(), "contexts=%s\n", utilityNativeContextDir)
+			return nil
+		},
+	}
+	prepareNativeContextsCmd.Flags().StringVar(&utilityProfilePath, "profile", "runtime/cases/W27-real-utility-comparison/case.json", "W27 utility profile JSON")
+	prepareNativeContextsCmd.Flags().StringVar(&caseRoot, "case-root", "reality/cases", "frozen reality case root")
+	prepareNativeContextsCmd.Flags().StringVar(&databaseURL, "database-url", "", "dedicated PostgreSQL connection URL")
+	_ = prepareNativeContextsCmd.MarkFlagRequired("database-url")
+	prepareNativeContextsCmd.Flags().StringVar(&utilityNativeContextDir, "output-dir", "", "native context evidence directory")
+	_ = prepareNativeContextsCmd.MarkFlagRequired("output-dir")
+	prepareNativeContextsCmd.Flags().StringVar(&runID, "run-id", "", "stable native context run id")
+	prepareNativeContextsCmd.Flags().BoolVar(&utilityResetDedicated, "reset-dedicated", false, "reset the explicitly dedicated qualification database before seeding")
+	prepareNativeContextsCmd.Flags().StringVar(&utilityRetrievalMode, "retrieval-mode", "lexical", "native retrieval mode: lexical, shadow, or vector")
+	prepareNativeContextsCmd.Flags().StringVar(&utilityRetrievalProfile, "retrieval-profile", runtime.ProductionRetrievalProfileID, "native retrieval profile identifier")
+	prepareNativeContextsCmd.Flags().StringVar(&utilityEmbeddingBaseURL, "embedding-base-url", "", "direct SiliconFlow embedding API base URL")
+	prepareNativeContextsCmd.Flags().StringVar(&utilityEmbeddingAPIKeyEnv, "embedding-api-key-env", "SILICONFLOW_API_KEY", "environment variable containing the embedding API key")
+	prepareNativeContextsCmd.Flags().StringVar(&utilityEmbeddingModel, "embedding-model", "", "embedding model name")
+	prepareNativeContextsCmd.Flags().IntVar(&utilityEmbeddingDimensions, "embedding-dimensions", 0, "embedding vector dimensions")
+	rootCmd.AddCommand(prepareNativeContextsCmd)
+
+	prepareMem0ContextsCmd := &cobra.Command{
+		Use:   "prepare-mem0-contexts",
+		Short: "Prepare the isolated mem0 OSS W27 comparison contexts",
+		Args:  cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if err := app.PrepareMem0UtilityContexts(cmd.Context(), app.Mem0UtilityContextOptions{
+				ProfilePath:   utilityProfilePath,
+				CaseRoot:      caseRoot,
+				BaseURL:       mem0BaseURL,
+				APIKey:        os.Getenv(mem0APIKeyEnv),
+				ContextDir:    utilityMem0ContextDir,
+				RunID:         runID,
+				IncludeSource: mem0IncludeSource,
+			}); err != nil {
+				return err
+			}
+			fmt.Fprintf(cmd.OutOrStdout(), "contexts=%s\n", utilityMem0ContextDir)
+			return nil
+		},
+	}
+	prepareMem0ContextsCmd.Flags().StringVar(&utilityProfilePath, "profile", "runtime/cases/W27-real-utility-comparison/case.json", "W27 utility profile JSON")
+	prepareMem0ContextsCmd.Flags().StringVar(&caseRoot, "case-root", "reality/cases", "frozen reality case root")
+	prepareMem0ContextsCmd.Flags().StringVar(&mem0BaseURL, "base-url", "", "mem0 OSS API base URL")
+	_ = prepareMem0ContextsCmd.MarkFlagRequired("base-url")
+	prepareMem0ContextsCmd.Flags().StringVar(&mem0APIKeyEnv, "api-key-env", "", "optional environment variable containing mem0 API key")
+	prepareMem0ContextsCmd.Flags().StringVar(&utilityMem0ContextDir, "context-dir", "", "output mem0 context directory")
+	_ = prepareMem0ContextsCmd.MarkFlagRequired("context-dir")
+	prepareMem0ContextsCmd.Flags().StringVar(&runID, "run-id", "", "stable mem0 context run id")
+	prepareMem0ContextsCmd.Flags().BoolVar(&mem0IncludeSource, "include-source", true, "include the case source fixtures in the disposable mem0 scope")
+	rootCmd.AddCommand(prepareMem0ContextsCmd)
 
 	probeProviderCmd := &cobra.Command{
 		Use:   "probe-provider",
@@ -123,17 +391,24 @@ func newRootCommand() *cobra.Command {
 				return err
 			}
 			fmt.Fprintf(cmd.OutOrStdout(), "provider_mode=%s provider=%s report=%s\n", report.ProviderMode, report.ProviderName, report.ReportURI)
+			var failedModels []string
 			for _, result := range report.Results {
 				fmt.Fprintf(cmd.OutOrStdout(), "model=%s status=%s preview=%s\n", result.Model, result.Status, result.OutputPreview)
 				if result.Error != "" {
 					fmt.Fprintf(cmd.OutOrStdout(), "model=%s error=%s\n", result.Model, result.Error)
 				}
+				if result.Status != "ok" {
+					failedModels = append(failedModels, result.Model)
+				}
+			}
+			if len(failedModels) > 0 {
+				return fmt.Errorf("provider probe failed for %d model(s): %s", len(failedModels), strings.Join(failedModels, ", "))
 			}
 			return nil
 		},
 	}
 	probeProviderCmd.Flags().StringVar(&artifactRoot, "artifact-root", "./artifacts", "artifact output root")
-	probeProviderCmd.Flags().StringVar(&providerName, "provider", "mock", "provider: mock, openai-compatible, siliconflow, or duojie")
+	probeProviderCmd.Flags().StringVar(&providerName, "provider", "mock", "provider: mock, grok-cli, openai-compatible, siliconflow, or duojie")
 	probeProviderCmd.Flags().StringVar(&providerBaseURL, "base-url", "", "direct provider base URL")
 	probeProviderCmd.Flags().StringVar(&providerAPIKeyEnv, "api-key-env", "", "environment variable containing provider API key")
 	probeProviderCmd.Flags().StringSliceVar(&providerModels, "models", nil, "provider model names to probe")
@@ -167,7 +442,7 @@ func newRootCommand() *cobra.Command {
 		},
 	}
 	evalMatrixCmd.Flags().StringVar(&artifactRoot, "artifact-root", "./artifacts", "artifact output root")
-	evalMatrixCmd.Flags().StringVar(&providerName, "provider", "mock", "provider: mock, openai-compatible, siliconflow, or duojie")
+	evalMatrixCmd.Flags().StringVar(&providerName, "provider", "mock", "provider: mock, grok-cli, openai-compatible, siliconflow, or duojie")
 	evalMatrixCmd.Flags().StringVar(&providerBaseURL, "base-url", "", "direct provider base URL")
 	evalMatrixCmd.Flags().StringVar(&providerAPIKeyEnv, "api-key-env", "", "environment variable containing provider API key")
 	evalMatrixCmd.Flags().StringSliceVar(&providerModels, "models", nil, "provider model names to evaluate")
@@ -199,7 +474,7 @@ func newRootCommand() *cobra.Command {
 		},
 	}
 	evalCasebookCmd.Flags().StringVar(&artifactRoot, "artifact-root", "./artifacts", "artifact output root")
-	evalCasebookCmd.Flags().StringVar(&providerName, "provider", "mock", "provider: mock, openai-compatible, siliconflow, or duojie")
+	evalCasebookCmd.Flags().StringVar(&providerName, "provider", "mock", "provider: mock, grok-cli, openai-compatible, siliconflow, or duojie")
 	evalCasebookCmd.Flags().StringVar(&providerBaseURL, "base-url", "", "direct provider base URL")
 	evalCasebookCmd.Flags().StringVar(&providerAPIKeyEnv, "api-key-env", "", "environment variable containing provider API key")
 	evalCasebookCmd.Flags().StringVar(&providerModel, "model", "", "provider model name")
@@ -232,7 +507,7 @@ func newRootCommand() *cobra.Command {
 		},
 	}
 	evalCasebookSuiteCmd.Flags().StringVar(&artifactRoot, "artifact-root", "./artifacts", "artifact output root")
-	evalCasebookSuiteCmd.Flags().StringVar(&providerName, "provider", "mock", "provider: mock, openai-compatible, siliconflow, or duojie")
+	evalCasebookSuiteCmd.Flags().StringVar(&providerName, "provider", "mock", "provider: mock, grok-cli, openai-compatible, siliconflow, or duojie")
 	evalCasebookSuiteCmd.Flags().StringVar(&providerBaseURL, "base-url", "", "direct provider base URL")
 	evalCasebookSuiteCmd.Flags().StringVar(&providerAPIKeyEnv, "api-key-env", "", "environment variable containing provider API key")
 	evalCasebookSuiteCmd.Flags().StringVar(&providerModel, "model", "", "provider model name")
@@ -279,7 +554,7 @@ func newRootCommand() *cobra.Command {
 		},
 	}
 	acceptanceReportCmd.Flags().StringVar(&artifactRoot, "artifact-root", "./artifacts", "artifact output root")
-	acceptanceReportCmd.Flags().StringVar(&providerName, "provider", "mock", "provider: mock, openai-compatible, siliconflow, or duojie")
+	acceptanceReportCmd.Flags().StringVar(&providerName, "provider", "mock", "provider: mock, grok-cli, openai-compatible, siliconflow, or duojie")
 	acceptanceReportCmd.Flags().StringVar(&providerBaseURL, "base-url", "", "direct provider base URL")
 	acceptanceReportCmd.Flags().StringVar(&providerAPIKeyEnv, "api-key-env", "", "environment variable containing provider API key")
 	acceptanceReportCmd.Flags().StringVar(&providerModel, "model", "", "provider model name")
@@ -343,7 +618,7 @@ func newRootCommand() *cobra.Command {
 		},
 	}
 	internalReadyCmd.Flags().StringVar(&artifactRoot, "artifact-root", "./artifacts", "artifact output root")
-	internalReadyCmd.Flags().StringVar(&providerName, "provider", "mock", "provider: mock, openai-compatible, siliconflow, or duojie")
+	internalReadyCmd.Flags().StringVar(&providerName, "provider", "mock", "provider: mock, grok-cli, openai-compatible, siliconflow, or duojie")
 	internalReadyCmd.Flags().StringVar(&providerBaseURL, "base-url", "", "direct provider base URL")
 	internalReadyCmd.Flags().StringVar(&providerAPIKeyEnv, "api-key-env", "", "environment variable containing provider API key")
 	internalReadyCmd.Flags().StringVar(&providerModel, "model", "", "provider model name")
@@ -548,9 +823,12 @@ func newRootCommand() *cobra.Command {
 	realityValidateCmd.Flags().StringVar(&realityArtifactRoot, "artifact-root", "./artifacts", "artifact output root")
 	realityValidateCmd.Flags().StringVar(&realityRunID, "run-id", "experiment-0-public", "stable reality validation run id")
 	rootCmd.AddCommand(realityValidateCmd)
+	rootCmd.AddCommand(newRealitySubmissionCreateCommand())
+	rootCmd.AddCommand(newRealitySubmissionVerifyCommand())
 
 	var attestationInput string
 	var attestationPublicKey string
+	var attestationSubmissionInput string
 	attestationVerifyCmd := &cobra.Command{
 		Use:   "reality-attestation-verify",
 		Short: "Verify an attestation signed by an external sealed evaluator",
@@ -564,12 +842,24 @@ func newRootCommand() *cobra.Command {
 			if err != nil {
 				return fmt.Errorf("decode public key: %w", err)
 			}
-			attestation, err := reality.VerifyAttestation(data, publicKey)
+			var attestation reality.Attestation
+			if strings.TrimSpace(attestationSubmissionInput) != "" {
+				submissionData, err := os.ReadFile(attestationSubmissionInput)
+				if err != nil {
+					return err
+				}
+				attestation, err = reality.VerifyAttestationForSubmission(data, publicKey, submissionData)
+			} else {
+				attestation, err = reality.VerifyAttestation(data, publicKey)
+				if err == nil && attestation.Version == 2 {
+					return fmt.Errorf("version 2 attestation requires --submission")
+				}
+			}
 			if err != nil {
 				return err
 			}
-			fmt.Fprintf(cmd.OutOrStdout(), "evaluator=%s suite=%s implementation=%s hard_gates_pass=%t\n",
-				attestation.EvaluatorID, attestation.SuiteVersion, attestation.ImplementationDigest, attestation.HardGatesPass)
+			fmt.Fprintf(cmd.OutOrStdout(), "version=%d evaluator=%s suite=%s implementation=%s hard_gates_pass=%t\n",
+				attestation.Version, attestation.EvaluatorID, attestation.SuiteVersion, attestation.ImplementationDigest, attestation.HardGatesPass)
 			keys := make([]string, 0, len(attestation.Counts))
 			for key := range attestation.Counts {
 				keys = append(keys, key)
@@ -583,6 +873,7 @@ func newRootCommand() *cobra.Command {
 	}
 	attestationVerifyCmd.Flags().StringVar(&attestationInput, "input", "", "external attestation JSON path")
 	attestationVerifyCmd.Flags().StringVar(&attestationPublicKey, "public-key", "", "base64-encoded Ed25519 public key")
+	attestationVerifyCmd.Flags().StringVar(&attestationSubmissionInput, "submission", "", "version 2 external evaluation submission JSON path")
 	_ = attestationVerifyCmd.MarkFlagRequired("input")
 	_ = attestationVerifyCmd.MarkFlagRequired("public-key")
 	rootCmd.AddCommand(attestationVerifyCmd)

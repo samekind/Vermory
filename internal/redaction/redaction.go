@@ -14,6 +14,8 @@ type rule struct {
 
 var rules = []rule{
 	{re: regexp.MustCompile(`\bsk-[A-Za-z0-9_-]{16,}\b`), replacement: "[REDACTED_API_KEY]"},
+	{re: regexp.MustCompile(`(?i)\b(?:api[_-]?token|api[_-]?key|secret|token)\s*[:=]\s*[^\s,;]{8,}`), replacement: "[REDACTED_CREDENTIAL]"},
+	{re: regexp.MustCompile(`-----BEGIN(?: [A-Z0-9]+)* PRIVATE KEY-----`), replacement: "[REDACTED_PRIVATE_KEY]"},
 	{re: regexp.MustCompile(`(?i)\b[A-Z0-9._%+\-]+@[A-Z0-9.\-]+\.[A-Z]{2,}\b`), replacement: "[REDACTED_EMAIL]"},
 	{re: regexp.MustCompile(`\b1[3-9]\d{9}\b`), replacement: "[REDACTED_PHONE]"},
 }

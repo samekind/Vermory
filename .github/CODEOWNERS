@@ -1,0 +1,11 @@
+# Founding ownership. Add a second maintainer through a governance pull request
+# before enabling required CODEOWNER reviews in branch protection.
+* @jstar0
+
+/.github/ @jstar0
+/SECURITY.md @jstar0
+/GOVERNANCE.md @jstar0
+/docs/superpowers/specs/2026-07-11-vermory-product-constitution.md @jstar0
+/internal/authn/ @jstar0
+/internal/store/postgres/ @jstar0
+/scripts/release-manifest.sh @jstar0

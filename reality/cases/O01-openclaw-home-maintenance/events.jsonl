@@ -1,0 +1,18 @@
+{"id":"o01-event-1","sequence":1,"actor":"user","channel":"openclaw","source_id":"o01-thread","content":"The plumbing inspection is booked for Friday at 15:30. The technician must check in with the concierge."}
+{"id":"o01-event-2","sequence":2,"actor":"assistant","channel":"openclaw","source_id":"o01-thread","content":"I will treat Friday at 15:30 and concierge check-in as the current arrangement for this matter."}
+{"id":"o01-event-3","sequence":3,"actor":"user","channel":"openclaw","source_id":"o01-thread","content":"The temporary access code is CEDAR-4826. Keep it only until the visit details are finalized."}
+{"id":"o01-event-4","sequence":4,"actor":"user","channel":"openclaw","source_id":"o01-thread","content":"It may rain on Friday and I might order lunch early."}
+{"id":"o01-event-5","sequence":5,"actor":"governance","channel":"vermory_operator","source_id":"o01-governance","content":"Confirm the appointment, concierge requirement, and temporary code. Do not confirm transient weather or lunch chatter."}
+{"id":"o01-event-6","sequence":6,"actor":"system","channel":"runtime","source_id":"o01-governance","content":"Restart Vermory and OpenClaw while preserving PostgreSQL and the OpenClaw session key."}
+{"id":"o01-event-7","sequence":7,"actor":"evaluation_probe","channel":"openclaw","source_id":"o01-thread","content":"In session A, summarize the current maintenance arrangement after restart."}
+{"id":"o01-event-8","sequence":8,"actor":"governance","channel":"vermory_operator","source_id":"o01-governance","content":"Explicitly link session B to session A. Keep session C unrelated."}
+{"id":"o01-event-9","sequence":9,"actor":"evaluation_probe","channel":"openclaw","source_id":"o01-thread","content":"In session B, state the governed visit details without importing session A raw chatter."}
+{"id":"o01-event-10","sequence":10,"actor":"evaluation_probe","channel":"openclaw","source_id":"o01-thread","content":"In unrelated session C, answer without maintenance details."}
+{"id":"o01-event-11","sequence":11,"actor":"user","channel":"openclaw","source_id":"o01-thread","content":"Correction: the building moved the inspection to Saturday at 10:00. Friday at 15:30 is obsolete."}
+{"id":"o01-event-12","sequence":12,"actor":"governance","channel":"vermory_operator","source_id":"o01-governance","content":"Supersede the old appointment and delete CEDAR-4826, then rebuild the search projection."}
+{"id":"o01-event-13","sequence":13,"actor":"evaluation_probe","channel":"openclaw","source_id":"o01-thread","content":"What is the current appointment, and what was the old cedar-style access sequence?"}
+{"id":"o01-event-14","sequence":14,"actor":"governance","channel":"vermory_operator","source_id":"o01-governance","content":"Set Chinese as the stable user-facing reply default."}
+{"id":"o01-event-15","sequence":15,"actor":"user","channel":"openclaw","source_id":"o01-thread","content":"For this turn only, reply in English with the current visit time."}
+{"id":"o01-event-16","sequence":16,"actor":"evaluation_probe","channel":"openclaw","source_id":"o01-thread","content":"On the next turn, verify the Chinese default still applies."}
+{"id":"o01-event-17","sequence":17,"actor":"governance","channel":"vermory_operator","source_id":"o01-governance","content":"Reverse the A-B link."}
+{"id":"o01-event-18","sequence":18,"actor":"evaluation_probe","channel":"openclaw","source_id":"o01-thread","content":"In a fresh session B turn, verify session A governed memory is no longer delivered."}

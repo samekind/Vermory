@@ -1,0 +1,283 @@
+{
+  "schema_version": 19,
+  "implementation": {
+    "version": "0.1.0-alpha.1",
+    "revision": "67b14b16cd78a2af96de052b7a8470980d6921c9",
+    "build_date": "2026-07-17T19:40:57Z",
+    "go_version": "go1.26.5"
+  },
+  "deployment": {
+    "host": "mac-mini-of-xin-era.local",
+    "listen": "127.0.0.1:8791",
+    "database": "vermory_w21_f01_5d488f5",
+    "tenant": "w21-f01",
+    "user_owned": true,
+    "sudo_used": false
+  },
+  "clients": {
+    "openclaw": {
+      "version": "OpenClaw 2026.6.11 (e085fa1)",
+      "model": "grok-cli/grok-4.5"
+    },
+    "formation_provider": {
+      "endpoint": "https://api.siliconflow.cn/v1",
+      "model": "deepseek-ai/DeepSeek-V4-Flash",
+      "newapi_used": false
+    }
+  },
+  "bindings": [
+    {
+      "thread_id": "agent:main:w21-formation-a",
+      "continuity_id": "4b84ee1a-42e7-424b-aa4d-f4076f611e11"
+    },
+    {
+      "thread_id": "agent:main:w21-formation-b",
+      "continuity_id": "89e385d3-85ee-4ed0-a321-6acdd2277917"
+    },
+    {
+      "thread_id": "agent:main:w21-formation-c",
+      "continuity_id": "80b35fcd-38b6-423c-a84d-5073546e80a6"
+    }
+  ],
+  "conversation_turns": 11,
+  "formation_runs": [
+    {
+      "items": 0,
+      "status": "failed",
+      "failure_code": "provider_timeout",
+      "operation_id": "w21-f01-initial"
+    },
+    {
+      "items": 0,
+      "status": "failed",
+      "failure_code": "invalid_provider_output",
+      "operation_id": "w21-f01-initial-nonthink"
+    },
+    {
+      "items": 4,
+      "status": "completed",
+      "failure_code": "",
+      "operation_id": "w21-f01-initial-schema-nonthink"
+    },
+    {
+      "items": 1,
+      "status": "completed",
+      "failure_code": "",
+      "operation_id": "w21-f01-correction-schema-nonthink"
+    },
+    {
+      "items": 0,
+      "status": "abstained",
+      "failure_code": "",
+      "operation_id": "w21-f01-transient-language"
+    },
+    {
+      "items": 0,
+      "status": "failed",
+      "failure_code": "evidence_observation_outside_manifest",
+      "operation_id": "w21-f01-outside-manifest-provider"
+    },
+    {
+      "items": 0,
+      "status": "failed",
+      "failure_code": "input_manifest_changed",
+      "operation_id": "w21-f01-input-manifest-drift"
+    },
+    {
+      "items": 0,
+      "status": "failed",
+      "failure_code": "active_snapshot_changed",
+      "operation_id": "w21-f01-active-snapshot-drift"
+    }
+  ],
+  "governance": {
+    "initial_model_items": 4,
+    "initial_accepted": 3,
+    "initial_rejected": 1,
+    "correction_updates": 1,
+    "transient_abstentions": 1,
+    "global_defaults_active": 0,
+    "active_facts": [
+      {
+        "content": "The plumbing inspection is booked for Saturday at 10:00.",
+        "memory_key": "plumbing_inspection.friday.appointment"
+      },
+      {
+        "content": "The technician must check in with the concierge.",
+        "memory_key": "plumbing_inspection.technician.check_in.concierge"
+      }
+    ]
+  },
+  "deletion": {
+    "target": "synthetic temporary access code",
+    "residual_counts": {
+      "observations": 0,
+      "governed_memories": 0,
+      "memory_deliveries": 0,
+      "conversation_turns": 0,
+      "source_formation_runs": 0,
+      "source_formation_items": 0,
+      "memory_search_documents": 0
+    },
+    "exact_probe_answer": "I'll look through the workspace for any temporary access code related to the plumbing visit.",
+    "paraphrase_probe_answer": "I'll look through the workspace for any stored \"cedar-style visit credential.\"",
+    "related_probe_result": "grok_cli_timeout_no_output_179s",
+    "external_client_state_matches": 0
+  },
+  "delivery": {
+    "fresh_schedule_answer": "The plumbing inspection is scheduled for **Saturday at 10:00**. On arrival, the technician must **check in with the concierge**.",
+    "required_contains": [
+      "Saturday at 10:00",
+      "concierge"
+    ],
+    "forbidden_contains": [
+      "Friday at 15:30",
+      "CEDAR-4826",
+      "rain",
+      "lunch"
+    ],
+    "hard_gate_pass": true
+  },
+  "isolation": {
+    "cross_scope_rejections": 2,
+    "cross_scope_persisted_runs": 0,
+    "outside_manifest_failure_code": "evidence_observation_outside_manifest"
+  },
+  "replay": {
+    "elapsed_seconds": 0,
+    "replayed": true,
+    "provider_endpoint": "http://127.0.0.1:1/v1",
+    "run_count": 1
+  },
+  "drift": {
+    "input_manifest": "input_manifest_changed",
+    "active_snapshot": "active_snapshot_changed",
+    "partial_items": 0
+  },
+  "fail_open": {
+    "answer": "FAIL_OPEN_OK",
+    "persisted_bindings": 0,
+    "bounded_warning": true
+  },
+  "provider_probes": {
+    "direct_deepseek_v4_flash": {
+      "http_code": 200,
+      "elapsed_seconds": 3
+    },
+    "formation_default": {
+      "status": "failed",
+      "failure_code": "provider_timeout",
+      "elapsed_seconds": 90
+    },
+    "formation_nonthink_without_schema": {
+      "status": "failed",
+      "failure_code": "invalid_provider_output",
+      "elapsed_seconds": 10
+    },
+    "formation_nonthink_with_schema": {
+      "status": "completed",
+      "elapsed_seconds": 14
+    }
+  },
+  "failure_ledger": [
+    {
+      "id": "F-01",
+      "failure": "OpenClaw result parser expected .result.payloads",
+      "resolution": "use top-level .payloads"
+    },
+    {
+      "id": "F-02",
+      "failure": "stable OpenClaw wrapper overrode W21 isolation variables",
+      "resolution": "use underlying user-owned OpenClaw binary and remove accidental stable rows from a reversible snapshot"
+    },
+    {
+      "id": "F-03",
+      "failure": "non-interactive SSH could not access login Keychain",
+      "resolution": "send provider key over SSH stdin for one process and leave no persistent secret"
+    },
+    {
+      "id": "F-04",
+      "failure": "DeepSeek-V4-Flash formation timed out in default thinking mode",
+      "resolution": "add explicit optional non-thinking request control"
+    },
+    {
+      "id": "F-05",
+      "failure": "OpenAI-compatible adapter discarded required JSON schema",
+      "resolution": "append schema to provider prompt and retain default request compatibility"
+    },
+    {
+      "id": "F-06",
+      "failure": "model proposed one lifecycle instruction as a separate memory",
+      "resolution": "operator rejected the candidate"
+    },
+    {
+      "id": "F-07",
+      "failure": "failed formation audit retained deleted code",
+      "resolution": "redact all runs whose manifest contains the deleted evidence observation and allow repair forget"
+    },
+    {
+      "id": "F-08",
+      "failure": "ambiguous current visit time prompt was answered as wall-clock time",
+      "resolution": "retain failure and use a natural unambiguous scheduled-time task for final gate"
+    },
+    {
+      "id": "F-09",
+      "failure": "two OpenClaw deletion probes stopped at workspace-search intent",
+      "resolution": "retain as client-quality failures; no deleted value leaked"
+    },
+    {
+      "id": "F-10",
+      "failure": "related deletion probe timed out after 179 seconds with no Grok output",
+      "resolution": "retain timeout; database and client state remained code-free"
+    },
+    {
+      "id": "F-11",
+      "failure": "first drift harness used command substitution and could not wait on child",
+      "resolution": "restore observation, verify failed run, and rerun with direct child PID plus trap"
+    },
+    {
+      "id": "F-12",
+      "failure": "model-generated appointment memory_key retained a stale temporal token after correction",
+      "resolution": "retain content/lifecycle evidence; require stable concept-key review in later formation-quality work"
+    },
+    {
+      "id": "F-13",
+      "failure": "first protected artifact stream was observed at 10092544 of 21657451 bytes and failed ZIP validation",
+      "resolution": "reject the partial transport, resume the remaining 11564907 bytes, and accept only the stable file matching the Artifact API size and SHA-256"
+    }
+  ],
+  "privacy": {
+    "local_provider_key_matches": 0,
+    "remote_provider_key_matches": 0,
+    "environment_files": 0,
+    "direct_credential_assignments": 0,
+    "full_environment_dumps": 0,
+    "sudo_processes": 0
+  },
+  "protected_delivery": {
+    "source_head": "cb78aed2335f115a85ed422b7ac099535dd6418f",
+    "ci_run_id": 29609943989,
+    "ci_job_id": 87981998623,
+    "ci_conclusion": "success",
+    "ci_duration_seconds": 293,
+    "artifact_id": 8418419540,
+    "artifact_name": "vermory-pr-snapshot-66c9aa96dfcd3b7d244b74f792ebceab60264c92",
+    "artifact_size_bytes": 21657451,
+    "artifact_sha256": "36d4d41ce080d7c7a7316160fd45094d680615ab3a3c592fbddde9d1b081f277",
+    "synthetic_merge": "66c9aa96dfcd3b7d244b74f792ebceab60264c92",
+    "synthetic_merge_verified": true,
+    "synthetic_merge_second_parent": "cb78aed2335f115a85ed422b7ac099535dd6418f",
+    "go_archives_verified": 4,
+    "openclaw_package_sha256": "e2833e6a5d5cbaf72af244b7c1650532fd81b0dfcb435c84f2462dd1906c3950",
+    "openclaw_package_files": 12,
+    "hermes_package_sha256": "99dd0c2c99cbf5703eec8cbc4a7e84442e2662af8becb81985d8b481ec90dfe6",
+    "hermes_package_files": 6,
+    "mac_mini_manifest_entries": 45,
+    "mac_mini_manifest_sha256": "39c6204479be5767f4dce2718033a2752c21a08ba4caff22c688c12ceffaf556",
+    "mac_mini_verification_sha256": "045b5438966c8ef65d1d56c3ead786fecf7624645a6f997954490ed111c6c35b"
+  },
+  "checksums": {
+    "entries": 6458,
+    "sha256": "f9e23207106b3dfcb17586f67eba2d870830ee749b5287fdbb989e6c7215fc0a"
+  }
+}

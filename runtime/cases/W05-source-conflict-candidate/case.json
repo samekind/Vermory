@@ -1,0 +1,14 @@
+{
+  "id": "W05-source-conflict-candidate",
+  "evidence_level": "public",
+  "repo_root": "/fixtures/release-control",
+  "memory_key": "release.signing.mode",
+  "old_source_ref": "repo:deploy/production.yaml@sha-old",
+  "new_source_ref": "repo:deploy/production.yaml@sha-new",
+  "old_fact": "Production releases use a macOS keychain certificate.",
+  "new_fact": "Production releases use GitHub Actions OIDC keyless signing.",
+  "independent_key": "deploy.api.timeout",
+  "independent_fact": "The deployment API timeout is 800 ms.",
+  "other_tenant_fact": "Production releases use static cloud credentials.",
+  "task": "Create release-signing-check.md with the current production signing mode and deployment API timeout."
+}

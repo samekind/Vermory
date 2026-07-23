@@ -1,0 +1,528 @@
+{
+  "aggregates": {
+    "full_oracle_history": {
+      "total": 6,
+      "completed": 6,
+      "failed": 0,
+      "exact_matches": 2,
+      "mean_token_f1": 0.5497,
+      "mean_answer_token_recall": 0.5727,
+      "abstention_expected": 1,
+      "abstention_detected": 1
+    },
+    "no_context": {
+      "total": 6,
+      "completed": 6,
+      "failed": 0,
+      "exact_matches": 0,
+      "mean_token_f1": 0.0263,
+      "mean_answer_token_recall": 0.0385,
+      "abstention_expected": 1,
+      "abstention_detected": 1
+    },
+    "plain_lexical_retrieval": {
+      "total": 6,
+      "completed": 6,
+      "failed": 0,
+      "exact_matches": 2,
+      "mean_token_f1": 0.4954,
+      "mean_answer_token_recall": 0.5154,
+      "abstention_expected": 1,
+      "abstention_detected": 1
+    },
+    "vermory_packet": {
+      "total": 6,
+      "completed": 6,
+      "failed": 0,
+      "exact_matches": 2,
+      "mean_token_f1": 0.5201,
+      "mean_answer_token_recall": 0.5214,
+      "abstention_expected": 1,
+      "abstention_detected": 1
+    }
+  },
+  "claim_scope": "dataset_sample",
+  "results": [
+    {
+      "record_id": "6a1eabeb",
+      "question_type": "knowledge-update",
+      "condition": "no_context",
+      "status": "completed",
+      "response": "It cannot be determined from the supplied conversation memory.",
+      "model": "grok-4.5",
+      "score": {
+        "exact_match": false,
+        "token_f1": 0,
+        "answer_token_recall": 0,
+        "abstention_expected": false,
+        "abstention_detected": true,
+        "reference_variant": "",
+        "normalized_reference": "",
+        "normalized_response": "it cannot be determined from the supplied conversation memory"
+      },
+      "request_uri": "artifacts/benchmarks/longmemeval-original-sample-grok-20260714-attempt-6/requests/6a1eabeb/no_context.json",
+      "response_uri": "artifacts/benchmarks/longmemeval-original-sample-grok-20260714-attempt-6/responses/6a1eabeb/no_context.json"
+    },
+    {
+      "record_id": "6a1eabeb",
+      "question_type": "knowledge-update",
+      "condition": "full_oracle_history",
+      "status": "completed",
+      "response": "**25:50**\n\n(You also earlier mentioned a charity 5K personal best of **27:12**.)",
+      "model": "grok-4.5",
+      "score": {
+        "exact_match": true,
+        "token_f1": 1,
+        "answer_token_recall": 1,
+        "abstention_expected": false,
+        "abstention_detected": false,
+        "reference_variant": "25:50",
+        "normalized_reference": "25 50",
+        "normalized_response": "25 50 you also earlier mentioned a charity 5k personal best of 27 12"
+      },
+      "request_uri": "artifacts/benchmarks/longmemeval-original-sample-grok-20260714-attempt-6/requests/6a1eabeb/full_oracle_history.json",
+      "response_uri": "artifacts/benchmarks/longmemeval-original-sample-grok-20260714-attempt-6/responses/6a1eabeb/full_oracle_history.json"
+    },
+    {
+      "record_id": "6a1eabeb",
+      "question_type": "knowledge-update",
+      "condition": "plain_lexical_retrieval",
+      "status": "completed",
+      "response": "**25:50**",
+      "model": "grok-4.5",
+      "score": {
+        "exact_match": true,
+        "token_f1": 1,
+        "answer_token_recall": 1,
+        "abstention_expected": false,
+        "abstention_detected": false,
+        "reference_variant": "25:50",
+        "normalized_reference": "25 50",
+        "normalized_response": "25 50"
+      },
+      "request_uri": "artifacts/benchmarks/longmemeval-original-sample-grok-20260714-attempt-6/requests/6a1eabeb/plain_lexical_retrieval.json",
+      "response_uri": "artifacts/benchmarks/longmemeval-original-sample-grok-20260714-attempt-6/responses/6a1eabeb/plain_lexical_retrieval.json"
+    },
+    {
+      "record_id": "6a1eabeb",
+      "question_type": "knowledge-update",
+      "condition": "vermory_packet",
+      "status": "completed",
+      "response": "**25:50** (also stated as a recent PB of **27:12**).",
+      "model": "grok-4.5",
+      "score": {
+        "exact_match": true,
+        "token_f1": 1,
+        "answer_token_recall": 1,
+        "abstention_expected": false,
+        "abstention_detected": false,
+        "reference_variant": "25:50",
+        "normalized_reference": "25 50",
+        "normalized_response": "25 50 also stated as a recent pb of 27 12"
+      },
+      "request_uri": "artifacts/benchmarks/longmemeval-original-sample-grok-20260714-attempt-6/requests/6a1eabeb/vermory_packet.json",
+      "response_uri": "artifacts/benchmarks/longmemeval-original-sample-grok-20260714-attempt-6/responses/6a1eabeb/vermory_packet.json"
+    },
+    {
+      "record_id": "0a995998",
+      "question_type": "multi-session",
+      "condition": "no_context",
+      "status": "completed",
+      "response": "It cannot be determined.",
+      "model": "grok-4.5",
+      "score": {
+        "exact_match": false,
+        "token_f1": 0,
+        "answer_token_recall": 0,
+        "abstention_expected": false,
+        "abstention_detected": true,
+        "reference_variant": "",
+        "normalized_reference": "",
+        "normalized_response": "it cannot be determined"
+      },
+      "request_uri": "artifacts/benchmarks/longmemeval-original-sample-grok-20260714-attempt-6/requests/0a995998/no_context.json",
+      "response_uri": "artifacts/benchmarks/longmemeval-original-sample-grok-20260714-attempt-6/responses/0a995998/no_context.json"
+    },
+    {
+      "record_id": "0a995998",
+      "question_type": "multi-session",
+      "condition": "full_oracle_history",
+      "status": "completed",
+      "response": "**2**\n\n1. Navy blue blazer (dry cleaning pickup)  \n2. New larger-size boots from Zara (pickup after exchange)",
+      "model": "grok-4.5",
+      "score": {
+        "exact_match": false,
+        "token_f1": 0,
+        "answer_token_recall": 0,
+        "abstention_expected": false,
+        "abstention_detected": false,
+        "reference_variant": "",
+        "normalized_reference": "",
+        "normalized_response": "2 1 navy blue blazer dry cleaning pickup 2 new larger size boots from zara pickup after exchange"
+      },
+      "request_uri": "artifacts/benchmarks/longmemeval-original-sample-grok-20260714-attempt-6/requests/0a995998/full_oracle_history.json",
+      "response_uri": "artifacts/benchmarks/longmemeval-original-sample-grok-20260714-attempt-6/responses/0a995998/full_oracle_history.json"
+    },
+    {
+      "record_id": "0a995998",
+      "question_type": "multi-session",
+      "condition": "plain_lexical_retrieval",
+      "status": "completed",
+      "response": "**1** (the exchanged Zara boots — still need to pick up the new pair).",
+      "model": "grok-4.5",
+      "score": {
+        "exact_match": false,
+        "token_f1": 0,
+        "answer_token_recall": 0,
+        "abstention_expected": false,
+        "abstention_detected": false,
+        "reference_variant": "",
+        "normalized_reference": "",
+        "normalized_response": "1 the exchanged zara boots still need to pick up the new pair"
+      },
+      "request_uri": "artifacts/benchmarks/longmemeval-original-sample-grok-20260714-attempt-6/requests/0a995998/plain_lexical_retrieval.json",
+      "response_uri": "artifacts/benchmarks/longmemeval-original-sample-grok-20260714-attempt-6/responses/0a995998/plain_lexical_retrieval.json"
+    },
+    {
+      "record_id": "0a995998",
+      "question_type": "multi-session",
+      "condition": "vermory_packet",
+      "status": "completed",
+      "response": "**2**\n\nYou still need to pick up:\n1. the **new Zara boots** (exchanged after the Feb 5 pair was too small)\n2. the **navy blue blazer** from dry cleaning\n\nThere is no pending clothing return still open in the memory—the boots were already exchanged.",
+      "model": "grok-4.5",
+      "score": {
+        "exact_match": false,
+        "token_f1": 0,
+        "answer_token_recall": 0,
+        "abstention_expected": false,
+        "abstention_detected": false,
+        "reference_variant": "",
+        "normalized_reference": "",
+        "normalized_response": "2 you still need to pick up 1 the new zara boots exchanged after the feb 5 pair was too small 2 the navy blue blazer from dry cleaning there is no pending clothing return still open in the memory the boots were already exchanged"
+      },
+      "request_uri": "artifacts/benchmarks/longmemeval-original-sample-grok-20260714-attempt-6/requests/0a995998/vermory_packet.json",
+      "response_uri": "artifacts/benchmarks/longmemeval-original-sample-grok-20260714-attempt-6/responses/0a995998/vermory_packet.json"
+    },
+    {
+      "record_id": "7161e7e2",
+      "question_type": "single-session-assistant",
+      "condition": "no_context",
+      "status": "completed",
+      "response": "It cannot be determined. There is no prior chat content here about the GM social media agents shift rotation sheet or Admon’s Sunday rotation.",
+      "model": "grok-4.5",
+      "score": {
+        "exact_match": false,
+        "token_f1": 0.1579,
+        "answer_token_recall": 0.2308,
+        "abstention_expected": false,
+        "abstention_detected": true,
+        "reference_variant": "Admon was assigned to the 8 am - 4 pm (Day Shift) on Sundays.",
+        "normalized_reference": "admon was assigned to the 8 am 4 pm day shift on sundays",
+        "normalized_response": "it cannot be determined there is no prior chat content here about the gm social media agents shift rotation sheet or admon s sunday rotation"
+      },
+      "request_uri": "artifacts/benchmarks/longmemeval-original-sample-grok-20260714-attempt-6/requests/7161e7e2/no_context.json",
+      "response_uri": "artifacts/benchmarks/longmemeval-original-sample-grok-20260714-attempt-6/responses/7161e7e2/no_context.json"
+    },
+    {
+      "record_id": "7161e7e2",
+      "question_type": "single-session-assistant",
+      "condition": "full_oracle_history",
+      "status": "completed",
+      "response": "On Sunday, Admon was on the **8 am - 4 pm (Day Shift)**.",
+      "model": "grok-4.5",
+      "score": {
+        "exact_match": false,
+        "token_f1": 0.8,
+        "answer_token_recall": 0.7692,
+        "abstention_expected": false,
+        "abstention_detected": false,
+        "reference_variant": "Admon was assigned to the 8 am - 4 pm (Day Shift) on Sundays.",
+        "normalized_reference": "admon was assigned to the 8 am 4 pm day shift on sundays",
+        "normalized_response": "on sunday admon was on the 8 am 4 pm day shift"
+      },
+      "request_uri": "artifacts/benchmarks/longmemeval-original-sample-grok-20260714-attempt-6/requests/7161e7e2/full_oracle_history.json",
+      "response_uri": "artifacts/benchmarks/longmemeval-original-sample-grok-20260714-attempt-6/responses/7161e7e2/full_oracle_history.json"
+    },
+    {
+      "record_id": "7161e7e2",
+      "question_type": "single-session-assistant",
+      "condition": "plain_lexical_retrieval",
+      "status": "completed",
+      "response": "Admon works the **8 am – 4 pm (Day Shift)** on Sunday.",
+      "model": "grok-4.5",
+      "score": {
+        "exact_match": false,
+        "token_f1": 0.75,
+        "answer_token_recall": 0.6923,
+        "abstention_expected": false,
+        "abstention_detected": false,
+        "reference_variant": "Admon was assigned to the 8 am - 4 pm (Day Shift) on Sundays.",
+        "normalized_reference": "admon was assigned to the 8 am 4 pm day shift on sundays",
+        "normalized_response": "admon works the 8 am 4 pm day shift on sunday"
+      },
+      "request_uri": "artifacts/benchmarks/longmemeval-original-sample-grok-20260714-attempt-6/requests/7161e7e2/plain_lexical_retrieval.json",
+      "response_uri": "artifacts/benchmarks/longmemeval-original-sample-grok-20260714-attempt-6/responses/7161e7e2/plain_lexical_retrieval.json"
+    },
+    {
+      "record_id": "7161e7e2",
+      "question_type": "single-session-assistant",
+      "condition": "vermory_packet",
+      "status": "completed",
+      "response": "**8 am - 4 pm (Day Shift)**",
+      "model": "grok-4.5",
+      "score": {
+        "exact_match": false,
+        "token_f1": 0.6316,
+        "answer_token_recall": 0.4615,
+        "abstention_expected": false,
+        "abstention_detected": false,
+        "reference_variant": "Admon was assigned to the 8 am - 4 pm (Day Shift) on Sundays.",
+        "normalized_reference": "admon was assigned to the 8 am 4 pm day shift on sundays",
+        "normalized_response": "8 am 4 pm day shift"
+      },
+      "request_uri": "artifacts/benchmarks/longmemeval-original-sample-grok-20260714-attempt-6/requests/7161e7e2/vermory_packet.json",
+      "response_uri": "artifacts/benchmarks/longmemeval-original-sample-grok-20260714-attempt-6/responses/7161e7e2/vermory_packet.json"
+    },
+    {
+      "record_id": "e47becba",
+      "question_type": "single-session-user",
+      "condition": "no_context",
+      "status": "completed",
+      "response": "It cannot be determined from the supplied conversation memory.",
+      "model": "grok-4.5",
+      "score": {
+        "exact_match": false,
+        "token_f1": 0,
+        "answer_token_recall": 0,
+        "abstention_expected": false,
+        "abstention_detected": true,
+        "reference_variant": "",
+        "normalized_reference": "",
+        "normalized_response": "it cannot be determined from the supplied conversation memory"
+      },
+      "request_uri": "artifacts/benchmarks/longmemeval-original-sample-grok-20260714-attempt-6/requests/e47becba/no_context.json",
+      "response_uri": "artifacts/benchmarks/longmemeval-original-sample-grok-20260714-attempt-6/responses/e47becba/no_context.json"
+    },
+    {
+      "record_id": "e47becba",
+      "question_type": "single-session-user",
+      "condition": "full_oracle_history",
+      "status": "completed",
+      "response": "Business Administration.",
+      "model": "grok-4.5",
+      "score": {
+        "exact_match": true,
+        "token_f1": 1,
+        "answer_token_recall": 1,
+        "abstention_expected": false,
+        "abstention_detected": false,
+        "reference_variant": "Business Administration",
+        "normalized_reference": "business administration",
+        "normalized_response": "business administration"
+      },
+      "request_uri": "artifacts/benchmarks/longmemeval-original-sample-grok-20260714-attempt-6/requests/e47becba/full_oracle_history.json",
+      "response_uri": "artifacts/benchmarks/longmemeval-original-sample-grok-20260714-attempt-6/responses/e47becba/full_oracle_history.json"
+    },
+    {
+      "record_id": "e47becba",
+      "question_type": "single-session-user",
+      "condition": "plain_lexical_retrieval",
+      "status": "completed",
+      "response": "Business Administration.",
+      "model": "grok-4.5",
+      "score": {
+        "exact_match": true,
+        "token_f1": 1,
+        "answer_token_recall": 1,
+        "abstention_expected": false,
+        "abstention_detected": false,
+        "reference_variant": "Business Administration",
+        "normalized_reference": "business administration",
+        "normalized_response": "business administration"
+      },
+      "request_uri": "artifacts/benchmarks/longmemeval-original-sample-grok-20260714-attempt-6/requests/e47becba/plain_lexical_retrieval.json",
+      "response_uri": "artifacts/benchmarks/longmemeval-original-sample-grok-20260714-attempt-6/responses/e47becba/plain_lexical_retrieval.json"
+    },
+    {
+      "record_id": "e47becba",
+      "question_type": "single-session-user",
+      "condition": "vermory_packet",
+      "status": "completed",
+      "response": "Business Administration",
+      "model": "grok-4.5",
+      "score": {
+        "exact_match": true,
+        "token_f1": 1,
+        "answer_token_recall": 1,
+        "abstention_expected": false,
+        "abstention_detected": false,
+        "reference_variant": "Business Administration",
+        "normalized_reference": "business administration",
+        "normalized_response": "business administration"
+      },
+      "request_uri": "artifacts/benchmarks/longmemeval-original-sample-grok-20260714-attempt-6/requests/e47becba/vermory_packet.json",
+      "response_uri": "artifacts/benchmarks/longmemeval-original-sample-grok-20260714-attempt-6/responses/e47becba/vermory_packet.json"
+    },
+    {
+      "record_id": "gpt4_2655b836",
+      "question_type": "temporal-reasoning",
+      "condition": "no_context",
+      "status": "completed",
+      "response": "It cannot be determined from the supplied conversation memory.",
+      "model": "grok-4.5",
+      "score": {
+        "exact_match": false,
+        "token_f1": 0,
+        "answer_token_recall": 0,
+        "abstention_expected": false,
+        "abstention_detected": true,
+        "reference_variant": "",
+        "normalized_reference": "",
+        "normalized_response": "it cannot be determined from the supplied conversation memory"
+      },
+      "request_uri": "artifacts/benchmarks/longmemeval-original-sample-grok-20260714-attempt-6/requests/gpt4_2655b836/no_context.json",
+      "response_uri": "artifacts/benchmarks/longmemeval-original-sample-grok-20260714-attempt-6/responses/gpt4_2655b836/no_context.json"
+    },
+    {
+      "record_id": "gpt4_2655b836",
+      "question_type": "temporal-reasoning",
+      "condition": "full_oracle_history",
+      "status": "completed",
+      "response": "The GPS system issue on 3/22 (the dealership replaced the entire system).",
+      "model": "grok-4.5",
+      "score": {
+        "exact_match": false,
+        "token_f1": 0.2222,
+        "answer_token_recall": 0.4,
+        "abstention_expected": false,
+        "abstention_detected": false,
+        "reference_variant": "GPS system not functioning correctly",
+        "normalized_reference": "gps system not functioning correctly",
+        "normalized_response": "the gps system issue on 3 22 the dealership replaced the entire system"
+      },
+      "request_uri": "artifacts/benchmarks/longmemeval-original-sample-grok-20260714-attempt-6/requests/gpt4_2655b836/full_oracle_history.json",
+      "response_uri": "artifacts/benchmarks/longmemeval-original-sample-grok-20260714-attempt-6/responses/gpt4_2655b836/full_oracle_history.json"
+    },
+    {
+      "record_id": "gpt4_2655b836",
+      "question_type": "temporal-reasoning",
+      "condition": "plain_lexical_retrieval",
+      "status": "completed",
+      "response": "The GPS system issue on 3/22 (the dealership replaced the entire system).",
+      "model": "grok-4.5",
+      "score": {
+        "exact_match": false,
+        "token_f1": 0.2222,
+        "answer_token_recall": 0.4,
+        "abstention_expected": false,
+        "abstention_detected": false,
+        "reference_variant": "GPS system not functioning correctly",
+        "normalized_reference": "gps system not functioning correctly",
+        "normalized_response": "the gps system issue on 3 22 the dealership replaced the entire system"
+      },
+      "request_uri": "artifacts/benchmarks/longmemeval-original-sample-grok-20260714-attempt-6/requests/gpt4_2655b836/plain_lexical_retrieval.json",
+      "response_uri": "artifacts/benchmarks/longmemeval-original-sample-grok-20260714-attempt-6/responses/gpt4_2655b836/plain_lexical_retrieval.json"
+    },
+    {
+      "record_id": "gpt4_2655b836",
+      "question_type": "temporal-reasoning",
+      "condition": "vermory_packet",
+      "status": "completed",
+      "response": "The GPS system issue on 3/22 (the dealership replaced the entire system).",
+      "model": "grok-4.5",
+      "score": {
+        "exact_match": false,
+        "token_f1": 0.2222,
+        "answer_token_recall": 0.4,
+        "abstention_expected": false,
+        "abstention_detected": false,
+        "reference_variant": "GPS system not functioning correctly",
+        "normalized_reference": "gps system not functioning correctly",
+        "normalized_response": "the gps system issue on 3 22 the dealership replaced the entire system"
+      },
+      "request_uri": "artifacts/benchmarks/longmemeval-original-sample-grok-20260714-attempt-6/requests/gpt4_2655b836/vermory_packet.json",
+      "response_uri": "artifacts/benchmarks/longmemeval-original-sample-grok-20260714-attempt-6/responses/gpt4_2655b836/vermory_packet.json"
+    },
+    {
+      "record_id": "0862e8bf_abs",
+      "question_type": "single-session-user",
+      "condition": "no_context",
+      "status": "completed",
+      "response": "It cannot be determined.",
+      "model": "grok-4.5",
+      "score": {
+        "exact_match": false,
+        "token_f1": 0,
+        "answer_token_recall": 0,
+        "abstention_expected": true,
+        "abstention_detected": true,
+        "reference_variant": "",
+        "normalized_reference": "",
+        "normalized_response": "it cannot be determined"
+      },
+      "request_uri": "artifacts/benchmarks/longmemeval-original-sample-grok-20260714-attempt-6/requests/0862e8bf_abs/no_context.json",
+      "response_uri": "artifacts/benchmarks/longmemeval-original-sample-grok-20260714-attempt-6/responses/0862e8bf_abs/no_context.json"
+    },
+    {
+      "record_id": "0862e8bf_abs",
+      "question_type": "single-session-user",
+      "condition": "full_oracle_history",
+      "status": "completed",
+      "response": "It cannot be determined. The conversation only names a cat (Luna), not a hamster.",
+      "model": "grok-4.5",
+      "score": {
+        "exact_match": false,
+        "token_f1": 0.2759,
+        "answer_token_recall": 0.2667,
+        "abstention_expected": true,
+        "abstention_detected": true,
+        "reference_variant": "You did not mention this information. You mentioned your cat Luna but not your hamster.",
+        "normalized_reference": "you did not mention this information you mentioned your cat luna but not your hamster",
+        "normalized_response": "it cannot be determined the conversation only names a cat luna not a hamster"
+      },
+      "request_uri": "artifacts/benchmarks/longmemeval-original-sample-grok-20260714-attempt-6/requests/0862e8bf_abs/full_oracle_history.json",
+      "response_uri": "artifacts/benchmarks/longmemeval-original-sample-grok-20260714-attempt-6/responses/0862e8bf_abs/full_oracle_history.json"
+    },
+    {
+      "record_id": "0862e8bf_abs",
+      "question_type": "single-session-user",
+      "condition": "plain_lexical_retrieval",
+      "status": "completed",
+      "response": "It cannot be determined.",
+      "model": "grok-4.5",
+      "score": {
+        "exact_match": false,
+        "token_f1": 0,
+        "answer_token_recall": 0,
+        "abstention_expected": true,
+        "abstention_detected": true,
+        "reference_variant": "",
+        "normalized_reference": "",
+        "normalized_response": "it cannot be determined"
+      },
+      "request_uri": "artifacts/benchmarks/longmemeval-original-sample-grok-20260714-attempt-6/requests/0862e8bf_abs/plain_lexical_retrieval.json",
+      "response_uri": "artifacts/benchmarks/longmemeval-original-sample-grok-20260714-attempt-6/responses/0862e8bf_abs/plain_lexical_retrieval.json"
+    },
+    {
+      "record_id": "0862e8bf_abs",
+      "question_type": "single-session-user",
+      "condition": "vermory_packet",
+      "status": "completed",
+      "response": "It cannot be determined. The conversation only mentions a cat named Luna, not a hamster.",
+      "model": "grok-4.5",
+      "score": {
+        "exact_match": false,
+        "token_f1": 0.2667,
+        "answer_token_recall": 0.2667,
+        "abstention_expected": true,
+        "abstention_detected": true,
+        "reference_variant": "You did not mention this information. You mentioned your cat Luna but not your hamster.",
+        "normalized_reference": "you did not mention this information you mentioned your cat luna but not your hamster",
+        "normalized_response": "it cannot be determined the conversation only mentions a cat named luna not a hamster"
+      },
+      "request_uri": "artifacts/benchmarks/longmemeval-original-sample-grok-20260714-attempt-6/requests/0862e8bf_abs/vermory_packet.json",
+      "response_uri": "artifacts/benchmarks/longmemeval-original-sample-grok-20260714-attempt-6/responses/0862e8bf_abs/vermory_packet.json"
+    }
+  ],
+  "run_id": "longmemeval-original-sample-grok-20260714-attempt-6"
+}

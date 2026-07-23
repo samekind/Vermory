@@ -15,7 +15,13 @@
     "evaluation_level": "executable_evaluation",
     "execution_mode": "casebook_translated_proxy",
     "case_ids": ["001-contextmesh-bluebridge-preparation", "102-workspace-rebind-relocation"],
-    "notes": "Maps update-over-stale-context pressure to workspace continuity and rebind cases."
+    "original_execution_evidence": [
+      "docs/evidence/snapshots/2026-07-14-longmemeval-original-sample-execution.json",
+      "docs/evidence/snapshots/2026-07-15-longmemeval-s-full-retrieval-execution.json",
+      "docs/evidence/snapshots/2026-07-15-longmemeval-s-full-reader-qa-execution.json",
+      "docs/evidence/snapshots/2026-07-20-longmemeval-s-full-vector-retrieval-execution.json"
+    ],
+    "notes": "Maps update-over-stale-context pressure to workspace continuity and rebind cases. Original evidence includes a six-record oracle QA sample, full 500-record lexical and vector LongMemEval-S retrieval executions, and a full 1,000-task reader QA execution. The full QA uses a custom Grok judge and is not official GPT-4o LongMemEval accuracy."
   },
   {
     "benchmark": "MemBench",

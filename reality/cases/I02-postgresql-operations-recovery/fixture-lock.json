@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "case_id": "I02-postgresql-operations-recovery",
+  "manifest_sha256": "0bd45d09295dda10031490ef61d15a6970d12e0ac862f09c39bb06752cc0275d",
+  "events_sha256": "9811607c18a3de5bedc6c953a3e5a1d3467ff3f10fd5431d231e6bbec71a35ff",
+  "files": [
+    {
+      "path": "fixtures/recovery-contract.md",
+      "sha256": "afab0d8770c49852232aff876307a3277a0deb38cde00c1216e11ea7d38209e2",
+      "bytes": 2862
+    }
+  ]
+}

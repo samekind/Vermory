@@ -1,0 +1,80 @@
+{
+  "version": "2",
+  "name": "W10 independent retrieval batch",
+  "scopes": [
+    {"id":"w10-coder","tenant_id":"batch2-dev","line":"workspace","anchor":"/fixtures/w10/atlas-service"},
+    {"id":"w10-thesis","tenant_id":"batch2-research","line":"workspace","anchor":"/fixtures/w10/thesis-methods"},
+    {"id":"w10-home","tenant_id":"batch2-life","line":"conversation","anchor":"openclaw:home-maintenance"},
+    {"id":"w10-shopping","tenant_id":"batch2-life","line":"conversation","anchor":"webchat:household-shopping"},
+    {"id":"w10-other-workspace","tenant_id":"batch2-other","line":"workspace","anchor":"/fixtures/w10/atlas-service"},
+    {"id":"w10-other-chat","tenant_id":"batch2-other","line":"conversation","anchor":"openclaw:home-maintenance"}
+  ],
+  "records": [
+    {"id":"w10-coder-command","scope_id":"w10-coder","memory_key":"release.command","content":"For the Atlas service release, run just pnpm exec verify:release --profile production.","lifecycle":"active","provenance_case":"101-workspace-parallel-repos"},
+    {"id":"w10-coder-flag","scope_id":"w10-coder","memory_key":"router.flag","content":"The active request router flag is atlas_router_v4.","lifecycle":"active","provenance_case":"102-workspace-rebind-relocation"},
+    {"id":"w10-coder-error","scope_id":"w10-coder","memory_key":"deploy.error","content":"DEPLOY_409 means the release lock is held by another deployment worker.","lifecycle":"active","provenance_case":"105-workspace-multi-coder-relay"},
+    {"id":"w10-coder-region","scope_id":"w10-coder","memory_key":"deploy.region","content":"Atlas production traffic is deployed in ap-southeast-1.","lifecycle":"active","provenance_case":"104-workspace-product-design"},
+    {"id":"w10-coder-window","scope_id":"w10-coder","memory_key":"release.window","content":"The Atlas release window ends on 2026-09-18.","lifecycle":"active","provenance_case":"106-workspace-source-revision"},
+    {"id":"w10-coder-approvals","scope_id":"w10-coder","memory_key":"release.approvals","content":"A production rollback needs approval from one release owner and one on-call engineer.","lifecycle":"active","provenance_case":"107-workspace-source-conflict-candidate"},
+
+    {"id":"w10-thesis-topic","scope_id":"w10-thesis","memory_key":"thesis.topic","content":"The thesis studies retrieval quality for long-running software maintenance conversations.","lifecycle":"active","provenance_case":"103-workspace-research-notebook"},
+    {"id":"w10-thesis-dataset","scope_id":"w10-thesis","memory_key":"thesis.dataset","content":"The current evaluation dataset is stored at research/data/continuity-v2.jsonl.","lifecycle":"active","provenance_case":"103-workspace-research-notebook"},
+    {"id":"w10-thesis-deadline","scope_id":"w10-thesis","memory_key":"thesis.deadline","content":"The methods chapter must be submitted by 2026-10-06.","lifecycle":"active","provenance_case":"105-workspace-multi-coder-relay"},
+    {"id":"w10-thesis-method","scope_id":"w10-thesis","memory_key":"thesis.method","content":"The primary method compares governed context against no-history and plain lexical baselines.","lifecycle":"active","provenance_case":"109-workspace-multifact-document-formation"},
+    {"id":"w10-thesis-language","scope_id":"w10-thesis","memory_key":"thesis.language","content":"The final thesis body is written in Chinese, while code identifiers remain in English.","lifecycle":"active","provenance_case":"104-workspace-product-design"},
+    {"id":"w10-thesis-citation","scope_id":"w10-thesis","memory_key":"thesis.citation","content":"Every benchmark claim must cite a reproducible artifact and its execution revision.","lifecycle":"active","provenance_case":"109-workspace-multifact-document-formation"},
+
+    {"id":"w10-home-filter","scope_id":"w10-home","content":"Replace the air purifier filter when the indicator stays red for more than 10 minutes.","lifecycle":"active","provenance_case":"204-conversation-household-admin"},
+    {"id":"w10-home-water","scope_id":"w10-home","content":"The apartment water meter appointment is scheduled for Saturday morning.","lifecycle":"active","provenance_case":"204-conversation-household-admin"},
+    {"id":"w10-home-model","scope_id":"w10-home","content":"The current air purifier model is AC-4100.","lifecycle":"active","provenance_case":"203-conversation-device-troubleshooting"},
+    {"id":"w10-home-reset","scope_id":"w10-home","content":"Do not factory-reset the purifier until its Wi-Fi schedule has been exported.","lifecycle":"active","provenance_case":"203-conversation-device-troubleshooting"},
+    {"id":"w10-home-cost","scope_id":"w10-home","content":"The maintenance visit budget is capped at CNY 480.","lifecycle":"active","provenance_case":"204-conversation-household-admin"},
+    {"id":"w10-home-code","scope_id":"w10-home","content":"E-AIR-17 means the purifier fan sensor did not report a stable reading.","lifecycle":"active","provenance_case":"203-conversation-device-troubleshooting"},
+
+    {"id":"w10-shopping-budget","scope_id":"w10-shopping","content":"The household replacement budget this month is CNY 1200.","lifecycle":"active","provenance_case":"201-conversation-housing-search"},
+    {"id":"w10-shopping-delivery","scope_id":"w10-shopping","content":"Deliver the replacement parts to the Qingdao home address after 18:30.","lifecycle":"active","provenance_case":"204-conversation-household-admin"},
+    {"id":"w10-shopping-size","scope_id":"w10-shopping","content":"The replacement filter must be the 4100-series compatible size, not the 3200-series size.","lifecycle":"active","provenance_case":"203-conversation-device-troubleshooting"},
+    {"id":"w10-shopping-return","scope_id":"w10-shopping","content":"Keep the receipt until the installation test passes for 48 hours.","lifecycle":"active","provenance_case":"204-conversation-household-admin"},
+    {"id":"w10-shopping-date","scope_id":"w10-shopping","content":"Place the order before 2026-08-22 so the parts arrive before the inspection.","lifecycle":"active","provenance_case":"204-conversation-household-admin"},
+    {"id":"w10-shopping-contact","scope_id":"w10-shopping","content":"Ask the installer to message the household chat rather than calling during the meeting.","lifecycle":"active","provenance_case":"204-conversation-household-admin"},
+
+    {"id":"w10-other-command","scope_id":"w10-other-workspace","content":"For the Atlas service release, run npm run verify:release -- --legacy.","lifecycle":"active","provenance_case":"101-workspace-parallel-repos"},
+    {"id":"w10-other-flag","scope_id":"w10-other-workspace","content":"The active request router flag is atlas_router_v3.","lifecycle":"active","provenance_case":"102-workspace-rebind-relocation"},
+    {"id":"w10-other-region","scope_id":"w10-other-workspace","content":"Atlas production traffic is deployed in eu-central-1.","lifecycle":"active","provenance_case":"104-workspace-product-design"},
+    {"id":"w10-other-chat-code","scope_id":"w10-other-chat","content":"E-AIR-17 means the purifier fan sensor is still reporting a stable reading.","lifecycle":"active","provenance_case":"203-conversation-device-troubleshooting"},
+    {"id":"w10-other-chat-budget","scope_id":"w10-other-chat","content":"The household replacement budget this month is CNY 1800.","lifecycle":"active","provenance_case":"204-conversation-household-admin"},
+    {"id":"w10-other-chat-date","scope_id":"w10-other-chat","content":"Place the order before 2026-08-30 so the parts arrive before the inspection.","lifecycle":"active","provenance_case":"204-conversation-household-admin"},
+
+    {"id":"w10-coder-proposed","scope_id":"w10-coder","content":"Skip the release verification command when the deployment queue is busy.","lifecycle":"proposed","provenance_case":"105-workspace-multi-coder-relay"},
+    {"id":"w10-thesis-proposed","scope_id":"w10-thesis","content":"Use an invented benchmark score when the reproducible artifact is unavailable.","lifecycle":"proposed","provenance_case":"109-workspace-multifact-document-formation"},
+    {"id":"w10-home-proposed","scope_id":"w10-home","content":"Factory-reset the air purifier before exporting any configuration.","lifecycle":"proposed","provenance_case":"203-conversation-device-troubleshooting"},
+
+    {"id":"w10-coder-command-old","scope_id":"w10-coder","memory_key":"release.command","content":"For the Atlas service release, run make release-check --legacy.","lifecycle":"superseded","replacement_id":"w10-coder-command","provenance_case":"106-workspace-source-revision"},
+    {"id":"w10-thesis-dataset-old","scope_id":"w10-thesis","memory_key":"thesis.dataset","content":"The evaluation dataset is stored at research/data/continuity-v1.jsonl.","lifecycle":"superseded","replacement_id":"w10-thesis-dataset","provenance_case":"106-workspace-source-revision"},
+    {"id":"w10-home-model-old","scope_id":"w10-home","content":"The old air purifier model was AC-3900.","lifecycle":"superseded","replacement_id":"w10-home-model","provenance_case":"203-conversation-device-troubleshooting"},
+
+    {"id":"w10-coder-secret-deleted","scope_id":"w10-coder","content":"The old deployment token was ATLAS-SECRET-DELETE-ME.","lifecycle":"deleted","provenance_case":"107-workspace-source-conflict-candidate"},
+    {"id":"w10-thesis-note-deleted","scope_id":"w10-thesis","content":"The deleted private reviewer note says REMOVE-THESIS-NOTE-42.","lifecycle":"deleted","provenance_case":"105-workspace-multi-coder-relay"},
+    {"id":"w10-home-pin-deleted","scope_id":"w10-home","content":"The obsolete device PIN was REMOVE-HOME-PIN-93.","lifecycle":"deleted","provenance_case":"203-conversation-device-troubleshooting"}
+  ],
+  "queries": [
+    {"id":"w10-coder-command-paraphrase","scope_id":"w10-coder","text":"生产发布时 Atlas 应该执行哪个 locked verification command？","limit":5,"relevant_record_ids":["w10-coder-command"],"forbidden_record_ids":["w10-coder-command-old","w10-other-command","w10-coder-proposed"],"cohorts":["semantic_paraphrase","mixed_language","technical_command"]},
+    {"id":"w10-coder-flag-exact","scope_id":"w10-coder","text":"atlas_router_v4","limit":3,"relevant_record_ids":["w10-coder-flag"],"forbidden_record_ids":["w10-other-flag","w10-coder-proposed"],"cohorts":["exact_identifier","feature_flag"]},
+    {"id":"w10-coder-error-chinese","scope_id":"w10-coder","text":"哪个错误码表示 release lock 被别的 worker 占用？","limit":5,"relevant_record_ids":["w10-coder-error"],"forbidden_record_ids":["w10-coder-proposed","w10-other-command"],"cohorts":["chinese_semantic","error_code"]},
+    {"id":"w10-coder-release-multi","scope_id":"w10-coder","text":"请给出生产区域、release window 结束日期和 rollback 审批要求。","limit":6,"relevant_record_ids":["w10-coder-region","w10-coder-window","w10-coder-approvals"],"forbidden_record_ids":["w10-other-region","w10-coder-proposed"],"cohorts":["multi_fact","date","numeric_constraint"]},
+    {"id":"w10-thesis-dataset-path","scope_id":"w10-thesis","text":"Which JSONL path contains the current continuity evaluation dataset?","limit":4,"relevant_record_ids":["w10-thesis-dataset"],"forbidden_record_ids":["w10-thesis-dataset-old","w10-thesis-proposed"],"cohorts":["path","exact_identifier"]},
+    {"id":"w10-thesis-method-chinese","scope_id":"w10-thesis","text":"论文的方法需要和哪些 baseline 做对比？","limit":5,"relevant_record_ids":["w10-thesis-method"],"forbidden_record_ids":["w10-thesis-proposed","w10-thesis-note-deleted"],"cohorts":["chinese_semantic","semantic_paraphrase"]},
+    {"id":"w10-thesis-deadline","scope_id":"w10-thesis","text":"What is the methods chapter submission date?","limit":4,"relevant_record_ids":["w10-thesis-deadline"],"forbidden_record_ids":["w10-thesis-dataset-old","w10-thesis-note-deleted"],"cohorts":["date","semantic_paraphrase"]},
+    {"id":"w10-thesis-claim-multi","scope_id":"w10-thesis","text":"请说明论文语言规则、citation 要求以及研究主题。","limit":6,"relevant_record_ids":["w10-thesis-language","w10-thesis-citation","w10-thesis-topic"],"forbidden_record_ids":["w10-thesis-proposed","w10-thesis-note-deleted"],"cohorts":["multi_fact","mixed_language","chinese_semantic"]},
+    {"id":"w10-home-filter-semantic","scope_id":"w10-home","text":"空气净化器的红灯一直亮多久才需要换滤芯？","limit":5,"relevant_record_ids":["w10-home-filter"],"forbidden_record_ids":["w10-other-chat-code","w10-home-proposed"],"cohorts":["chinese_semantic","semantic_paraphrase","duration"]},
+    {"id":"w10-home-error-exact","scope_id":"w10-home","text":"E-AIR-17","limit":4,"relevant_record_ids":["w10-home-code"],"forbidden_record_ids":["w10-other-chat-code","w10-home-proposed"],"cohorts":["exact_identifier","error_code"]},
+    {"id":"w10-home-safe-reset","scope_id":"w10-home","text":"Before resetting the purifier, what must be exported and what is the model?","limit":5,"relevant_record_ids":["w10-home-reset","w10-home-model"],"forbidden_record_ids":["w10-home-model-old","w10-home-proposed"],"cohorts":["multi_fact","semantic_paraphrase"]},
+    {"id":"w10-home-appointment","scope_id":"w10-home","text":"When is the water meter appointment, and what is the maintenance budget?","limit":5,"relevant_record_ids":["w10-home-water","w10-home-cost"],"forbidden_record_ids":["w10-other-chat-budget","w10-home-proposed"],"cohorts":["multi_fact","date","numeric_constraint"]},
+    {"id":"w10-shopping-budget","scope_id":"w10-shopping","text":"这次 replacement parts 的预算上限是多少？","limit":4,"relevant_record_ids":["w10-shopping-budget"],"forbidden_record_ids":["w10-other-chat-budget"],"cohorts":["chinese_semantic","numeric_constraint"]},
+    {"id":"w10-shopping-delivery","scope_id":"w10-shopping","text":"Where and after what time should the replacement parts be delivered?","limit":5,"relevant_record_ids":["w10-shopping-delivery"],"forbidden_record_ids":["w10-other-chat-date"],"cohorts":["mixed_language","semantic_paraphrase"]},
+    {"id":"w10-shopping-filter-size","scope_id":"w10-shopping","text":"Which compatible filter series should I order, and which series is wrong?","limit":5,"relevant_record_ids":["w10-shopping-size"],"forbidden_record_ids":["w10-home-model-old"],"cohorts":["multi_fact","numeric_constraint","semantic_paraphrase"]},
+    {"id":"w10-shopping-order-date","scope_id":"w10-shopping","text":"请问最晚哪天前下单？","limit":4,"relevant_record_ids":["w10-shopping-date"],"forbidden_record_ids":["w10-other-chat-date"],"cohorts":["date","chinese_semantic"]},
+    {"id":"w10-cross-tenant-code","scope_id":"w10-coder","text":"DEPLOY_409 release lock worker error","limit":5,"relevant_record_ids":["w10-coder-error"],"forbidden_record_ids":["w10-other-command","w10-other-region","w10-coder-secret-deleted"],"cohorts":["continuity_isolation","error_code","mixed_language"]},
+    {"id":"w10-cross-tenant-release","scope_id":"w10-coder","text":"Atlas production release command and region","limit":6,"relevant_record_ids":["w10-coder-command","w10-coder-region"],"forbidden_record_ids":["w10-other-command","w10-other-region","w10-coder-command-old","w10-coder-proposed"],"cohorts":["continuity_isolation","multi_fact","technical_command"]}
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "schema_version": "longmemeval-s-full-vector-retrieval-failures/v1",
+  "run_id": "longmemeval-s-full-vector-retrieval-20260719-v7",
+  "implementation_revision": "837149e2c4ded381d749abc3b5a43513f24b40b3",
+  "runtime_failures": [],
+  "hard_gate_failures": [],
+  "provider_attempts": {
+    "total": 25455,
+    "failed_attempts": 1088,
+    "retried_operations": 1088,
+    "terminal_failures": 0,
+    "unrecovered_projection_failures": 0
+  },
+  "scope_or_lifecycle_violations": 0,
+  "vector_authority_hash_violations": 0,
+  "source_shape_corrections": [
+    {
+      "category": "repeated_distractor_session_id",
+      "affected_records": 13,
+      "disposition": "Retain both timestamped occurrences as distinct governed memories and preserve the raw session ID for upstream-compatible metrics."
+    },
+    {
+      "category": "empty_unlabeled_turn_content",
+      "affected_turns": 12,
+      "disposition": "Retain source turn counts and omit empty semantic content; reject empty answer-labeled turns and all-empty sessions."
+    }
+  ]
+}

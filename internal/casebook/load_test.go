@@ -3,6 +3,7 @@ package casebook
 import (
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 	"testing"
 )
@@ -112,8 +113,27 @@ func TestLoadMinimumV1MainCaseMatrix(t *testing.T) {
 		loaded++
 	}
 
-	if loaded < 15 {
-		t.Fatalf("expected at least 15 V1 main cases, got %d", loaded)
+	if loaded < 16 {
+		t.Fatalf("expected at least 16 V1 main cases, got %d", loaded)
+	}
+}
+
+func TestLoadWorkspaceSourceRevisionCase(t *testing.T) {
+	loaded, err := LoadCase("../../casebook/cases/106-workspace-source-revision")
+	if err != nil {
+		t.Fatalf("load source revision case: %v", err)
+	}
+	if loaded.ID != "106-workspace-source-revision" || len(loaded.Tasks) != 1 {
+		t.Fatalf("unexpected source revision case: %#v", loaded)
+	}
+	task := loaded.Tasks[0]
+	for _, required := range []string{"pnpm exec release:verify --mode locked", "800 ms"} {
+		if !slices.Contains(task.MustInclude, required) {
+			t.Fatalf("source revision task does not require %q: %#v", required, task)
+		}
+	}
+	if !slices.Contains(task.MustNotInclude, "npm run release:verify -- --legacy") {
+		t.Fatalf("source revision task does not forbid the stale command: %#v", task)
 	}
 }
 

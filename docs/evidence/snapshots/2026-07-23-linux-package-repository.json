@@ -1,0 +1,206 @@
+{
+  "evidence_version": 1,
+  "case_id": "I08-linux-package-repository",
+  "status": "runtime-qualified",
+  "source_head": "858e5afc05b8136fd81d46a88164f799f2925197",
+  "github": {
+    "repository": "samekind/Vermory",
+    "run_id": 29953896649,
+    "run_conclusion": "success",
+    "test_job_id": 89038024634,
+    "linux_service_amd64_job_id": 89038024549,
+    "linux_service_arm64_job_id": 89038024603,
+    "sign_snapshot_job_id": 89038852826,
+    "pull_request_state": "OPEN",
+    "pull_request_draft": true
+  },
+  "repository_legs": [
+    {
+      "job_id": 89038308876,
+      "artifact_id": 8543259023,
+      "artifact_name": "vermory-i08-linux-repository-apt-amd64-858e5afc05b8136fd81d46a88164f799f2925197",
+      "artifact_size_bytes": 5747419,
+      "artifact_sha256": "9b53387e35b175c57c88923dd8f3a349bb9825557e630d71361b39d483e86b3f",
+      "downloaded_zip_sha256": "9b53387e35b175c57c88923dd8f3a349bb9825557e630d71361b39d483e86b3f",
+      "report_sha256": "cb7c978dad9d4d7d254244aa05ea0848bc71e27622efb4f6d602c34d2135fda3",
+      "repository_bundle_size_bytes": 5744542,
+      "repository_bundle_sha256": "e3d6313fa2e60700b363dddb630e3128e2b1be8306a8d74665ab68eeddea4d3f",
+      "signed_snapshot_hash_match": true,
+      "report": {
+        "repository": {
+          "kind": "apt",
+          "package_format": "deb",
+          "architecture": "amd64",
+          "machine": "x86_64",
+          "native": true,
+          "package_manager": "apt",
+          "transport": "file://",
+          "package_sha256": "b481f16cef527695849583c69fef62a73c1cb27f6920d470bc4e734df80d3cb6",
+          "metadata_signature_enforced": true,
+          "key_fingerprint": "D45C3402648996AA8A30439BB77B04EB3595213C",
+          "key_scope": "ephemeral-ci-qualification"
+        },
+        "hard_gates_passed": 18,
+        "hard_gates_total": 18
+      }
+    },
+    {
+      "job_id": 89038308994,
+      "artifact_id": 8543258420,
+      "artifact_name": "vermory-i08-linux-repository-apt-arm64-858e5afc05b8136fd81d46a88164f799f2925197",
+      "artifact_size_bytes": 5236658,
+      "artifact_sha256": "2a570f603f2bc26f11605d428a77690275f96b75917cddec84c787c91a1fe38b",
+      "downloaded_zip_sha256": "2a570f603f2bc26f11605d428a77690275f96b75917cddec84c787c91a1fe38b",
+      "report_sha256": "f43d66e0c947fed87da5a1d3671b5cfc06c62d9ac0f2d92bb8cd015e87d1b4bf",
+      "repository_bundle_size_bytes": 5233985,
+      "repository_bundle_sha256": "7a8deb3e1cfc693fa180776a730661773f4741242e90bf880fb3a8a67953ced4",
+      "signed_snapshot_hash_match": true,
+      "report": {
+        "repository": {
+          "kind": "apt",
+          "package_format": "deb",
+          "architecture": "arm64",
+          "machine": "aarch64",
+          "native": true,
+          "package_manager": "apt",
+          "transport": "file://",
+          "package_sha256": "e3f783e56f2e3fc07f0ddaafc942f8dd80345d81a233b0be763577341c722b47",
+          "metadata_signature_enforced": true,
+          "key_fingerprint": "4D64B72B91EBFC5D20F56794A018CD5AF2EF2BEB",
+          "key_scope": "ephemeral-ci-qualification"
+        },
+        "hard_gates_passed": 18,
+        "hard_gates_total": 18
+      }
+    },
+    {
+      "job_id": 89038308886,
+      "artifact_id": 8543267443,
+      "artifact_name": "vermory-i08-linux-repository-dnf-amd64-858e5afc05b8136fd81d46a88164f799f2925197",
+      "artifact_size_bytes": 5726567,
+      "artifact_sha256": "c4dfa6a7f21096e365b01c18c8fc05ebfeed7a32a1fbc00cdcb14929aab84d3b",
+      "downloaded_zip_sha256": "c4dfa6a7f21096e365b01c18c8fc05ebfeed7a32a1fbc00cdcb14929aab84d3b",
+      "report_sha256": "5df4f252d7de8a11d65780fe8756d57db384d787ff498b70f78fa88d8d32d8a3",
+      "repository_bundle_size_bytes": 5723699,
+      "repository_bundle_sha256": "58bd985cea6a0d10524ded38da6ed65e06f07f227b30f43042671f7abf0fddd4",
+      "signed_snapshot_hash_match": true,
+      "report": {
+        "repository": {
+          "kind": "dnf",
+          "package_format": "rpm",
+          "architecture": "amd64",
+          "machine": "x86_64",
+          "native": true,
+          "package_manager": "dnf",
+          "transport": "file://",
+          "package_sha256": "849df49aa64518f36664769d7479d70ac7230e115fcc27db42353d0496bd276e",
+          "metadata_signature_enforced": true,
+          "key_fingerprint": "2CD128BFE0B5215DDE4B9097048D70082ADB17F7",
+          "key_scope": "ephemeral-ci-qualification"
+        },
+        "hard_gates_passed": 18,
+        "hard_gates_total": 18
+      }
+    },
+    {
+      "job_id": 89038308883,
+      "artifact_id": 8543260060,
+      "artifact_name": "vermory-i08-linux-repository-dnf-arm64-858e5afc05b8136fd81d46a88164f799f2925197",
+      "artifact_size_bytes": 5203392,
+      "artifact_sha256": "bf907c14833c81ba00d5ea76e8d27444d1fb7d9564a0c2a170ec7fb14cfd6650",
+      "downloaded_zip_sha256": "bf907c14833c81ba00d5ea76e8d27444d1fb7d9564a0c2a170ec7fb14cfd6650",
+      "report_sha256": "a981b7bb6062e7f8917e28996e9f5e75ea98246129f5299ae6f501a9fdfbc3cc",
+      "repository_bundle_size_bytes": 5200677,
+      "repository_bundle_sha256": "59a72b68af208f2d0b4bacf2f4603d7c7f74769081fb4a34db7d137426390cbc",
+      "signed_snapshot_hash_match": true,
+      "report": {
+        "repository": {
+          "kind": "dnf",
+          "package_format": "rpm",
+          "architecture": "arm64",
+          "machine": "aarch64",
+          "native": true,
+          "package_manager": "dnf",
+          "transport": "file://",
+          "package_sha256": "3761499c01361f24b1d243d2eecbf7b44be6fd5c3baa87a8230e0fc6ac317745",
+          "metadata_signature_enforced": true,
+          "key_fingerprint": "B75FEC9DB0CF51A75BAA08CAB3A7CAE0FD91943B",
+          "key_scope": "ephemeral-ci-qualification"
+        },
+        "hard_gates_passed": 18,
+        "hard_gates_total": 18
+      }
+    }
+  ],
+  "signed_snapshot": {
+    "artifact_id": 8543470072,
+    "artifact_name": "vermory-pr-snapshot-858e5afc05b8136fd81d46a88164f799f2925197",
+    "artifact_size_bytes": 66186977,
+    "artifact_sha256": "8ccd4ea3de9fb23f166c510d4e924f3f63d7caa982332372f9cfe17b4d588e67",
+    "downloaded_zip_sha256": "8ccd4ea3de9fb23f166c510d4e924f3f63d7caa982332372f9cfe17b4d588e67",
+    "manifest_sha256": "f151a384d94ce2dc317dfd90787cbfaf11e0a56dfc9f7e0c2596503d58eee5a9",
+    "checksums_sha256": "eebd485ca2573aa91f92f9689859f0abcf06558bcbc6d473f9409edcf088b192",
+    "sigstore_bundle_sha256": "5b23c71810632195405c121a30de578d7a92e59e71242bcf7a75c00cecf86d74",
+    "manifest_entries": 16,
+    "checksums_entries": 8,
+    "repository_entries": 4,
+    "all_payload_hashes_verified": true,
+    "all_accepted_package_hashes_match": true,
+    "all_accepted_repository_hashes_match": true,
+    "sigstore": {
+      "cosign_version": "v3.0.6",
+      "workflow_identity": "https://github.com/samekind/Vermory/.github/workflows/ci.yml@refs/pull/1/merge",
+      "oidc_issuer": "https://token.actions.githubusercontent.com",
+      "bundle_media_type": "application/vnd.dev.sigstore.bundle.v0.3+json",
+      "rekor_log_index": "2219773507",
+      "inclusion_promise": true,
+      "inclusion_proof": true,
+      "positive_verification": "pass",
+      "modified_manifest_rejection": "pass",
+      "wrong_identity_rejection": "pass"
+    }
+  },
+  "retained_failures": [
+    {
+      "run_id": 29951831006,
+      "source_head": "f6723f710a27ebb8aa107dfc3266ca21024bf843",
+      "failure": "APT download-only output was searched at the wrong cache level, and DNF checkout hit container ownership protection."
+    },
+    {
+      "run_id": 29952252432,
+      "source_head": "2ba06ad6d2df48154deefd7488ba6eb27a6b2c48",
+      "failure": "APT still used the wrong download location, and DNF assumed a fixed compressed metadata filename."
+    },
+    {
+      "run_id": 29952545596,
+      "source_head": "87b358efe616b2517daac8691bb37e47c2d6e89b",
+      "failure": "APT passed on both architectures, while DNF repository construction still assumed the wrong primary metadata format."
+    },
+    {
+      "run_id": 29952883835,
+      "source_head": "1ead952f75475b010fe720122c340beef33ad8fe",
+      "failure": "DNF metadata signing and loading passed, but DNF5 rejected the legacy install download-only invocation."
+    },
+    {
+      "run_id": 29953121695,
+      "source_head": "eb073aa896f7ab0dd66ae33d48041ddd7357a1f3",
+      "failure": "dnf download fetched the package, but the evidence script looked in the wrong output location."
+    },
+    {
+      "run_id": 29953440464,
+      "source_head": "eafe4b1be8266f28d96b7050d9089e0d691675c9",
+      "failure": "Both DNF installations passed, but the tampered repository probe reused state and returned success instead of proving rejection."
+    }
+  ],
+  "claim_boundary": {
+    "qualified": "four exact-head APT and DNF repository bundles containing exact I06-qualified packages, installed through native package managers on AMD64 and ARM64 with signed repository metadata enforcement and tamper rejection, then incorporated byte-for-byte into one verified OIDC-signed pull-request snapshot",
+    "not_qualified": [
+      "a stable production repository signing key",
+      "a public or long-lived hosted repository, mirror, or retention policy",
+      "cross-version upgrade, downgrade, or rollback behavior",
+      "tagged release publication",
+      "RPM payload OpenPGP signatures",
+      "the complete Vermory platform"
+    ]
+  }
+}

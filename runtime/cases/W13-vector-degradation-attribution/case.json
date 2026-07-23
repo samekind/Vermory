@@ -1,0 +1,49 @@
+{
+  "version": "1",
+  "id": "W13-vector-degradation-attribution",
+  "profile_name": "vector-degradation-attribution-v1",
+  "source_profile": "W12-server-qualification-scale-profile",
+  "active_memory_count": 100000,
+  "tenant_count": 10,
+  "continuities_per_tenant": 10,
+  "records_per_continuity": 1000,
+  "query_client_count": 50,
+  "vector_queries_per_client": 11,
+  "requested_vector_queries": 550,
+  "concurrent_delete_count": 1000,
+  "snapshot_page_size": 500,
+  "pool_max_connections": 64,
+  "profile_id": "siliconflow-bge-m3-1024-v1",
+  "observed_runs": {
+    "w12_original": {
+      "effective_vector_queries": 138,
+      "degraded_queries": 412,
+      "failure_code_breakdown_recorded": false
+    },
+    "w12_attribution": {
+      "effective_vector_queries": 145,
+      "projection_lag_fallbacks": 405,
+      "other_degraded_queries": 0
+    },
+    "projection_current_control": {
+      "effective_vector_queries": 550,
+      "degraded_queries": 0
+    }
+  },
+  "calibrated_limits": {
+    "vector_snapshot_seconds": 1800,
+    "query_p95_ms": 2000,
+    "query_p99_ms": 5000,
+    "database_size_gib": 20
+  },
+  "hard_gates": [
+    "the projection-current control completes 550 requested vector queries as 550 effective vector results with zero degradation",
+    "the W12 concurrent schedule records exactly 550 requested vector audits",
+    "effective vector queries plus projection_lag fallbacks equal all requested vector queries",
+    "other degraded vector queries remain zero",
+    "all delivered memories remain the exact expected current target",
+    "cross-tenant and cross-continuity leakage remain zero",
+    "concurrent deletion leaves zero authority lexical or vector residue and all tenants return to zero lag",
+    "no production retrieval algorithm or default mode changes are required by this attribution"
+  ]
+}

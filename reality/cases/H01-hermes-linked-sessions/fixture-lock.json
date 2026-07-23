@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "case_id": "H01-hermes-linked-sessions",
+  "manifest_sha256": "e73cd957d92e05430bab21fcc5b62756bbdb382530ff2c9c8c8caa5b13cbf90d",
+  "events_sha256": "8b30cbb37267fedcfbaf181bf037ef19686a0e576fe68351c94a9c28f046a4fb",
+  "files": [
+    {
+      "path": "fixtures/acceptance-contract.md",
+      "sha256": "fb6d6379777ac365b13f35eb4207e793496abcddd02406912d3dbd75a99d75c4",
+      "bytes": 1756
+    },
+    {
+      "path": "fixtures/hermes-session-trajectory.md",
+      "sha256": "3bd321135c10ddada7dd0b2c159f5a7c894ee8a1c10fe18cb5a6e98c8b053414",
+      "bytes": 941
+    }
+  ]
+}

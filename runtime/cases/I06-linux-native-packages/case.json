@@ -1,0 +1,23 @@
+{
+  "version": "1",
+  "id": "I06-linux-native-packages",
+  "hard_gate_count": 16,
+  "hard_gates": [
+    "the package is built from the exact pull-request head",
+    "the package format matches the requested DEB or RPM leg",
+    "the package architecture matches the native runner architecture",
+    "the installed binary is a native executable and returns help",
+    "the package creates a non-root non-login vermory service identity",
+    "the package installs the hardened systemd unit at the declared path",
+    "the package installs a non-secret environment example",
+    "the package does not create the protected service environment",
+    "the package does not enable or start the service",
+    "the package scripts never invoke sudo",
+    "the package scripts never run database migrations",
+    "the package scripts never carry database credentials",
+    "package removal stops an active service only on a true removal",
+    "package removal deletes package-owned files",
+    "package removal preserves operator-owned configuration and service identity",
+    "the normalized report contains no credential material"
+  ]
+}

@@ -1,0 +1,7 @@
+{"id":"b01-event-1","sequence":1,"actor":"user","channel":"web_chat","source_id":"b01-conversation","content":"Use checkout_eta_v2 for the staged checkout release."}
+{"id":"b01-event-2","sequence":2,"actor":"user","channel":"web_chat","source_id":"b01-conversation","content":"Run the checkout smoke suite before increasing rollout percentage."}
+{"id":"b01-event-3","sequence":3,"actor":"assistant","channel":"web_chat","source_id":"b01-conversation","content":"Maybe rename the internal mascot before launch."}
+{"id":"b01-event-4","sequence":4,"actor":"operator","channel":"bridge_promote","source_id":"b01-workspace","content":"Promote only the confirmed checkout_eta_v2 decision into the checkout workspace."}
+{"id":"b01-event-5","sequence":5,"actor":"evaluation_probe","channel":"workspace_mcp","source_id":"b01-workspace","content":"Which checkout flag should the staged release use?"}
+{"id":"b01-event-6","sequence":6,"actor":"operator","channel":"bridge_export","source_id":"b01-workspace","content":"Export the selected release flag and smoke-suite gate for team handoff."}
+{"id":"b01-event-7","sequence":7,"actor":"operator","channel":"bridge_reverse","source_id":"b01-workspace","content":"Reverse the promotion and verify the source conversation remains unchanged."}

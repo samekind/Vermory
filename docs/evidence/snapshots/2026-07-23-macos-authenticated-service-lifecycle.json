@@ -1,0 +1,140 @@
+{
+  "evidence_version": 1,
+  "case_id": "I11-macos-authenticated-service-lifecycle",
+  "status": "runtime-qualified",
+  "sources": {
+    "base": "989bea77eeab56ee8ef87ccf9034269958897231",
+    "candidate": "e8d2bd34ee63e4cb923287baaed1275061ef5e8b"
+  },
+  "github": {
+    "repository": "samekind/Vermory",
+    "run_id": 29967482446,
+    "run_conclusion": "success",
+    "test_job_id": 89082029034,
+    "sign_snapshot_job_id": 89082583992,
+    "pull_request_number": 1,
+    "pull_request_state": "OPEN",
+    "pull_request_draft": true
+  },
+  "signed_snapshot": {
+    "artifact_id": 8548456074,
+    "artifact_name": "vermory-pr-snapshot-e8d2bd34ee63e4cb923287baaed1275061ef5e8b",
+    "artifact_size_bytes": 66380867,
+    "artifact_sha256": "3c51c7b846eb669a7bb35356b538352d8f5eeabfac0b915916afa1034f3ce5c8",
+    "manifest_entries": 16,
+    "manifest_sha256": "05e0b8f7251e9c9ce6c8df9f8085e06724c798cd78d9cb4764f2fe9c8aad1817",
+    "sigstore_bundle_sha256": "31567d83ae7ec09dc140a85b6e8b9ea845f566e71f8217fc2cf8099ac4806384",
+    "darwin_arm64_archive_sha256": "ecc0620538527ee3145a5f569bf93c3eb04c12e68288b227459648e268517a77",
+    "candidate_binary_sha256": "6fbe9057986a36ef989ad0804c2f7f673af2d185cfe6bfb1b471a50c0489478d",
+    "all_payload_hashes_verified": true,
+    "sigstore": {
+      "cosign_version": "v3.0.6",
+      "workflow_identity": "https://github.com/samekind/Vermory/.github/workflows/ci.yml@refs/pull/1/merge",
+      "oidc_issuer": "https://token.actions.githubusercontent.com",
+      "positive_verification": "pass"
+    }
+  },
+  "transport": {
+    "route": "restricted FRP SSH",
+    "privilege": "unprivileged user",
+    "sudo_used": false,
+    "runner_bundle_sha256": "0aaa07103b93234799bf75b69584d1389ebbbd740850fccbe7e8c846dc026215",
+    "local_and_remote_candidate_hash_match": true
+  },
+  "report": {
+    "version": 1,
+    "run_id": "i11-20260723-e8d2bd3-v6",
+    "report_sha256": "6927f71866e416665a6a1e0b5fdb38fe4f505e9e3f3d70d3d7945ebb7d171e7e",
+    "runtime": {
+      "host_class": "user-owned Mac mini",
+      "operating_system": "macOS 26.5.1",
+      "machine": "arm64",
+      "postgres": "PostgreSQL 18.3",
+      "service_scope": "unprivileged user LaunchAgent",
+      "loopback_only": true,
+      "provider": "mock"
+    },
+    "base": {
+      "version": "0.0.0-SNAPSHOT-989bea7",
+      "revision": "989bea77eeab56ee8ef87ccf9034269958897231",
+      "binary_sha256": "178f9142e0ac9ce06008114e97025942aefd98536ea4badf22658abacb3761f3"
+    },
+    "candidate": {
+      "version": "0.0.0-SNAPSHOT-e8d2bd3",
+      "revision": "e8d2bd34ee63e4cb923287baaed1275061ef5e8b",
+      "binary_sha256": "6fbe9057986a36ef989ad0804c2f7f673af2d185cfe6bfb1b471a50c0489478d"
+    },
+    "state": {
+      "marker_sha256": "bdee02775e7cd6da34dc68c5d1533a8795a04a27648ff9f26901beea7978e2a5",
+      "baseline_counts": "1|1|1|1",
+      "final_counts": "3|1|1|1",
+      "authoritative_state_preserved": true
+    },
+    "security": {
+      "environment_mode": 600,
+      "protected_environment_files": 2,
+      "plist_secret_matches": 0,
+      "runtime_secret_matches": 0
+    },
+    "client_backend_probes": {
+      "openclaw": true,
+      "hermes": true,
+      "real_client_qualification_inferred": false
+    },
+    "hard_gate_count": 20,
+    "hard_gates": {
+      "candidate_version_preflight": true,
+      "candidate_database_compatibility_preflight": true,
+      "incompatible_candidate_no_change": true,
+      "unprivileged_launchagent": true,
+      "loopback_only": true,
+      "protected_environment_and_clean_plist": true,
+      "complete_rollback_slot": true,
+      "partial_installation_rejected_by_contract": true,
+      "atomic_stable_paths": true,
+      "root_health_200": true,
+      "unauthenticated_session_401": true,
+      "automatic_complete_restore": true,
+      "automatic_restore_verified": true,
+      "explicit_rollback_compatibility_preflight": true,
+      "incompatible_rollback_rejected_by_contract": true,
+      "explicit_complete_restore": true,
+      "rollback_slot_consumed": true,
+      "authoritative_state_preserved": true,
+      "isolated_macmini_runtime_without_model": true,
+      "checksum_bound_credential_free_report": true
+    },
+    "cleanup": {
+      "launchagent_plist_present": false,
+      "launchd_service_loaded": false,
+      "database_count": 0,
+      "runtime_role_count": 0,
+      "runtime_root_present": false,
+      "listener_count": 0
+    }
+  },
+  "retained_failures": [
+    {
+      "run_id": "i11-20260723-3cc50b9-v5",
+      "source_head": "3cc50b98dc85b2fbb19452e122de4bc90b946949",
+      "classification": "implementation-defect",
+      "failure": "The runtime report passed, but independent post-run inspection found an unloaded LaunchAgent plist residue; the same residue existed from the earlier v4 debug run.",
+      "report_sha256": "5d97f931ce0b04e5b35f5df0eb10c9f36a114d7e37e89e069ab97ea79d167213",
+      "accepted_as_qualification": false,
+      "resolution": "Revision e8d2bd3 added a cleanup regression assertion and removed the plist after bootout; v6 proved zero service, database, role, runtime, plist, and listener residue."
+    }
+  ],
+  "claim_boundary": {
+    "qualified": "one frozen signed base-to-candidate authenticated user LaunchAgent lifecycle on the ARM64 Mac mini, including exact artifact binding, read-only compatibility preflight, loopback authenticated startup, incompatible-change rejection, upgrade, restart, compatible explicit rollback, failed-activation automatic restoration, governed-state preservation, credential scanning, and residue-free cleanup",
+    "not_qualified": [
+      "PostgreSQL down migration or arbitrary historical-version rollback",
+      "zero-downtime restart or a long-duration service-level objective",
+      "database backup, restore, high availability, or disaster recovery",
+      "model availability or model quality",
+      "public Internet exposure, macOS notarization, or package-manager delivery",
+      "a system-wide LaunchDaemon or privileged installation",
+      "real OpenClaw or Hermes client behavior from the I11 backend probes",
+      "the complete Vermory platform"
+    ]
+  }
+}

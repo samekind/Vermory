@@ -1,0 +1,145 @@
+{
+  "evidence_version": 1,
+  "case_id": "I07-release-database-compatibility",
+  "status": "runtime-qualified",
+  "evidence_level": "public",
+  "source_head": "45dbdee9a311322249f3d37bbc8e6551e7e8a285",
+  "support_interval": {
+    "minimum_supported_schema": 24,
+    "maximum_supported_schema": 24
+  },
+  "exact_artifacts": {
+    "binary_sha256": "3c835c35091aa8eeb08a46fa12a8ed72b275b73579a186a6d6baf835d9dfe510",
+    "case_sha256": "64252dd27d84a9e6550d642d8f4174eec75aa0e6c519806e79f154e9569bc7c0",
+    "migration_sha256": "f19584226de626eecfb67570b7841768ee6444ab525d7cc9a9b717e61876366a"
+  },
+  "local_postgresql": {
+    "version": "PostgreSQL 17.10 (Homebrew) on aarch64-apple-darwin25.4.0",
+    "socket": "/Volumes/JSData/.cache/vermory/postgres/socket",
+    "port": 55439,
+    "fixtures": [
+      {
+        "database": "vermory_i07_old_45dbdee",
+        "schema_version": 23,
+        "business_state": "0:0:0",
+        "compatibility_status": "migration_required",
+        "exit_code": 1
+      },
+      {
+        "database": "vermory_i07_current_45dbdee",
+        "schema_version": 24,
+        "business_state": "0:0:0",
+        "compatibility_status": "compatible",
+        "exit_code": 0
+      },
+      {
+        "database": "vermory_i07_future_45dbdee",
+        "schema_version": 25,
+        "business_state": "0:0:0",
+        "compatibility_status": "binary_too_old",
+        "exit_code": 1
+      }
+    ]
+  },
+  "runtime_role": {
+    "name": "vermory_i07_runtime_45dbdee",
+    "can_login": true,
+    "superuser": false,
+    "bypass_rls": false,
+    "schema_function": "vermory_auth.schema_version",
+    "schema_function_result": 24,
+    "goose_table_select": "permission_denied",
+    "goose_table_update": "permission_denied"
+  },
+  "serve_replay": {
+    "compatible": {
+      "database": "vermory_i07_current_45dbdee",
+      "listen": "127.0.0.1:18797",
+      "unauthenticated_status": 401,
+      "listener_released": true
+    },
+    "rejections": [
+      {
+        "database": "vermory_i07_old_45dbdee",
+        "role": "vermory_i07_runtime_45dbdee",
+        "status": "preflight_failed",
+        "exit_code": 1,
+        "listener_absent": true
+      },
+      {
+        "database": "vermory_i07_future_45dbdee",
+        "role": "vermory_i07_runtime_45dbdee",
+        "status": "preflight_failed",
+        "exit_code": 1,
+        "listener_absent": true
+      },
+      {
+        "database": "vermory_i07_current_45dbdee",
+        "role": "vermory_i07_unprivileged_45dbdee",
+        "status": "preflight_failed",
+        "exit_code": 1,
+        "listener_absent": true
+      }
+    ],
+    "tested_ports_free_after_replay": [18797, 18798, 18799, 18800]
+  },
+  "protected_ci": {
+    "repository": "samekind/Vermory",
+    "run_id": 29928032496,
+    "run_url": "https://github.com/samekind/Vermory/actions/runs/29928032496",
+    "conclusion": "success",
+    "jobs": {
+      "test": 88950141037,
+      "linux_service_amd64": 88950140926,
+      "linux_service_arm64": 88950140995,
+      "deb_amd64": 88950141022,
+      "rpm_amd64": 88950141063,
+      "deb_arm64": 88950140992,
+      "rpm_arm64": 88950141176,
+      "sign_snapshot": 88951335584
+    }
+  },
+  "signed_snapshot": {
+    "artifact_id": 8532953742,
+    "artifact_name": "vermory-pr-snapshot-45dbdee9a311322249f3d37bbc8e6551e7e8a285",
+    "artifact_api_digest": "sha256:16905ab13988fd2ad56835ae5c488a1a8cb5da5a1dfa168271167d0659e3806b",
+    "independent_download_sha256": "16905ab13988fd2ad56835ae5c488a1a8cb5da5a1dfa168271167d0659e3806b",
+    "manifest_sha256": "b243a330bbc272343d13229d4ae70751bfb523083136eb167d4a48cfd5ef213b",
+    "checksums_sha256": "73fc49531066a20e3d2f13e773f72ab7410f6ea8a3d789cedddabed2f0c251eb",
+    "sigstore_bundle_sha256": "061d671c246ab5623b281f255c2882c7228b364ef1ad0a57f6cc280086671683",
+    "manifest_entries": 12,
+    "checksums_entries": 8,
+    "cosign_version": "v3.0.6",
+    "workflow_identity": "https://github.com/samekind/Vermory/.github/workflows/ci.yml@refs/pull/1/merge",
+    "oidc_issuer": "https://token.actions.githubusercontent.com",
+    "rekor_log_index": "2218281092",
+    "positive_verification": "pass",
+    "modified_manifest_rejection": "pass",
+    "wrong_identity_rejection": "pass"
+  },
+  "hard_gates": {
+    "deterministic_inclusive_support_interval": true,
+    "current_schema_compatible": true,
+    "old_schema_requires_migration": true,
+    "future_schema_rejected": true,
+    "unreadable_schema_fails_closed": true,
+    "restricted_function_only": true,
+    "goose_table_is_not_readable_or_mutable": true,
+    "stable_json_is_credential_free": true,
+    "migration_is_explicit_admin_operation": true,
+    "package_and_systemd_scripts_are_migration_free": true,
+    "binary_rollback_is_interval_bounded": true,
+    "incompatible_rollback_uses_backup_or_pitr": true
+  },
+  "claim_boundary": {
+    "qualified": "schema-24 compatibility preflight, restricted inspection, fail-closed startup, migration-free package/service lifecycle, and documented rollback boundary",
+    "not_qualified": [
+      "universal automatic PostgreSQL down migration",
+      "zero-downtime database upgrades",
+      "long-duration uptime or SLA",
+      "APT/DNF repository delivery",
+      "tagged release publication",
+      "rollback across arbitrary future schemas"
+    ]
+  }
+}

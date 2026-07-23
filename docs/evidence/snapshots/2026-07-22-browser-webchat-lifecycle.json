@@ -1,0 +1,90 @@
+{
+  "case_id": "W32-browser-webchat-lifecycle",
+  "status": "accepted",
+  "hard_gate_count": 20,
+  "accepted_at": "2026-07-22",
+  "surface": {
+    "browser": "Google Chrome 150",
+    "origin": "http://127.0.0.1:8792",
+    "desktop_viewport": "1440x900",
+    "mobile_viewport": "390x844@2x",
+    "console_errors_on_final_reload": 0,
+    "lighthouse_snapshot": {
+      "accessibility": 100,
+      "best_practices": 100,
+      "seo": 100,
+      "agentic_browsing": 100,
+      "passed": 29,
+      "failed": 0
+    }
+  },
+  "runtime": {
+    "provider": "deterministic mock provider",
+    "model_label": "w32-browser-contract",
+    "postgresql": 17,
+    "schema_version": 23,
+    "fresh_database": true,
+    "real_model_claim": false
+  },
+  "refresh": {
+    "thread_id_preserved": true,
+    "message_rows_before": 4,
+    "message_rows_after": 4,
+    "user_rows_after": 2,
+    "assistant_rows_after": 2,
+    "memory_count_after": 1,
+    "pending_after": null
+  },
+  "network_failure_retry": {
+    "first_request_status": "net::ERR_CONNECTION_REFUSED",
+    "retry_request_status": 200,
+    "same_operation_id": true,
+    "failed_state_user_rows": 1,
+    "failed_state_assistant_rows": 0,
+    "completed_state_user_rows": 1,
+    "completed_state_assistant_rows": 1
+  },
+  "uncertain_response_replay": {
+    "first_response_status": 200,
+    "first_response_was_discarded_in_browser": true,
+    "first_replayed": false,
+    "retry_response_status": 200,
+    "retry_replayed": true,
+    "same_operation_id": true,
+    "same_turn_id": true,
+    "same_delivery_id": true,
+    "same_user_observation_id": true,
+    "same_assistant_observation_id": true,
+    "final_user_rows": 2,
+    "final_assistant_rows": 2,
+    "pending_after": null
+  },
+  "thread_switch_races": {
+    "send_success_scoped_to_origin": true,
+    "send_failure_scoped_to_origin": true,
+    "selected_thread_draft_preserved": true,
+    "stale_inspection_discarded": true,
+    "stale_candidate_inbox_discarded": true
+  },
+  "governance": {
+    "direct_confirmation": true,
+    "candidate_accept": true,
+    "candidate_reject": true,
+    "correction": true,
+    "forget": true,
+    "active_memories_after_forget": 1,
+    "deleted_memories": 1,
+    "rejected_memories": 1,
+    "fresh_context_contains_deleted_beta": false,
+    "fresh_context_contains_retained_sunday": true
+  },
+  "database_assertions": {
+    "conversation_continuities": 3,
+    "replay_turn_rows": 1,
+    "replay_unique_user_observations": 1,
+    "replay_unique_assistant_observations": 1,
+    "replay_completed": true,
+    "active_deleted_beta": false,
+    "active_retained_sunday": true
+  }
+}

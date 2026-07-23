@@ -1,10 +1,11 @@
 package eval
 
 type Task struct {
-	ID             string   `json:"id"`
-	Prompt         string   `json:"prompt"`
-	MustInclude    []string `json:"must_include"`
-	MustNotInclude []string `json:"must_not_include"`
+	ID             string     `json:"id"`
+	Prompt         string     `json:"prompt"`
+	MustInclude    []string   `json:"must_include"`
+	MustIncludeAny [][]string `json:"must_include_any,omitempty"`
+	MustNotInclude []string   `json:"must_not_include"`
 }
 
 // Score keeps the legacy string-check outputs and adds heuristic proxy metrics

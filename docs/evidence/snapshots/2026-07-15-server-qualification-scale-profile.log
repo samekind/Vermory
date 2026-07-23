@@ -1,0 +1,25 @@
+=== RUN   TestServerQualificationScaleProfile
+2026/07/15 17:48:28 OK   00001_initial.sql (12.56ms)
+2026/07/15 17:48:28 OK   00002_workspace_runtime.sql (11.04ms)
+2026/07/15 17:48:28 OK   00003_governed_memory_origin.sql (482.92µs)
+2026/07/15 17:48:28 OK   00004_conversation_continuity.sql (4.27ms)
+2026/07/15 17:48:28 OK   00005_conversation_turns.sql (2.05ms)
+2026/07/15 17:48:28 OK   00006_global_defaults.sql (1.16ms)
+2026/07/15 17:48:28 OK   00007_durable_bridges.sql (7.48ms)
+2026/07/15 17:48:28 OK   00008_conversation_turn_fingerprints.sql (1.41ms)
+2026/07/15 17:48:28 OK   00009_identity_authorization_rls.sql (15.46ms)
+2026/07/15 17:48:28 OK   00010_source_conflict_candidates.sql (927.08µs)
+2026/07/15 17:48:28 OK   00011_source_match_decisions.sql (3.16ms)
+2026/07/15 17:48:28 OK   00012_source_match_continuity_fks.sql (2.57ms)
+2026/07/15 17:48:28 OK   00013_source_document_formation.sql (5.26ms)
+2026/07/15 17:48:28 OK   00014_production_retrieval_runtime.sql (14.81ms)
+2026/07/15 17:48:28 OK   00015_retrieval_profile_migration.sql (2.99ms)
+2026/07/15 17:48:28 goose: successfully migrated database to version: 15
+    server_scale_profile_test.go:200: W12 authority seed complete: records=100000 duration=10.699394s
+    server_scale_profile_test.go:209: W12 governed history complete: revisions=450000 events=1000000 duration=1m42.709307542s
+    server_scale_profile_test.go:222: W12 lexical rebuild complete: rows=100000 duration=11.301178792s
+    server_scale_profile_test.go:239: W12 vector snapshot complete: vectors=100000 duration=5m17.34564275s
+    server_scale_profile_test.go:363: server qualification evidence={"active_after_delete":99000,"active_before_delete":100000,"authority_seed_ms":10699,"competing_worker_results":{"already_running":10,"processed":1000},"database_size_bytes":2710910655,"degraded_queries":412,"delete_and_query_ms":19381,"effective_vector_queries":138,"governed_memories":550000,"history_generation_ms":102709,"lexical_rebuild_ms":11301,"lexical_rows_before_delete":100000,"profile":"server-qualification-v1","projection_events_before_tail":1000000,"projection_events_final":1001000,"query_clients":50,"query_p50_ms":8,"query_p95_ms":234,"query_p99_ms":266,"query_samples":1000,"real_provider_requests":2,"snapshot_embedding_requests":100000,"superseded_memories":450000,"tail_catchup_ms":18431,"vector_rows_before_delete":100000,"vector_snapshot_ms":317345}
+--- PASS: TestServerQualificationScaleProfile (465.35s)
+PASS
+ok  	vermory/internal/runtime	465.719s

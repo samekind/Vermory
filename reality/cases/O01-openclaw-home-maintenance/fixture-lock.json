@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "case_id": "O01-openclaw-home-maintenance",
+  "manifest_sha256": "06c32926d2bb653f9e8b12812ecb237e6913dce5cffaab7e30049afa53f2ecdc",
+  "events_sha256": "515c6e6a7a1c2153aa9157c00925d08047e2d57c4edb7e8045e98e876973df9e",
+  "files": [
+    {
+      "path": "fixtures/home-maintenance-thread.md",
+      "sha256": "58d81b13d600e47090d4bd2389fa84bf879622b6a14599792b52f8f54acbc42b",
+      "bytes": 884
+    },
+    {
+      "path": "fixtures/governance-actions.md",
+      "sha256": "356292ae8fa9e044693d393a71db2f1a7fdfa6aaccf770a8840cfd090ec3d0bf",
+      "bytes": 899
+    }
+  ]
+}

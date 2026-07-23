@@ -1,0 +1,101 @@
+{
+  "version": 1,
+  "id": "I03-postgresql-ha-pitr",
+  "title": "PostgreSQL streaming failover and exact-LSN historical recovery",
+  "evidence_level": "public",
+  "continuity_lines": ["security"],
+  "pressures": [
+    "physical_streaming_replication",
+    "primary_immediate_failure",
+    "standby_promotion",
+    "multi_host_runtime_reconnect",
+    "wal_archive",
+    "pitr_target_lsn",
+    "historical_deletion_resurrection",
+    "historical_token_resurrection",
+    "post_recovery_projection_rebuild",
+    "post_recovery_credential_governance"
+  ],
+  "sources": [
+    {
+      "id": "i03-ha-pitr-contract",
+      "kind": "authorized_postgresql_ha_pitr_trajectory",
+      "fixture_path": "fixtures/ha-pitr-contract.md",
+      "original_ref": "vermory-design:i03-postgresql-ha-pitr",
+      "original_revision": "2026-07-16",
+      "sha256": "9418dfdb6c43a48da9df9d0aedf2f3ef4f24ba78eec19975dbd8074e157b5a08",
+      "authorized": true,
+      "anonymization": "Every cluster, role, tenant, continuity, memory, token metadata, fact, port, WAL position, and runtime identifier is synthetic; credentials, private connection material, and user data paths are excluded."
+    }
+  ],
+  "anchors": [
+    {
+      "kind": "dedicated_database_scope",
+      "value": "vermory-ha-pitr-i03/primary",
+      "ambiguous": false
+    },
+    {
+      "kind": "dedicated_database_scope",
+      "value": "vermory-ha-pitr-i03/standby",
+      "ambiguous": false
+    },
+    {
+      "kind": "dedicated_database_scope",
+      "value": "vermory-ha-pitr-i03/restored-target",
+      "ambiguous": false
+    },
+    {
+      "kind": "release_revision",
+      "value": "vermory-ha-pitr-i03/current-commit",
+      "ambiguous": false
+    }
+  ],
+  "expectations": {
+    "current_facts": [
+      "PostgreSQL streaming replication can preserve committed Vermory authority before standby promotion.",
+      "A failed request during primary loss cannot return a successful receipt or persist a partial operation.",
+      "The same Vermory runtime pools and handler can resume against a promoted read-write standby through a multi-host connection contract.",
+      "Physical recovery to the captured T2 WAL position restores the T2 authority state and excludes transactions committed after T2.",
+      "PITR-restored projections are disposable and must be reset and rebuilt from restored active authority.",
+      "Historically restored token metadata and later-deleted facts require explicit quarantine review and credential or lifecycle reconciliation before traffic resumes."
+    ],
+    "forbidden_facts": [
+      "One same-host streaming replication run proves cross-region high availability.",
+      "Vermory provides automatic leader election or split-brain prevention.",
+      "A failed transition request may be treated as persisted because a later retry succeeded.",
+      "A PITR-restored historical database is automatically equivalent to current production truth.",
+      "A token revoked after the target WAL position remains revoked without an explicit post-recovery action.",
+      "Projection rows are authoritative and may be trusted without post-recovery rebuild.",
+      "One measured failover or recovery duration is a universal RPO or RTO.",
+      "The HA and PITR qualification changes the production lexical retrieval default or W15 benchmark result."
+    ],
+    "allowed_unknowns": [
+      "Which production leader-election system or managed PostgreSQL service an operator will choose.",
+      "Which cross-region topology and network-fencing policy a later deployment will use.",
+      "Which later corrections and deletions an incident-specific reconciliation plan must replay after a historical restore."
+    ],
+    "expected_action": "Create only dedicated PostgreSQL 18 clusters, prove streaming replay and same-pool recovery through immediate primary failure and standby promotion, restore the exact T2 historical state from physical backup plus archived WAL, rebuild disposable projections, re-govern restored credentials, and retain all failures and same-host limitations in evidence."
+  },
+  "task": {
+    "prompt": "Qualify a dedicated Vermory PostgreSQL deployment through streaming standby promotion and exact-target point-in-time recovery, preserving authority, RLS, operation receipts, projection rebuild, and credential quarantine semantics.",
+    "artifact_checks": [
+      "fixture and evidence contain no raw token, password, private connection string, user database path, or PostgreSQL process log",
+      "failover evidence records primary flush and standby replay positions plus exact operation counts before and after promotion",
+      "PITR evidence records the configured target WAL position, T2 authority fingerprint, later-transaction exclusion, and projection rebuild",
+      "security evidence distinguishes historical state restored from current state reconciled and proves old-token rejection plus new-token access"
+    ],
+    "deterministic_checks": [
+      "streaming_replication:standby_replay_reaches_required_lsn",
+      "primary_failure:no_false_success_receipt",
+      "standby_promotion:read_write_and_same_pool_recovers",
+      "failover_persistence:pre_and_post_exactly_once_transition_zero",
+      "promoted_rls:tenant_isolation_preserved",
+      "pitr_target:t2_fingerprint_equal",
+      "pitr_exclusion:t3_t4_absent",
+      "projection_rebuild:restored_active_authority_only",
+      "historical_token:rejected_after_regovernance",
+      "replacement_token:authenticated_after_regovernance",
+      "profile_cleanup:dedicated_clusters_stopped"
+    ]
+  }
+}

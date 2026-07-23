@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Private security report
+    url: https://github.com/samekind/Vermory/security/advisories/new
+    about: Report leakage, credential exposure, deletion residue, or another security-sensitive issue privately.
+  - name: Contribution and repository workflow
+    url: https://github.com/samekind/Vermory/blob/main/CONTRIBUTING.md
+    about: Read the contribution, evidence, review, and delivery rules before opening an issue.

@@ -1,0 +1,71 @@
+name: Capability or architecture proposal
+description: Propose a user-visible capability or a durable architecture decision.
+title: "[Proposal]: "
+labels:
+  - proposal
+  - needs-design
+body:
+  - type: textarea
+    id: real_failure
+    attributes:
+      label: Real failure or workflow
+      description: Which real user, client, or operational workflow requires this change?
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: User-visible outcome
+      description: Describe what becomes possible or reliable without prescribing the implementation.
+    validations:
+      required: true
+  - type: textarea
+    id: expected_forbidden
+    attributes:
+      label: Expected and forbidden behavior
+      description: Include isolation, stale-state, deletion, privacy, and ambiguity behavior where relevant.
+    validations:
+      required: true
+  - type: dropdown
+    id: continuity
+    attributes:
+      label: Continuity scope
+      multiple: true
+      options:
+        - Workspace-backed continuity
+        - Conversation-backed continuity
+        - Global Defaults
+        - Cross-continuity bridge
+        - Operational or release boundary
+    validations:
+      required: true
+  - type: textarea
+    id: baseline
+    attributes:
+      label: Simpler baseline
+      description: What simpler implementation or existing behavior must be compared?
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance evidence
+      description: Name deterministic gates, real-client execution, negative controls, and explicit non-claims.
+    validations:
+      required: true
+  - type: textarea
+    id: migration
+    attributes:
+      label: Migration and rollback
+      description: Describe affected schema, data, clients, providers, or deployment profiles and how the change can be reversed.
+  - type: checkboxes
+    id: contract
+    attributes:
+      label: Product boundary
+      options:
+        - label: PostgreSQL remains the native semantic authority.
+          required: true
+        - label: Models may propose but cannot silently govern.
+          required: true
+        - label: The proposal does not rely on similarity alone to merge continuity or promote Global Defaults.
+          required: true

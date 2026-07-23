@@ -1,0 +1,9 @@
+[project]
+name = "vermory-hermes-integration"
+version = "0.1.0"
+description = "Hermes MemoryProvider integration for Vermory governed continuity"
+requires-python = ">=3.11"
+dependencies = []
+
+[tool.uv]
+package = false

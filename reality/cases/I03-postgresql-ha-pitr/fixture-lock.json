@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "case_id": "I03-postgresql-ha-pitr",
+  "manifest_sha256": "246b4e93b369ffe9add109a40977167c740c8485a6d36681e0ce69ef15fc3b8e",
+  "events_sha256": "b1da7f314fe97c93dded8ef55ef9487256f142a9d94f8fb64e62803b5f5c51ef",
+  "files": [
+    {
+      "path": "fixtures/ha-pitr-contract.md",
+      "sha256": "9418dfdb6c43a48da9df9d0aedf2f3ef4f24ba78eec19975dbd8074e157b5a08",
+      "bytes": 4046
+    }
+  ]
+}

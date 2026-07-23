@@ -15,6 +15,18 @@ func ScoreOutput(task Task, output string) Score {
 			missing = append(missing, item)
 		}
 	}
+	for _, alternatives := range task.MustIncludeAny {
+		matched := false
+		for _, alternative := range alternatives {
+			if strings.Contains(lowerOutput, strings.ToLower(alternative)) {
+				matched = true
+				break
+			}
+		}
+		if !matched {
+			missing = append(missing, "any of: "+strings.Join(alternatives, " | "))
+		}
+	}
 
 	var violations []string
 	for _, item := range task.MustNotInclude {
@@ -24,8 +36,9 @@ func ScoreOutput(task Task, output string) Score {
 	}
 
 	hitRate := 1.0
-	if len(task.MustInclude) > 0 {
-		hitRate = float64(len(task.MustInclude)-len(missing)) / float64(len(task.MustInclude))
+	requiredFacts := len(task.MustInclude) + len(task.MustIncludeAny)
+	if requiredFacts > 0 {
+		hitRate = float64(requiredFacts-len(missing)) / float64(requiredFacts)
 	}
 
 	groundedness := 1.0

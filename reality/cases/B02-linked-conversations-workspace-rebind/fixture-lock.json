@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "case_id": "B02-linked-conversations-workspace-rebind",
+  "manifest_sha256": "a4648c0b19867723a0e8556b0e493d947c3953d2d2e3623792a6d9cdbcd32dd7",
+  "events_sha256": "40e5d38c913db018b7b52a6d697ca33606eec36325776550f654c9e086e7c09c",
+  "files": [
+    {
+      "path": "fixtures/thesis-channels.md",
+      "sha256": "d0b05f0d33d1666b17cb386df08d82511b0c981db3b707d6ec7e5c77f85ee74e",
+      "bytes": 556
+    },
+    {
+      "path": "fixtures/workspace-move.md",
+      "sha256": "a8f5491689c1b77e531df6f28a4d204c2b9cef43c3cf1a3dcd7c64d37c9f3122",
+      "bytes": 414
+    }
+  ]
+}

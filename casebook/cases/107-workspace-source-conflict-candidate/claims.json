@@ -1,0 +1,10 @@
+[
+  {
+    "type": "decision",
+    "content": "Production releases use GitHub Actions OIDC keyless signing."
+  },
+  {
+    "type": "constraint",
+    "content": "The deployment API timeout is 800 ms."
+  }
+]

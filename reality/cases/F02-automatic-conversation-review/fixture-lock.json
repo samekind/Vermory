@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "case_id": "F02-automatic-conversation-review",
+  "manifest_sha256": "0d9b4c156be93c27d1e0a4741f4146da7a553a0defc1d4684026ad4962ce3fd7",
+  "events_sha256": "80724540424618b13065b49edb62c694315e8503175cb1823b8cb302b8689e59",
+  "files": [
+    {
+      "path": "fixtures/review-governance.md",
+      "sha256": "e81284f84bf5810041266b8f7881b7e4170f12c77e8b14f32c7fc13b901b7559",
+      "bytes": 1482
+    },
+    {
+      "path": "fixtures/review-transcript.md",
+      "sha256": "af35829301e7906e8a553e23e704a22d57c20ac08424216f07655f4b5661d248",
+      "bytes": 902
+    }
+  ]
+}

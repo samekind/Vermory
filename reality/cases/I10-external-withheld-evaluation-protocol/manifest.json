@@ -1,0 +1,104 @@
+{
+  "version": 1,
+  "id": "I10-external-withheld-evaluation-protocol",
+  "title": "Submission-bound external withheld evaluation protocol",
+  "evidence_level": "public",
+  "continuity_lines": ["security"],
+  "pressures": [
+    "implementation_evaluator_separation",
+    "exact_artifact_binding",
+    "canonical_submission_digest",
+    "submission_expiry",
+    "evaluator_key_pinning",
+    "private_answer_non_disclosure",
+    "evaluator_owned_provider_proxy",
+    "outbound_network_restriction",
+    "minimal_signed_result",
+    "count_consistency",
+    "tamper_rejection",
+    "no_local_attestation_signer"
+  ],
+  "sources": [
+    {
+      "id": "i10-evaluation-boundary",
+      "kind": "authorized_external_evaluation_contract",
+      "fixture_path": "fixtures/evaluation-boundary.md",
+      "original_ref": "vermory-design:i10-external-withheld-evaluation-protocol",
+      "original_revision": "2026-07-23",
+      "sha256": "497102448665f49f611dc2ca35c6b2886446282449f5e290cb4d1aaf4ae12fb7",
+      "authorized": true,
+      "anonymization": "The case contains only public protocol fields and synthetic negative controls. Private cases, expected answers, credentials, callback addresses, private keys, private paths, prompts, outputs, and detailed evaluator reports are excluded."
+    }
+  ],
+  "anchors": [
+    {
+      "kind": "evaluation_protocol",
+      "value": "vermory.external-evaluation/v1",
+      "ambiguous": false
+    },
+    {
+      "kind": "implementation_artifact",
+      "value": "submission-bound-sha256",
+      "ambiguous": false
+    },
+    {
+      "kind": "external_evaluator_key",
+      "value": "out-of-band-ed25519-public-key",
+      "ambiguous": false
+    }
+  ],
+  "expectations": {
+    "current_facts": [
+      "A version-1 submission binds one exact implementation artifact, source revision, validity interval, suite profile, declared interfaces, platforms, and evaluator execution boundary.",
+      "The canonical submission digest is stable across JSON formatting and changes when a bound field changes.",
+      "Artifact verification checks filename, size, and SHA-256 before evaluator execution.",
+      "The submission rejects credential-bearing or query-bearing artifact URIs and contains no provider, database, callback, or signing credential.",
+      "A version-2 attestation binds the exact evaluator public-key identity, submission digest, implementation digest, protocol, suite profile, run identity, counts, hard gates, result digest, and signature.",
+      "The evaluator execution boundary uses ephemeral PostgreSQL, an evaluator-owned provider proxy, denied outbound network except that proxy, disabled telemetry, and evaluator-controlled detailed artifacts.",
+      "The production CLI exposes submission creation and verification plus attestation verification, but no external attestation signer.",
+      "Protocol qualification is distinct from an externally recorded run and from a passing sealed qualification."
+    ],
+    "forbidden_facts": [
+      "A repository-readable hidden directory is external sealed evidence.",
+      "A locally generated and locally signed fixture proves withheld generalization.",
+      "Passing protocol unit tests means an external evaluator ran a private suite.",
+      "The implementation process may read private expected answers or detailed evaluator output.",
+      "A valid signature for another submission, artifact, suite profile, protocol, or evaluator key is accepted.",
+      "A hard-gate pass is accepted when a hard gate failed or did not run.",
+      "An artifact URL may carry a bearer token, embedded user information, query secret, or implementation callback.",
+      "The Vermory production CLI can sign an external evaluation attestation."
+    ],
+    "allowed_unknowns": [
+      "Which independent evaluator will own the first private suite and signing key.",
+      "The private suite version, private case count, and unreleased expected answers.",
+      "Which exact provider models the evaluator will route through its controlled proxy.",
+      "Whether later protocol versions add an OCI artifact transport or hardware attestation."
+    ],
+    "expected_action": "Create and verify a credential-free exact-artifact submission, verify only an externally signed version-2 result bound to that submission, retain all private answers and detailed reports outside implementation access, and preserve the distinction between protocol readiness and a genuine external run."
+  },
+  "task": {
+    "prompt": "Qualify Vermory's public external-evaluation handoff and verifier without creating or claiming a private external evaluation result.",
+    "artifact_checks": [
+      "submission schema and strict Go parser bind all public execution fields without credentials",
+      "exact local artifact bytes reproduce the submission filename, size, and SHA-256",
+      "version-2 attestation schema and verifier bind exact key, submission, artifact, suite profile, protocol, validity interval, counts, hard gates, result digest, and signature",
+      "positive and negative tests cover formatting stability, mutation, unknown fields, unsafe URI, expiry, mismatch, false pass, and wrong evaluator key",
+      "CLI contains no attestation signing command and documentation makes no external-run claim"
+    ],
+    "deterministic_checks": [
+      "submission:strict_schema_and_unknown_field_rejection",
+      "submission:canonical_digest_stable",
+      "submission:bound_field_mutation_changes_digest",
+      "artifact:filename_size_and_sha256_verify",
+      "privacy:no_credential_callback_answer_or_private_key",
+      "execution:evaluator_owned_database_provider_network_and_artifacts",
+      "attestation:v1_backward_compatible",
+      "attestation:v2_exact_key_submission_artifact_and_suite_binding",
+      "attestation:count_and_hard_gate_consistency",
+      "attestation:mutation_wrong_key_and_false_pass_rejected",
+      "cli:submission_create_and_verify_only",
+      "cli:no_external_attestation_signer",
+      "claims:protocol_qualification_is_not_external_run"
+    ]
+  }
+}

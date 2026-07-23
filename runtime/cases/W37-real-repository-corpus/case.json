@@ -1,0 +1,95 @@
+{
+  "version": "1",
+  "id": "W37-real-repository-corpus",
+  "reality_case_id": "W05-trusted-workspace-attachment",
+  "tenant_id": "w37-public-repository-corpus",
+  "other_tenant_id": "w37-public-repository-corpus-other",
+  "filesystem_namespace": "w37-public-corpus",
+  "alternate_filesystem_namespace": "w37-public-corpus-alternate",
+  "source_authorization": "public_https_read_only",
+  "minimum_repository_count": 6,
+  "repositories": [
+    {
+      "id": "golang-example",
+      "ecosystem": "go-multi-example",
+      "url": "https://github.com/golang/example.git",
+      "revision": "7f05d217867b2af52b0a28c6d1c91df97e1b5b39",
+      "directory": "golang-example",
+      "nested_path": "hello",
+      "marker": "continuation_marker=w37-golang-example"
+    },
+    {
+      "id": "rust-mdbook",
+      "ecosystem": "rust-workspace",
+      "url": "https://github.com/rust-lang/mdBook.git",
+      "revision": "4f8c9460977e18974b37bb9a2292219bfa317632",
+      "directory": "rust-mdbook",
+      "nested_path": "crates",
+      "marker": "continuation_marker=w37-rust-mdbook"
+    },
+    {
+      "id": "python-django",
+      "ecosystem": "python-framework",
+      "url": "https://github.com/django/django.git",
+      "revision": "21b3a4c4c528ca827adda14b6c4cf045afba6d4f",
+      "directory": "python-django",
+      "nested_path": "django",
+      "marker": "continuation_marker=w37-python-django"
+    },
+    {
+      "id": "node-pnpm",
+      "ecosystem": "node-monorepo",
+      "url": "https://github.com/pnpm/pnpm.git",
+      "revision": "50ed6f5070fa5b159f4cfd56e6de8ffddeae4d3e",
+      "directory": "node-pnpm",
+      "nested_path": "pnpm",
+      "marker": "continuation_marker=w37-node-pnpm"
+    },
+    {
+      "id": "memory-mem0",
+      "ecosystem": "memory-platform-monorepo",
+      "url": "https://github.com/mem0ai/mem0.git",
+      "revision": "ca2abca2b884e038d3e525070e79d3057ef2012c",
+      "directory": "memory-mem0",
+      "nested_path": "mem0",
+      "marker": "continuation_marker=w37-memory-mem0"
+    },
+    {
+      "id": "agent-openclaw",
+      "ecosystem": "agent-platform-monorepo",
+      "url": "https://github.com/openclaw/openclaw.git",
+      "revision": "9ca500db98574d1d0e87bdc412293d5196f2a8d8",
+      "directory": "agent-openclaw",
+      "nested_path": "src",
+      "marker": "continuation_marker=w37-agent-openclaw"
+    }
+  ],
+  "other_tenant_marker": "continuation_marker=w37-other-tenant-only",
+  "hard_gate_count": 18,
+  "hard_gates": [
+    "the public corpus contains at least six authorized exact-revision repositories",
+    "every checkout HEAD equals the frozen public revision",
+    "every origin URL equals the frozen public source",
+    "every repository root produces a valid trusted attachment",
+    "every real nested directory resolves to its canonical repository root",
+    "root and nested probes retain the same Git common-directory evidence",
+    "root and nested probes remain distinct bounded attachment receipts",
+    "Git common-directory fingerprints do not collide across corpus repositories",
+    "every nested attachment survives exact encode and decode",
+    "confirming each exact anchor creates a distinct continuity",
+    "each repository receives its own governed marker",
+    "no repository receives another corpus repository marker",
+    "an exact prepare replay returns the same immutable delivery",
+    "the same path in an unconfirmed filesystem namespace abstains",
+    "namespace abstention creates no delivery or context",
+    "the same exact anchor under another tenant resolves to a different continuity",
+    "the other tenant receives only its own marker",
+    "the original tenant remains isolated after the other tenant is confirmed"
+  ],
+  "non_claims": [
+    "the corpus does not prove compatibility with every Git implementation or repository",
+    "public remote URLs and shared history do not authorize automatic continuity merging",
+    "the case does not qualify worktree adoption, repository migration, or cross-host transfer beyond W31, W33, and W34",
+    "the case does not rank repository ecosystems, coding clients, or models"
+  ]
+}

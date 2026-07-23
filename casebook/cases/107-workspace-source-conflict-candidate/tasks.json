@@ -1,0 +1,14 @@
+[
+  {
+    "id": "workspace-source-candidate-current-signing-check",
+    "prompt": "Create `release-signing-check.md` from the current governed workspace context. Record the production signing mode and deployment API timeout. Do not reuse superseded or cross-tenant instructions.",
+    "must_include": [
+      "GitHub Actions OIDC keyless signing",
+      "800 ms"
+    ],
+    "must_not_include": [
+      "macOS keychain certificate",
+      "static cloud credentials"
+    ]
+  }
+]

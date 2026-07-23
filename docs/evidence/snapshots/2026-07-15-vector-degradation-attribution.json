@@ -1,0 +1,106 @@
+{
+  "run_id": "w13-vector-degradation-attribution-20260715-v1",
+  "implementation_revision": "b1ca093",
+  "w12_attribution_revision": "29a3429",
+  "case_sha256": "ae00edce919813287c21ff06f53a8d104b911254a4cb34c5648e57eeb0235125",
+  "environment": {
+    "os": "Darwin 27.0 arm64",
+    "cpu": "Apple M4 Pro",
+    "memory_bytes": 51539607552,
+    "go": "go1.26.5 darwin/arm64",
+    "postgresql": "18.4",
+    "pgvector": "0.8.5"
+  },
+  "w12_original": {
+    "implementation_revision": "c41edfa423de0ccda7b52262942aef3f1f14d101",
+    "raw_log_sha256": "8854564d5e2ae4ee7f6f5c6447917ea436df474a6c5733b026013e0af8a4cd2f",
+    "requested_vector_queries": 550,
+    "effective_vector_queries": 138,
+    "degraded_queries": 412,
+    "failure_code_breakdown_recorded": false
+  },
+  "w12_attribution_replay": {
+    "raw_log_sha256": "88b876f933876d650522ba7f50cb1d3cbff20a0f16e6b4f41fba1cab1795e413",
+    "requested_vector_queries": 550,
+    "effective_vector_queries": 145,
+    "projection_lag_fallbacks": 405,
+    "other_degraded_queries": 0,
+    "correct_target_results": 1000,
+    "cross_scope_leaks": 0,
+    "final_lag": 0,
+    "query_p50_ms": 13,
+    "query_p95_ms": 212,
+    "query_p99_ms": 253,
+    "vector_snapshot_ms": 337625,
+    "database_size_bytes": 2709165759,
+    "real_provider_requests": 2,
+    "test_duration_seconds": 472.11
+  },
+  "projection_current_control": {
+    "implementation_revision": "b1ca093",
+    "raw_log_sha256": "7407b497ebfba629971bb21ff08705d9b6b45fb3796cf3c7b729f062a5f46810",
+    "active_memories": 100000,
+    "vector_rows": 100000,
+    "requested_vector_queries": 550,
+    "effective_vector_queries": 550,
+    "degraded_queries": 0,
+    "cross_scope_leaks": 0,
+    "query_p50_ms": 134,
+    "query_p95_ms": 248,
+    "query_p99_ms": 287,
+    "vector_snapshot_ms": 352484,
+    "database_size_bytes": 1728173759,
+    "test_duration_seconds": 367.793
+  },
+  "rejected_hypothesis": {
+    "name": "scoped HNSW recall shortage",
+    "decision": "rejected",
+    "reasons": [
+      "the production query plan selected the scope B-tree and exact sort for the frozen fixture",
+      "the 100000-vector projection-current control completed 550 of 550 vector requests without degradation",
+      "the instrumented concurrent replay classified every degraded request as projection_lag and recorded zero other degraded requests"
+    ]
+  },
+  "preserved_fixture_attempts": [
+    {
+      "name": "medium scope-index plan",
+      "raw_log_sha256": "e3e510ecaa13c78fc81b612cb5a13227eb06c60a26d641202a9bb08ac8ab4ba3",
+      "result": "rejected because the simplified query used the scope B-tree"
+    },
+    {
+      "name": "medium sequential plan",
+      "raw_log_sha256": "b7923b94831005fc624dce7f1161ce81397dfc1fefb0966fa1a57849415f22b5",
+      "result": "rejected because removing the scope index selected a sequential scan"
+    },
+    {
+      "name": "medium bitmap plan",
+      "raw_log_sha256": "7a6ad64be3059ca4bc7b81716a657a011b5ed9d990c5f6707ca18d9e0a89e1cf",
+      "result": "rejected because disabling sequential scan selected a primary-key bitmap scan"
+    },
+    {
+      "name": "medium forced HNSW control",
+      "raw_log_sha256": "44b9af7b6423e1464d5950eb66d59d193192f6cbc3d1ec7051fe30e50470762a",
+      "result": "200 of 200 effective vector requests, but non-representative because disposable indexes were removed"
+    },
+    {
+      "name": "full simplified-plan check",
+      "raw_log_sha256": "2e65d9719f9ada17d256308641672d95803c9f79b09716833eff8e301b43fefb",
+      "result": "rejected because the evaluator inspected a simplified query instead of production SQL"
+    },
+    {
+      "name": "full production-plan check",
+      "raw_log_sha256": "0d360b43cf2f60f298d1a6a97ca50f464be9eb682e124cf2e7567d00fbef4c5d",
+      "result": "production SQL used the scope B-tree; the HNSW hypothesis was falsified before query execution"
+    }
+  ],
+  "hard_gates": {
+    "pass": true,
+    "current_projection_effective_vector_queries": 550,
+    "current_projection_degraded_queries": 0,
+    "concurrent_requested_equals_effective_plus_projection_lag": true,
+    "concurrent_other_degraded_queries": 0,
+    "correct_target_results": true,
+    "scope_leakage": 0,
+    "production_retrieval_change_required": false
+  }
+}
