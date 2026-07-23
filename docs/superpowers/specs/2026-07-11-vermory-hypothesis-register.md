@@ -219,10 +219,11 @@ Names, payloads, streaming behavior, and transport remain versioned rather than 
 
 This hypothesis intentionally does not introduce a generic task scheduler, durable arbitrary tool state, or automatic truth promotion.
 
-### H-017 W36 qualification update (2026-07-23)
+### H-017 W36 exact-commit qualification update (2026-07-23)
 
-The external-disk W36 runtime trajectory passed all 28 frozen hard gates on a
-fresh PostgreSQL 18.4 cluster. The run used the actual compiled OpenClaw
+The external-disk W36 runtime trajectory passed all 28 frozen hard gates on
+exact implementation revision `bc0eb0e90bba0d9f0013f38cd12f788d979ad1cd`
+and a fresh PostgreSQL 18.4 cluster. The run used the actual compiled OpenClaw
 plugin hooks, two Vermory and PostgreSQL restart cycles, an expired-lease
 reclaim, retained stale-write failures, a concurrent cancel/complete race,
 cross-tenant and cross-continuity probes, Hermes bounded complete/fail
@@ -233,7 +234,7 @@ identities.
 This is runtime evidence, not model-quality evidence. No LLM ranking,
 embedding-quality, Hermes long-running, offline synchronization, or generic
 workflow-scheduler claim is inferred. The status remains `testing` until the
-same case is rerun against the protected exact commit head after delivery.
+same pushed revision completes the protected PR checks.
 
 ## 3. Decision Records
 

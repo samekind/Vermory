@@ -10,13 +10,14 @@ Evidence level: `public`
 
 The normalized runtime report is retained on the external evidence disk at:
 
-`/Volumes/JSData/.cache/vermory/w36/runs/w36-worktree-dumprestore-attempt5/report.json`
+`/Volumes/JSData/.cache/vermory/w36/runs/w36-exact-bc0eb0e9/report.json`
 
-The report binds the run to the frozen case SHA, candidate revision,
+The report binds the run to frozen case SHA
+`553126cd1af677018c68d79d13145203c4a64c3b329f3fbdecef32197b3efe21`, exact
+implementation revision `bc0eb0e90bba0d9f0013f38cd12f788d979ad1cd`,
 authoritative PostgreSQL counts, native dump SHA-256, and all 28 hard gates.
-The working-tree run qualifies the W36 runtime contract. A protected
-commit-head rerun is required before H-017 changes from `testing` to a
-supported public release decision.
+The exact-commit run qualifies the W36 runtime contract. H-017 remains
+`testing` until the same pushed revision completes the protected PR checks.
 
 ## Qualified Contract
 
@@ -107,20 +108,24 @@ The restored database and service reported:
 
 ```text
 leased turns              6
-completed turns           4
+completed turns           3
 failed turns              3
-cancelled turns           1
-assistant observations    4
+cancelled turns           2
+assistant observations    3
 tool-result observations  3
-formation schedules       4
-race assistant effects    1
-race formation effects    1
+formation schedules       3
+race assistant effects    0
+race formation effects    0
 ```
 
-The native dump was `174668` bytes with SHA-256
-`b33d1ae0285285592100654e5384ff77213544b7844dc8d220ca1e3d7e474922`.
+The native dump was `174318` bytes with SHA-256
+`98e4a0a8fb19bdcb52d3e4480a03ecd8125f4e9f75c9899a8d2c5b780c620321`.
 Completed, cancelled, and failed terminal receipts retained their original
 identities after restore.
+
+The cancel/complete race was won by cancellation in this exact-commit run.
+That is the second accepted terminal outcome of the frozen race contract; it
+correctly produced zero assistant and formation effects for the raced turn.
 
 ## Verification Evidence
 
@@ -150,7 +155,8 @@ Earlier worktree runs remain under the external evidence root:
 | `w36-worktree-b8fc0b380f597c7e-attempt2` | rejected | Readiness probe used local `jstar`, not `postgres` |
 | `w36-worktree-b8fc0b380f597c7e-attempt3` | rejected | Full operation ID was used as OpenClaw `run_id` |
 | `w36-worktree-b8fc0b380f597c7e-attempt4` | passed pre-dump | Established the 28-gate trajectory before dump/restore was added |
-| `w36-worktree-dumprestore-attempt5` | accepted | Complete W36 run including native dump/restore |
+| `w36-worktree-dumprestore-attempt5` | accepted worktree precursor | Complete W36 run including native dump/restore |
+| `w36-exact-bc0eb0e9` | accepted exact commit | All 28 gates, native dump/restore, and residue checks passed on `bc0eb0e90bba0d9f0013f38cd12f788d979ad1cd` |
 
 Failed run directories contain sanitized logs only; their temporary clusters
 and credentials were removed.
