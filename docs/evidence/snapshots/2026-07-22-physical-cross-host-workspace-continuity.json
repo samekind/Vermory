@@ -1,11 +1,11 @@
 {
-  "evidence_version": 1,
+  "evidence_version": 2,
   "case_id": "W34-physical-cross-host-workspace-continuity",
   "reality_case_id": "W05-trusted-workspace-attachment",
-  "status": "physical-runtime-qualified-grok-generation-external-blocked",
+  "status": "physical-cross-host-grok-client-qualified",
   "evidence_level": "public",
-  "executed_at": "2026-07-23T00:20:24+08:00",
-  "source_head": "ceafea623791beeeb1f2a10e70f3f45a0bae494c",
+  "executed_at": "2026-07-23T19:55:03+08:00",
+  "source_head": "2f67366b0b6afb29393dd96bc50aebbf044b61d5",
   "contract": {
     "case_sha256": "ed8de0a2a04e6ab58e68be9b6abb05b38da7b68fe9e198d2eb9d830e6d3f555d",
     "spec_sha256": "d3d12b94e576e81eb20429b5f2719e4085979e505d6fe36207a89f3a839586c8",
@@ -13,82 +13,91 @@
   },
   "protected_ci": {
     "repository": "samekind/Vermory",
-    "pull_request": 1,
-    "draft": true,
-    "run_id": 29934847722,
-    "run_url": "https://github.com/samekind/Vermory/actions/runs/29934847722",
+    "pull_request": 2,
+    "draft": false,
+    "review_decision": "REVIEW_REQUIRED",
+    "run_id": 29991498524,
+    "run_url": "https://github.com/samekind/Vermory/actions/runs/29991498524",
     "conclusion": "success",
     "jobs": {
-      "test": 88973645778,
-      "linux_service_amd64": 88973645579,
-      "linux_service_arm64": 88973645465,
-      "deb_amd64": 88973645539,
-      "rpm_amd64": 88973645507,
-      "deb_arm64": 88973645641,
-      "rpm_arm64": 88973645585,
-      "sign_snapshot": 88974697163
+      "test": 89155182803,
+      "linux_service_amd64": 89155182796,
+      "linux_service_arm64": 89155182872,
+      "deb_amd64": 89155182797,
+      "rpm_amd64": 89155182835,
+      "deb_arm64": 89155182846,
+      "rpm_arm64": 89155182823,
+      "apt_repository_amd64": 89155482718,
+      "apt_repository_arm64": 89155482721,
+      "dnf_repository_amd64": 89155482672,
+      "dnf_repository_arm64": 89155482679,
+      "apt_lifecycle_amd64": 89155496526,
+      "apt_lifecycle_arm64": 89155496503,
+      "dnf_lifecycle_amd64": 89155496532,
+      "dnf_lifecycle_arm64": 89155496502,
+      "sign_snapshot": 89156161069
     }
   },
   "signed_snapshot": {
-    "artifact_id": 8535789948,
-    "artifact_name": "vermory-pr-snapshot-ceafea623791beeeb1f2a10e70f3f45a0bae494c",
-    "artifact_bytes": 44253308,
-    "artifact_api_digest": "sha256:9bce20e9653c972a6617cf6917f91dd4826c2582f6e651ef530555e82e0b2b37",
-    "independent_zip_sha256": "9bce20e9653c972a6617cf6917f91dd4826c2582f6e651ef530555e82e0b2b37",
-    "manifest_entries": 12,
+    "artifact_id": 8557394490,
+    "artifact_name": "vermory-pr-snapshot-2f67366b0b6afb29393dd96bc50aebbf044b61d5",
+    "artifact_bytes": 66675000,
+    "artifact_api_digest": "sha256:2b1115a5a316cab461d728527a4d2903660ada499118c39125941ed58b3affb4",
+    "independent_zip_sha256": "2b1115a5a316cab461d728527a4d2903660ada499118c39125941ed58b3affb4",
+    "manifest_entries": 16,
     "checksums_entries": 8,
-    "manifest_sha256": "070499c3841b5fb52535683941f9faf2cefafb22e638ac8d151ff4467cd683c4",
-    "checksums_sha256": "6c8669a4848a59728f2389b8efc944a3c98cd64e2489807886349ce805f537df",
-    "sigstore_bundle_sha256": "ddb08105192357b98ac5653115cd52412178d615a4bf879ebf528d8ee6aba62b",
+    "manifest_sha256": "1ef56d66d8d0cef623b618560df063c3dfaab10608c5de1f0f71c4b02bce4654",
+    "checksums_sha256": "0cdfede79c05b8719791c64535e71e6d128f5df23e80d4f098b7d7a5f7872fd3",
+    "sigstore_bundle_sha256": "19521956e66d4572d708810f7df66f6fe4e21c528c49ea342cf749051ac0eae4",
     "cosign_version": "v3.0.6",
     "cosign_sha256": "5fadd012ae6381a6a29ff86a7d39aa873878852f1073fc90b15995961ecfb084",
-    "workflow_identity": "https://github.com/samekind/Vermory/.github/workflows/ci.yml@refs/pull/1/merge",
+    "workflow_identity": "https://github.com/samekind/Vermory/.github/workflows/ci.yml@refs/pull/2/merge",
     "oidc_issuer": "https://token.actions.githubusercontent.com",
-    "tlog_entry_index": "2218560113",
-    "inclusion_proof_index": "2096655851",
+    "tlog_entry_index": "2224043187",
+    "inclusion_proof_index": "2102138925",
     "positive_verification": "pass",
     "modified_manifest_rejection": "pass",
     "wrong_identity_rejection": "pass",
-    "darwin_arm64_binary_sha256": "48947a5cd587ea1d4724fce098f68c7dbff5b238f5f5a6b68b6bd40a3a8bbdcf",
-    "darwin_arm64_revision": "ceafea623791beeeb1f2a10e70f3f45a0bae494c"
+    "darwin_arm64_binary_sha256": "5328479583111894b14752a133ff969c84f5b75775bd60239e1260e424e85da0",
+    "darwin_arm64_revision": "2f67366b0b6afb29393dd96bc50aebbf044b61d5"
   },
   "hosts": {
     "source": {
       "label": "operator-workstation",
       "storage": "external-volume",
-      "root_sha256": "55a6ef35fd0fb88b247aef475806fcf7c1bc7783ba0b7cbdf75b9ac5e02fbc12",
+      "root_sha256": "cb34e12516c673b18982623d7e358044f79bafa87045641913503d308c8e4e57",
       "namespace": "w34-workstation-source",
       "git_remote": "https://github.com/samekind/Vermory.git",
-      "git_commit": "ceafea623791beeeb1f2a10e70f3f45a0bae494c",
+      "git_commit": "2f67366b0b6afb29393dd96bc50aebbf044b61d5",
       "git_bare": false,
-      "git_common_fingerprint": "bff31503527966862e1a5b7598e8432f7bf65205ae8f56c6d425ea19f8eaad44",
-      "attachment_fingerprint": "46318d678c2424740c0f677f7fbd92e67a0e3c073f63210b27a05922512825d5"
+      "git_common_fingerprint": "e243669388572c8080e30821b661d1ef0e38811d46b8d6c930c2542da4ce808d",
+      "attachment_fingerprint": "013c78904d79f9f1691b6a974f57430a7b2ba3eade42668c0333b422c8b2951d"
     },
     "target": {
       "label": "macmini-runtime",
       "storage": "isolated-w34-root",
-      "root_sha256": "822bebb572c0dd5b58dca1816cc7354710d138efeb844ad04554fc1de34601e0",
+      "root_sha256": "3fd27f82167b7e46a078537cbc296973704db2b81e01e90e328a2c696d8500b2",
       "namespace": "w34-macmini-target",
       "git_remote": "https://github.com/samekind/Vermory.git",
-      "git_commit": "ceafea623791beeeb1f2a10e70f3f45a0bae494c",
+      "git_commit": "2f67366b0b6afb29393dd96bc50aebbf044b61d5",
       "git_bare": false,
-      "git_common_fingerprint": "c0aeee3a8b6961e171fca223c17d58672d914298320e1212fd54fd8bd6dbc319",
-      "attachment_fingerprint": "eb3b36fdb875ed14d8dcbf284bd7969658ae964cdfa8df294f83d494a3d19b7c"
+      "git_common_fingerprint": "059c3288da4b8acbb3e13a20f8d7b435c5bff67f3b504883c3fb2783a04dd468",
+      "attachment_fingerprint": "44889dd54036206c4c7ced5da631cdfe1f429c0910c7019c53b17137b4bf1d64"
     }
   },
   "database": {
     "server": "PostgreSQL 18.3",
-    "schema_version": 24,
-    "runtime_role": "vermory_w34_runtime_ceafea6",
+    "schema_version": 25,
+    "runtime_role": "vermory_w34_runtime_2f67366_091822",
     "runtime_current_user_matches_session_user": true,
-    "runtime_schema_function": 24,
+    "runtime_schema_function": 25,
     "credential_retained_in_snapshot": false
   },
   "authority": {
     "tenant_id": "w34-physical-cross-host",
     "other_tenant_id": "w34-physical-cross-host-other",
-    "continuity_id": "306f5c58-3dc2-4b76-9c2e-9897700a38d3",
-    "other_continuity_id": "db1f4a84-e859-40c1-bbd2-bea88345d42e",
+    "continuity_id": "07b01687-6638-4d61-b46a-9378b4e635d1",
+    "other_continuity_id": "7b376b37-797f-4f04-a633-eb794dbbf3aa",
     "current_fact": "continuation_marker=w34-current",
     "other_tenant_fact": "continuation_marker=w34-other-tenant-only"
   },
@@ -101,8 +110,8 @@
     "after_counts": {"deliveries": 0, "observations": 1, "memories": 1}
   },
   "rebind": {
-    "bridge_id": "264a7288-7f9a-410c-ab60-d56b54257ab3",
-    "operation_id": "w34-ceafea6-rebind-device-migration",
+    "bridge_id": "208048ff-8d57-4722-a2a0-0a0ba91304be",
+    "operation_id": "w34-2f67366-091822-rebind2",
     "status_before_reversal": "active",
     "continuity_preserved": true,
     "source_binding_after_rebind": "retired",
@@ -129,32 +138,46 @@
     "other_context_current_fact": false,
     "artifact_sha256": "ede4f57a80f003593489ed55de503804ff17f65bc1c5ca671ee6b468c20bc21b",
     "artifact_content_exact": true,
-    "delivery_id": "236cda8d-e046-4dba-809d-ce5c420d68fb",
-    "observation_id": "a1692de6-f4b7-476c-9564-6fab3921b361",
-    "memory_id": "3f80707c-1af7-450f-8ce7-9afbd1cc660d",
+    "delivery_id": "df6fdcdb-ad4e-4658-83ca-50c30ed9fbf1",
+    "observation_id": "6a342176-f6bd-4202-8aa5-dbe2f5b3c4dc",
+    "memory_id": "c79651fc-870a-4b15-8bce-dc5cdcfad82f",
     "memory_status": "proposed",
     "first_replayed": false,
     "exact_replay": true,
     "proposed_projection_rows": 0,
-    "target_delivery_count": 1,
-    "other_tenant_delivery_count": 1
+    "accepted_target_delivery_count": 1,
+    "accepted_other_tenant_delivery_count": 1
   },
   "grok_attempt": {
     "client": "grok-cli",
     "version": "0.2.101 (5bc4b5dfadcf)",
     "fresh_isolated_state": true,
     "prompt_contained_fact_value": false,
-    "status": "external_blocked",
-    "failure_class": "authentication_expired",
-    "error": "Not signed in; device-code login required",
-    "prepare_calls": 0,
-    "commit_calls": 0,
-    "deliveries": 0,
-    "observations": 0,
-    "artifacts": 0
+    "status": "pass",
+    "failure_class": "",
+    "primary_route": "grok-build",
+    "primary_route_status": "spending-limit-fallback",
+    "model": "grok-4.5-build-free",
+    "session_id": "019f8ecf-b433-7242-819a-63ca973e3a1f",
+    "request_id": "1d2275c6-bbc3-4093-b37c-0187f223b5e0",
+    "model_calls": 5,
+    "prepare_calls": 1,
+    "commit_calls": 1,
+    "file_edits": 1,
+    "deliveries": 1,
+    "observations": 1,
+    "artifacts": 1,
+    "prepare_completed_at": "2026-07-23T11:50:10.229Z",
+    "artifact_completed_at": "2026-07-23T11:50:13.384Z",
+    "commit_started_at": "2026-07-23T11:50:15.354Z",
+    "sequential_order_verified": true,
+    "first_commit_replayed": false,
+    "trace_sha256": "2f04c5d8bcce894f00f0c1dc8807b47fe6d3d8157f4fcb4070ed54d5db9a360a",
+    "session_export_sha256": "a16b024eb08b84765060d9b517f6e6e9e4925b7334ba8ceb9444cbb312285bd4",
+    "stream_sha256": "19427067c1b9997acfbc589c64b9afba0ce85b0807be3c33d39d66845ca3c2b3"
   },
   "reversal": {
-    "operation_id": "w34-ceafea6-reverse-device-migration",
+    "operation_id": "w34-2f67366-091822-reverse2",
     "bridge_status": "reversed",
     "source_binding": "confirmed",
     "target_binding": "retired",
@@ -171,10 +194,10 @@
     "other_tenant_memory_status": "active"
   },
   "hard_gate_summary": {
-    "passed": 28,
-    "external_blocked": 4,
+    "passed": 32,
+    "external_blocked": 0,
     "platform_failed": 0,
-    "qualified_32_of_32": false
+    "qualified_32_of_32": true
   },
   "hard_gates": [
     {"id": 1, "status": "pass", "gate": "two distinct physical hosts"},
@@ -196,14 +219,14 @@
     {"id": 17, "status": "pass", "gate": "other tenant remained isolated"},
     {"id": 18, "status": "pass", "gate": "active auditable bridge operation"},
     {"id": 19, "status": "pass", "gate": "rebind replay was idempotent"},
-    {"id": 20, "status": "pass", "gate": "Grok MCP doctor negotiated protocol 2025-06-18"},
-    {"id": 21, "status": "pass", "gate": "Grok MCP exposed exactly two normal-flow tools"},
-    {"id": 22, "status": "pass", "gate": "tool schema exposed no governance authority"},
-    {"id": 23, "status": "external_blocked", "gate": "fresh authenticated Grok called prepare_context"},
-    {"id": 24, "status": "external_blocked", "gate": "Grok received current context without forbidden fact"},
-    {"id": 25, "status": "external_blocked", "gate": "Grok wrote deterministic target artifact"},
+    {"id": 20, "status": "pass", "gate": "Grok MCP doctor negotiated protocol 2025-06-18", "client": "grok-cli"},
+    {"id": 21, "status": "pass", "gate": "Grok MCP exposed exactly two normal-flow tools", "client": "grok-cli"},
+    {"id": 22, "status": "pass", "gate": "tool schema exposed no governance authority", "client": "grok-cli"},
+    {"id": 23, "status": "pass", "gate": "fresh authenticated Grok called prepare_context", "client": "grok-cli"},
+    {"id": 24, "status": "pass", "gate": "Grok received current context without forbidden fact", "client": "grok-cli"},
+    {"id": 25, "status": "pass", "gate": "Grok wrote deterministic target artifact", "client": "grok-cli"},
     {"id": 26, "status": "pass", "gate": "artifact content and SHA-256 matched", "client": "independent-go-mcp-sdk"},
-    {"id": 27, "status": "external_blocked", "gate": "Grok called commit_observation with delivery id"},
+    {"id": 27, "status": "pass", "gate": "Grok called commit_observation with delivery id", "client": "grok-cli"},
     {"id": 28, "status": "pass", "gate": "client writeback remained proposed", "client": "independent-go-mcp-sdk"},
     {"id": 29, "status": "pass", "gate": "exact writeback replay returned the same observation", "client": "independent-go-mcp-sdk"},
     {"id": 30, "status": "pass", "gate": "PostgreSQL ledger and tenant isolation agreed"},
@@ -212,19 +235,29 @@
   ],
   "retained_failures": [
     {
-      "stage": "real-grok-generation",
+      "stage": "initial-grok-authentication",
       "classification": "external_client_authentication",
-      "result": "Not signed in; no MCP call or authoritative side effect"
+      "result": "expired refresh token rejected before model generation; zero MCP or database side effects"
     },
     {
-      "stage": "remote-go-test",
-      "classification": "transport_and_dependency_download",
-      "result": "long SSH command disconnected; checksum-identical Darwin ARM64 test binary passed on the Mac mini"
+      "stage": "grok-attempt-1",
+      "classification": "client_toolset_configuration",
+      "result": "search_replace required read_file; session creation failed with zero MCP or database side effects"
     },
     {
-      "stage": "remote-cosign-download",
-      "classification": "upstream_download_stall",
-      "result": "stalled process terminated; official checksum-verified binary downloaded to external volume and used independently"
+      "stage": "grok-attempt-2",
+      "classification": "target_provider_network",
+      "result": "target provider route stalled; process was terminated after zero MCP or database side effects"
+    },
+    {
+      "stage": "grok-attempt-3",
+      "classification": "client_sequence_violation",
+      "result": "commit completed before the artifact edit; the bridge was reversed and the proposed-only writeback was retained without projection"
+    },
+    {
+      "stage": "target-git-clone",
+      "classification": "managed_transport_disconnect",
+      "result": "remote HTTPS clone disconnected; a source bundle was transferred and the target was recreated with git clone at the same commit and remote"
     }
   ],
   "privacy": {
@@ -233,12 +266,13 @@
     "provider_key_retained": false,
     "database_password_retained": false,
     "raw_auth_material_retained": false,
+    "raw_trace_committed": false,
     "personal_home_path_retained": false
   },
   "claim_boundary": {
-    "qualified": "signed physical cross-host workspace rebind runtime, tenant isolation, MCP behavior, proposed-only writeback, replay, and reversal",
+    "qualified": "signed two-physical-host workspace rebind, real Grok MCP context consumption, sequential artifact and proposed writeback, exact replay, tenant isolation, and reversal",
     "not_qualified": [
-      "Grok generation or complete 32-of-32 W34 trajectory",
+      "the paid grok-build route or model ranking",
       "Cursor generation",
       "automatic clone identity merging",
       "uncommitted workspace state transfer",

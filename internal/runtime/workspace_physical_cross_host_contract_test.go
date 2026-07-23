@@ -55,13 +55,17 @@ type workspacePhysicalCrossHostEvidence struct {
 		ProjectionRows int    `json:"proposed_projection_rows"`
 	} `json:"runtime_probe"`
 	GrokAttempt struct {
-		Status       string `json:"status"`
-		FailureClass string `json:"failure_class"`
-		PrepareCalls int    `json:"prepare_calls"`
-		CommitCalls  int    `json:"commit_calls"`
-		Deliveries   int    `json:"deliveries"`
-		Observations int    `json:"observations"`
-		Artifacts    int    `json:"artifacts"`
+		Status                  string `json:"status"`
+		FailureClass            string `json:"failure_class"`
+		Model                   string `json:"model"`
+		PrimaryRouteStatus      string `json:"primary_route_status"`
+		PrepareCalls            int    `json:"prepare_calls"`
+		CommitCalls             int    `json:"commit_calls"`
+		Deliveries              int    `json:"deliveries"`
+		Observations            int    `json:"observations"`
+		Artifacts               int    `json:"artifacts"`
+		SequentialOrderVerified bool   `json:"sequential_order_verified"`
+		FirstCommitReplayed     bool   `json:"first_commit_replayed"`
 	} `json:"grok_attempt"`
 	Reversal struct {
 		BridgeStatus          string `json:"bridge_status"`
@@ -140,7 +144,7 @@ func TestW34PhysicalCrossHostEvidencePreservesClientBoundary(t *testing.T) {
 		t.Fatal(err)
 	}
 	if evidence.CaseID != "W34-physical-cross-host-workspace-continuity" ||
-		evidence.Status != "physical-runtime-qualified-grok-generation-external-blocked" ||
+		evidence.Status != "physical-cross-host-grok-client-qualified" ||
 		evidence.SourceHead == "" || evidence.ProtectedCI.Conclusion != "success" {
 		t.Fatalf("unexpected W34 evidence identity: %#v", evidence)
 	}
@@ -158,10 +162,14 @@ func TestW34PhysicalCrossHostEvidencePreservesClientBoundary(t *testing.T) {
 		!evidence.RuntimeProbe.ExactReplay || !evidence.RuntimeProbe.ArtifactExact || evidence.RuntimeProbe.ProjectionRows != 0 {
 		t.Fatalf("W34 runtime probe evidence drifted: %#v", evidence.RuntimeProbe)
 	}
-	if evidence.GrokAttempt.Status != "external_blocked" || evidence.GrokAttempt.FailureClass != "authentication_expired" ||
-		evidence.GrokAttempt.PrepareCalls != 0 || evidence.GrokAttempt.CommitCalls != 0 ||
-		evidence.GrokAttempt.Deliveries != 0 || evidence.GrokAttempt.Observations != 0 || evidence.GrokAttempt.Artifacts != 0 {
-		t.Fatalf("W34 Grok failure was blurred into a runtime pass: %#v", evidence.GrokAttempt)
+	if evidence.GrokAttempt.Status != "pass" || evidence.GrokAttempt.FailureClass != "" ||
+		evidence.GrokAttempt.Model != "grok-4.5-build-free" ||
+		evidence.GrokAttempt.PrimaryRouteStatus != "spending-limit-fallback" ||
+		evidence.GrokAttempt.PrepareCalls != 1 || evidence.GrokAttempt.CommitCalls != 1 ||
+		evidence.GrokAttempt.Deliveries != 1 || evidence.GrokAttempt.Observations != 1 ||
+		evidence.GrokAttempt.Artifacts != 1 || !evidence.GrokAttempt.SequentialOrderVerified ||
+		evidence.GrokAttempt.FirstCommitReplayed {
+		t.Fatalf("W34 accepted Grok trajectory drifted: %#v", evidence.GrokAttempt)
 	}
 	if evidence.Reversal.BridgeStatus != "reversed" || evidence.Reversal.SourceBinding != "confirmed" ||
 		evidence.Reversal.TargetBinding != "retired" || evidence.Reversal.OtherTargetBinding != "confirmed" ||
@@ -169,22 +177,21 @@ func TestW34PhysicalCrossHostEvidencePreservesClientBoundary(t *testing.T) {
 		!evidence.Reversal.TargetDeliveryIDEmpty || evidence.Reversal.TargetDeliveryRows != 0 {
 		t.Fatalf("W34 reversal evidence drifted: %#v", evidence.Reversal)
 	}
-	if evidence.HardGateSummary.Passed != 28 || evidence.HardGateSummary.ExternalBlocked != 4 ||
-		evidence.HardGateSummary.PlatformFailed != 0 || evidence.HardGateSummary.Qualified32Of32 || len(evidence.HardGates) != 32 {
+	if evidence.HardGateSummary.Passed != 32 || evidence.HardGateSummary.ExternalBlocked != 0 ||
+		evidence.HardGateSummary.PlatformFailed != 0 || !evidence.HardGateSummary.Qualified32Of32 || len(evidence.HardGates) != 32 {
 		t.Fatalf("W34 hard-gate summary is invalid: summary=%#v gates=%d", evidence.HardGateSummary, len(evidence.HardGates))
 	}
-	blocked := map[int]bool{23: true, 24: true, 25: true, 27: true}
 	seen := make(map[int]bool, len(evidence.HardGates))
 	for _, gate := range evidence.HardGates {
 		if gate.ID < 1 || gate.ID > 32 || seen[gate.ID] {
 			t.Fatalf("invalid W34 hard-gate id: %#v", gate)
 		}
 		seen[gate.ID] = true
-		if blocked[gate.ID] && gate.Status != "external_blocked" {
-			t.Fatalf("Grok gate %d was incorrectly qualified: %#v", gate.ID, gate)
-		}
-		if !blocked[gate.ID] && gate.Status != "pass" {
+		if gate.Status != "pass" {
 			t.Fatalf("runtime gate %d unexpectedly failed: %#v", gate.ID, gate)
+		}
+		if (gate.ID == 23 || gate.ID == 24 || gate.ID == 25 || gate.ID == 27) && gate.Client != "grok-cli" {
+			t.Fatalf("Grok runtime gate %d lost client provenance: %#v", gate.ID, gate)
 		}
 		if (gate.ID == 26 || gate.ID == 28 || gate.ID == 29) && gate.Client != "independent-go-mcp-sdk" {
 			t.Fatalf("SDK runtime gate %d lost client provenance: %#v", gate.ID, gate)
@@ -209,8 +216,9 @@ func TestW34PhysicalCrossHostEvidencePreservesClientBoundary(t *testing.T) {
 	matrix := strings.Join(strings.Fields(strings.ToLower(string(capabilityMatrix))), " ")
 	for _, required := range []string{
 		"physical cross-host continuity",
-		"w34 now qualifies the signed two-physical-host platform runtime",
-		"four grok generation gates remain externally blocked",
+		"w34 now qualifies the signed two-physical-host grok client trajectory",
+		"32 / 32",
+		"paid `grok-build` route remains outside the qualified boundary",
 	} {
 		if !strings.Contains(matrix, required) {
 			t.Fatalf("W34 capability matrix lost required boundary %q", required)
@@ -218,6 +226,9 @@ func TestW34PhysicalCrossHostEvidencePreservesClientBoundary(t *testing.T) {
 	}
 	if strings.Contains(matrix, "or physical cross-host migration.") {
 		t.Fatal("W34 capability matrix still reports physical cross-host migration as unqualified")
+	}
+	if strings.Contains(matrix, "w34 grok generation remains externally blocked") {
+		t.Fatal("W34 capability matrix still reports the accepted Grok trajectory as blocked")
 	}
 }
 
